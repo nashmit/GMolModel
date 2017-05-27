@@ -1,0 +1,72 @@
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:49,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bAddParams.hpp:11,
+                 from bAddParams.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/bondGeometry.h:44:1: warning: multi-line comment
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/bondGeometry.h:47:1: warning: multi-line comment
+In file included from /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/ext/hash_map:60,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/VoxelHash.h:11,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/AtomSubsystem.h:6,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:51,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bAddParams.hpp:11,
+                 from bAddParams.cpp:1:
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/backward/backward_warning.h:28:2: warning: #warning This file includes at least one deprecated or antiquated header which may be removed without further notice at a future date. Please use a non-deprecated interface with equivalent functionality instead. For a listing of replacement headers and interfaces, consult the file backward_warning.h. To disable this warning use -Wno-deprecated.
+In file included from bMoleculeReader.hpp:15,
+                 from bAddParams.hpp:12,
+                 from bAddParams.cpp:1:
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:549:1: warning: multi-line comment
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:552:1: warning: multi-line comment
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:53,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bAddParams.hpp:11,
+                 from bAddParams.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In member function 'SimTK::Compound& SimTK::Compound::setAtomBiotype(const SimTK::Compound::AtomPathName&, const SimTK::String&, const SimTK::String&, SimTK::Ordinality::Residue)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1134: warning: comparison between signed and unsigned integer expressions
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In constructor 'SimTK::MethyleneGroup::MethyleneGroup()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1439: warning: unused variable 'C_Hdistance'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In constructor 'SimTK::ResidueInfo::AtomInfo::AtomInfo(SimTK::Compound::AtomIndex, const SimTK::Compound::AtomName&)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1763: warning: 'SimTK::ResidueInfo::AtomInfo::pdbAtomName' will be initialized after
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1762: warning:   'SimTK::Compound::AtomIndex SimTK::ResidueInfo::AtomInfo::biopolymerAtomIndex'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1751: warning:   when initialized here
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:54,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bAddParams.hpp:11,
+                 from bAddParams.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::Cysteine::Cysteine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:328: warning: unused variable 'S_C_Cangle'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::DisulphideBridgedCysteine::DisulphideBridgedCysteine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:353: warning: unused variable 'H_Sdistance'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:359: warning: unused variable 'S_C_Cangle'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::Histidine::Histidine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:494: warning: unused variable 'NE_CDdistance'
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:72,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bAddParams.hpp:11,
+                 from bAddParams.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h: In constructor 'SimTK::CompoundModeler::RigidUnit::RigidUnit(SimTK::CompoundModeler::RigidUnitIndex, SimTK::CompoundModeler&)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:103: warning: 'SimTK::CompoundModeler::RigidUnit::myIndex' will be initialized after
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:100: warning:   'SimTK::CompoundModeler* SimTK::CompoundModeler::RigidUnit::compoundModeler'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:52: warning:   when initialized here
+bAddParams.cpp: In function 'SimTK::Real bDihedral(SimTK::Vec3, SimTK::Vec3, SimTK::Vec3, SimTK::Vec3)':
+bAddParams.cpp:12: warning: unused variable 'dih'
+bAddParams.cpp: In function 'void bAddGaffParams(SimTK::DuMMForceFieldSubsystem&, const char*, int, bSpecificAtom*, unsigned int, bBond*, std::string)':
+bAddParams.cpp:370: warning: format '%s' expects type 'char*', but argument 3 has type 'char (*)[(((long unsigned int)(((long int)ATOMTYPE_MAX_LEN) + -0x00000000000000001)) + 1)]'
+bAddParams.cpp:442: warning: format '%s' expects type 'char*', but argument 3 has type 'char (*)[(((long unsigned int)(((long int)ATOMTYPE_MAX_LEN) + -0x00000000000000001)) + 1)]'
+bAddParams.cpp:827: warning: deprecated conversion from string constant to 'char*'
+bAddParams.cpp:828: warning: deprecated conversion from string constant to 'char*'
+bAddParams.cpp:856: warning: deprecated conversion from string constant to 'char*'
+bAddParams.cpp:808: warning: unused variable 'atomType'
+In file included from /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/algorithm:62,
+                 from bAddParams.hpp:4,
+                 from bAddParams.cpp:1:
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/bits/stl_algo.h: In function '_OIter std::transform(_IIter, _IIter, _OIter, _UnaryOperation) [with _IIter = __gnu_cxx::__normal_iterator<const char*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, _OIter = __gnu_cxx::__normal_iterator<const char*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, _UnaryOperation = int (*)(int)throw ()]':
+bAddParams.cpp:492:   instantiated from here
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/bits/stl_algo.h:4703: error: assignment of read-only location '__result.__gnu_cxx::__normal_iterator<_Iterator, _Container>::operator* [with _Iterator = const char*, _Container = std::basic_string<char, std::char_traits<char>, std::allocator<char> >]()'
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h: At global scope:
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:156: warning: 'mol_res_names' defined but not used
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:217: warning: 'mol_res_props' defined but not used
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:531: warning: 'pdb_table' defined but not used
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/DuMMForceFieldSubsystem.h:290: warning: 'SimTK::DuMM::Sigma2Radius' defined but not used
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/DuMMForceFieldSubsystem.h:292: warning: 'SimTK::DuMM::Radius2Sigma' defined but not used
+g++ -Wall -fPIC -g -c bAddParams.cpp -I/home/lspirido/Installers/simbody/SimTK-3.0/include -I/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal -I/home/lspirido/Installers/simbody/simbody-Simbody-3.0 -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/src -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/include -I/home/lspirido/Installers/boost_1_55_0 -o bAddParams.o
