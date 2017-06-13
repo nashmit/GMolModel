@@ -69,4 +69,332 @@ bAddParams.cpp:492:   instantiated from here
 /home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:531: warning: 'pdb_table' defined but not used
 /home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/DuMMForceFieldSubsystem.h:290: warning: 'SimTK::DuMM::Sigma2Radius' defined but not used
 /home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/DuMMForceFieldSubsystem.h:292: warning: 'SimTK::DuMM::Radius2Sigma' defined but not used
-g++ -Wall -fPIC -g -c bAddParams.cpp -I/home/lspirido/Installers/simbody/SimTK-3.0/include -I/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal -I/home/lspirido/Installers/simbody/simbody-Simbody-3.0 -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/src -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/include -I/home/lspirido/Installers/boost_1_55_0 -o bAddParams.o
+g++ -Wall -fPIC -g -c bAddParams.cpp -I/home/lspirido/Installers/simbody/SimTK-3.0/include -I/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal -I/home/lspirido/Installers/simbody/simbody-Simbody-3.0 -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/src -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/include -I/home/lspirido/Installers/boost_1_55_0 -o bAddParams.oIn file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:49,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bMoleculeReader.hpp:14,
+                 from bMainResidue.hpp:4,
+                 from bMainResidue.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/bondGeometry.h:44:1: warning: multi-line comment
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/bondGeometry.h:47:1: warning: multi-line comment
+In file included from /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/ext/hash_map:60,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/VoxelHash.h:11,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/AtomSubsystem.h:6,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:51,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bMoleculeReader.hpp:14,
+                 from bMainResidue.hpp:4,
+                 from bMainResidue.cpp:1:
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/backward/backward_warning.h:28:2: warning: #warning This file includes at least one deprecated or antiquated header which may be removed without further notice at a future date. Please use a non-deprecated interface with equivalent functionality instead. For a listing of replacement headers and interfaces, consult the file backward_warning.h. To disable this warning use -Wno-deprecated.
+In file included from bMoleculeReader.hpp:15,
+                 from bMainResidue.hpp:4,
+                 from bMainResidue.cpp:1:
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:549:1: warning: multi-line comment
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:552:1: warning: multi-line comment
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:53,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bMoleculeReader.hpp:14,
+                 from bMainResidue.hpp:4,
+                 from bMainResidue.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In member function 'SimTK::Compound& SimTK::Compound::setAtomBiotype(const SimTK::Compound::AtomPathName&, const SimTK::String&, const SimTK::String&, SimTK::Ordinality::Residue)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1134: warning: comparison between signed and unsigned integer expressions
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In constructor 'SimTK::MethyleneGroup::MethyleneGroup()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1439: warning: unused variable 'C_Hdistance'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In constructor 'SimTK::ResidueInfo::AtomInfo::AtomInfo(SimTK::Compound::AtomIndex, const SimTK::Compound::AtomName&)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1763: warning: 'SimTK::ResidueInfo::AtomInfo::pdbAtomName' will be initialized after
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1762: warning:   'SimTK::Compound::AtomIndex SimTK::ResidueInfo::AtomInfo::biopolymerAtomIndex'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1751: warning:   when initialized here
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:54,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bMoleculeReader.hpp:14,
+                 from bMainResidue.hpp:4,
+                 from bMainResidue.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::Cysteine::Cysteine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:328: warning: unused variable 'S_C_Cangle'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::DisulphideBridgedCysteine::DisulphideBridgedCysteine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:353: warning: unused variable 'H_Sdistance'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:359: warning: unused variable 'S_C_Cangle'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::Histidine::Histidine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:494: warning: unused variable 'NE_CDdistance'
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:72,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bMoleculeReader.hpp:14,
+                 from bMainResidue.hpp:4,
+                 from bMainResidue.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h: In constructor 'SimTK::CompoundModeler::RigidUnit::RigidUnit(SimTK::CompoundModeler::RigidUnitIndex, SimTK::CompoundModeler&)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:103: warning: 'SimTK::CompoundModeler::RigidUnit::myIndex' will be initialized after
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:100: warning:   'SimTK::CompoundModeler* SimTK::CompoundModeler::RigidUnit::compoundModeler'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:52: warning:   when initialized here
+bMainResidue.cpp: In constructor 'bMainResidue::bMainResidue(SimTK::DuMMForceFieldSubsystem&, unsigned int, bSpecificAtom*, unsigned int, bBond*, double**, double**, double*, double*, bool, std::string)':
+bMainResidue.cpp:31: warning: the address of 'int fflush(FILE*)' will always evaluate as 'true'
+bMainResidue.cpp:396: warning: comparison between signed and unsigned integer expressions
+bMainResidue.cpp:431: warning: comparison between signed and unsigned integer expressions
+bMainResidue.cpp:436: warning: comparison between signed and unsigned integer expressions
+bMainResidue.cpp:446: warning: comparison between signed and unsigned integer expressions
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h: At global scope:
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:156: warning: 'mol_res_names' defined but not used
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:217: warning: 'mol_res_props' defined but not used
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:531: warning: 'pdb_table' defined but not used
+g++ -Wall -fPIC -g -c bMainResidue.cpp -I/home/lspirido/Installers/simbody/SimTK-3.0/include -I/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal -I/home/lspirido/Installers/simbody/simbody-Simbody-3.0 -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/src -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/include -I/home/lspirido/Installers/boost_1_55_0 -o bMainResidue.og++ -Wall -fPIC -g -c bgeneral.cpp -I/home/lspirido/Installers/simbody/SimTK-3.0/include -I/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal -I/home/lspirido/Installers/simbody/simbody-Simbody-3.0 -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/src -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/include -I/home/lspirido/Installers/boost_1_55_0 -o bgeneral.oIn file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:49,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bSystem.hpp:22,
+                 from bSystem.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/bondGeometry.h:44:1: warning: multi-line comment
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/bondGeometry.h:47:1: warning: multi-line comment
+In file included from /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/ext/hash_map:60,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/VoxelHash.h:11,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/AtomSubsystem.h:6,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:51,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bSystem.hpp:22,
+                 from bSystem.cpp:1:
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/backward/backward_warning.h:28:2: warning: #warning This file includes at least one deprecated or antiquated header which may be removed without further notice at a future date. Please use a non-deprecated interface with equivalent functionality instead. For a listing of replacement headers and interfaces, consult the file backward_warning.h. To disable this warning use -Wno-deprecated.
+In file included from /share/apps/miniconda/2/include/python2.7/Python.h:8,
+                 from /share/apps/miniconda/2/include/python2.7/MMTK/core.h:9,
+                 from /share/apps/miniconda/2/include/python2.7/MMTK/universe.h:8,
+                 from bSystem.hpp:25,
+                 from bSystem.cpp:1:
+/share/apps/miniconda/2/include/python2.7/pyconfig.h:1193:1: warning: "_POSIX_C_SOURCE" redefined
+In file included from /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/x86_64-redhat-linux/bits/os_defines.h:39,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/x86_64-redhat-linux/bits/c++config.h:1687,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/iostream:39,
+                 from bSystem.hpp:4,
+                 from bSystem.cpp:1:
+/usr/include/features.h:162:1: warning: this is the location of the previous definition
+In file included from /share/apps/miniconda/2/include/python2.7/Python.h:8,
+                 from /share/apps/miniconda/2/include/python2.7/MMTK/core.h:9,
+                 from /share/apps/miniconda/2/include/python2.7/MMTK/universe.h:8,
+                 from bSystem.hpp:25,
+                 from bSystem.cpp:1:
+/share/apps/miniconda/2/include/python2.7/pyconfig.h:1215:1: warning: "_XOPEN_SOURCE" redefined
+In file included from /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/x86_64-redhat-linux/bits/os_defines.h:39,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/x86_64-redhat-linux/bits/c++config.h:1687,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/iostream:39,
+                 from bSystem.hpp:4,
+                 from bSystem.cpp:1:
+/usr/include/features.h:164:1: warning: this is the location of the previous definition
+In file included from /share/apps/miniconda/2/lib/python2.7/site-packages/numpy/core/include/numpy/ndarraytypes.h:1761,
+                 from /share/apps/miniconda/2/lib/python2.7/site-packages/numpy/core/include/numpy/ndarrayobject.h:17,
+                 from /share/apps/miniconda/2/lib/python2.7/site-packages/numpy/core/include/numpy/arrayobject.h:4,
+                 from /share/apps/miniconda/2/lib/python2.7/site-packages/numpy/core/include/numpy/oldnumeric.h:1,
+                 from /share/apps/miniconda/2/include/python2.7/MMTK/arrayobject.h:2,
+                 from /share/apps/miniconda/2/include/python2.7/MMTK/core.h:11,
+                 from /share/apps/miniconda/2/include/python2.7/MMTK/universe.h:8,
+                 from bSystem.hpp:25,
+                 from bSystem.cpp:1:
+/share/apps/miniconda/2/lib/python2.7/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION"
+In file included from bMoleculeReader.hpp:15,
+                 from bSystem.hpp:77,
+                 from bSystem.cpp:1:
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:549:1: warning: multi-line comment
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:552:1: warning: multi-line comment
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:53,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bSystem.hpp:22,
+                 from bSystem.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In member function 'SimTK::Compound& SimTK::Compound::setAtomBiotype(const SimTK::Compound::AtomPathName&, const SimTK::String&, const SimTK::String&, SimTK::Ordinality::Residue)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1134: warning: comparison between signed and unsigned integer expressions
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In constructor 'SimTK::MethyleneGroup::MethyleneGroup()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1439: warning: unused variable 'C_Hdistance'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In constructor 'SimTK::ResidueInfo::AtomInfo::AtomInfo(SimTK::Compound::AtomIndex, const SimTK::Compound::AtomName&)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1763: warning: 'SimTK::ResidueInfo::AtomInfo::pdbAtomName' will be initialized after
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1762: warning:   'SimTK::Compound::AtomIndex SimTK::ResidueInfo::AtomInfo::biopolymerAtomIndex'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1751: warning:   when initialized here
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:54,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bSystem.hpp:22,
+                 from bSystem.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::Cysteine::Cysteine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:328: warning: unused variable 'S_C_Cangle'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::DisulphideBridgedCysteine::DisulphideBridgedCysteine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:353: warning: unused variable 'H_Sdistance'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:359: warning: unused variable 'S_C_Cangle'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::Histidine::Histidine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:494: warning: unused variable 'NE_CDdistance'
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:72,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bSystem.hpp:22,
+                 from bSystem.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h: In constructor 'SimTK::CompoundModeler::RigidUnit::RigidUnit(SimTK::CompoundModeler::RigidUnitIndex, SimTK::CompoundModeler&)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:103: warning: 'SimTK::CompoundModeler::RigidUnit::myIndex' will be initialized after
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:100: warning:   'SimTK::CompoundModeler* SimTK::CompoundModeler::RigidUnit::compoundModeler'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:52: warning:   when initialized here
+In file included from /home/lspirido/Installers/simbody/simbody-Simbody-3.0/SimTKmath/Integrators/src/AbstractIntegratorRep.h:32,
+                 from bSystem.hpp:145,
+                 from bSystem.cpp:1:
+/home/lspirido/Installers/simbody/simbody-Simbody-3.0/SimTKmath/Integrators/src/IntegratorRep.h: In member function 'void SimTK::IntegratorRep::setTriggeredEvents(SimTK::Real, SimTK::Real, const SimTK::Array_<SimTK::EventId, unsigned int>&, const SimTK::Array_<double, unsigned int>&, const SimTK::Array_<SimTK::Event::Trigger, unsigned int>&)':
+/home/lspirido/Installers/simbody/simbody-Simbody-3.0/SimTKmath/Integrators/src/IntegratorRep.h:580: warning: comparison between signed and unsigned integer expressions
+/home/lspirido/Installers/simbody/simbody-Simbody-3.0/SimTKmath/Integrators/src/IntegratorRep.h:580: warning: comparison between signed and unsigned integer expressions
+bSystem.cpp: In function 'void shmDump(double*, unsigned int)':
+bSystem.cpp:66: warning: comparison between signed and unsigned integer expressions
+bSystem.cpp: In member function 'virtual void GridForce::calcForce(const SimTK::State&, SimTK::Vector_<SimTK::Vec<2, SimTK::Vec<3, double, 1>, 1> >&, SimTK::Vector_<SimTK::Vec<3, double, 1> >&, SimTK::Vector&) const':
+bSystem.cpp:119: warning: unused variable 'natoms3'
+bSystem.cpp:120: warning: unused variable 'i'
+bSystem.cpp:121: warning: unused variable 'tshm'
+bSystem.cpp:122: warning: unused variable 'v'
+bSystem.cpp:123: warning: unused variable 'ix'
+bSystem.cpp: In member function 'virtual SimTK::Real GridForce::calcPotentialEnergy(const SimTK::State&) const':
+bSystem.cpp:172: warning: unused variable 'c'
+In file included from bSystem.cpp:188:
+MidVVIntegrator.cpp: In member function 'SimTK::Real MidVVIntegratorRep::getUncorrAnglesSinesSq(const SimTK::Compound&, SimTK::State&, std::vector<int, std::allocator<int> >, SimTK::Real*, int*)':
+MidVVIntegrator.cpp:205: warning: comparison between signed and unsigned integer expressions
+In file included from bSystem.cpp:188:
+MidVVIntegrator.cpp: In member function 'SimTK::Real MidVVIntegratorRep::calcDetMBATct(const SimTK::Compound&, SimTK::State&)':
+MidVVIntegrator.cpp:268: warning: comparison between signed and unsigned integer expressions
+MidVVIntegrator.cpp:287: warning: comparison between signed and unsigned integer expressions
+MidVVIntegrator.cpp:293: warning: comparison between signed and unsigned integer expressions
+MidVVIntegrator.cpp:295: warning: comparison between signed and unsigned integer expressions
+MidVVIntegrator.cpp:255: warning: unused variable 'matter'
+MidVVIntegrator.cpp:260: warning: unused variable 'costheta'
+MidVVIntegrator.cpp:264: warning: unused variable 'theta'
+MidVVIntegrator.cpp: In member function 'SimTK::Real MidVVIntegratorRep::calcDetMBAT(const SimTK::Compound&, SimTK::State&)':
+MidVVIntegrator.cpp:323: warning: unused variable 'costheta'
+MidVVIntegrator.cpp: In member function 'SimTK::Real MidVVIntegratorRep::calcMAndDetM(const SimTK::Compound&, SimTK::State&)':
+MidVVIntegrator.cpp:390: warning: no return statement in function returning non-void
+MidVVIntegrator.cpp: In member function 'SimTK::Real MidVVIntegratorRep::calcUFixNum(const SimTK::Compound&, SimTK::State&)':
+MidVVIntegrator.cpp:405: warning: unused variable 'RT'
+MidVVIntegrator.cpp: In member function 'void MidVVIntegratorRep::initializeVelsFromRandU(const SimTK::Compound&, SimTK::State&, SimTK::Real)':
+MidVVIntegrator.cpp:469: warning: unused variable 'Qs'
+MidVVIntegrator.cpp: In member function 'void MidVVIntegratorRep::initializeVelsFromVRT(const SimTK::Compound&, SimTK::State&, SimTK::Real)':
+MidVVIntegrator.cpp:640: warning: unused variable 'nq'
+MidVVIntegrator.cpp:642: warning: unused variable 'nb'
+MidVVIntegrator.cpp:643: warning: unused variable 'm'
+MidVVIntegrator.cpp: In member function 'void MidVVIntegratorRep::initializeVelsFromAtoms(const SimTK::Compound&, SimTK::State&, SimTK::Real)':
+MidVVIntegrator.cpp:896: warning: unused variable 'p_GB'
+MidVVIntegrator.cpp:840: warning: unused variable 'invKT'
+MidVVIntegrator.cpp:915: warning: unused variable 'T'
+MidVVIntegrator.cpp: In member function 'void MidVVIntegratorRep::initializeVelsFromMobods(const SimTK::Compound&, SimTK::State&, SimTK::Real)':
+MidVVIntegrator.cpp:957: warning: unused variable 'pamobod'
+MidVVIntegrator.cpp:944: warning: unused variable 'X_GF'
+MidVVIntegrator.cpp:945: warning: unused variable 'X_FM'
+MidVVIntegrator.cpp:947: warning: unused variable 'R_GB'
+MidVVIntegrator.cpp:967: warning: unused variable 'pseudoLocalSeed'
+MidVVIntegrator.cpp:968: warning: unused variable 'OriginIInGround'
+MidVVIntegrator.cpp:970: warning: unused variable 'sigma'
+MidVVIntegrator.cpp:929: warning: unused variable 'sigma'
+MidVVIntegrator.cpp:930: warning: unused variable 'wsigma'
+MidVVIntegrator.cpp:931: warning: unused variable 'vxsigma'
+MidVVIntegrator.cpp:931: warning: unused variable 'vysigma'
+MidVVIntegrator.cpp:931: warning: unused variable 'vzsigma'
+MidVVIntegrator.cpp:932: warning: unused variable 'wxsigma'
+MidVVIntegrator.cpp:932: warning: unused variable 'wysigma'
+MidVVIntegrator.cpp:932: warning: unused variable 'wzsigma'
+MidVVIntegrator.cpp: In member function 'void MidVVIntegratorRep::initializeVelsFromJacobian(const SimTK::Compound&, SimTK::State&, SimTK::Real)':
+MidVVIntegrator.cpp:1008: warning: unused variable 'nq'
+MidVVIntegrator.cpp:1059: warning: unused variable 'T'
+MidVVIntegrator.cpp: In member function 'void MidVVIntegratorRep::setTVector(SimTK::State&)':
+MidVVIntegrator.cpp:1125: warning: unused variable 'vertex'
+MidVVIntegrator.cpp: In member function 'void MidVVIntegratorRep::assignConfAndTVectorFromShm0(SimTK::State&)':
+MidVVIntegrator.cpp:1160: warning: unused variable 'vertex'
+MidVVIntegrator.cpp:1215: warning: unused variable 'iParentMb'
+MidVVIntegrator.cpp:1216: warning: unused variable 'iChildAt'
+MidVVIntegrator.cpp:1216: warning: unused variable 'iParentAt'
+MidVVIntegrator.cpp:1218: warning: unused variable 'vertex'
+MidVVIntegrator.cpp:1252: warning: unused variable 'vertex'
+MidVVIntegrator.cpp:1150: warning: unused variable 'xMid'
+MidVVIntegrator.cpp:1151: warning: unused variable 'tx'
+MidVVIntegrator.cpp:1151: warning: unused variable 'tshm'
+MidVVIntegrator.cpp:1154: warning: unused variable 'p_G'
+MidVVIntegrator.cpp: In member function 'void MidVVIntegratorRep::assignConfAndTVectorFromShm1(SimTK::State&)':
+MidVVIntegrator.cpp:1326: warning: unused variable 'iParentMb'
+MidVVIntegrator.cpp:1327: warning: unused variable 'iChildAt'
+MidVVIntegrator.cpp:1327: warning: unused variable 'iParentAt'
+MidVVIntegrator.cpp:1329: warning: unused variable 'vertex'
+MidVVIntegrator.cpp:1363: warning: unused variable 'vertex'
+MidVVIntegrator.cpp:1266: warning: unused variable 'system'
+MidVVIntegrator.cpp:1268: warning: unused variable 'xMid'
+MidVVIntegrator.cpp:1269: warning: unused variable 'tx'
+MidVVIntegrator.cpp:1269: warning: unused variable 'tshm'
+MidVVIntegrator.cpp:1273: warning: unused variable 'p_G'
+MidVVIntegrator.cpp: In member function 'void MidVVIntegratorRep::assignConfAndTVectorFromShm2(SimTK::State&)':
+MidVVIntegrator.cpp:1431: warning: unused variable 'tolerance'
+MidVVIntegrator.cpp:1446: warning: unused variable 'vertex'
+MidVVIntegrator.cpp: In member function 'SimTK::State& MidVVIntegratorRep::assignConfAndTVectorFromShm3Opt(SimTK::State&)':
+MidVVIntegrator.cpp:1538: warning: unused variable 'mobod'
+MidVVIntegrator.cpp: In member function 'SimTK::State& MidVVIntegratorRep::assignConfAndTVectorFromShm3(SimTK::State&)':
+MidVVIntegrator.cpp:1658: warning: unused variable 'mobod'
+MidVVIntegrator.cpp: In member function 'void MidVVIntegratorRep::metropolis(const SimTK::Compound&, SimTK::State&)':
+MidVVIntegrator.cpp:2122: warning: unused variable 'expression'
+MidVVIntegrator.cpp: In member function 'void MidVVIntegratorRep::try_finalize(const SimTK::Compound&, SimTK::State&, int, int)':
+MidVVIntegrator.cpp:2225: warning: comparison between signed and unsigned integer expressions
+MidVVIntegrator.cpp:2236: warning: comparison between signed and unsigned integer expressions
+MidVVIntegrator.cpp:2237: warning: format '%d' expects type 'int', but argument 3 has type 'long int'
+MidVVIntegrator.cpp:2244: warning: comparison between signed and unsigned integer expressions
+MidVVIntegrator.cpp: In member function 'virtual bool MidVVIntegratorRep::attemptDAEStep(SimTK::Real, SimTK::Vector&, int&, int&)':
+MidVVIntegrator.cpp:2936: warning: comparison between signed and unsigned integer expressions
+MidVVIntegrator.cpp:2937: warning: format '%d' expects type 'int', but argument 3 has type 'long int'
+MidVVIntegrator.cpp:2944: warning: comparison between signed and unsigned integer expressions
+MidVVIntegrator.cpp:2669: warning: unused variable 'i'
+bSystem.cpp: In member function 'void SymSystem::InitSimulation(double**, double**, double**, double**, double**, double, bool)':
+bSystem.cpp:330: warning: comparison between signed and unsigned integer expressions
+bSystem.cpp:335: warning: comparison between signed and unsigned integer expressions
+bSystem.cpp:352: warning: unused variable 'vv_vals'
+bSystem.cpp:355: warning: unused variable 'step'
+bSystem.cpp:356: warning: unused variable 'nosteps'
+bSystem.cpp:374: warning: unused variable 'nmbx_1'
+MidVVIntegrator.cpp: In member function 'SimTK::Real MidVVIntegratorRep::getUncorrAnglesSinesSq(const SimTK::Compound&, SimTK::State&, std::vector<int, std::allocator<int> >, SimTK::Real*, int*)':
+MidVVIntegrator.cpp:249: warning: control reaches end of non-void function
+/share/apps/miniconda/2/lib/python2.7/site-packages/numpy/core/include/numpy/__multiarray_api.h: At global scope:
+/share/apps/miniconda/2/lib/python2.7/site-packages/numpy/core/include/numpy/__multiarray_api.h:1629: warning: 'int _import_array()' defined but not used
+/share/apps/miniconda/2/include/python2.7/MMTK/universe.h:130: warning: 'PyUniverse_API' defined but not used
+/share/apps/miniconda/2/include/python2.7/MMTK/forcefield.h:342: warning: 'PyFF_API' defined but not used
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:156: warning: 'mol_res_names' defined but not used
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:217: warning: 'mol_res_props' defined but not used
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:531: warning: 'pdb_table' defined but not used
+g++ -std=gnu++0x -Wall -fPIC -g -c bSystem.cpp -DNUMPY=1 -I/home/lspirido/Installers/simbody/SimTK-3.0/include -I/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal -I/home/lspirido/Installers/simbody/simbody-Simbody-3.0 -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/src -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/include -I/home/lspirido/Installers/boost_1_55_0 -I/share/apps/miniconda/2/include/python2.7 -I/usr/include/python2.6 -I/export/apps/amber/12/AmberTools/src/mtkpp/src/eigen3b2 -I/share/apps/miniconda/2/lib/python2.7/site-packages/numpy/core/include -l_compiled_base -llapack -o bSystem.og++ -Wall -fPIC -g -c bArgParser.cpp -I/home/lspirido/Installers/simbody/SimTK-3.0/include -I/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal -I/home/lspirido/Installers/simbody/simbody-Simbody-3.0 -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/src -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/include -I/home/lspirido/Installers/boost_1_55_0 -o bArgParser.oIn file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:49,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bMoleculeReader.hpp:14,
+                 from bMoleculeReader.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/bondGeometry.h:44:1: warning: multi-line comment
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/bondGeometry.h:47:1: warning: multi-line comment
+In file included from /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/ext/hash_map:60,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/VoxelHash.h:11,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/AtomSubsystem.h:6,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:51,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bMoleculeReader.hpp:14,
+                 from bMoleculeReader.cpp:1:
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/backward/backward_warning.h:28:2: warning: #warning This file includes at least one deprecated or antiquated header which may be removed without further notice at a future date. Please use a non-deprecated interface with equivalent functionality instead. For a listing of replacement headers and interfaces, consult the file backward_warning.h. To disable this warning use -Wno-deprecated.
+In file included from bMoleculeReader.hpp:15,
+                 from bMoleculeReader.cpp:1:
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:549:1: warning: multi-line comment
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:552:1: warning: multi-line comment
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:53,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bMoleculeReader.hpp:14,
+                 from bMoleculeReader.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In member function 'SimTK::Compound& SimTK::Compound::setAtomBiotype(const SimTK::Compound::AtomPathName&, const SimTK::String&, const SimTK::String&, SimTK::Ordinality::Residue)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1134: warning: comparison between signed and unsigned integer expressions
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In constructor 'SimTK::MethyleneGroup::MethyleneGroup()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1439: warning: unused variable 'C_Hdistance'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h: In constructor 'SimTK::ResidueInfo::AtomInfo::AtomInfo(SimTK::Compound::AtomIndex, const SimTK::Compound::AtomName&)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1763: warning: 'SimTK::ResidueInfo::AtomInfo::pdbAtomName' will be initialized after
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1762: warning:   'SimTK::Compound::AtomIndex SimTK::ResidueInfo::AtomInfo::biopolymerAtomIndex'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Compound.h:1751: warning:   when initialized here
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:54,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bMoleculeReader.hpp:14,
+                 from bMoleculeReader.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::Cysteine::Cysteine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:328: warning: unused variable 'S_C_Cangle'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::DisulphideBridgedCysteine::DisulphideBridgedCysteine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:353: warning: unused variable 'H_Sdistance'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:359: warning: unused variable 'S_C_Cangle'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h: In constructor 'SimTK::AminoAcidResidue::Histidine::Histidine()':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/Protein.h:494: warning: unused variable 'NE_CDdistance'
+In file included from /home/lspirido/Installers/simbody/SimTK-3.0/include/SimTKmolmodel.h:72,
+                 from /home/lspirido/Installers/simbody/SimTK-3.0/include/Molmodel.h:45,
+                 from bMoleculeReader.hpp:14,
+                 from bMoleculeReader.cpp:1:
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h: In constructor 'SimTK::CompoundModeler::RigidUnit::RigidUnit(SimTK::CompoundModeler::RigidUnitIndex, SimTK::CompoundModeler&)':
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:103: warning: 'SimTK::CompoundModeler::RigidUnit::myIndex' will be initialized after
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:100: warning:   'SimTK::CompoundModeler* SimTK::CompoundModeler::RigidUnit::compoundModeler'
+/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal/CompoundModeler.h:52: warning:   when initialized here
+bMoleculeReader.cpp: In constructor 'bMoleculeReader::bMoleculeReader(SimTK::DuMMForceFieldSubsystem&, const char*, const char*, const char*)':
+bMoleculeReader.cpp:780: warning: suggest parentheses around '&&' within '||'
+bMoleculeReader.cpp:342: warning: unused variable 'elem'
+bMoleculeReader.cpp:343: warning: unused variable 'lno'
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h: At global scope:
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:156: warning: 'mol_res_names' defined but not used
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:217: warning: 'mol_res_props' defined but not used
+/home/lspirido/Installers/molmodel/molmodel-3.0.0/src/mol.h:531: warning: 'pdb_table' defined but not used
+g++ -Wall -fPIC -g -c bMoleculeReader.cpp -I/home/lspirido/Installers/simbody/SimTK-3.0/include -I/home/lspirido/Installers/simbody/SimTK-3.0/include/molmodel/internal -I/home/lspirido/Installers/simbody/simbody-Simbody-3.0 -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/src -I/home/lspirido/Installers/molmodel/molmodel-3.0.0/include -I/home/lspirido/Installers/boost_1_55_0 -o bMoleculeReader.o
