@@ -4,3 +4,6 @@
 [submodule "mmtk_legacy"]
 	path = mmtk_legacy
 	url = ssh://git@mybioinformaticslab.xyz:7999/rob/mmtk_legacy.git
+[submodule "molmodel_legacy"]
+	path = molmodel_legacy
+	url = ssh://git@mybioinformaticslab.xyz:7999/rob/molmodel_legacy.git
