@@ -487,7 +487,8 @@ void MidVVIntegratorRep::initializeVelsFromRandU(const SimTK::Compound& c, SimTK
 
   system.realize(advanced, SimTK::Stage::Position);
   //std::cout<<"V:"<<V<<std::endl;
-  matter.multiplyBySqrtMInv(advanced, V, SqrtMInvV);
+  //HOREA
+  //matter.multiplyBySqrtMInv(advanced, V, SqrtMInvV);
   SqrtMInvV *= sqrtkTb; // Set stddev according to temperature
   //std::cout<<"SqrtMInvV:"<<SqrtMInvV<<std::endl;
 

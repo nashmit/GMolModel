@@ -489,7 +489,8 @@ void bAddGaffParams(
   for(l1it = l1types.begin(); l1it != l1types.end(); ++l1it){
     #ifdef DEBUG_PARAMS_LEVEL02
     std::cout<<"bAddParams BONDS defineBondStretch gaff_x "<<Type2Ix[(*l1it).c_str()]<<' '<<std::endl<<std::flush;
-    std::transform((*l1it).begin(), (*l1it).end(), (*l1it).begin(), ::tolower);
+    //HOREA
+    //std::transform((*l1it).begin(), (*l1it).end(), (*l1it).begin(), ::tolower);
     std::cout<<(*l1it)<<std::endl;
     std::cout<<"bAddParams BONDS defineBondStretch gaff_x "<<Type2Ix[(*l1it).c_str()]<<' '<<std::endl<<std::flush;
     #endif
