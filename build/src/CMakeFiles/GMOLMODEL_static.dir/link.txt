@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../lib/libGMOLMODEL_static.a  CMakeFiles/GMOLMODEL_static.dir/bAddParams.cpp.o CMakeFiles/GMOLMODEL_static.dir/bMainResidue.cpp.o CMakeFiles/GMOLMODEL_static.dir/bMoleculeReader.cpp.o CMakeFiles/GMOLMODEL_static.dir/bSystem.cpp.o
-/usr/bin/ranlib ../lib/libGMOLMODEL_static.a
