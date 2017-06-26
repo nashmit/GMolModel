@@ -1,9 +1,14 @@
+#ifndef _MidVVIntegrator_h_
+#define _MidVVIntegrator_h_
+
 //@file This is included in bSysSystem.cpp
 class MidVVIntegratorRep;
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 //#include "/home/lspirido/Installers/simbody/simbody-Simbody-3.0/SimTKmath/Integrators/src/AbstractIntegratorRep.h"
-#include "SimTKmath/Integrators/src/AbstractIntegratorRep.h"
+
+#include "AbstractIntegratorRep.h"
+//#include "SimTKmath/Integrators/src/AbstractIntegratorRep.h"
 
 //==============================================================================
 //                           CLASS MidVVIntegrator
@@ -316,5 +321,4 @@ class SimTK_SIMMATH_EXPORT MidVVIntegrator : public SimTK::Integrator {
   ~MidVVIntegrator();
 };
 
-
-
+#endif

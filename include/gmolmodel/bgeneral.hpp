@@ -25,9 +25,9 @@ using namespace std;
 
 #define sq(x)		((x)*(x))
 
-#ifndef sqr
-#define sqr(x) ((x)*(x))
-#endif
+//#ifndef sqr
+//#define sqr(x) ((x)*(x))
+//#endif
 
 #ifndef ANG_360_TO_180
 #define ANG_360_TO_180(x) (((x)>180) ? (180-(x)) : (x))

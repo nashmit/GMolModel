@@ -1,3 +1,5 @@
+#include <math.h>
+
 //==============================================================================
 //                           MIDVV INTEGRATOR
 //==============================================================================
@@ -164,8 +166,9 @@ void MidVVIntegratorRep::printForcesNorms(const SimTK::Compound& c, SimTK::State
     for (SimTK::Compound::AtomIndex aIx(0); aIx < c.getNumAtoms(); ++aIx){
       acc = c.calcAtomAccelerationInGroundFrame(advanced, aIx);// * c.getAtomMass(aIx);
       mass = c.getAtomElement(aIx).getMass();
-      std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
-        <<"[ "<<sqrt(sqr(acc[0]*mass) + sqr(acc[1]*mass) + sqr(acc[2]*mass))<<" ]"<<std::endl;
+      //HOREA 
+      //std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
+      //  <<"[ "<<sqrt(sqr(acc[0]*mass) + sqr(acc[1]*mass) + sqr(acc[2]*mass))<<" ]"<<std::endl;
     }
     std::cout<<std::endl;
 }
@@ -358,7 +361,8 @@ SimTK::Real MidVVIntegratorRep::calcDetM(const SimTK::Compound& c, SimTK::State&
   SimTK::Vector DetV(nu);
   SimTK::Matrix D0(6, 6);
 
-  matter.calcDetM(advanced, V, DetV, D0);
+  //HOREA
+  //matter.calcDetM(advanced, V, DetV, D0);
 
   Eigen::MatrixXd EiD0(6, 6);
   for(int i=0; i<6; i++){ // Put M in Eignn
@@ -765,7 +769,8 @@ void MidVVIntegratorRep::initializeVelsFromVRT(const SimTK::Compound& c, SimTK::
   SimTK::Matrix MInv;
   SimTK::Matrix SqrtMInv;
   matter.calcMInv(advanced, MInv);
-  matter.calcSqrtMInv(advanced, SqrtMInv);
+  //HOREA
+  //matter.calcSqrtMInv(advanced, SqrtMInv);
 
   //std::cout<<"M"<<std::endl;
   //for(int i=0; i<nu; i++){for(int j=0; j<nu; j++){std::cout<<M(i,j)<<' ';} std::cout<<std::endl;}

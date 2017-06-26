@@ -175,10 +175,10 @@ CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 Eigen3_DIR:PATH=/usr/lib/cmake/eigen3
 
 //Dependencies for the target
-GMOLMODEL_dynamic_LIB_DEPENDS:STATIC=general;SimTKcommon;general;SimTKmath;general;SimTKsimbody;general;SimTKcommon;general;SimTKmath;general;SimTKsimbody;
+GMOLMODEL_dynamic_LIB_DEPENDS:STATIC=general;SimTKcommon;general;SimTKmath;general;SimTKsimbody;general;SimTKcommon;general;SimTKmath;general;SimTKsimbody;general;m;
 
 //Dependencies for the target
-GMOLMODEL_static_LIB_DEPENDS:STATIC=general;SimTKcommon;general;SimTKmath;general;SimTKsimbody;general;SimTKcommon;general;SimTKmath;general;SimTKsimbody;
+GMOLMODEL_static_LIB_DEPENDS:STATIC=general;SimTKcommon;general;SimTKmath;general;SimTKsimbody;general;SimTKcommon;general;SimTKmath;general;SimTKsimbody;general;m;
 
 //The directory containing a CMake configuration file for Simbody.
 Simbody_DIR:PATH=/usr/local/SimTK/lib/cmake/simbody
