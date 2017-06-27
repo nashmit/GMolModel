@@ -1,4 +1,4 @@
 build-release/*
-!build-release/CMakeCache.txt
+#!build-release/CMakeCache.txt
 build-debug/*
-!build-debug/CMakeCache.txt
+#!build-debug/CMakeCache.txt
