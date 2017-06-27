@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(gmolmodel)
+set(CMAKE_C_COMPILER "gcc")
+set(CMAKE_CXX_COMPILER "g++")
+
+project(gmolmodel VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -fPIC -g")
 
