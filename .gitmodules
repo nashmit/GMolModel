@@ -1,6 +1,3 @@
-[submodule "simbody"]
-	path = simbody
-	url = ssh://git@mybioinformaticslab.xyz:7999/rob/simbody.git
 [submodule "mmtk_legacy"]
 	path = mmtk_legacy
 	url = ssh://git@mybioinformaticslab.xyz:7999/rob/mmtk_legacy.git
