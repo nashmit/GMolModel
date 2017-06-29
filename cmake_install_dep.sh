@@ -7,6 +7,7 @@ sudo apt-get install libglew-dev
 sudo apt-get install libxmu-dev
 sudo apt-get install libeigen3-dev
 sudo apt-get install doxygen
+sudo apt-get install subversion
 sudo apt-get install libblas-dev liblapack-dev
 sudo apt-get install libboost-all-dev
 
