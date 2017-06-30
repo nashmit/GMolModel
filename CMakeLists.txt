@@ -30,7 +30,7 @@ set( AnacondaEnvironmentPath
      ""
      CACHE FILEPATH "envs path for Anaconda: e.g. :/home/nash_mit/Anaconda/envs/" )
     
-if( InstallEnvironment AND AnacondaEnvironmentPath ) 
+if( InstallEnvironment AND AnacondaEnvironmentPath )
 	execute_process(
 		COMMAND cp -RfHp "mmtk_environment" ${AnacondaEnvironmentPath}
 		OUTPUT_VARIABLE statusCP )
