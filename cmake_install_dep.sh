@@ -11,5 +11,21 @@ sudo apt-get install subversion
 sudo apt-get install libblas-dev liblapack-dev
 sudo apt-get install libboost-all-dev
 
-cmake .. -DMakeDownload_mmtk_environment=true -DInstallEnvironment=true -DAnacondaEnvironmentPath="/home/nash_mit/Anaconda/envs/"
+cd ../molmodel_legacy/simbody
+mkdir build-debug
+cd build-debug
+
+cmake ..
+make -j4
+sudo make install
+
+cd ../../
+mkdir build-debug
+cd build-debug
+cmake ..
+make -j4
+sudo make install
+cd ../../build-debug
+
+cmake .. -DMakeDownload_mmtk_environment=true -DInstallEnvironment=true -DAnacondaEnvironmentPath="/home/osboxes/Anaconda/envs/"
 
