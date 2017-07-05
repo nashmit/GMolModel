@@ -84,18 +84,49 @@ INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIR})
 LINK_DIRECTORIES(${BOOST_LIBRARY_DIRS})
 
 
+#it's for linking GMOLMODEL_static into GCHMC lib
+LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/lib)
+
 set(LIBGMOLMODEL_SRC 
 	bAddParams.cpp 
 	bMainResidue.cpp 
 	bMoleculeReader.cpp 
 	bSystem.cpp
+	bgeneral.cpp
 	)
 
 include_directories(../include/gmolmodel)
 
 add_library(GMOLMODEL_dynamic SHARED ${LIBGMOLMODEL_SRC})
 add_library(GMOLMODEL_static  STATIC ${LIBGMOLMODEL_SRC})
+add_executable(GMOLMODEL_test ${LIBGMOLMODEL_SRC} testMain.cpp )
 
+PYTHON_ADD_MODULE( 
+		GCHMC 
+		#${LIBGMOLMODEL_SRC} 
+		simmain.cpp 
+		bArgParser.cpp 
+		)
+#add_library( GCHMC SHARED ${LIBGMOLMODEL_SRC} simmain.cpp )
+
+TARGET_LINK_LIBRARIES( GCHMC
+		boost_python 
+		GMOLMODEL_static
+                ${Simbody_LIBRARIES}
+                SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
+                ${BOOST_LIBRARIES}
+                ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code..
+                m )
+                #${mmtk_libs} )
+
+
+TARGET_LINK_LIBRARIES( GMOLMODEL_test 
+                ${Simbody_LIBRARIES}
+                SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
+                ${BOOST_LIBRARIES}
+                ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code..
+                m )
+                #${mmtk_libs} )
 
 # link Simbody libraries
 TARGET_LINK_LIBRARIES(GMOLMODEL_dynamic 
