@@ -41,5 +41,6 @@ endif( InstallEnvironment AND AnacondaEnvironmentPath )
 
 if( NOT InstallEnvironment )
 	add_subdirectory(src)
+	add_subdirectory(tests) # Laur
 endif( NOT InstallEnvironment )
 
