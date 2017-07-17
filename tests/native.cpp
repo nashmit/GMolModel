@@ -16,8 +16,8 @@ using namespace SimTK;
 int main() {
 try {
     
-    MultibodySystem someMultibodySystem;
-    //MolecularMechanicsSystem someMolecularMechanicsSystem;
+    //MultibodySystem someMultibodySystem;
+    MolecularMechanicsSystem someMolecularMechanicsSystem;
     //CompoundSystem system;
     //SimbodyMatterSubsystem matter(system);
     //DecorationSubsystem decorations(system);
