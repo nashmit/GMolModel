@@ -94,3 +94,11 @@ include_directories(../include/gmolmodel)
 
 add_executable(NATIVE_test ${NATIVE_SRC} )
 
+TARGET_LINK_LIBRARIES( NATIVE_test 
+                ${Simbody_LIBRARIES}
+                SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
+                ${BOOST_LIBRARIES}
+                ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code..
+                m )
+                #${mmtk_libs} )
+
