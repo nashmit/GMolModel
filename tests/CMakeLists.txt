@@ -3,32 +3,41 @@ cmake_minimum_required(VERSION 3.0)
 find_package(Simbody 3.6 CONFIG REQUIRED) # you may have to set a path for config file location e.g.  modify the environment variable list specific for find_package..
 INCLUDE_DIRECTORIES( ${Simbody_INCLUDE_DIR} )
 LINK_DIRECTORIES( ${Simbody_LIB_DIR} )
+MESSAGE("Simbody_INCLUDE_DIR: ${Simbody_INCLUDE_DIR}")
+MESSAGE("Simbody_LIB_DIR: ${Simbody_LIB_DIR}")
 
 set( Integrators_PATH 
      "${CMAKE_CURRENT_LIST_DIR}/../simbody/SimTKmath/Integrators/src"
      CACHE FILEPATH "Path to Integrator.h from Simbody..." )
 INCLUDE_DIRECTORIES( ${Integrators_PATH} )
+MESSAGE("Integrators_PATH: ${Integrators_PATH}")
 
 set( MOL_MODEL_INCLUDE 
      "${Simbody_INCLUDE_DIR}/.."
      CACHE FILEPATH "header include folder path for Molmodel" ) 
 INCLUDE_DIRECTORIES( ${MOL_MODEL_INCLUDE} )
+MESSAGE("MOL_MODEL_INCLUDE: ${MOL_MODEL_INCLUDE}")
 
 find_package(Eigen3 REQUIRED)
 include_directories( ${EIGEN3_INCLUDE_DIRS} )
+MESSAGE("EIGEN3_INCLUDE_DIRS: ${EIGEN3_INCLUDE_DIRS}")
 
 add_definitions(-DNUMPY=1)
+MESSAGE("ADD DEFINITION: DNUMPY=1")
 
 set(Python_ADDITIONAL_VERSIONS 2)
 FIND_PACKAGE(PythonInterp)
 FIND_PACKAGE(PythonLibs REQUIRED)
 include_directories( ${PYTHON_INCLUDE_DIRS} )
 link_directories( ${PYTHON_LIBRARIES} )
+MESSAGE("PYTHON_INCLUDE_DIRS: ${PYTHON_INCLUDE_DIRS}")
+MESSAGE("PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
 
 set(mmtk_include 
     "${PYTHON_INCLUDE_DIRS}/MMTK" 
     CACHE FILEPATH "Adding header path to MMTK installed location")
 include_directories( ${mmtk_include} )
+MESSAGE("mmtk_include: ${mmtk_include}")
 
 execute_process(
   COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" 
@@ -38,11 +47,13 @@ execute_process(
 set(PYTHON_SITE-PACKAGES_PATH
     ${PYTHON_SITE_PATH} 
     CACHE FILEPATH "side-packages python path")
+MESSAGE("PYTHON_SITE_PATH: ${PYTHON_SITE_PATH}")
 
 set(mmtk_libs 
     "${PYTHON_SITE-PACKAGES_PATH}/MMTK/linux2"
     CACHE FILEPATH "Addinng path to MMTK libs folder")
 link_directories( ${mmtk_libs} )
+MESSAGE("mmtk_libs: ${mmtk_libs}")
 
 execute_process(
   COMMAND ls "${mmtk_libs}"
@@ -53,18 +64,30 @@ set(numpy_include
     "${PYTHON_SITE-PACKAGES_PATH}/numpy/core/include" 
     CACHE FILEPATH "Header path to numpy installed location")
 include_directories( ${numpy_include} )
+MESSAGE("numpy_include: ${numpy_include}")
 
 find_package(Boost 1.55 REQUIRED) #I'm using 1.58
 INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIR})
 LINK_DIRECTORIES(${BOOST_LIBRARY_DIRS})
+MESSAGE("Boost_FOUND: ${Boost_FOUND}")
+MESSAGE("Boost_VERSION: ${Boost_VERSION}")
+MESSAGE("BOOST_LIBRARIES: ${BOOST_LIBRARIES}")
+MESSAGE("BOOST_INCLUDE_DIR: ${BOOST_INCLUDE_DIR}")
+MESSAGE("BOOST_LIBRARY_DIRS: ${BOOST_LIBRARY_DIRS}")
 
-LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/lib)
+SET(BOOST_INCLUDE_DIR_BYHAND "/usr/include/boost/")
+INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIR_BYHAND})
+#LINK_DIRECTORIES("/usr/lib/x86_64-linux-gnu/")
+file(GLOB BOOST_LIBS_BYHAND "/usr/lib/x86_64-linux-gnu/*boost*so*")
+MESSAGE("BOOST_INCLUDE_DIR_BYHAND: ${BOOST_INCLUDE_DIR_BYHAND}")
+MESSAGE("BOOST_LIBS_BYHAND: ${BOOST_LIBS_BYHAND}")
+
+#INCLUDE_DIRECTORIES(../include/gmolmodel)
+#LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/lib)
 
 set(TESTS_SRC 
 	TestNative.cpp
 	)
-
-include_directories(../include/gmolmodel)
 
 add_executable(TestNative ${TESTS_SRC} )
 
@@ -72,6 +95,7 @@ TARGET_LINK_LIBRARIES( TestNative
                 ${Simbody_LIBRARIES}
                 SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
                 ${BOOST_LIBRARIES}
+                ${BOOST_LIBS_BYHAND}
                 ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code..
                 m )
 

@@ -24,7 +24,7 @@ try {
     // =====================
 
     // MOLMODEL CONSTRUCTORS DON'T WORK:
-    //MolecularMechanicsSystem someMolecularMechanicsSystem; // Extends MultibodySystem (Simbody)
+    MolecularMechanicsSystem someMolecularMechanicsSystem; // Extends MultibodySystem (Simbody)
     //CompoundSystem system; // Extends MolecularMechanicsSystem (Molmodel)
     //SimbodyMatterSubsystem matter(system);
     //DecorationSubsystem decorations(system);
