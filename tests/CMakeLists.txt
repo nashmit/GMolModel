@@ -66,24 +66,25 @@ set(numpy_include
 include_directories( ${numpy_include} )
 MESSAGE("numpy_include: ${numpy_include}")
 
-find_package(Boost 1.55 REQUIRED) #I'm using 1.58
-INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIR})
-LINK_DIRECTORIES(${BOOST_LIBRARY_DIRS})
-MESSAGE("Boost_FOUND: ${Boost_FOUND}")
-MESSAGE("Boost_VERSION: ${Boost_VERSION}")
-MESSAGE("Boost_LIBRARIES: ${Boost_LIBRARIES}")
-MESSAGE("BOOST_LIBRARIES: ${BOOST_LIBRARIES}")
-MESSAGE("Boost_INCLUDE_DIR: ${Boost_INCLUDE_DIR}")
-MESSAGE("BOOST_INCLUDE_DIR: ${BOOST_INCLUDE_DIR}")
-MESSAGE("Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
-MESSAGE("BOOST_LIBRARY_DIRS: ${BOOST_LIBRARY_DIRS}")
+#set(Boost_USE_STATIC_LIBS OFF)
+#set(Boost_USE_MULTITHREADED ON)
+#set(Boost_USE_STATIC_RUNTIME OFF)
 
-SET(BOOST_INCLUDE_DIR_BYHAND "/usr/include/boost/")
-INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIR_BYHAND})
+#find_package(Boost 1.55 REQUIRED) #I'm using 1.58
+#INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+#LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+#MESSAGE("Boost_FOUND: ${Boost_FOUND}")
+#MESSAGE("Boost_VERSION: ${Boost_VERSION}")
+#MESSAGE("Boost_INCLUDE_DIR: ${Boost_INCLUDE_DIR}")
+#MESSAGE("Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
+
+#SET(BOOST_INCLUDE_DIR_BYHAND "/usr/include/boost/")
+#INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIR_BYHAND})
+#MESSAGE("BOOST_INCLUDE_DIR_BYHAND: ${BOOST_INCLUDE_DIR_BYHAND}")
+
 #LINK_DIRECTORIES("/usr/lib/x86_64-linux-gnu/")
-file(GLOB BOOST_LIBS_BYHAND "/usr/lib/x86_64-linux-gnu/*boost*so*")
-MESSAGE("BOOST_INCLUDE_DIR_BYHAND: ${BOOST_INCLUDE_DIR_BYHAND}")
-MESSAGE("BOOST_LIBS_BYHAND: ${BOOST_LIBS_BYHAND}")
+#file(GLOB BOOST_LIBS_BYHAND "/usr/lib/x86_64-linux-gnu/*boost*")
+#MESSAGE("BOOST_LIBS_BYHAND: ${BOOST_LIBS_BYHAND}")
 
 #INCLUDE_DIRECTORIES(../include/gmolmodel)
 #LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/lib)
@@ -94,11 +95,14 @@ set(TESTS_SRC
 
 add_executable(TestNative ${TESTS_SRC} )
 
+#string(REGEX REPLACE "\;" "_d;" Simbody_LIBRARIES_DEBUG ${Simbody_LIBRARIES})
 TARGET_LINK_LIBRARIES( TestNative 
                 ${Simbody_LIBRARIES}
-                SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
-                ${BOOST_LIBRARIES}
+                SimTKmolmodel_d #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
+                ${Boost_LIBRARIES}
                 ${BOOST_LIBS_BYHAND}
                 ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code..
                 m )
-
+MESSAGE("Simbody_LIBRARIES: ${Simbody_LIBRARIES}")
+MESSAGE("Boost_LIBRARIES: ${Boost_LIBRARIES}")
+MESSAGE("PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
