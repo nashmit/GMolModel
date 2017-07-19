@@ -202,7 +202,8 @@ void bAddGaffParams(
   vle["x"]  = 8;  //dummy atom
   vle["z"]  = 1;  //dummy atom
   vle["c"]  = vle["C"] = 6;
-  vle["h"]  = vle["H"] = 300; // for MMTK mass
+  //vle["h"]  = vle["H"] = 300; // for MMTK mass
+  vle["h"]  = vle["H"] = 1; // for MMTK mass
   vle["f"]  = vle["F"] = 9;
   vle["cl"] = vle["Cl"] = 17;
   vle["br"] = vle["Br"] = 35;
