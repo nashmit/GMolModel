@@ -9,6 +9,7 @@ from MMTK.ForceFields import Amber12SBForceField
 from MMTK import Universe, InfiniteUniverse
 from MMTK import Units
 
+from VelocityVerlet import VelocityVerletIntegrator
 import GCHMC
 
 R = 8.3144621*Units.J/Units.mol/Units.K
@@ -25,7 +26,15 @@ universe.addObject(newmol)
 universe.configuration();
 configuration =  universe.configuration().array
 
+VVintegrator = VelocityVerletIntegrator(universe)
+print "VV constructed"
 GCintegrator = GCHMC.GCHMCIntegrator(universe, mol_dir, parm_dir + gaff_FN)
+print "GCHMC constructed"
+
+(confs, KEs_MM, Es_MM, acc, ntrials, dt) = VVintegrator(steps=200, steps_per_trial=50, T=300.0, delta_t=0.0015, \
+     normalize=False, adapt=False, random_seed=random.randint(1,300))
+print "Velocity Verlet finished"
+
 (confs, Es_MM, acc, ntrials, dt) = GCintegrator.Call(30, 10, 300, 0.0015, random.randint(1,300), 0, 1, 0.5)
 print "GC: ", Es_MM
 GCintegrator.Clear()

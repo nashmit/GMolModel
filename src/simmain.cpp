@@ -114,9 +114,11 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
   }
 
   p_energy_po->gradients = (PyObject *)gradarr;
-  p_energy_po->gradient_fn = NULL;
-  p_energy_po->force_constants = NULL;
-  p_energy_po->fc_fn = NULL;
+  // LAUR
+  //p_energy_po->gradient_fn = NULL;
+  //p_energy_po->force_constants = NULL;
+  //p_energy_po->fc_fn = NULL;
+  //====
 
   int natoms = configuration->dimensions[0];
   int order[natoms+2];

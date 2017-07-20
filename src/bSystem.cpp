@@ -140,7 +140,47 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
     #ifdef WITH_THREAD
       Caller->evaluator->tstate_save = PyEval_SaveThread();
     #endif
+
+    // LAUR
+    assert(Caller);
+    assert(Caller->evaluator);
+    assert(Caller->evaluator->eval_func);
+    assert(Caller->evaluator->terms);
+    assert(Caller->evaluator->universe_spec);
+    assert(Caller->evaluator->energy_terms_array);
+    assert(Caller->evaluator->energy_terms);
+    assert(Caller->evaluator->scratch);
+    std::cout<<"Done with evaluator"<<std::endl<<std::flush;
+
+    assert(Caller->configuration);
+    std::cout<<"Caller->configuration->nd "<<Caller->configuration->nd<<std::endl<<std::flush;
+    std::cout<<"Caller->configuration->dimensions[0] "<<(Caller->configuration->dimensions)[0]<<std::endl<<std::flush;
+    std::cout<<"Caller->configuration->dimensions[1] "<<(Caller->configuration->dimensions)[1]<<std::endl<<std::flush;
+    for(int i=0; i<(Caller->configuration->dimensions)[0]; i++){
+      for(int j=0; j<(Caller->configuration->dimensions)[1]; j++){
+        std::cout<<" data["<<(Caller->configuration->dimensions)[1]*i + j<<"] "<<std::flush;
+        std::cout<<((double *)Caller->configuration->data)[(Caller->configuration->dimensions)[1]*i + j]<<std::flush;
+      }
+      std::cout<<endl;
+    }
+    std::cout<<"Done with configuration"<<std::endl<<std::flush;
+
+    assert(Caller->p_energy_po);
+    assert(Caller->p_energy_po->gradients);
+    assert(Caller->p_energy_po->gradient_fn); // failed due to nullifing in simmain.cp
+    assert(Caller->p_energy_po->force_constants); // failed due to nullifing in simmain.cp
+    assert(Caller->p_energy_po->fc_fn); // failed due to nullifing in simmain.cpp
+    assert(Caller->p_energy_po->energy_terms);
+    std::cout<<"Done with p_energy_po"<<std::endl<<std::flush;
+
+    //====
+
     (*Caller->evaluator->eval_func)(Caller->evaluator, Caller->p_energy_po, Caller->configuration, 0);
+
+    // LAUR
+    std::cout<<"*LAUR: Caller->evaluator->eval_func finished"<<std::endl<<std::flush;
+    //====
+
     #ifdef WITH_THREAD
       PyEval_RestoreThread(Caller->evaluator->tstate_save);
     #endif
