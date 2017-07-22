@@ -11,7 +11,7 @@ class GCHMCIntegrator{
  public:
   SymSystem *sys;
   TARGET_TYPE *shm;
-  PyFFEvaluatorObject *evaluator;
+  PyFFEvaluatorObject *pyFFEvaluatorObject;
   energy_data *p_energy_po;
   PyArrayObject *configuration;
   PyUniverseSpecObject *universe_spec;
@@ -115,7 +115,7 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
 
   p_energy_po->gradients = (PyObject *)gradarr;
   // LAUR
-  //p_energy_po->gradient_fn = NULL;
+  //p_energy_po->gradient_fn = NULL; // forgot why I nullified them
   //p_energy_po->force_constants = NULL;
   //p_energy_po->fc_fn = NULL;
   //====
@@ -189,14 +189,14 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
   std::cout<<"parser.ictdF "<<parser.ictdF<<std::endl<<std::flush;
 
   // LS EU
-  //(((PyFFEnergyTermObject **)(evaluator)->terms->data)[5])->param[0] = 0.5;
+  //(((PyFFEnergyTermObject **)(pyFFEvaluatorObject)->terms->data)[5])->param[0] = 0.5;
   // LS EU
 
   sys = new SymSystem(
     parser.mol2F, parser.rbF, parser.gaffF, parser.frcmodF,
     parser.ictdF, 
     PrmToAx_po, MMTkToPrm_po,
-    evaluator,
+    pyFFEvaluatorObject,
     p_energy_po,
     configuration,
     universe_spec,
@@ -408,8 +408,8 @@ boost::python::object GCHMCIntegrator::Call(
   pyo_evaluator = PyObject_CallMethod(this->universe, "energyEvaluator", NULL);
   cpyo_evaluator = PyObject_CallMethod(pyo_evaluator, "CEvaluator", NULL);
 
-  this->evaluator = (PyFFEvaluatorObject *)cpyo_evaluator;
-  sys->evaluator = this->evaluator;
+  this->pyFFEvaluatorObject = (PyFFEvaluatorObject *)cpyo_evaluator;
+  sys->pyFFEvaluatorObject = this->pyFFEvaluatorObject;
 
   #ifdef DEBUG_TIME
   //std::cout<<"Time simmain nosteps"<<this->nosteps<<" time "<<boost_timer.elapsed()<<std::endl;

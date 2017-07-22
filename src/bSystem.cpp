@@ -80,7 +80,7 @@ GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatter
                      , TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
                      , int *fassno
                      // From MMTK:
-                     , PyFFEvaluatorObject *evaluator
+                     , PyFFEvaluatorObject *pyFFEvaluatorObject
                      , energy_data *p_energy_po
                      , PyArrayObject *configuration
                      , PyUniverseSpecObject *universe_spec
@@ -97,7 +97,7 @@ GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatter
   this->fassno = fassno;
   flag = new int;
   // From MMTK:
-  this->evaluator = Caller->evaluator;
+  this->pyFFEvaluatorObject = Caller->pyFFEvaluatorObject;
   this->p_energy_po = Caller->p_energy_po;
   this->configuration = Caller->configuration;
   this->universe_spec = Caller->universe_spec;
@@ -135,22 +135,22 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
       x[tx][2] = c.calcAtomLocationInGroundFrame(state, SimTK::Compound::AtomIndex(Caller->_indexMap[ a ][1]))[2];
     }
 
-    // * Run evaluator * //
+    // * Run pyFFEvaluatorObject * //
     PyGILState_STATE GILstate = PyGILState_Ensure();
     #ifdef WITH_THREAD
-      Caller->evaluator->tstate_save = PyEval_SaveThread();
+      Caller->pyFFEvaluatorObject->tstate_save = PyEval_SaveThread();
     #endif
 
     // LAUR
     assert(Caller);
-    assert(Caller->evaluator);
-    assert(Caller->evaluator->eval_func);
-    assert(Caller->evaluator->terms);
-    assert(Caller->evaluator->universe_spec);
-    assert(Caller->evaluator->energy_terms_array);
-    assert(Caller->evaluator->energy_terms);
-    assert(Caller->evaluator->scratch);
-    std::cout<<"Done with evaluator"<<std::endl<<std::flush;
+    assert(Caller->pyFFEvaluatorObject);
+    assert(Caller->pyFFEvaluatorObject->eval_func);
+    assert(Caller->pyFFEvaluatorObject->terms);
+    assert(Caller->pyFFEvaluatorObject->universe_spec);
+    assert(Caller->pyFFEvaluatorObject->energy_terms_array);
+    assert(Caller->pyFFEvaluatorObject->energy_terms);
+    assert(Caller->pyFFEvaluatorObject->scratch);
+    std::cout<<"Done with pyFFEvaluatorObject"<<std::endl<<std::flush;
 
     assert(Caller->configuration);
     std::cout<<"Caller->configuration->nd "<<Caller->configuration->nd<<std::endl<<std::flush;
@@ -175,14 +175,16 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
 
     //====
 
-    (*Caller->evaluator->eval_func)(Caller->evaluator, Caller->p_energy_po, Caller->configuration, 0);
+    // LAUR
+    //(*(Caller->pyFFEvaluatorObject->eval_func))(Caller->pyFFEvaluatorObject, Caller->p_energy_po, Caller->configuration, 0);
+    //====
 
     // LAUR
-    std::cout<<"*LAUR: Caller->evaluator->eval_func finished"<<std::endl<<std::flush;
+    std::cout<<"*LAUR: Caller->pyFFEvaluatorObject->eval_func finished"<<std::endl<<std::flush;
     //====
 
     #ifdef WITH_THREAD
-      PyEval_RestoreThread(Caller->evaluator->tstate_save);
+      PyEval_RestoreThread(Caller->pyFFEvaluatorObject->tstate_save);
     #endif
     PyGILState_Release(GILstate);
 
@@ -190,9 +192,12 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
     for(int a=0; a<c.getNumAtoms(); a++){
       SimTK::Compound::AtomIndex aIx(Caller->_indexMap[ a ][1]);
       const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(c.getAtomMobilizedBodyIndex(aIx));
-      SimTK::Vec3 v_check(f[ Caller->_indexMap[ a ][2] ][0] * conversion_factor,
-                          f[ Caller->_indexMap[ a ][2] ][1] * conversion_factor,
-                          f[ Caller->_indexMap[ a ][2] ][2] * conversion_factor);
+      // LAUR
+      //SimTK::Vec3 v_check(f[ Caller->_indexMap[ a ][2] ][0] * conversion_factor,
+      //                    f[ Caller->_indexMap[ a ][2] ][1] * conversion_factor,
+      //                    f[ Caller->_indexMap[ a ][2] ][2] * conversion_factor);
+      SimTK::Vec3 v_check(0, 0, -0.1);
+      //====
       mobod.applyForceToBodyPoint(state, c.getAtomLocationInMobilizedBodyFrame(aIx), v_check, bodyForces);
     }
     /////////////////////// 
@@ -239,7 +244,7 @@ SymSystem::SymSystem(
   string mol2F, string rbF, string gaffF, string frcmodF,
   string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
   // From MMTK:
-  PyFFEvaluatorObject *evaluator,
+  PyFFEvaluatorObject *pyFFEvaluatorObject,
   energy_data *p_energy_po,
   PyArrayObject *configuration,
   PyUniverseSpecObject *universe_spec,
@@ -261,7 +266,7 @@ SymSystem::SymSystem(
   this->PrmToAx_po = PrmToAx_po;
   this->MMTkToPrm_po = MMTkToPrm_po;
   // From MMTK:
-  this->evaluator = evaluator;
+  this->pyFFEvaluatorObject = pyFFEvaluatorObject;
   this->p_energy_po = p_energy_po;
   this->configuration = configuration;
   this->universe_spec = universe_spec;
@@ -320,7 +325,7 @@ void SymSystem::InitSimulation(
 
   ExtForce = new SimTK::Force::Custom(*forces, new GridForce(system, *matter, indexMap, PrmToAx_po, MMTkToPrm_po, coords, vels, grads, fassno
     //From MMTK:
-    , evaluator
+    , pyFFEvaluatorObject
     , p_energy_po
     , configuration
     , universe_spec

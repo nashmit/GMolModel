@@ -106,7 +106,7 @@ class GridForce : public SimTK::Force::Custom::Implementation {
   int *fassno;
   int *flag;
   // From MMTK:
-  PyFFEvaluatorObject *evaluator;
+  PyFFEvaluatorObject *pyFFEvaluatorObject;
   energy_data *p_energy_po;
   PyArrayObject *configuration;
   PyUniverseSpecObject *universe_spec;
@@ -118,7 +118,7 @@ class GridForce : public SimTK::Force::Custom::Implementation {
             , TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
             , int *fassno
             // From MMTK:
-            , PyFFEvaluatorObject *evaluator
+            , PyFFEvaluatorObject *pyFFEvaluatorObject
             , energy_data *p_energy_po
             , PyArrayObject *configuration
             , PyUniverseSpecObject *universe_spec
@@ -201,7 +201,7 @@ class SymSystem{
 
 
   // From MMTK:
-  PyFFEvaluatorObject *evaluator;
+  PyFFEvaluatorObject *pyFFEvaluatorObject;
   energy_data *p_energy_po;
   PyArrayObject *configuration;
   PyUniverseSpecObject *universe_spec;
@@ -220,7 +220,7 @@ class SymSystem{
     string mol2F, string rbF, string gaffF, string frcmodF,
     string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
     // From MMTK:
-    PyFFEvaluatorObject *evaluator,
+    PyFFEvaluatorObject *pyFFEvaluatorObject,
     energy_data *p_energy_po,
     PyArrayObject *configuration,
     PyUniverseSpecObject *universe_spec,
