@@ -33,6 +33,7 @@
 #endif
 
 /*
+*/
 #ifndef DEBUG_LEVEL01
 #define DEBUG_LEVEL01
 #endif
@@ -42,7 +43,6 @@
 #ifndef DEBUG_WRITEDATA
 #define DEBUG_WRITEDATA
 #endif
-*/
 /*
 #ifndef DEBUG_WRITEALLPDBS
 #define DEBUG_WRITEALLPDBS
@@ -69,10 +69,10 @@
 #endif
 */
 /*
+*/
 #ifndef DEBUG_TIME
 #define DEBUG_TIME
 #endif
-*/
 
 #include "bMoleculeReader.hpp"
 #include "bAddParams.hpp"

@@ -452,16 +452,19 @@ SimTK::Real MidVVIntegratorRep::calcKEFromAtoms(const SimTK::Compound& c, SimTK:
 
 SimTK::Real MidVVIntegratorRep::calcPEFromMMTK(void)
 {
-  PyGILState_STATE GILstate = PyGILState_Ensure();
-  #ifdef WITH_THREAD
-    Caller->pyFFEvaluatorObject->tstate_save = PyEval_SaveThread();
-  #endif
-  (*Caller->pyFFEvaluatorObject->eval_func)(Caller->pyFFEvaluatorObject, Caller->p_energy_po, Caller->configuration, 0);
-  #ifdef WITH_THREAD
-    PyEval_RestoreThread(Caller->pyFFEvaluatorObject->tstate_save);
-  #endif
-  PyGILState_Release(GILstate);
-  return Caller->p_energy_po->energy;
+  // LAUR
+  //PyGILState_STATE GILstate = PyGILState_Ensure();
+  //#ifdef WITH_THREAD
+  //  Caller->pyFFEvaluatorObject->tstate_save = PyEval_SaveThread();
+  //#endif
+  //(*Caller->pyFFEvaluatorObject->eval_func)(Caller->pyFFEvaluatorObject, Caller->p_energy_po, Caller->configuration, 0);
+  //#ifdef WITH_THREAD
+  //  PyEval_RestoreThread(Caller->pyFFEvaluatorObject->tstate_save);
+  //#endif
+  //PyGILState_Release(GILstate);
+  //return Caller->p_energy_po->energy;
+  return 0.0;
+  // ====
 }
 
 
@@ -1705,16 +1708,19 @@ SimTK::State& MidVVIntegratorRep::assignConfAndTVectorFromShm3(SimTK::State& adv
 // Write positions in MMTK configuration pointer for PE calculations
 void MidVVIntegratorRep::setMMTKConf(const SimTK::Compound& c, SimTK::State& state)
 {
-  int tx, tshm;
-  vector3 *x;
-  x = (vector3 *)Caller->configuration->data;
-  for (int a=0; a<(c.getNumAtoms()); a++){
-    tx = Caller->_indexMap[ a ][2];
-    tshm = ((Caller->_indexMap[ a ][1]) * 3) + 2;
-    x[tx][0] = c.calcAtomLocationInGroundFrame(state, SimTK::Compound::AtomIndex(Caller->_indexMap[ a ][1]))[0];
-    x[tx][1] = c.calcAtomLocationInGroundFrame(state, SimTK::Compound::AtomIndex(Caller->_indexMap[ a ][1]))[1];
-    x[tx][2] = c.calcAtomLocationInGroundFrame(state, SimTK::Compound::AtomIndex(Caller->_indexMap[ a ][1]))[2];
-  }
+  // LAUR
+  std::cout<<"setMMTKConf: does nothing now"<<std::endl;
+  //int tx, tshm;
+  //vector3 *x;
+  //x = (vector3 *)Caller->configuration->data;
+  //for (int a=0; a<(c.getNumAtoms()); a++){
+  //  tx = Caller->_indexMap[ a ][2];
+  //  tshm = ((Caller->_indexMap[ a ][1]) * 3) + 2;
+  //  x[tx][0] = c.calcAtomLocationInGroundFrame(state, SimTK::Compound::AtomIndex(Caller->_indexMap[ a ][1]))[0];
+  //  x[tx][1] = c.calcAtomLocationInGroundFrame(state, SimTK::Compound::AtomIndex(Caller->_indexMap[ a ][1]))[1];
+  //  x[tx][2] = c.calcAtomLocationInGroundFrame(state, SimTK::Compound::AtomIndex(Caller->_indexMap[ a ][1]))[2];
+  //}
+  // ====
 }
 
 
@@ -1912,179 +1918,6 @@ unsigned long int MidVVIntegratorRep::getNtrials(void)
   return this->ntrials;
 }
 
-/*
-void MidVVIntegratorRep::metropolis_old(const SimTK::Compound& compound, SimTK::State& advanced)
-{
-      raiseMetroFlag();
-
-      const SimTK::System& system   = getSystem();
-      const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
-      int nu = advanced.getNU();
-
-      TARGET_TYPE rand_no = boostRealRand(rng);
-
-      TARGET_TYPE ke_n = Caller->system->calcKineticEnergy(advanced); // from Sim
-      setMMTKConf(compound, advanced);
-      TARGET_TYPE pe_n = calcPEFromMMTK(); // from MMTK
-      //TARGET_TYPE pe_n = Caller->system->calcPotentialEnergy(advanced); // from Sim
-
-      system.realize(advanced, SimTK::Stage::Position);
-
-      // Fixman potential version
-      //this->UFixj = calcUFixNum(c, advanced); // Fixman potential
-      //this->UFixj = calcUFix(c, advanced);
-      //TARGET_TYPE en = ke_n + pe_n + UFixj;
-      //TARGET_TYPE eo = getKe() + getPe() + UFixi;
-
-      //this->detMBATj = calcDetMBAT(c, advanced);
-      //this->detMj = calcDetM(c, advanced);
-
-      // Without Fixman potential
-      //TARGET_TYPE en = ke_n + pe_n;
-      //TARGET_TYPE eo = getKe() + getPe();
-      //TARGET_TYPE RT = getTb() * SimTK_BOLTZMANN_CONSTANT_MD;
-      #ifdef DEBUG_SPECIFIC
-      // ko kn po pn
-      printf("%lf %lf %lf %lf", getKe(), ke_n, getPe(), pe_n);
-      #endif
-     
-      // Get Simbody Mass Matrix 
-      SimTK::Matrix M;
-      matter.calcM(advanced, M);
-
-      if(getMetroFixmanOpt() == 1){
-        if(getMassMatNumOpt() == 1){
-          // Put Simbody Mass Matrix in Eigen
-          Eigen::MatrixXd EiM(nu, nu);
-          for(int i=0; i<nu; i++){ // Put MInv in Eigen
-            for(int j=0; j<nu; j++){
-              EiM(i, j) = M(i, j);
-            }
-          }
-          // Get Numerical Sqrt of Mass Matrix
-          Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> Eims(EiM);
-          Eigen::MatrixXd Eim = Eims.operatorSqrt();
-          if(getMassMatNumOpt() == 1){
-            //std::cout<<"Compute Numerically Det(Mj)"<<std::endl;
-            this->numDetSqrtMj = Eim.determinant();
-          }
-        }else{ // The Same for now TODO: Analytical determinant (should be the same)
-          Eigen::MatrixXd EiM(nu, nu);
-          for(int i=0; i<nu; i++){ // Put MInv in Eigen
-            for(int j=0; j<nu; j++){
-              EiM(i, j) = M(i, j);
-            }
-          }
-          Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> Eims(EiM);
-          Eigen::MatrixXd Eim = Eims.operatorSqrt();
-          if(getMassMatNumOpt() == 1){
-            //std::cout<<"Compute Pseudo Analytically Det(Mj)"<<std::endl;
-            this->detsqrtMj = Eim.determinant();
-          }
-        }
-      }
-      //this->numDetMj = EiM.determinant();
-
-      SimTK::Real correction, correction2, correction3, correction4; 
-      SimTK::Real fixo, fixn;
-      
-      //if(this->detMBATj){
-      //  correction = 1.6487212707001281468486507878141 * 
-      //  ((this->detMj * this->detMBATi) / (this->detMBATj * this->detMi));
-      //}else{
-      //  correction = 1.0;
-      //}
-      
-      
-      //if(detsqrtMj){ // numerical correction
-      //  correction2 = 1.6487212707001281468486507878141 * 
-      //  ((detsqrtMj * this->detMBATi) / (this->detMBATj * detsqrtMi));
-      //}else{
-      //  correction2 = 1.0;
-      //}
-      
-      
-      //if(this->detsqrtMj){ // numerical correction
-      //  correction4 = ((this->detsqrtMj * this->detMBATi) / (this->detMBATj * this->detsqrtMi));
-      //}else{
-      //  correction4 = 1.0;
-      //}
-      
-      //std::cout<<"detMBATi "<<this->detMBATi<<" detMBATj "<<this->detMBATj
-      //  <<" detMi "<<this->detMi<<" detMj "<<this->detMj
-      //  <<" correction= "<<correction<<std::endl;
-
-      // With Fixman potential // fix U
-      TARGET_TYPE RT = getTb() * SimTK_BOLTZMANN_CONSTANT_MD;
-      //TARGET_TYPE en = ke_n + (pe_n * (0.5 * std::log(this->numDetMj/this->detMBATj)));
-      //TARGET_TYPE eo = getKe() + (getPe() * (0.5 * std::log(this->numDetMi/this->detMBATi)));
-      TARGET_TYPE en = ke_n + pe_n;
-      TARGET_TYPE eo = getKe() + getPe();
-      //std::cout<<"numDetMi "<<numDetMi<<" numDetMj "<<numDetMj
-      //  <<" ke_n + pe_n "<<(ke_n+pe_n)<<" en "<<en
-      //  <<" ke_o + pe_o "<<(getKe() + getPe())<<" eo "<<eo<<std::endl;
-      //std::cout<<"No cor"<<std::endl;
-
-      //TARGET_TYPE expression = exp(-(en-eo)/RT) * correction3;
-      TARGET_TYPE expression;
-      if(getMetroFixmanOpt() == 1){
-        if(getMassMatNumOpt() == 1){
-          correction = this->numDetSqrtMj/this->numDetSqrtMi;
-          fixo = RT*std::log(this->numDetSqrtMi);
-          fixn = RT*std::log(this->numDetSqrtMj);
-          #ifdef DEBUG_SPECIFIC
-          std::cout<<' '<<this->numDetSqrtMi<<' '<<this->numDetSqrtMj; // print dets
-          #endif
-        }else{
-          correction = this->detsqrtMj/this->detsqrtMi;
-        }
-        //std::cout<<"Apply Fixman correction in Metropolis"<<std::endl;
-        //expression = exp(-(en-eo)/RT) * correction;
-        expression = exp(-((en + fixn)-(eo + fixo))/RT); // Me02
-      }else{
-        //std::cout<<"Don't apply Fixman correction in Metropolis"<<std::endl;
-        expression = exp(-(en-eo)/RT);
-      }
-      //TARGET_TYPE expression = exp(-((this->detsqrtMj)*en - (this->detsqrtMi)*eo)/RT); // fix0
-      //std::cout<<"Fix 0"<<std::endl;
-  
-      if(isnan(en)){
-        shm[arrays_cut + 7] = 0.0;
-        printf("en is nan\n");
-      }else{ 
-        if (((en+fixn)<(eo+fixo)) or (rand_no<expression)){ // First condition might not be correct
-        //if (rand_no<expression){ // Without en<eo as above = Me01
-          shm[arrays_cut + 7] = 1.0;
-        }else{
-          shm[arrays_cut + 7] = 0.0;
-        }
-      }
-      if(shm[arrays_cut + 7] < 0.5){ // Move not accepted - assign old conf TVector
-      //if(0 == 1){ // Force the move to be always accepted
-        assignConfFromTVector(advanced);
-        advanced.updU() = 0.0;
-        setKe(0.0);
-        setPe(getIniPe()); // OPTIMZE = store old pe somewhere
-        //std::cout<<"GC: 0,"<<getPe()<<','<<this->detMBATi<<','<<this->numDetMi<<std::endl;
-        #ifdef DEBUG_SPECIFIC
-        printf(" 0\n");
-        #endif
-      }
-      else{                          // Move accepted - set new TVector
-        setTVector(advanced);
-        advanced.updU() = 0.0; // to advance Stage
-        writePossToShm(compound, advanced); // OPTIM
-        setKe(ke_n);
-        setPe(pe_n);
-        *this->Caller->sysAccs += 1.0;
-        #ifdef DEBUG_SPECIFIC
-        printf(" 1\n");
-        #endif
-        //std::cout<<"GC: 1,"<<getPe()<<','<<this->detMBATj<<','<<this->numDetMj<<std::endl;
-      } // else // Move accepted
-
-}
-*/
 
 void MidVVIntegratorRep::metropolis(const SimTK::Compound& compound, SimTK::State& advanced)
 {
@@ -2095,7 +1928,9 @@ void MidVVIntegratorRep::metropolis(const SimTK::Compound& compound, SimTK::Stat
       int nu = advanced.getNU();
 
       #ifdef TRY_SOFT_LJ
-      (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = 0.5;
+      // LAUR
+      //(((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = 0.5;
+      // ====
       //printf("Start Metropolis. LJ scale %lf\n", (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] );
       #endif
 
@@ -2165,7 +2000,9 @@ void MidVVIntegratorRep::metropolis(const SimTK::Compound& compound, SimTK::Stat
         setPe(getIniPe()); // OPTIMZE = store old pe somewhere
 
         #ifdef TRY_SOFT_LJ
-        (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = this->Caller->lj14sf;
+        // LAUR
+        //(((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = this->Caller->lj14sf;
+        // ====
         //printf("Move rejected. LJ scale %lf\n", (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] );
         #endif
 
@@ -2182,7 +2019,9 @@ void MidVVIntegratorRep::metropolis(const SimTK::Compound& compound, SimTK::Stat
         *this->Caller->sysAccs += 1.0;
 
         #ifdef TRY_SOFT_LJ
-        (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = this->Caller->lj14sf;
+        // LAUR
+        //(((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = this->Caller->lj14sf;
+        // ====
         //printf("Move accepted. LJ scale %lf\n", (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] );
         #endif
 
@@ -2690,7 +2529,9 @@ bool MidVVIntegratorRep::attemptDAEStep
           setMMTKConf(c, advanced);
 
           #ifdef TRY_SOFT_LJ
-          (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = 0.5;
+          // LAUR
+          //(((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = 0.5;
+          // ====
           //printf("Before trial setIniPe. LJ scale %lf\n", (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1]);
           #endif
 
@@ -2698,7 +2539,9 @@ bool MidVVIntegratorRep::attemptDAEStep
           setPe(getIniPe());
 
           #ifdef TRY_SOFT_LJ
-          (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = this->Caller->lj14sf;
+          // LAUR
+          //(((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = this->Caller->lj14sf;
+          // ====
           //printf("After trial setIniPe. LJ scale %lf\n", (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] );
           #endif
 
@@ -2729,7 +2572,9 @@ bool MidVVIntegratorRep::attemptDAEStep
       // Set initial energies after initialize vels
 
       #ifdef TRY_SOFT_LJ
-      (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = 0.5;
+      // LAUR
+      //(((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = 0.5;
+      // ====
       //printf("Before setIniPe. LJ scale %lf\n", (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] );
       #endif
 
@@ -2738,7 +2583,9 @@ bool MidVVIntegratorRep::attemptDAEStep
       setPe(getIniPe());
 
       #ifdef TRY_SOFT_LJ
-      (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = this->Caller->lj14sf;
+      // LAUR
+      //(((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] = this->Caller->lj14sf;
+      // ====
       //printf("After setIniPe. LJ scale %lf\n", (((PyFFEnergyTermObject **)(this->Caller->pyFFEvaluatorObject)->terms->data)[4])->param[1] );
       #endif
 
@@ -2759,15 +2606,18 @@ bool MidVVIntegratorRep::attemptDAEStep
       SimTK::VectorView uErrEst  = yErrEst(   nq, nu);
       SimTK::VectorView zErrEst  = yErrEst(nq+nu, nz);
       SimTK::VectorView uzErrEst = yErrEst(   nq, nu+nz);    // all 2nd order estimates
-      
-      // Calculate the new positions q (3rd order) and initial (1st order) 
-      // estimate for the velocities u and auxiliary variables z.
-      
-      // These are final values (the q's will get projected, though).
+     
+      // LAUR 
+      std::cout<<"Calculate the new positions q (3rd order) and initial (1st order)"
+      <<"estimate for the velocities u and auxiliary variables z."
+      <<"These are final values (the q's will get projected, though)"<<std::endl;
+      // ====
       advanced.updTime() = t1;
       advanced.updQ()    = q0 + h*qdot0 + (h*h/2)*qdotdot0;
   
-      // Now make an initial estimate of first-order variable u and z.
+      // LAUR 
+      std::cout<<"Now make an initial estimate of first-order variable u and z."<<std::endl;
+      // ====
       const SimTK::Vector u1_est = u0 + h*udot0;
       const SimTK::Vector z1_est = z0 + h*zdot0;
   
@@ -2776,10 +2626,15 @@ bool MidVVIntegratorRep::attemptDAEStep
   
       system.realize(advanced, SimTK::Stage::Time);
       system.prescribeQ(advanced);
+      // LAUR 
+      std::cout<<"Time realized. Q prescribed."<<std::endl; 
+      // ====
       system.realize(advanced, SimTK::Stage::Position);
   
-      // Consider position constraint projection. (See AbstractIntegratorRep
-      // for how we decide not to project.)
+      // LAUR 
+      std::cout<<"Consider position constraint projection. (See AbstractIntegratorRep"
+      <<"for how we decide not to project.)"<<std::endl;
+      // ====
       const SimTK::Real projectionLimit = 
           std::max(2*getConstraintToleranceInUse(), 
                       std::sqrt(getConstraintToleranceInUse()));
@@ -2791,17 +2646,21 @@ bool MidVVIntegratorRep::attemptDAEStep
           //return false; // convergence failure for this step
       }
   
-      // q is now at its final integrated, prescribed, and projected value.
-      // u and z still need refinement.
+      // LAUR 
+      std::cout<<"q is now at its final integrated, prescribed, and projected value."
+      <<"u and z still need refinement."<<std::endl;
+      // ====
   
       system.prescribeU(advanced);
       system.realize(advanced, SimTK::Stage::Velocity);
   
-      // No u projection yet.
-  
-      // Get new values for the derivatives.
+      // LAUR 
+      std::cout<<"No u projection yet."
+      <<"Get new values for the derivatives."<<std::endl;
+      // ====
       realizeStateDerivatives(advanced);
       
+      // LAUR 
       // We're going to integrate the u's and z's with the 2nd order implicit
       // trapezoid rule: u(t+h) = u(t) + h*(f(u(t))+f(u(t+h)))/2. Unfortunately 
       // this is an implicit method so we have to iterate to refine u(t+h) until
@@ -2815,37 +2674,49 @@ bool MidVVIntegratorRep::attemptDAEStep
       SimTK::Real prevChange = SimTK::Infinity; // use this to quit early
       for (int i = 0; !converged && i < 10; ++i) {
           ++numIterations;
+          // LAUR 
           // At this point we know that the advanced state has been realized
           // through the Acceleration level, so its uDot and zDot reflect
           // the u and z state values it contains.
+          // ====
           usave = advanced.getU();
           zsave = advanced.getZ();
   
+          // LAUR 
           // Get these references now -- as soon as we change u or z they
           // will be invalid.
+          // ====
           const SimTK::Vector& udot1 = advanced.getUDot();
           const SimTK::Vector& zdot1 = advanced.getZDot();
           
+          // LAUR 
           // Refine u and z estimates.
           //cout<<"MidVVIntegratorRep: updU:"<<endl;
+          // ====
           advanced.setU(u0 + (h/2)*(udot0 + udot1));
           advanced.setZ(z0 + (h/2)*(zdot0 + zdot1));
   
+          // LAUR 
           // Fix prescribed u's which may have been changed here.
+          // ====
           system.prescribeU(advanced);
           system.realize(advanced, SimTK::Stage::Velocity);
   
+          // LAUR 
           // No projection yet.
   
           // Calculate fresh derivatives UDot and ZDot.
           //cout<<"MidVVIntegratorRep: realizeStateDerivatives:"<<endl;
+          // ====
           shm[arrays_cut + 6] = i + 2.0; // DAE done
           realizeStateDerivatives(advanced);
   
+          // LAUR 
           // Calculate convergence as the ratio of the norm of the last delta to
           // the norm of the values prior to the last change. We're using the 
           // 2-norm but this ratio would be the same if we used the RMS norm. 
           // TinyReal is there to keep us out of trouble if we started at zero.
+          // ====
           
           const SimTK::Real convergenceU = (advanced.getU()-usave).norm()
                                     / (usave.norm()+SimTK::TinyReal);
@@ -2858,10 +2729,12 @@ bool MidVVIntegratorRep::attemptDAEStep
           prevChange = change;
       }
   
+      // LAUR 
       // Now that we have achieved 2nd order estimates of u and z, we can use 
       // them to calculate a 3rd order error estimate for q and 2nd order error 
       // estimates for u and z. Note that we have already realized the state with
       // the new values, so QDot reflects the new u's.
+      // ====
   
       qErrEst = q0 + (h/2)*(qdot0+advanced.getQDot()) // implicit trapezoid rule integral
                 - advanced.getQ();                    // Verlet integral
@@ -2870,10 +2743,12 @@ bool MidVVIntegratorRep::attemptDAEStep
                 - advanced.getU();        // implicit trapezoid rule integral
       zErrEst = z1_est - advanced.getZ(); // ditto for z's
   
+      // LAUR 
       // TODO: because we're only projecting velocities here, we aren't going to 
       // get our position errors reduced here, which is a shame. Should be able 
       // to do this even though we had to project q's earlier, because the 
       // projection matrix should still be around.
+      // ====
   
       bool anyChangesU;
       if (!localProjectUAndUErrEstNoThrow(advanced, yErrEst, anyChangesU,
@@ -2882,6 +2757,7 @@ bool MidVVIntegratorRep::attemptDAEStep
           //return false; // convergence failure for this step
       }
   
+      // LAUR 
       // Two different integrators were used to estimate errors: trapezoidal for 
       // Q, and explicit Euler for U and Z.  This means that the U and Z errors
       // are of a different order than the Q errors.  We therefore multiply them 
@@ -2892,6 +2768,7 @@ bool MidVVIntegratorRep::attemptDAEStep
       // them since h is probably < 1) which will affect whether the caller
       // decides to accept the step. Instead, a different error order should
       // be used when one of these is driving the step size.
+      // ====
   
       uErrEst *= h; zErrEst *= h; // everything is 3rd order in h now
       errOrder = 3;

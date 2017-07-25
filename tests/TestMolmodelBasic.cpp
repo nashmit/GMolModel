@@ -16,15 +16,7 @@ using namespace SimTK;
 int main() {
 try {
     
-    // SIMBODY CONSTRUCTORS WORK:
-    //System someSystem;
-    //MultibodySystem someMultibodySystem; // Extends System (Simbody) // adoptSystemGuts(new MultibodySystemRep())
-    //SimbodyMatterSubsystem matter(someMultibodySystem); // Extends Subsystem (Simbody)
-    //DecorationSubsystem decorations(someMultibodySystem); // Extends Subsystem (Simbody)
-    // =====================
-
     // MOLMODEL CONSTRUCTORS DON'T WORK IN Realease mode:
-    //MolecularMechanicsSystem someMolecularMechanicsSystem; // Extends MultibodySystem (Simbody)
     CompoundSystem system; // Extends MolecularMechanicsSystem (Molmodel)
     SimbodyMatterSubsystem matter(system);
     DecorationSubsystem decorations(system);

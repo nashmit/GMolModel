@@ -20,6 +20,7 @@
 #include "molmodel/internal/units.h"
 
 /*
+*/
 #ifndef DEBUG_LEVEL01
 #define DEBUG_LEVEL01
 #endif
@@ -27,7 +28,6 @@
 #ifndef DEBUG_LEVEL02
 #define DEBUG_LEVEL02
 #endif
-*/
 
 //==============================================================================
 //                           CLASS MMTKElement

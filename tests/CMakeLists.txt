@@ -86,23 +86,30 @@ MESSAGE("numpy_include: ${numpy_include}")
 #file(GLOB BOOST_LIBS_BYHAND "/usr/lib/x86_64-linux-gnu/*boost*")
 #MESSAGE("BOOST_LIBS_BYHAND: ${BOOST_LIBS_BYHAND}")
 
-#INCLUDE_DIRECTORIES(../include/gmolmodel)
-#LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/lib)
+INCLUDE_DIRECTORIES(../include/gmolmodel)
+LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/../build-debug/lib)
+MESSAGE("Gmolmodel libs dir: ${CMAKE_CURRENT_LIST_DIR}/../build-debug/lib")
 
-set(TESTS_SRC 
-	TestNative.cpp
+set(TESTS_SRCS 
+	TestSimbodyBasic.cpp
+	TestMolmodelBasic.cpp
+        TestGmolmodelNative.cpp
 	)
 
-add_executable(TestNative ${TESTS_SRC} )
-
-#string(REGEX REPLACE "\;" "_d;" Simbody_LIBRARIES_DEBUG ${Simbody_LIBRARIES})
-TARGET_LINK_LIBRARIES( TestNative 
+foreach(TEST_SRC ${TESTS_SRCS})
+    STRING(REGEX REPLACE ".cpp" "" TEST_EXE ${TEST_SRC})
+    MESSAGE(${TEST_EXE} ${TEST_SRC}) 
+    add_executable(${TEST_EXE} ${TEST_SRC} )
+    TARGET_LINK_LIBRARIES( ${TEST_EXE}
                 ${Simbody_LIBRARIES}
                 SimTKmolmodel_d #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
                 ${Boost_LIBRARIES}
                 ${BOOST_LIBS_BYHAND}
-                ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code..
+                ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense...
+                libGMOLMODEL_dynamic.so
                 m )
+endforeach()
+
 MESSAGE("Simbody_LIBRARIES: ${Simbody_LIBRARIES}")
 MESSAGE("Boost_LIBRARIES: ${Boost_LIBRARIES}")
 MESSAGE("PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
