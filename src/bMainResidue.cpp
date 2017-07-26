@@ -378,9 +378,11 @@ using namespace SimTK;
     #endif
 
     /* Create atomTargets from passed coords array*/
+    std::cout<<"Create atomTargets from passed coords array"<<std::endl;
     std::map<AtomIndex, Vec3> atomTargets;  
     ix = 0;
     if(first_time == true){ // Take coordinates from memory
+      std::cout<<"Take coordinates from memory"<<std::endl;
       for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
        Vec3 v(coords[ (int)(indexMap[ix][2]) ][0],
               coords[ (int)(indexMap[ix][2]) ][1],
@@ -392,6 +394,7 @@ using namespace SimTK;
       }
     }
     else{ // Take coordinates from
+      std::cout<<"Take coordinates from MMTK"<<std::endl;
       int ixi, prmtopi_from_SimTK, prmtopi_from_MMTK;
       for(ix = 0; ix < getNumAtoms(); ++ix){
         ixi                 = indexMap[ix][0];

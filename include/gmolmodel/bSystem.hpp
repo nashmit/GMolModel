@@ -44,14 +44,14 @@
 #define DEBUG_WRITEDATA
 #endif
 /*
+*/
 #ifndef DEBUG_WRITEALLPDBS
 #define DEBUG_WRITEALLPDBS
 #endif
+/*
 #ifndef DEBUG_WRITEPDBS
 #define DEBUG_WRITEPDBS
 #endif
-*/
-/*
 #ifndef DEBUG_WRITEPFPDB
 #define DEBUG_WRITEPFPDB
 #endif
@@ -106,10 +106,10 @@ class GridForce : public SimTK::Force::Custom::Implementation {
   int *fassno;
   int *flag;
   // From MMTK:
-  PyFFEvaluatorObject *pyFFEvaluatorObject;
-  energy_data *p_energy_po;
-  PyArrayObject *configuration;
-  PyUniverseSpecObject *universe_spec;
+  //PyFFEvaluatorObject *pyFFEvaluatorObject;
+  //energy_data *p_energy_po;
+  //PyArrayObject *configuration;
+  //PyUniverseSpecObject *universe_spec;
   TARGET_TYPE *shm;
   SymSystem *Caller;
 
@@ -118,10 +118,10 @@ class GridForce : public SimTK::Force::Custom::Implementation {
             , TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
             , int *fassno
             // From MMTK:
-            , PyFFEvaluatorObject *pyFFEvaluatorObject
-            , energy_data *p_energy_po
-            , PyArrayObject *configuration
-            , PyUniverseSpecObject *universe_spec
+            //, PyFFEvaluatorObject *pyFFEvaluatorObject
+            //, energy_data *p_energy_po
+            //, PyArrayObject *configuration
+            //, PyUniverseSpecObject *universe_spec
             , TARGET_TYPE *shm
             , SymSystem *Caller
             );
@@ -220,10 +220,10 @@ class SymSystem{
     string mol2F, string rbF, string gaffF, string frcmodF,
     string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
     // From MMTK:
-    PyFFEvaluatorObject *pyFFEvaluatorObject,
-    energy_data *p_energy_po,
-    PyArrayObject *configuration,
-    PyUniverseSpecObject *universe_spec,
+    //PyFFEvaluatorObject *pyFFEvaluatorObject,
+    //energy_data *p_energy_po,
+    //PyArrayObject *configuration,
+    //PyUniverseSpecObject *universe_spec,
     TARGET_TYPE *shm
   );
 

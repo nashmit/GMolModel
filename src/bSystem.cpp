@@ -80,10 +80,10 @@ GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatter
                      , TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
                      , int *fassno
                      // From MMTK:
-                     , PyFFEvaluatorObject *pyFFEvaluatorObject
-                     , energy_data *p_energy_po
-                     , PyArrayObject *configuration
-                     , PyUniverseSpecObject *universe_spec
+                     //, PyFFEvaluatorObject *pyFFEvaluatorObject
+                     //, energy_data *p_energy_po
+                     //, PyArrayObject *configuration
+                     //, PyUniverseSpecObject *universe_spec
                      , TARGET_TYPE *shm
                      , SymSystem *Caller
                     ) : matter(matter){
@@ -97,10 +97,10 @@ GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatter
   this->fassno = fassno;
   flag = new int;
   // From MMTK:
-  this->pyFFEvaluatorObject = Caller->pyFFEvaluatorObject;
-  this->p_energy_po = Caller->p_energy_po;
-  this->configuration = Caller->configuration;
-  this->universe_spec = Caller->universe_spec;
+  //this->pyFFEvaluatorObject = Caller->pyFFEvaluatorObject;
+  //this->p_energy_po = Caller->p_energy_po;
+  //this->configuration = Caller->configuration;
+  //this->universe_spec = Caller->universe_spec;
   this->shm = shm;
   this->Caller = Caller;
 }
@@ -197,7 +197,7 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
       //SimTK::Vec3 v_check(f[ Caller->_indexMap[ a ][2] ][0] * conversion_factor,
       //                    f[ Caller->_indexMap[ a ][2] ][1] * conversion_factor,
       //                    f[ Caller->_indexMap[ a ][2] ][2] * conversion_factor);
-      SimTK::Vec3 v_check(0, 0, -0.1);
+      SimTK::Vec3 v_check(0, 0, -10.0);
       //====
       mobod.applyForceToBodyPoint(state, c.getAtomLocationInMobilizedBodyFrame(aIx), v_check, bodyForces);
     }
@@ -251,10 +251,10 @@ SymSystem::SymSystem(
   string mol2F, string rbF, string gaffF, string frcmodF,
   string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
   // From MMTK:
-  PyFFEvaluatorObject *pyFFEvaluatorObject,
-  energy_data *p_energy_po,
-  PyArrayObject *configuration,
-  PyUniverseSpecObject *universe_spec,
+  //PyFFEvaluatorObject *pyFFEvaluatorObject,
+  //energy_data *p_energy_po,
+  //PyArrayObject *configuration,
+  //PyUniverseSpecObject *universe_spec,
   TARGET_TYPE *shm
 ){
   std::cout<<"hop 1"<<std::endl<<std::flush;
@@ -273,10 +273,10 @@ SymSystem::SymSystem(
   this->PrmToAx_po = PrmToAx_po;
   this->MMTkToPrm_po = MMTkToPrm_po;
   // From MMTK:
-  this->pyFFEvaluatorObject = pyFFEvaluatorObject;
-  this->p_energy_po = p_energy_po;
-  this->configuration = configuration;
-  this->universe_spec = universe_spec;
+  //this->pyFFEvaluatorObject = pyFFEvaluatorObject;
+  //this->p_energy_po = p_energy_po;
+  //this->configuration = configuration;
+  //this->universe_spec = universe_spec;
   this->shm = shm;
   this->pyseed = new unsigned long int;
   this->lj14sf = 0.5;
@@ -285,6 +285,10 @@ SymSystem::SymSystem(
   matter = new SimTK::SimbodyMatterSubsystem(*system);
   forces = new SimTK::GeneralForceSubsystem(*system);
   decorations = new SimTK::DecorationSubsystem(*system);
+  // LAUR
+  //SimTK::Visualizer viz(*system);
+  //system->addEventReporter( new SimTK::Visualizer::Reporter(viz, 0.0));
+  // ====
   forceField = new SimTK::DuMMForceFieldSubsystem(*system);
   forceField->loadAmber99Parameters();
 
@@ -332,10 +336,10 @@ void SymSystem::InitSimulation(
 
   ExtForce = new SimTK::Force::Custom(*forces, new GridForce(system, *matter, indexMap, PrmToAx_po, MMTkToPrm_po, coords, vels, grads, fassno
     //From MMTK:
-    , pyFFEvaluatorObject
-    , p_energy_po
-    , configuration
-    , universe_spec
+    //, pyFFEvaluatorObject
+    //, p_energy_po
+    //, configuration
+    //, universe_spec
     , shm
     , this
   ));
@@ -499,8 +503,10 @@ void SymSystem::Advance(int nosteps){
   TARGET_TYPE myrealtime=0;
   //myrealtime = (TARGET_TYPE)nosteps * (*sysTimestep);
   myrealtime = (TARGET_TYPE)nosteps * (shm[arrays_cut + 3]);
+  std::cout<<"myrealtime: "<<myrealtime<<std::endl;
 
   SimTK::State& advanced = integ->updAdvancedState();
+  std::cout<<"Advance: integ->updAdvancedState: "<<std::endl;
 
   integ->dropBeginFlag();
   integ->dropStep0Flag();
@@ -509,14 +515,32 @@ void SymSystem::Advance(int nosteps){
   integ->resetTotStepsInCall();
 
   integ->setFixedStepSize(shm[arrays_cut + 3]); // EU
+  std::cout<<"Advance: step size: "<<shm[arrays_cut + 3]<<std::endl;
 
   integ->setTimeToReach(advanced.getTime() + myrealtime);
+  std::cout<<"Advance: integ->getTimeToReach: "<<integ->getTimeToReach()<<std::endl;
+
   integ->setNoSteps((int)shm[arrays_cut + 1]);
+  std::cout<<"Advance: integ->getNoSteps: "<<integ->getNoSteps()<<std::endl;
+
   integ->setStepsPerTrial(int(round(shm[arrays_cut + 9])));
+  std::cout<<"Advance: integ->getStepsPerTrial: "<<integ->getStepsPerTrial()<<std::endl;
+
+  std::cout<<"int(shm[arrays_cut + 1]): "<<int(shm[arrays_cut + 1])
+    <<" int(shm[arrays_cut + 9]): "<<int(shm[arrays_cut + 9])<<std::endl;
   integ->setNtrials(int(shm[arrays_cut + 1]) / int(shm[arrays_cut + 9]));
+  std::cout<<" int(shm[arrays_cut + 1]) / int(shm[arrays_cut + 9]): "
+    <<int(shm[arrays_cut + 1]) / int(shm[arrays_cut + 9])<<std::endl;
+  std::cout<<"Advance: integ->getNtrials: "<<integ->getNtrials()<<std::endl;
+
   integ->setTrial(int(shm[arrays_cut + 10]));
+  std::cout<<"Advance: integ->getTrial: "<<integ->getTrial()<<std::endl;
+
   integ->setMassMatNumOpt(this->massMatNumOpt); // EU
+  std::cout<<"Advance: integ->getMassMatNumOpt: "<<integ->getMassMatNumOpt()<<std::endl;
+
   integ->setMetroFixmanOpt(this->metroFixmanOpt); // EU
+  std::cout<<"Advance: integ->getMetroFixmanOpt: "<<integ->getMetroFixmanOpt()<<std::endl;
 
   #ifdef DEBUG_TIME
   printf("Advance: integ time %.8lf\n", Advance_timer.elapsed());

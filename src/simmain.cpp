@@ -196,10 +196,12 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
     parser.mol2F, parser.rbF, parser.gaffF, parser.frcmodF,
     parser.ictdF, 
     PrmToAx_po, MMTkToPrm_po,
-    pyFFEvaluatorObject,
-    p_energy_po,
-    configuration,
-    universe_spec,
+    // LAUR
+    //pyFFEvaluatorObject,
+    //p_energy_po,
+    //configuration,
+    //universe_spec,
+    // ====
     shm
   );
   for(int i=0; i<natoms; i++){
