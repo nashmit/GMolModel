@@ -297,7 +297,7 @@ int main(int argc, char **argv)
       system_initialized = true;
 
 //boost::python::object GCHMCIntegrator::Call(
-  int nosteps_arg = 20;
+  int nosteps_arg = 200;
   int steps_per_trial_arg = 10;
   TARGET_TYPE temp_arg;
   TARGET_TYPE ts;

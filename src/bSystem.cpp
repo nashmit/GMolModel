@@ -286,8 +286,8 @@ SymSystem::SymSystem(
   forces = new SimTK::GeneralForceSubsystem(*system);
   decorations = new SimTK::DecorationSubsystem(*system);
   // LAUR
-  //SimTK::Visualizer viz(*system);
-  //system->addEventReporter( new SimTK::Visualizer::Reporter(viz, 0.0));
+  SimTK::Visualizer viz(*system);
+  system->addEventReporter( new SimTK::Visualizer::Reporter(viz, 0.0015));
   // ====
   forceField = new SimTK::DuMMForceFieldSubsystem(*system);
   forceField->loadAmber99Parameters();

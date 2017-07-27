@@ -43,11 +43,13 @@
 #ifndef DEBUG_WRITEDATA
 #define DEBUG_WRITEDATA
 #endif
+
 /*
-*/
 #ifndef DEBUG_WRITEALLPDBS
 #define DEBUG_WRITEALLPDBS
 #endif
+*/
+
 /*
 #ifndef DEBUG_WRITEPDBS
 #define DEBUG_WRITEPDBS
@@ -55,11 +57,12 @@
 #ifndef DEBUG_WRITEPFPDB
 #define DEBUG_WRITEPFPDB
 #endif
-
 */
+
 #ifndef DEBUG_CONF
 #define DEBUG_CONF
 #endif
+
 /*
 #ifndef DEBUG_SPECIFIC
 #define DEBUG_SPECIFIC
