@@ -60,7 +60,7 @@ using namespace SimTK;
     }
     #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
     for(int tz=0; tz<natms; tz++){
-      std::cout<<"bMainRes: SpecAtom tz bonds freebonds "
+      std::cout<<"bMainRes SpecAtom tz name bonds freebonds: "
         <<tz<<' '<<bAtomList[tz].name<<' '<<bAtomList[tz].nbonds<<' '<<bAtomList[tz].freebonds<<std::endl;
     }
     #endif
@@ -89,7 +89,7 @@ using namespace SimTK;
     dumm.setCoulombGlobalScaleFactor(0);
     dumm.setGbsaGlobalScaleFactor(0);
 
-    setCompoundName("bMainResidue");
+    this->setCompoundName("bMainResidue");
 
     /*First atom*/
     int found = 0;
@@ -128,17 +128,17 @@ using namespace SimTK;
     std::cout<<"bMainRes: fst "<<fst<<std::endl;
     #endif
     
-    setBaseAtom( *(bAtomList[bi[fst]].bAtomType) );
-    setAtomBiotype(bAtomList[bi[fst]].name, "mainRes", bAtomList[bi[fst]].biotype);
-    convertInboardBondCenterToOutboard();
+    this->setBaseAtom( *(bAtomList[bi[fst]].bAtomType) );
+    this->setAtomBiotype(bAtomList[bi[fst]].name, "mainRes", bAtomList[bi[fst]].biotype);
+    this->convertInboardBondCenterToOutboard();
 
     sbuff.str("");
     sbuff<<bAtomList[bi[fst]].name<<"/bond"<<1;
     buff[fst] = sbuff.str();
 
-    bondAtom(*bAtomList[bj[fst]].bAtomType, buff[fst].c_str());
-    setAtomBiotype(bAtomList[bj[fst]].name, "mainRes", bAtomList[bj[fst]].biotype);
-    bAtomList[bi[fst]].freebonds = 2;    // linked to Ground and bj (++ in loop)
+    this->bondAtom(*bAtomList[bj[fst]].bAtomType, buff[fst].c_str());
+    this->setAtomBiotype(bAtomList[bj[fst]].name, "mainRes", bAtomList[bj[fst]].biotype);
+    bAtomList[bi[fst]].freebonds = 2;    // linked to Ground and bj (++ in loop) // WATCHOUT freebonds hardcoded
     #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
     std::cout<<"MainRes: bond "<<bAtomList[bj[fst]].name<<" to "<<bAtomList[bi[fst]].name<<' '
       <<buff[fst].c_str()<<std::endl;
@@ -179,8 +179,8 @@ using namespace SimTK;
               sbuff.str("");
               sbuff<<bAtomList[bi[m]].name<<"/bond"<<bAtomList[bi[m]].freebonds;
               buff[m] = sbuff.str();
-              bondAtom(*bAtomList[bj[m]].bAtomType, buff[m].c_str());
-              setAtomBiotype(bAtomList[bj[m]].name, "mainRes", bAtomList[bj[m]].biotype);
+              this->bondAtom(*bAtomList[bj[m]].bAtomType, buff[m].c_str());
+              this->setAtomBiotype(bAtomList[bj[m]].name, "mainRes", bAtomList[bj[m]].biotype);
               if(bi[m] == bi[fst]){
                 ++bAtomList[bi[m]].freebonds; // The first atom
               }
@@ -235,7 +235,7 @@ using namespace SimTK;
                 <<buff[m].c_str()<<' '<<otbuff.c_str()<<' '<<bi[m]<<' '<<bj[m]<<std::endl;
               #endif
               
-              addRingClosingBond(
+              this->addRingClosingBond(
                 buff[m].c_str(),
                 otbuff.c_str(),
                 0.14,
@@ -243,8 +243,8 @@ using namespace SimTK;
                 //BondMobility::Rigid
                 BondMobility::Torsion // TODO
                 );
-              setAtomBiotype(bAtomList[bi[m]].name, "mainRes", bAtomList[bi[m]].biotype);
-              setAtomBiotype(bAtomList[bj[m]].name, "mainRes", bAtomList[bj[m]].biotype);
+              this->setAtomBiotype(bAtomList[bi[m]].name, "mainRes", bAtomList[bi[m]].biotype);
+              this->setAtomBiotype(bAtomList[bj[m]].name, "mainRes", bAtomList[bj[m]].biotype);
               if(bi[m] == bi[fst]){
                 ++bAtomList[bi[m]].freebonds; // The first atom
               }
@@ -288,15 +288,13 @@ using namespace SimTK;
       #endif
     }
 
-    /* Assign AtomIndex values to atoms in bAtomList[] */
+    /* Assign AtomIndex values to atoms in bAtomList[] by name */
     unsigned int ix = 0; // MINE change type
     unsigned int jx = 0; // MINE change type
     std::string cname, myname;
     for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
       for(ix = 0; ix<natms; ix++){
-        cname = getAtomName(aIx); // WRONG
-        myname = bAtomList[ix].name;
-        if(cname == myname){
+        if(this->getAtomName(aIx) == std::string(bAtomList[ix].name)){ // compare SimTK::String with std::string
           bAtomList[ix].atomIndex = aIx;
           break;
         }
@@ -343,53 +341,81 @@ using namespace SimTK;
    
    for(ix = 0; ix<natms; ix++){
      #ifdef MAIN_RESIDUE_DEBUG_SPECIFIC
-     std::cout<<"ix "<<ix<<std::endl<<std::flush;
-     std::cout<<"bAtomList[ix].atomIndex "<<bAtomList[ix].atomIndex<<std::endl<<std::flush;
+     std::cout<<"ix "<<ix<<" "
+     <<"bAtomList[ix].atomIndex "<<bAtomList[ix].atomIndex<<std::endl<<std::flush;
      #endif
       //indexMap[bAtomList[ix].atomIndex][0] = bAtomList[ix].atomIndex;
       //indexMap[bAtomList[ix].atomIndex][1] = ix;
       indexMap[ix][0] = ix;
       indexMap[ix][1] = bAtomList[ix].atomIndex;
     }
-    #ifdef MAIN_RESIDUE_DEBUG_SPECIFIC
-    std::cout<<"indexMap filled "<<std::endl<<std::flush;
-    #endif
 
-    for(unsigned int i=0; i<natms; i++){
-      for(unsigned int k=0; k<natms; k++){
-        if(indexMap[k][1] == i){
-          PrmToAx_po[i] = TARGET_TYPE(k);
-        }
-      }
-    }  
+    // LAUR
+    // indeMap[1] inverse
+    int Inverse[natms];
+    //for(unsigned int i=0; i<natms; i++){
+    //  for(unsigned int k=0; k<natms; k++){
+    //    if(indexMap[k][1] == i){
+    //      PrmToAx_po[i] = TARGET_TYPE(k);
+    //    }
+    //  }
+    //}
+    for(unsigned int i=0; i<natms; i++){ // invert
+      Inverse[ (int)(indexMap[i][1]) ] = i;
+    }
+    for(unsigned int i=0; i<natms; i++){ // copy
+      PrmToAx_po[i] = TARGET_TYPE(Inverse[i]);
+    }
+
+    //for(unsigned int i=0; i<natms; i++){
+    //  for(unsigned int k=0; k<natms; k++){
+    //    if(indexMap[k][2] == i){
+    //      MMTkToPrm_po[i] = TARGET_TYPE(k);
+    //    }
+    //  }
+    //}
+    for(unsigned int i=0; i<natms; i++){ // invert
+      Inverse[ (int)(indexMap[i][2]) ] = i;
+    }
+    for(unsigned int i=0; i<natms; i++){ // copy
+      MMTkToPrm_po[i] = TARGET_TYPE(Inverse[i]);
+    }
+    // ====
+
     #ifdef MAIN_RESIDUE_DEBUG_SPECIFIC
     std::cout<<"PrmToAx_po filled "<<std::endl<<std::flush;
-    #endif
-
-    for(unsigned int i=0; i<natms; i++){
-      for(unsigned int k=0; k<natms; k++){
-        if(indexMap[k][2] == i){
-          MMTkToPrm_po[i] = TARGET_TYPE(k);
-        }
-      }
+    for(unsigned int k=0; k<natms; k++){
+        std::cout<<"PrmToAx_po["<<k<<"]: "<<PrmToAx_po[k]<<std::endl;
     }
-    #ifdef MAIN_RESIDUE_DEBUG_SPECIFIC
     std::cout<<"MMTkToPrm_po filled"<<std::endl<<std::flush;
+    for(unsigned int k=0; k<natms; k++){
+        std::cout<<"MMTkToPrm_po["<<k<<"]: "<<MMTkToPrm_po[k]<<std::endl;
+    }
+    std::cout<<"indexMap filled "<<std::endl<<std::flush;
+    for(int i = 0; i<natms; i++){
+      std::cout<<"indexMap["<<i<<"]: "<<indexMap[i][0]<<" "<<indexMap[i][1]<<" "<<indexMap[i][2]<<std::endl;
+    }
     #endif
 
     /* Create atomTargets from passed coords array*/
     std::cout<<"Create atomTargets from passed coords array"<<std::endl;
     std::map<AtomIndex, Vec3> atomTargets;  
     ix = 0;
-    if(first_time == true){ // Take coordinates from memory
-      std::cout<<"Take coordinates from memory"<<std::endl;
+    if(first_time == true){ // Take coordinates from main (mol2 / previously MMTK)
+      std::cout<<"Take coordinates from main (mol2)"<<std::endl;
       for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
-       Vec3 v(coords[ (int)(indexMap[ix][2]) ][0],
-              coords[ (int)(indexMap[ix][2]) ][1],
-              coords[ (int)(indexMap[ix][2]) ][2]);
-        atomTargets.insert(pair<AtomIndex, Vec3>
-          (bAtomList[ix].atomIndex, v)
-        );
+       // LAUR
+       //Vec3 v(coords[ (int)(indexMap[ix][2]) ][0],
+       //       coords[ (int)(indexMap[ix][2]) ][1],
+       //       coords[ (int)(indexMap[ix][2]) ][2]);
+       //Vec3 v(coords[ (int)(PrmToAx_po[ix]) ][0],
+       //       coords[ (int)(PrmToAx_po[ix]) ][1],
+       //       coords[ (int)(PrmToAx_po[ix]) ][2]);
+       Vec3 v(coords[ ix ][0],
+              coords[ ix ][1],
+              coords[ ix ][2]);
+        atomTargets.insert(pair<AtomIndex, Vec3> (bAtomList[ix].atomIndex, v));
+        // ====
         ix++;
       }
     }
