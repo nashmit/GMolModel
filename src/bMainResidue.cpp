@@ -450,9 +450,14 @@ using namespace SimTK;
       const PdbAtom& P = pdb.getAtom(String(bAtomList[i].name), PdbResidueId(1), String(" "));
       std::string s(P.getName());
       const Vec3& PC = P.getCoordinates();
-      bAtomList[i].x = PC[0]*10;
-      bAtomList[i].y = PC[1]*10;
-      bAtomList[i].z = PC[2]*10;
+      // LAUR
+      //bAtomList[i].x = PC[0]*10; // WATCHOUT
+      //bAtomList[i].y = PC[1]*10;
+      //bAtomList[i].z = PC[2]*10;
+      bAtomList[i].x = PC[0];
+      bAtomList[i].y = PC[1];
+      bAtomList[i].z = PC[2];
+      // ====
     }
 
     /* Set all the bonds to ... */
@@ -493,7 +498,7 @@ using namespace SimTK;
     std::filebuf fb;
     fb.open(ofilename.c_str(), std::ios::out);
     std::ostream os(&fb);
-    pdb.write(os);
+    pdb.write(os); // automatically multiplies by ten (nm to A)
     fb.close();
 
   }

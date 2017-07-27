@@ -11,7 +11,7 @@ void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
   std::filebuf fb;
   fb.open(ofilename.c_str(), std::ios::out);
   std::ostream os(&fb);
-  pdb.write(os);
+  pdb.write(os); // automatically multiplies by ten (nm to A)
   fb.close();
 }
 
@@ -26,7 +26,7 @@ void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
   std::filebuf fb;
   fb.open(ofilename.c_str(), std::ios::out);
   std::ostream os(&fb);
-  pdb.write(os);
+  pdb.write(os); // automatically multiplies by ten (nm to A)
   fb.close();
 }
 
@@ -35,7 +35,7 @@ void writePdb(SimTK::PdbStructure pdb, const char *FN)
   std::filebuf fb;
   fb.open(FN, std::ios::out);
   std::ostream os(&fb);
-  pdb.write(os);
+  pdb.write(os); //automatically multiplies by ten (nm to A)
   fb.close();
 }
 

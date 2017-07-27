@@ -210,7 +210,10 @@ int main(int argc, char **argv)
           iss >> mol2z;
           std::cout<<"mol2 info "<<mol2atom_no<<" "<< mol2atom_name
             <<" "<<mol2x<<" "<<mol2y<<" "<<mol2z<<std::endl;
-          shm[cli++] = mol2x/10.0; shm[cli++] = mol2y/10.0; shm[cli++] = mol2z/10.0; // instead of MMTK (Angstroms) WATCHOUT
+          // LAUR
+          shm[cli++] = mol2x/10.0; shm[cli++] = mol2y/10.0; shm[cli++] = mol2z/10.0; // convert A to nm
+          //shm[cli++] = mol2x; shm[cli++] = mol2y; shm[cli++] = mol2z; // instead of MMTK (Angstroms) WATCHOUT
+          // ====
         }
         mol2ifstream.close();
         // ====
