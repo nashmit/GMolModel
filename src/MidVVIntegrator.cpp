@@ -1185,9 +1185,14 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm0(SimTK::State& advanced)
     }
     aIx2mbx.insert(pair<SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex>(aIx, mbx));
 
-    SimTK::Vec3 v(coords[ Caller->_indexMap[ix][1] ][0],
-           coords[ Caller->_indexMap[ix][1] ][1],
-           coords[ Caller->_indexMap[ix][1] ][2]);
+    // LAUR ORDER
+    //SimTK::Vec3 v(coords[ Caller->_indexMap[ix][1] ][0],
+    //       coords[ Caller->_indexMap[ix][1] ][1],
+    //       coords[ Caller->_indexMap[ix][1] ][2]);
+    SimTK::Vec3 v(coords[ ix ][0],
+                  coords[ ix ][1],
+                  coords[ ix ][2]);
+    // ====
     atomTargets.insert(pair<SimTK::Compound::AtomIndex, SimTK::Vec3>(((Caller->lig1->bAtomList)[ix]).atomIndex, v));
     ix++;
   }
@@ -1296,9 +1301,14 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm1(SimTK::State& advanced)
     }
     aIx2mbx.insert(pair<SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex>(aIx, mbx));
 
-    SimTK::Vec3 v(coords[ Caller->_indexMap[ix][1] ][0],
-           coords[ Caller->_indexMap[ix][1] ][1],
-           coords[ Caller->_indexMap[ix][1] ][2]);  
+    // LAUR ORDER
+    //SimTK::Vec3 v(coords[ Caller->_indexMap[ix][1] ][0],
+    //       coords[ Caller->_indexMap[ix][1] ][1],
+    //       coords[ Caller->_indexMap[ix][1] ][2]);
+    SimTK::Vec3 v(coords[ ix ][0],
+                  coords[ ix ][1],
+                  coords[ ix ][2]);
+    // ====
     atomTargets.insert(pair<SimTK::Compound::AtomIndex, SimTK::Vec3>(((Caller->lig1->bAtomList)[ix]).atomIndex, v));
     ix++;
   }
@@ -1401,9 +1411,14 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm2(SimTK::State& advanced)
     }
     aIx2mbx.insert(pair<SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex>(aIx, mbx));
 
-    SimTK::Vec3 v(coords[ Caller->_indexMap[ix][1] ][0],
-           coords[ Caller->_indexMap[ix][1] ][1],
-           coords[ Caller->_indexMap[ix][1] ][2]);
+    // LAUR ORDER
+    //SimTK::Vec3 v(coords[ Caller->_indexMap[ix][1] ][0],
+    //       coords[ Caller->_indexMap[ix][1] ][1],
+    //       coords[ Caller->_indexMap[ix][1] ][2]);
+    SimTK::Vec3 v(coords[ ix ][0],
+                  coords[ ix ][1],
+                  coords[ ix ][2]);
+    // ====
     atomTargets.insert(pair<SimTK::Compound::AtomIndex, SimTK::Vec3>(((Caller->lig1->bAtomList)[ix]).atomIndex, v));
     ix++;
   }
@@ -1470,9 +1485,14 @@ SimTK::State& MidVVIntegratorRep::assignConfAndTVectorFromShm3Opt(SimTK::State& 
   std::map<SimTK::Compound::AtomIndex, SimTK::Vec3>           atomTargets;
   int ix = 0;
   for (SimTK::Compound::AtomIndex aIx(0); aIx < mutc1.getNumAtoms(); ++aIx){
-    SimTK::Vec3 v(coords[ Caller->_indexMap[ix][1] ][0],
-                  coords[ Caller->_indexMap[ix][1] ][1],
-                  coords[ Caller->_indexMap[ix][1] ][2]);  
+    // LAUR ORDER
+    //SimTK::Vec3 v(coords[ Caller->_indexMap[ix][1] ][0],
+    //              coords[ Caller->_indexMap[ix][1] ][1],
+    //              coords[ Caller->_indexMap[ix][1] ][2]);  
+    SimTK::Vec3 v(coords[ ix ][0],
+                  coords[ ix ][1],
+                  coords[ ix ][2]);
+    // ====
     atomTargets.insert(pair<SimTK::Compound::AtomIndex, SimTK::Vec3>(((Caller->lig1->bAtomList)[ix]).atomIndex, v));
     ix++;
   }
@@ -1599,9 +1619,14 @@ SimTK::State& MidVVIntegratorRep::assignConfAndTVectorFromShm3(SimTK::State& adv
 
   int ix = 0;
   for (SimTK::Compound::AtomIndex aIx(0); aIx < mutc1.getNumAtoms(); ++aIx){
-    SimTK::Vec3 v(coords[ Caller->_indexMap[ix][1] ][0],
-           coords[ Caller->_indexMap[ix][1] ][1],
-           coords[ Caller->_indexMap[ix][1] ][2]);  
+    // LAUR ORDER
+    //SimTK::Vec3 v(coords[ Caller->_indexMap[ix][1] ][0],
+    //       coords[ Caller->_indexMap[ix][1] ][1],
+    //       coords[ Caller->_indexMap[ix][1] ][2]);  
+    SimTK::Vec3 v(coords[ ix ][0],
+                  coords[ ix ][1],
+                  coords[ ix ][2]);
+    // ====
     atomTargets.insert(pair<SimTK::Compound::AtomIndex, SimTK::Vec3>(((Caller->lig1->bAtomList)[ix]).atomIndex, v));
     ix++;
   }
@@ -2085,15 +2110,17 @@ void MidVVIntegratorRep::try_finalize(const SimTK::Compound& c, SimTK::State& ad
       this->Caller->sysRetPotEsPoi[trial - 1] = getPe(); // RetPotEsPoi[trial] = PE
 
       // * Set return configuration * //
+      // LAUR ORDER
       xMid = (vector3 *)(Caller->sysRetConfsPois[trial - 1]);
       for(int a=0; a<this->natms; a++){
         tx = Caller->_indexMap[ a ][2];
-        tshm = ((Caller->_indexMap[ a ][1]) * 3) + 2;
+        //tshm = ((Caller->_indexMap[ a ][1]) * 3) + 2; // RESTORE
+        tshm = (a * 3) + 2;
         xMid[tx][0] = shm[ tshm +0];
         xMid[tx][1] = shm[ tshm +1];
         xMid[tx][2] = shm[ tshm +2];
       }
-      
+      // ====
     }
   }
 }
@@ -2823,14 +2850,17 @@ bool MidVVIntegratorRep::attemptDAEStep
       this->Caller->sysRetPotEsPoi[trial - 1] = getPe(); // RetPotEsPoi[trial] = PE
 
       // * Set return configuration * //
+      // LAUR ORDER
       xMid = (vector3 *)(Caller->sysRetConfsPois[trial - 1]);
       for(int a=0; a<this->natms; a++){
         tx = Caller->_indexMap[ a ][2];
-        tshm = ((Caller->_indexMap[ a ][1]) * 3) + 2;
+        //tshm = ((Caller->_indexMap[ a ][1]) * 3) + 2; // RESTORE
+        tshm = (a * 3) + 2;
         xMid[tx][0] = shm[ tshm +0];
         xMid[tx][1] = shm[ tshm +1];
         xMid[tx][2] = shm[ tshm +2];
       }
+      // ====
       
     }
   }
