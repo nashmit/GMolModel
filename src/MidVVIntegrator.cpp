@@ -373,17 +373,38 @@ SimTK::Real MidVVIntegratorRep::calcDetM(const SimTK::Compound& c, SimTK::State&
   SimTK::Real DetD0 = EiD0.determinant();
   //std::cout<<"EiD0: "<<EiD0<<std::endl;
   //std::cout<<"DetD0: "<<DetD0<<std::endl;
-  //std::cout<<"DetV:";
-  //for(int i=6; i<nu; i++){
-  //  std::cout<<' '<<DetV[i];
-  //}
-  //std::cout<<std::endl;
+
+  // LAUR
+  #ifdef DEBUG_LEVEL02
+  std::cout<<"calcDetM V:";
+  for(int i=6; i<nu; i++){
+    std::cout<<' '<<V[i];
+  }
+  std::cout<<std::endl;
+  std::cout<<"calcDetM DetV:";
+  for(int i=6; i<nu; i++){
+    std::cout<<' '<<DetV[i];
+  }
+  std::cout<<std::endl;
+  std::cout<<"calcDetM D0:";
+  for(int i=0; i<6; i++){ // Put M in Eignn
+    for(int j=0; j<6; j++){
+      std::cout<<D0(i, j)<<" ";
+    }
+    std::cout<<std::endl;
+  }
+  #endif
+  // ====
+
   detM *= DetD0;
   for(int i=6; i<nu; i++){
     detM *= DetV[i];
   }
-  //std::cout<<"calcDetM detM: "<<detM<<std::endl;
-  return detM;
+  std::cout<<"calcDetM detM: "<<detM<<std::endl;
+  // LAUR
+  //return detM;
+  return 0.1; // WATCHOUT ARBITRARY
+  // ====
 }
 
 
@@ -1997,8 +2018,8 @@ void MidVVIntegratorRep::metropolis(const SimTK::Compound& compound, SimTK::Stat
           fixn = 0.5*RT*std::log(this->detMj);
       }
       #ifdef DEBUG_LEVEL02
-      std::cout<<' '<<this->numDetSqrtMi<<' '<<this->numDetSqrtMj // print dets
-        <<' '<<this->detMi<<' '<<this->detMj;
+      std::cout<<"numDetSqrtMi: "<<this->numDetSqrtMi<<" numDetSqrtM: "<<this->numDetSqrtMj // print dets
+        <<" detMi: "<<this->detMi<<" detMj: "<<this->detMj;
       //printf("%lf %lf %lf %lf", getKe(), ke_n, (getPe() + fixo), (pe_n + fixn)); // ko kn po pn
       #endif
 
@@ -2055,7 +2076,7 @@ void MidVVIntegratorRep::metropolis(const SimTK::Compound& compound, SimTK::Stat
         #endif
       } // else // Move accepted
       #ifdef DEBUG_SPECIFIC
-      printf("%.5lf ", getPe() );
+      printf("getPe: %.5lf ", getPe() );
       #endif
 
   #ifdef DEBUG_CONF
@@ -2067,7 +2088,7 @@ void MidVVIntegratorRep::metropolis(const SimTK::Compound& compound, SimTK::Stat
   }
   // Dihedral in lin4 2 - 0 - 1 - 3
   // DiAla Phi/Psi 1- 5 - 7 - 9 - 14
-  std::cout<<std::setprecision(10)<<getPe()<<' '<<SimTK_RADIAN_TO_DEGREE*bDihedral(pos[1], pos[5], pos[7], pos[9])
+  std::cout<<"getPE dihedrals"<<std::setprecision(10)<<getPe()<<' '<<SimTK_RADIAN_TO_DEGREE*bDihedral(pos[1], pos[5], pos[7], pos[9])
     <<' '<<SimTK_RADIAN_TO_DEGREE*bDihedral(pos[5], pos[7], pos[9], pos[14])<<std::endl;
   #endif
 
@@ -2115,7 +2136,7 @@ void MidVVIntegratorRep::try_finalize(const SimTK::Compound& c, SimTK::State& ad
       for(int a=0; a<this->natms; a++){
         tx = Caller->_indexMap[ a ][2];
         //tshm = ((Caller->_indexMap[ a ][1]) * 3) + 2; // RESTORE
-        tshm = (a * 3) + 2;
+        tshm = ((Caller->_indexMap[ a ][0]) * 3) + 2;
         xMid[tx][0] = shm[ tshm +0];
         xMid[tx][1] = shm[ tshm +1];
         xMid[tx][2] = shm[ tshm +2];
@@ -2855,7 +2876,8 @@ bool MidVVIntegratorRep::attemptDAEStep
       for(int a=0; a<this->natms; a++){
         tx = Caller->_indexMap[ a ][2];
         //tshm = ((Caller->_indexMap[ a ][1]) * 3) + 2; // RESTORE
-        tshm = (a * 3) + 2;
+        tshm = ((Caller->_indexMap[ a ][0]) * 3) + 2;
+        //std::cout<<"DAE: tshm: "<<tshm<<std::endl;
         xMid[tx][0] = shm[ tshm +0];
         xMid[tx][1] = shm[ tshm +1];
         xMid[tx][2] = shm[ tshm +2];

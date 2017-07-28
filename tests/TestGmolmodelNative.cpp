@@ -10,44 +10,47 @@
 
 int main(int argc, char **argv)
 {
-    // Declare the shared memory
+    // Declare a shared memory pointer used by all the classes in the library
 
     TARGET_TYPE *shm;
+    TARGET_TYPE **coords; // convenient pointer to coordinates in shm
+    int SHMSZ; // size
+    int sweep;
 
-    // 
+    //  Declare variables for simulation parameters
+
+    int natoms;
     int nosteps;
     int ntrials;
     int steps_per_trial;
     double temperature;
     double delta_t;
-    int sweep;
-    int SHMSZ;
-    TARGET_TYPE **coords;
-    std::string ligdir = argv[0];
+
+    // Set simulation parameters
+
     temperature = 300.0;
     delta_t = 0.0015; // ps
+    //nosteps = 50; // RESTORE DEL
+    //ntrials = 5; // RESTORE DEL
+    //std::cout<<"main ntrials: "<<ntrials<<std::endl;
+    //std::cout<<"main nosteps: "<<nosteps<<std::endl;
+
+    // Set input filenames
  
-    int parser_argc = 6;
-    ligdir += '/';
     std::string mol2FN = "2but/ligand.mol2";
     std::string rbFN = "2but/ligand.rb";
     std::string gaffFN = "gaff.dat";
     std::string frcmodFN = "2but/ligand.frcmod";
+
+    // Simulation type:
+    // IC: Internal Coordinates Dynamics
+    // TD: Torsional Dynamics
+    // RR: Rigid Rings Torsional Dynamics
+
     std::string ictd = "TD";
 
-    /* Options are:
-      IC: Internal Coordinates: fully flexible
-      TD: Torsional Dynamics: only torsions are flexible 
-      RR: Rigid Rings: torsional dynamics with rigid rings
-     */
-    const char *parser_argv[6] = {
-    "-ligdir", ligdir.c_str(),
-    "-gaff",  gaffFN.c_str(),
-    "-ictd", "TD"
-    };
+    // Read number of atoms from mol2 file
 
-    // * Read number of atoms  * //
-    int natoms;
     std::string line;
     std::string column;
 
@@ -194,7 +197,7 @@ int main(int argc, char **argv)
         shm[cli++] = .0; shm[cli++] = .0; shm[cli++] = .0;
     }
     shm[cli++] = big_loop_i;          // Step
-    shm[cli++] = 50.0; //(TARGET_TYPE)nosteps;    // Number of steps
+    shm[cli++] = (TARGET_TYPE)nosteps;    // Number of steps
     shm[cli++] = temperature; // Temeperature
     shm[cli++] = delta_t;
     shm[cli++] = 0.0; // Trouble flag
@@ -206,14 +209,6 @@ int main(int argc, char **argv)
     shm[1] = CLIENT_FLAG;
 
     shm[arrays_cut + 6] = 13.0; // set DAE to done
-
-    // Print shm
-    std::cout<<"shm contents:"<<std::endl;
-    for(i=0; i<SHMSZ; i++){
-        std::cout<<shm[i]<<" ";
-        if(i%3 == 0) std::cout<<std::endl;
-    }
-    std::cout<<std::endl;
 
     // * Assign convenient pointers for coordinates * //
     int shm_coords_sup = (natoms3)+2;
@@ -255,7 +250,7 @@ int main(int argc, char **argv)
     sys->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
     system_initialized = true;
 
-    int nosteps_arg = 200;
+    int nosteps_arg = 50; // RESTORE
     int steps_per_trial_arg = 10;
     TARGET_TYPE temp_arg;
     TARGET_TYPE ts;
@@ -268,18 +263,24 @@ int main(int argc, char **argv)
             //boost::timer boost_timer;
     #endif
 
-    int ntrials_arg = 0;
-    if(nosteps_arg%steps_per_trial_arg){
+    int ntrials_arg = 0; // RESTORE
+    if(nosteps_arg%steps_per_trial_arg){ // RESTORE DEL
         fprintf(stderr, 
             "GCHMCIntegrator::Call(): Incorrect nosteps/steps_per_trial combination: %d/%d\n",
              nosteps_arg, steps_per_trial_arg);
         exit(1);
     }
-    ntrials_arg = nosteps_arg/steps_per_trial_arg;
+    ntrials_arg = nosteps_arg/steps_per_trial_arg; // RESTORE
 
+    // LAUR
     double **retConfsPois = new double* [ntrials_arg];
     double *retPotEsPoi = new double[ntrials_arg];
     double *accs = new double;
+
+    //double **retConfsPois = new double* [ntrials];
+    //double *retPotEsPoi = new double[ntrials];
+    //double *accs = new double;
+    // ====
 
     *sys->pyseed = pyseed;
     sys->massMatNumOpt = _massMatNumOpt;
@@ -302,6 +303,14 @@ int main(int argc, char **argv)
     shm[arrays_cut + 7] = 1.0;     // acceptance always 1 !!
     shm[arrays_cut + 9] = nosteps/ntrials; // steps_per_trial
     shm[arrays_cut + 10] = 0.0;    // initialize trial
+
+    // Print shm
+    std::cout<<"shm contents:"<<std::endl;
+    for(i=0; i<SHMSZ; i++){
+        std::cout<<shm[i]<<" ";
+        if(i%3 == 0) std::cout<<std::endl;
+    }
+    std::cout<<std::endl;
 
     sys->Advance(nosteps_arg); 
     #ifdef DEBUG_TIME
