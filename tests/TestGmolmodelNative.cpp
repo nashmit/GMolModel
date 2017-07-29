@@ -30,10 +30,11 @@ int main(int argc, char **argv)
 
     temperature = 300.0;
     delta_t = 0.0015; // ps
-    //nosteps = 50; // RESTORE DEL
-    //ntrials = 5; // RESTORE DEL
-    //std::cout<<"main ntrials: "<<ntrials<<std::endl;
-    //std::cout<<"main nosteps: "<<nosteps<<std::endl;
+    nosteps = 200; // RESTORE DEL
+    ntrials = 10; // RESTORE DEL
+    steps_per_trial = nosteps / ntrials;
+    std::cout<<"main ntrials: "<<ntrials<<std::endl;
+    std::cout<<"main nosteps: "<<nosteps<<std::endl;
 
     // Set input filenames
  
@@ -48,6 +49,12 @@ int main(int argc, char **argv)
     // RR: Rigid Rings Torsional Dynamics
 
     std::string ictd = "TD";
+
+    std::cout<<"mol2FN "<<mol2FN<<std::endl<<std::flush;
+    std::cout<<"rbFN "<<rbFN<<std::endl<<std::flush;
+    std::cout<<"gaffFN "<<gaffFN<<std::endl<<std::flush;
+    std::cout<<"frcmodFN "<<frcmodFN<<std::endl<<std::flush;
+    std::cout<<"ictd "<<ictd<<std::endl<<std::flush;
 
     // Read number of atoms from mol2 file
 
@@ -66,24 +73,26 @@ int main(int argc, char **argv)
     mol2ifstream.close();
     std::cout<<"natoms read from mol2: "<<natoms<<std::endl;
 
+    // Read atom ordering from mol2
  
-    int order[natoms+2]; // prmtop order previously read from MMTK
+    int order[natoms+2]; // prmtop ORDER previously read from MMTK
+    int acceptance;
+    TARGET_TYPE **indexMap = NULL;
+    TARGET_TYPE *PrmToAx_po = NULL;
+    TARGET_TYPE *MMTkToPrm_po = NULL;
+    int _indexMap[natoms][3];
+    indexMap = new TARGET_TYPE*[(natoms)];
+    PrmToAx_po = new TARGET_TYPE[natoms];
+    MMTkToPrm_po = new TARGET_TYPE[natoms];
+
     for(int i=0; i<natoms; i++){
       order[i] = i; // instead of MMTK
     }
-    int acceptance;
     order[natoms] = 1;
     order[natoms+1] = 1945;
     acceptance = order[natoms];
 
-    TARGET_TYPE **indexMap = NULL;
-    TARGET_TYPE *PrmToAx_po = NULL;
-    TARGET_TYPE *MMTkToPrm_po = NULL;
-
-    indexMap = new TARGET_TYPE*[(natoms)];
-    int _indexMap[natoms][3];
-    PrmToAx_po = new TARGET_TYPE[natoms];
-    MMTkToPrm_po = new TARGET_TYPE[natoms];
+    // Set the shared memory size
 
     int natoms3 = 3*(natoms);
     int arrays_cut = 2 + 4*natoms3;
@@ -102,12 +111,6 @@ int main(int argc, char **argv)
         1*sizeof(TARGET_TYPE) //+     // ac + 10      // trial
     );
     shm = new TARGET_TYPE[SHMSZ];
-
-    std::cout<<"mol2FN "<<mol2FN<<std::endl<<std::flush;
-    std::cout<<"rbFN "<<rbFN<<std::endl<<std::flush;
-    std::cout<<"gaffFN "<<gaffFN<<std::endl<<std::flush;
-    std::cout<<"frcmodFN "<<frcmodFN<<std::endl<<std::flush;
-    std::cout<<"ictd "<<ictd<<std::endl<<std::flush;
 
     SymSystem *sys = new SymSystem(
         mol2FN, rbFN, gaffFN, frcmodFN,
@@ -250,8 +253,6 @@ int main(int argc, char **argv)
     sys->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
     system_initialized = true;
 
-    int nosteps_arg = 50; // RESTORE
-    int steps_per_trial_arg = 10;
     TARGET_TYPE temp_arg;
     TARGET_TYPE ts;
     int pyseed;
@@ -263,24 +264,12 @@ int main(int argc, char **argv)
             //boost::timer boost_timer;
     #endif
 
-    int ntrials_arg = 0; // RESTORE
-    if(nosteps_arg%steps_per_trial_arg){ // RESTORE DEL
-        fprintf(stderr, 
-            "GCHMCIntegrator::Call(): Incorrect nosteps/steps_per_trial combination: %d/%d\n",
-             nosteps_arg, steps_per_trial_arg);
-        exit(1);
+    double **retConfsPois = new double* [ntrials];
+    for(int r=0; r<ntrials; r++){
+        retConfsPois[r] = new double[3 * sys->mr->natms]; // WATCHOUT
     }
-    ntrials_arg = nosteps_arg/steps_per_trial_arg; // RESTORE
-
-    // LAUR
-    double **retConfsPois = new double* [ntrials_arg];
-    double *retPotEsPoi = new double[ntrials_arg];
+    double *retPotEsPoi = new double[ntrials];
     double *accs = new double;
-
-    //double **retConfsPois = new double* [ntrials];
-    //double *retPotEsPoi = new double[ntrials];
-    //double *accs = new double;
-    // ====
 
     *sys->pyseed = pyseed;
     sys->massMatNumOpt = _massMatNumOpt;
@@ -290,18 +279,13 @@ int main(int argc, char **argv)
     sys->sysRetPotEsPoi = retPotEsPoi;
     sys->sysAccs = accs;
 
-    if(nosteps_arg % ntrials_arg){
-        fprintf(stderr, "nosteps_arg % ntrials_arg not 0\n");
-        exit(1);
-    }
-
     arrays_cut = 2 + 4*3*(sys->mr->natms);
     shm[arrays_cut + 0] = 0.0; // step (will be incremented in MidVV
-    shm[arrays_cut + 1] = (TARGET_TYPE)(nosteps_arg);
+    shm[arrays_cut + 1] = (TARGET_TYPE)(nosteps);
     shm[arrays_cut + 2] = temperature;
     shm[arrays_cut + 3] = delta_t; // picosec
     shm[arrays_cut + 7] = 1.0;     // acceptance always 1 !!
-    shm[arrays_cut + 9] = nosteps/ntrials; // steps_per_trial
+    shm[arrays_cut + 9] = (TARGET_TYPE)steps_per_trial; // steps_per_trial
     shm[arrays_cut + 10] = 0.0;    // initialize trial
 
     // Print shm
@@ -312,7 +296,7 @@ int main(int argc, char **argv)
     }
     std::cout<<std::endl;
 
-    sys->Advance(nosteps_arg); 
+    sys->Advance(nosteps); 
     #ifdef DEBUG_TIME
         //std::cout<<"Time simmain nosteps"<<this->nosteps<<" time "<<boost_timer.elapsed()<<std::endl;
     #endif

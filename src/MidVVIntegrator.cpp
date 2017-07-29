@@ -2872,12 +2872,12 @@ bool MidVVIntegratorRep::attemptDAEStep
 
       // * Set return configuration * //
       // LAUR ORDER
+      std::cout<<"DAE: trial: "<<trial<<std::endl<<std::flush;
       xMid = (vector3 *)(Caller->sysRetConfsPois[trial - 1]);
       for(int a=0; a<this->natms; a++){
         tx = Caller->_indexMap[ a ][2];
-        //tshm = ((Caller->_indexMap[ a ][1]) * 3) + 2; // RESTORE
         tshm = ((Caller->_indexMap[ a ][0]) * 3) + 2;
-        //std::cout<<"DAE: tshm: "<<tshm<<std::endl;
+        std::cout<<"DAE: tx: "<<tx<<" tshm: "<<tshm<<std::endl<<std::flush;
         xMid[tx][0] = shm[ tshm +0];
         xMid[tx][1] = shm[ tshm +1];
         xMid[tx][2] = shm[ tshm +2];
