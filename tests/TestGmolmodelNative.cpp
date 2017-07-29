@@ -88,11 +88,14 @@ int main(int argc, char **argv)
     for(int i=0; i<natoms; i++){
       order[i] = i; // instead of MMTK
     }
+    for(int i=0; i<natoms; i++){
+        _indexMap[i][2] = order[i];
+    }
     order[natoms] = 1;
     order[natoms+1] = 1945;
     acceptance = order[natoms];
 
-    // Set the shared memory size
+    // Set the shared memory size (SHMSZ)
 
     int natoms3 = 3*(natoms);
     int arrays_cut = 2 + 4*natoms3;
@@ -112,26 +115,28 @@ int main(int argc, char **argv)
     );
     shm = new TARGET_TYPE[SHMSZ];
 
+    // Build Gmolmodel simulation system
+
     SymSystem *sys = new SymSystem(
         mol2FN, rbFN, gaffFN, frcmodFN,
         ictd, 
         PrmToAx_po, MMTkToPrm_po,
         shm
     );
-    for(int i=0; i<natoms; i++){
-        _indexMap[i][2] = order[i];
-    }
 
-    // * Memory alloc for convinient arrays * //
+    // Memory alloc for convinient arrays 
+
     coords = new TARGET_TYPE*[sys->mr->natms];
     TARGET_TYPE **vels = new TARGET_TYPE*[sys->mr->natms];
     TARGET_TYPE **inivels = new TARGET_TYPE*[sys->mr->natms];
     TARGET_TYPE **grads = new TARGET_TYPE*[sys->mr->natms];
 
-    // * Seed the random number generator * //
+    // Seed the random number generator 
+
     srand (time(NULL));
 
     // Load initial shared memory values
+
     float mysweep = 0;
     shm[0] = CNT_START;
 
@@ -145,12 +150,15 @@ int main(int argc, char **argv)
     int start, start_1, stop;
     int i = natoms*2*3 + 2;
 
-    // * Assign convenient pointers for order * /
+    // Assign convenient pointers for order
+
     start = 2 + natoms3 + natoms3; 
     for(a=0; a<natoms; a++){
         indexMap[a] = &(shm[a*3 + start]);
     }
-    // * Assign order in shm[][2] * //
+
+    // Assign order in shm[][2] 
+
     start = 2 + natoms3 + natoms3;
     cli = start;
     for(a=0; a<natoms; a++){ // Order
@@ -159,7 +167,9 @@ int main(int argc, char **argv)
     }
 
     cli = 2;
-    // ---- Read positions in the same order as in mol2
+
+    // Get coordinates in the same order as in mol2
+
     int mol2atomlineno = -1;
     int mol2atom_no;
     std::string mol2atom_name;
@@ -187,18 +197,31 @@ int main(int argc, char **argv)
     }
     mol2ifstream.close();
 
-    for(a=0; a<natoms; a++){ // Velocities
-        shm[cli++] = .0; //vels[a][0];//shm[cli++] = v[a][0];
-        shm[cli++] = .0; //vels[a][1];//shm[cli++] = v[a][1];
-        shm[cli++] = .0; //vels[a][2];//shm[cli++] = v[a][2];
+    // Get velocities
+
+    for(a=0; a<natoms; a++){
+        shm[cli++] = .0; 
+        shm[cli++] = .0; 
+        shm[cli++] = .0; 
     }
-    for(a=0; a<natoms; a++){ // Order
+
+    // Get order    
+
+    for(a=0; a<natoms; a++){
         cli += 2;
         shm[cli++] = order[a];
     }
-    for(a=0; a<natoms; a++){ // Forces
-        shm[cli++] = .0; shm[cli++] = .0; shm[cli++] = .0;
+
+    // Get forces   
+
+    for(a=0; a<natoms; a++){
+        shm[cli++] = .0;
+        shm[cli++] = .0;
+        shm[cli++] = .0;
     }
+
+    // Get simulation parameters
+
     shm[cli++] = big_loop_i;          // Step
     shm[cli++] = (TARGET_TYPE)nosteps;    // Number of steps
     shm[cli++] = temperature; // Temeperature
@@ -208,12 +231,13 @@ int main(int argc, char **argv)
     cli++; // DAE set only by the server
     shm[cli] = acceptance + 0.0;
 
-    //Set the client flag
-    shm[1] = CLIENT_FLAG;
+    // Set the client flag
 
+    shm[1] = CLIENT_FLAG;
     shm[arrays_cut + 6] = 13.0; // set DAE to done
 
-    // * Assign convenient pointers for coordinates * //
+    // Assign convenient pointers for coordinates
+
     int shm_coords_sup = (natoms3)+2;
     int j=-1, k=0;
     start = 2; 
@@ -221,9 +245,10 @@ int main(int argc, char **argv)
         coords[j] = &(shm[j*3 + start]);
     }
 
-      mysweep = shm[0] - CNT_START;
+    mysweep = shm[0] - CNT_START;
 
-    // * Assign convenient pointers for velocities * //
+    // Assign convenient pointers for velocities
+
     start = 2 + natoms3;
     start_1 = start - 1;
     stop = 2 + natoms3 + natoms3;
@@ -232,7 +257,8 @@ int main(int argc, char **argv)
         inivels[j] = &(shm[j*3 + start]);
     }
 
-    // * Assign convenient pointers for gradients * //
+    // Assign convenient pointers for gradients
+
     start = 2 + natoms3 + natoms3 + natoms3;
     start_1 = start - 1;
     stop = 2 + natoms3 + natoms3 + natoms3 + natoms3;
@@ -240,18 +266,23 @@ int main(int argc, char **argv)
         grads[j] = &(shm[j*3 + start]);
     }
 
-    // * Rewrite indexMap to memory * /
+    // Rewrite indexMap to memory
+
     start = 2 + natoms3 + natoms3;
     start_1 = start - 1;
     stop = 2 + natoms3 + natoms3 + natoms3;
 
-    // * Initialize Simulation * /
+    // Initialize Simulation
+
     TARGET_TYPE timestep, mytimestep;
     mytimestep = shm[arrays_cut + 3];
 
-    // * Build bMainResidue and fill indexMap * /
+    // Build bMainResidue and fill indexMap
+
     sys->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
     system_initialized = true;
+
+    // Options for mass matrix, Lennard Jones
 
     TARGET_TYPE temp_arg;
     TARGET_TYPE ts;
@@ -263,6 +294,8 @@ int main(int argc, char **argv)
     #ifdef DEBUG_TIME
             //boost::timer boost_timer;
     #endif
+
+    // Alloc memory for saving configurations WATCHOUT TOO BIG
 
     double **retConfsPois = new double* [ntrials];
     for(int r=0; r<ntrials; r++){
@@ -295,6 +328,8 @@ int main(int argc, char **argv)
         if(i%3 == 0) std::cout<<std::endl;
     }
     std::cout<<std::endl;
+
+   // Simulate
 
     sys->Advance(nosteps); 
     #ifdef DEBUG_TIME
