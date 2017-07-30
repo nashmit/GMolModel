@@ -79,11 +79,6 @@ GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatter
                      , TARGET_TYPE **indexMap, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
                      , TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
                      , int *fassno
-                     // From MMTK:
-                     //, PyFFEvaluatorObject *pyFFEvaluatorObject
-                     //, energy_data *p_energy_po
-                     //, PyArrayObject *configuration
-                     //, PyUniverseSpecObject *universe_spec
                      , TARGET_TYPE *shm
                      , SymSystem *Caller
                     ) : matter(matter){
@@ -119,75 +114,10 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
   int natoms3 = 3*(c.getNumAtoms());
   int i=0;
   int tx, tshm;
-  vector3 *x, *v, *f;
+  Vector3 *x, *v, *f;
   int ix = 0;
   
   if((*fassno>0)){ // Get forces from MMTK
-
-    // LAUR
-    //x = (vector3 *)Caller->configuration->data;
-    //f = (vector3 *)(((PyArrayObject *)(Caller->p_energy_po->gradients))->data);
-    // ====
-    
-    // LAUR
-    // ** Write configuration to MMTK
-    //for (int a=0; a<(c.getNumAtoms()); a++){
-    //  tx = Caller->_indexMap[ a ][2];
-    //  x[tx][0] = c.calcAtomLocationInGroundFrame(state, SimTK::Compound::AtomIndex(Caller->_indexMap[ a ][1]))[0];
-    //  x[tx][1] = c.calcAtomLocationInGroundFrame(state, SimTK::Compound::AtomIndex(Caller->_indexMap[ a ][1]))[1];
-    //  x[tx][2] = c.calcAtomLocationInGroundFrame(state, SimTK::Compound::AtomIndex(Caller->_indexMap[ a ][1]))[2];
-    //}
-    // ====
-
-    // * Run pyFFEvaluatorObject * //
-    // LAUR
-    //PyGILState_STATE GILstate = PyGILState_Ensure();
-    #ifdef WITH_THREAD
-      //Caller->pyFFEvaluatorObject->tstate_save = PyEval_SaveThread();
-    #endif
-
-    //assert(Caller);
-    //assert(Caller->pyFFEvaluatorObject);
-    //assert(Caller->pyFFEvaluatorObject->eval_func);
-    //assert(Caller->pyFFEvaluatorObject->terms);
-    //assert(Caller->pyFFEvaluatorObject->universe_spec);
-    //assert(Caller->pyFFEvaluatorObject->energy_terms_array);
-    //assert(Caller->pyFFEvaluatorObject->energy_terms);
-    //assert(Caller->pyFFEvaluatorObject->scratch);
-    //std::cout<<"Done with pyFFEvaluatorObject"<<std::endl<<std::flush;
-
-    //assert(Caller->configuration);
-    //std::cout<<"Caller->configuration->nd "<<Caller->configuration->nd<<std::endl<<std::flush;
-    //std::cout<<"Caller->configuration->dimensions[0] "<<(Caller->configuration->dimensions)[0]<<std::endl<<std::flush;
-    //std::cout<<"Caller->configuration->dimensions[1] "<<(Caller->configuration->dimensions)[1]<<std::endl<<std::flush;
-    //for(int i=0; i<(Caller->configuration->dimensions)[0]; i++){
-    //  for(int j=0; j<(Caller->configuration->dimensions)[1]; j++){
-    //    std::cout<<" data["<<(Caller->configuration->dimensions)[1]*i + j<<"] "<<std::flush;
-    //    std::cout<<((double *)Caller->configuration->data)[(Caller->configuration->dimensions)[1]*i + j]<<std::flush;
-    //  }
-    //  std::cout<<endl;
-    //}
-    //std::cout<<"Done with configuration"<<std::endl<<std::flush;
-
-    //assert(Caller->p_energy_po);
-    //assert(Caller->p_energy_po->gradients);
-    //assert(Caller->p_energy_po->gradient_fn); // failed due to nullifing in simmain.cp
-    //assert(Caller->p_energy_po->force_constants); // failed due to nullifing in simmain.cp
-    //assert(Caller->p_energy_po->fc_fn); // failed due to nullifing in simmain.cpp
-    //assert(Caller->p_energy_po->energy_terms);
-    //std::cout<<"Done with p_energy_po"<<std::endl<<std::flush;
-    //====
-
-    // LAUR
-    //(*(Caller->pyFFEvaluatorObject->eval_func))(Caller->pyFFEvaluatorObject, Caller->p_energy_po, Caller->configuration, 0);
-    //====
-
-    #ifdef WITH_THREAD
-      // LAUR
-      //PyEval_RestoreThread(Caller->pyFFEvaluatorObject->tstate_save);
-    #endif
-    //PyGILState_Release(GILstate);
-    // ====
 
     // Apply forces from MMTK
     for(int a=0; a<c.getNumAtoms(); a++){

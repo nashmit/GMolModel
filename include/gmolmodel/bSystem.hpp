@@ -83,6 +83,8 @@
 #include "bMainResidue.hpp"
 #include "bArgParser.hpp"
 
+typedef double Vector3[3];
+
 void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
          const char *dirname, const char *prefix, int midlength, const char *sufix);
 
@@ -204,10 +206,10 @@ class SymSystem{
 
 
   // From MMTK:
-  PyFFEvaluatorObject *pyFFEvaluatorObject;
-  energy_data *p_energy_po;
-  PyArrayObject *configuration;
-  PyUniverseSpecObject *universe_spec;
+  //PyFFEvaluatorObject *pyFFEvaluatorObject;
+  //energy_data *p_energy_po;
+  //PyArrayObject *configuration;
+  //PyUniverseSpecObject *universe_spec;
   TARGET_TYPE *shm;
 
   double **sysRetConfsPois;

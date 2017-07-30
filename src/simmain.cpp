@@ -411,7 +411,7 @@ boost::python::object GCHMCIntegrator::Call(
   cpyo_evaluator = PyObject_CallMethod(pyo_evaluator, "CEvaluator", NULL);
 
   this->pyFFEvaluatorObject = (PyFFEvaluatorObject *)cpyo_evaluator;
-  sys->pyFFEvaluatorObject = this->pyFFEvaluatorObject;
+  //sys->pyFFEvaluatorObject = this->pyFFEvaluatorObject; WATCHOUT RESTORE
 
   #ifdef DEBUG_TIME
   //std::cout<<"Time simmain nosteps"<<this->nosteps<<" time "<<boost_timer.elapsed()<<std::endl;

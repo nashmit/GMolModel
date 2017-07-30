@@ -1177,7 +1177,7 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm0(SimTK::State& advanced)
   // Declare vars
   int i;
   const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
-  vector3 *xMid;
+  Vector3 *xMid;
   int tx, tshm; // x -> shm index correspondence
   SimTK::Compound& mutc1 = compoundSystem->updCompound(SimTK::CompoundSystem::CompoundIndex(0));
   SimTK::Transform X_CoAt[mutc1.getNumAtoms()];
@@ -1300,7 +1300,7 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm1(SimTK::State& advanced)
   int i;
   const SimTK::System& system   = getSystem();
   const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
-  vector3 *xMid;
+  Vector3 *xMid;
   int tx, tshm; // x -> shm index correspondence
   SimTK::Compound& mutc1 = compoundSystem->updCompound(SimTK::CompoundSystem::CompoundIndex(0));
 
@@ -1757,8 +1757,8 @@ void MidVVIntegratorRep::setMMTKConf(const SimTK::Compound& c, SimTK::State& sta
   // LAUR
   std::cout<<"setMMTKConf: does nothing now"<<std::endl;
   //int tx, tshm;
-  //vector3 *x;
-  //x = (vector3 *)Caller->configuration->data;
+  //Vector3 *x;
+  //x = (Vector3 *)Caller->configuration->data;
   //for (int a=0; a<(c.getNumAtoms()); a++){
   //  tx = Caller->_indexMap[ a ][2];
   //  tshm = ((Caller->_indexMap[ a ][1]) * 3) + 2;
@@ -2096,7 +2096,7 @@ void MidVVIntegratorRep::metropolis(const SimTK::Compound& compound, SimTK::Stat
 
 void MidVVIntegratorRep::try_finalize(const SimTK::Compound& c, SimTK::State& advanced, int step, int steps_done)
 {
-  vector3 *xMid;
+  Vector3 *xMid;
   int tx, tshm; // x -> shm index correspondence
   #ifdef DEBUG_LEVEL02
   printf("startt %.4lf time %.4lf arr3 %.4lf ", starttime, advanced.getTime(), (shm[arrays_cut + 3]));
@@ -2132,7 +2132,7 @@ void MidVVIntegratorRep::try_finalize(const SimTK::Compound& c, SimTK::State& ad
 
       // * Set return configuration * //
       // LAUR ORDER
-      xMid = (vector3 *)(Caller->sysRetConfsPois[trial - 1]);
+      xMid = (Vector3 *)(Caller->sysRetConfsPois[trial - 1]);
       for(int a=0; a<this->natms; a++){
         tx = Caller->_indexMap[ a ][2];
         //tshm = ((Caller->_indexMap[ a ][1]) * 3) + 2; // RESTORE
@@ -2525,7 +2525,7 @@ bool MidVVIntegratorRep::attemptDAEStep
     #endif
 
     //int tx, tshm; // x -> shm index correspondence
-    //vector3 *xMid;
+    //Vector3 *xMid;
 
     const SimTK::System& system   = getSystem();
     SimTK::State& advanced = updAdvancedState();
@@ -2826,7 +2826,7 @@ bool MidVVIntegratorRep::attemptDAEStep
       // * CHECKPOINT Increment step & total # of steps * //
       int steps_done = rint( (advanced.getTime() - starttime) / (shm[arrays_cut + 3]) );
       //try_finalize(c, advanced, step, steps_done);
-  vector3 *xMid;
+  Vector3 *xMid;
   int tx, tshm; // x -> shm index correspondence
   #ifdef DEBUG_LEVEL02
   printf("startt %.4lf time %.4lf arr3 %.4lf ", starttime, advanced.getTime(), (shm[arrays_cut + 3]));
@@ -2873,7 +2873,7 @@ bool MidVVIntegratorRep::attemptDAEStep
       // * Set return configuration * //
       // LAUR ORDER
       std::cout<<"DAE: trial: "<<trial<<std::endl<<std::flush;
-      xMid = (vector3 *)(Caller->sysRetConfsPois[trial - 1]);
+      xMid = (Vector3 *)(Caller->sysRetConfsPois[trial - 1]);
       for(int a=0; a<this->natms; a++){
         tx = Caller->_indexMap[ a ][2];
         tshm = ((Caller->_indexMap[ a ][0]) * 3) + 2;
