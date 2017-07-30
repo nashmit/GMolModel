@@ -30,30 +30,6 @@
 #endif
 
 //==============================================================================
-//                           CLASS MMTKElement
-//==============================================================================
-/** 
- * MMTK Elements with slightly different masses
-**/
-
-class MMTKElement : public SimTK::Element{
- public:
-  MMTKElement(int atomicNumber, Name name, Symbol symbol, SimTK::mdunits::Mass typicalMass);
-    //: SimTK::Element(atomicNumber, name, symbol, typicalMass){}
-  ~MMTKElement();
-
-  MMTKElement getByAtomicNumber(int atomicNumber);
-  MMTKElement getBySymbol(const SimTK::String& symbol);
-
-  class MMTKHydrogen;
-};
-
-class MMTKElement::MMTKHydrogen : public MMTKElement {
-  public: MMTKHydrogen(); 
-}; // EU
-
-
-//==============================================================================
 //                           CLASS TrivalentAtomTetra
 //==============================================================================
 /** 

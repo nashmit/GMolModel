@@ -21,9 +21,6 @@
 #include "Simbody.h"
 #include "Molmodel.h"
 
-// From MMTK:
-#include "MMTK/universe.h"
-#include "MMTK/forcefield.h"
 #include <boost/timer.hpp>
 
 //#include "/home/lspirido/Installers/armadillo-6.400.3/include/armadillo.hpp"
@@ -110,11 +107,6 @@ class GridForce : public SimTK::Force::Custom::Implementation {
   TARGET_TYPE **grads;
   int *fassno;
   int *flag;
-  // From MMTK:
-  //PyFFEvaluatorObject *pyFFEvaluatorObject;
-  //energy_data *p_energy_po;
-  //PyArrayObject *configuration;
-  //PyUniverseSpecObject *universe_spec;
   TARGET_TYPE *shm;
   SymSystem *Caller;
 
@@ -122,11 +114,6 @@ class GridForce : public SimTK::Force::Custom::Implementation {
             , TARGET_TYPE **indexMap, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
             , TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
             , int *fassno
-            // From MMTK:
-            //, PyFFEvaluatorObject *pyFFEvaluatorObject
-            //, energy_data *p_energy_po
-            //, PyArrayObject *configuration
-            //, PyUniverseSpecObject *universe_spec
             , TARGET_TYPE *shm
             , SymSystem *Caller
             );
@@ -205,11 +192,6 @@ class SymSystem{
   SimTK::Real *branchMassVec; // branch masses self body included
 
 
-  // From MMTK:
-  //PyFFEvaluatorObject *pyFFEvaluatorObject;
-  //energy_data *p_energy_po;
-  //PyArrayObject *configuration;
-  //PyUniverseSpecObject *universe_spec;
   TARGET_TYPE *shm;
 
   double **sysRetConfsPois;
@@ -224,11 +206,6 @@ class SymSystem{
   SymSystem(
     string mol2F, string rbF, string gaffF, string frcmodF,
     string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
-    // From MMTK:
-    //PyFFEvaluatorObject *pyFFEvaluatorObject,
-    //energy_data *p_energy_po,
-    //PyArrayObject *configuration,
-    //PyUniverseSpecObject *universe_spec,
     TARGET_TYPE *shm
   );
 

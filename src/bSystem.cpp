@@ -124,17 +124,12 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
       SimTK::Compound::AtomIndex aIx(Caller->_indexMap[ a ][1]);
       const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(c.getAtomMobilizedBodyIndex(aIx));
       // LAUR
-      //SimTK::Vec3 v_check(f[ Caller->_indexMap[ a ][2] ][0] * conversion_factor,
-      //                    f[ Caller->_indexMap[ a ][2] ][1] * conversion_factor,
-      //                    f[ Caller->_indexMap[ a ][2] ][2] * conversion_factor);
       SimTK::Vec3 v_check(0, 0, -10.0);
       //====
       mobod.applyForceToBodyPoint(state, c.getAtomLocationInMobilizedBodyFrame(aIx), v_check, bodyForces);
     }
-    /////////////////////// 
 
     // LAUR
-    //shm[arrays_cut + 5] = Caller->p_energy_po->energy;
     shm[arrays_cut + 5] = 0.0;
     //====
 
@@ -150,7 +145,6 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
 SimTK::Real GridForce::calcPotentialEnergy(const SimTK::State& state) const {
   const SimTK::Compound& c = compoundSystem->getCompound(SimTK::CompoundSystem::CompoundIndex(0));
   // LAUR
-  //double energy = Caller->p_energy_po->energy;
   double energy = 0.0;
   //====
   return energy;
@@ -180,11 +174,6 @@ bool GridForce::dependsOnlyOnPositions() const {
 SymSystem::SymSystem(
   string mol2F, string rbF, string gaffF, string frcmodF,
   string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
-  // From MMTK:
-  //PyFFEvaluatorObject *pyFFEvaluatorObject,
-  //energy_data *p_energy_po,
-  //PyArrayObject *configuration,
-  //PyUniverseSpecObject *universe_spec,
   TARGET_TYPE *shm
 ){
   std::cout<<"hop 1"<<std::endl<<std::flush;
@@ -202,11 +191,6 @@ SymSystem::SymSystem(
   this->ictdF = ictdF;
   this->PrmToAx_po = PrmToAx_po;
   this->MMTkToPrm_po = MMTkToPrm_po;
-  // From MMTK:
-  //this->pyFFEvaluatorObject = pyFFEvaluatorObject;
-  //this->p_energy_po = p_energy_po;
-  //this->configuration = configuration;
-  //this->universe_spec = universe_spec;
   this->shm = shm;
   this->pyseed = new unsigned long int;
   this->lj14sf = 0.5;
@@ -215,10 +199,12 @@ SymSystem::SymSystem(
   matter = new SimTK::SimbodyMatterSubsystem(*system);
   forces = new SimTK::GeneralForceSubsystem(*system);
   decorations = new SimTK::DecorationSubsystem(*system);
+
   // LAUR
   SimTK::Visualizer viz(*system);
   system->addEventReporter( new SimTK::Visualizer::Reporter(viz, 0.0015));
   // ====
+
   forceField = new SimTK::DuMMForceFieldSubsystem(*system);
   forceField->loadAmber99Parameters();
 
@@ -265,11 +251,6 @@ void SymSystem::InitSimulation(
   *sassno = 0;
 
   ExtForce = new SimTK::Force::Custom(*forces, new GridForce(system, *matter, indexMap, PrmToAx_po, MMTkToPrm_po, coords, vels, grads, fassno
-    //From MMTK:
-    //, pyFFEvaluatorObject
-    //, p_energy_po
-    //, configuration
-    //, universe_spec
     , shm
     , this
   ));

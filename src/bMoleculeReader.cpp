@@ -13,38 +13,6 @@
 //using namespace std;
 using namespace SimTK;
 
-
-MMTKElement::MMTKElement(int atomicNumber, Name name, Symbol symbol, SimTK::mdunits::Mass typicalMass)
-  : SimTK::Element(atomicNumber, name, symbol, typicalMass){}
-MMTKElement::~MMTKElement(){
-}
-
-MMTKElement::MMTKHydrogen::MMTKHydrogen() 
-    //: MMTKElement::MMTKElement(1, "mmtkhydrogen", "MMTKH", 1.00797598){
-    : MMTKElement::MMTKElement(301, "mmtkhydrogen", "MMTKH", 3.108){
-}
-
-MMTKElement MMTKElement::getBySymbol(const SimTK::String& symbol)
-{
-    if      (symbol == "MMTKH")  return MMTKHydrogen();
-    else {
-        assert(false);
-        return MMTKHydrogen();
-    }
-
-}
-
-MMTKElement MMTKElement::getByAtomicNumber(int atomicNumber) {
-    switch (atomicNumber) {
-        case 300: return MMTKHydrogen();
-        default: assert(false); return MMTKHydrogen();
-    }
-}
-
-
-
-
-
 /****
  *  Trivalent Atom Class with tetrahedral geometry.
  *  Bond centers are named "bond1", "bond2", and "bond3"
