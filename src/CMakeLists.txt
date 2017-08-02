@@ -87,7 +87,8 @@ LINK_DIRECTORIES(${BOOST_LIBRARY_DIRS})
 #it's for linking GMOLMODEL_static into GCHMC lib
 LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/lib)
 
-set(LIBGMOLMODEL_SRC 
+set(LIBGMOLMODEL_SRC
+        Context.cpp # LAUR
 	bAddParams.cpp 
 	bMainResidue.cpp 
 	bMoleculeReader.cpp 
