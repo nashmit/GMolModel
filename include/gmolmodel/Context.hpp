@@ -2,6 +2,7 @@
 #define GMOL_CONTEXT_H_
 
 #include <iostream>
+#include "ContextRep.hpp"
 
 class Context{
 public:
@@ -22,7 +23,7 @@ private:
 
     // Private implementation
 
-    ContextRep rep;
+    ContextRep *rep;
 
 };
 

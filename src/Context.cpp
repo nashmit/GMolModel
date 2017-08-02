@@ -1,25 +1,22 @@
-#ifndef CONTEXT_H_
-#define CONTEXT_H_
-
 #include "Context.hpp"
+#include "ContextRep.hpp"
 
 // Context constructor
 
 Context::Context(){
-    ;
+    rep = new ContextRep;
 }
 
 // Context destructor
 
 Context::~Context(){
-    ;
+    delete rep;
 }
 
 // Simple print function
 
 void Context::Print(void){
-    std::cout << "Hello World!" << std::endl;
+    rep->Print();
 }
 
 
-#endif // CONTEXT_H_
