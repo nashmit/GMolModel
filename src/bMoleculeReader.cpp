@@ -56,7 +56,7 @@ bSpecificAtom::bSpecificAtom(){
     freebonds = 0;
     number = 0;
     bZeroCharArray(name, 5);
-    bZeroCharArray(mol2name, 5);
+    bZeroCharArray(inName, 5);
     bZeroCharArray(fftype, 20);
     bZeroCharArray(biotype, 20);
     x = -999;
@@ -72,7 +72,7 @@ void bSpecificAtom::Zero(void){
     freebonds = 0;
     number = 0;
     bZeroCharArray(name, 5);
-    bZeroCharArray(mol2name, 5);
+    bZeroCharArray(inName, 5);
     bZeroCharArray(fftype, 20);
     bZeroCharArray(biotype, 20);
     x = -999;
@@ -83,7 +83,7 @@ void bSpecificAtom::Zero(void){
 
 void bSpecificAtom::Print(void)
 {
-  std::cout<<"bSpecificAtom: nbonds "<<nbonds<<" freebonds "<<freebonds<<" name "<<name<<" mol2name "<<mol2name<<std::endl
+  std::cout<<"bSpecificAtom: nbonds "<<nbonds<<" freebonds "<<freebonds<<" name "<<name<<" inName "<<inName<<std::endl
     <<" number "<<number<<" elem "<<elem<<" x "<<x<<" y "<< y<<" z "<<z<<" fftype "<<fftype<<" biotype "<<biotype
     <<" charge "<<charge<<" mobile "<<mobile<<std::endl;
 }
@@ -400,7 +400,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
 
       bZeroCharArray(buff, 80);
       bSubstr(buff, line_c, 8,4);
-      strncpy(bAtomList[lno-1].mol2name, buff, 4);
+      strncpy(bAtomList[lno-1].inName, buff, 4);
 
       bZeroCharArray(buff, 80);
       bSubstr(buff, line_c, 17,9);
@@ -623,8 +623,8 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
   #ifdef DEBUG_LEVEL02
   std::cout<<"Just checking\n";
   for(i=0; i<natms;i++){
-    printf(" -- name(%s) mol2name(%s) number(%d) elem(%c) fftype(%s) biotype(%s) charge(%f)\n", 
-      bAtomList[i].name, bAtomList[i].mol2name, bAtomList[i].number, 
+    printf(" -- name(%s) inName(%s) number(%d) elem(%c) fftype(%s) biotype(%s) charge(%f)\n", 
+      bAtomList[i].name, bAtomList[i].inName, bAtomList[i].number, 
       bAtomList[i].elem, bAtomList[i].fftype,
       bAtomList[i].biotype, bAtomList[i].charge);
     fflush(stdout);

@@ -479,7 +479,7 @@ using namespace SimTK;
           std::cout<<"Bond "<<m<<"("<<bonds[m].getBondIndex()<<")"<<" rigidized ";
           for(ix = 0; ix < getNumAtoms(); ++ix){
             if(bAtomList[ix].number == bonds[m].i || bAtomList[ix].number == bonds[m].j){
-              std::cout<<" mol2name "<<bAtomList[ix].mol2name<<" name  "<<bAtomList[ix].name;
+              std::cout<<" inName "<<bAtomList[ix].inName<<" name  "<<bAtomList[ix].name;
             }
           }
           std::cout<<std::endl;

@@ -193,7 +193,7 @@ SimTK::Real MidVVIntegratorRep::getUncorrAnglesSinesSq(const SimTK::Compound& c,
   
   //std::cout<<"getUncorrAnglesSinesSq molecule_tree: "<<std::endl;
   //for(int i=1; i<molecule_tree.size(); i++){
-  //  std::cout<<Caller->lig1->bAtomList[molecule_tree[i]].mol2name<<' ';
+  //  std::cout<<Caller->lig1->bAtomList[molecule_tree[i]].inName<<' ';
   //}
   //std::cout<<std::endl;
 

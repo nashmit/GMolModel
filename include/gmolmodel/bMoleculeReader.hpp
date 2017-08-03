@@ -71,7 +71,7 @@ class bSpecificAtom{ /*Information like in sdf*/
   int nbonds;
   int freebonds;
   char name[5];
-  char mol2name[5];
+  char inName[5];
   int number;
   char elem;
   float x;
