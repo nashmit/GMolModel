@@ -89,7 +89,6 @@ LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/lib)
 
 set(LIBGMOLMODEL_SRC
         InitialContext.cpp # LAUR
-        InitialContextRep.cpp # LAUR
 	bAddParams.cpp 
 	bMainResidue.cpp 
 	bMoleculeReader.cpp 

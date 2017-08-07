@@ -2,7 +2,8 @@
 #define GMOL_CONTEXT_H_
 
 #include <iostream>
-#include "InitialContextRep.hpp"
+#include <vector>
+#include "bMoleculeReader.hpp"
 
 class InitialContext{
 public:
@@ -24,10 +25,7 @@ public:
     void Print(void);
 
 private:
-
-    // Private implementation
-
-    InitialContextRep *rep;
+    std::vector<bSpecificAtom> bAtomList;
 
 };
 
