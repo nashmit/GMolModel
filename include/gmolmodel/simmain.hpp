@@ -20,7 +20,7 @@ using namespace boost::python;
 #include "bAddParams.hpp"
 #include "bSystem.hpp"
 #include "server.hpp"
-#include "Context.hpp"
+#include "InitialContext.hpp"
 
 #include "MMTK/universe.h"
 #include "MMTK/forcefield.h"

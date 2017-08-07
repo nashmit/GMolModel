@@ -11,11 +11,11 @@ int main(int argc, char **argv){
     
     // Declarations    
 
-    Context context;
+    InitialContext initialContext;
 
     // Do whatever
 
-    context.Print();
+    initialContext.Print();
 
     return 0;
 }

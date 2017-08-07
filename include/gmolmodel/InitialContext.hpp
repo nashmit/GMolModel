@@ -2,18 +2,22 @@
 #define GMOL_CONTEXT_H_
 
 #include <iostream>
-#include "ContextRep.hpp"
+#include "InitialContextRep.hpp"
 
-class Context{
+class InitialContext{
 public:
 
     // Constructor
 
-    Context();
+    InitialContext();
 
     // Destructor
 
-    ~Context();
+    ~InitialContext();
+
+    // Insert an atom
+
+    void addAtom(int number);
 
     // Print functions
 
@@ -23,7 +27,7 @@ private:
 
     // Private implementation
 
-    ContextRep *rep;
+    InitialContextRep *rep;
 
 };
 

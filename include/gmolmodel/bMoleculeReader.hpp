@@ -84,6 +84,12 @@ class bSpecificAtom{ /*Information like in sdf*/
   double charge;
   int mobile;
   int visited;
+  
+  // Suggested by Eliza
+  std::string residueName;
+  long int residueIndex;
+  std::string chain;
+  int moleculeIndex;
 
   bSpecificAtom();
   ~bSpecificAtom();

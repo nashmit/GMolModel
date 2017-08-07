@@ -94,7 +94,7 @@ set(TESTS_SRCS
 	TestSimbodyBasic.cpp
 	TestMolmodelBasic.cpp
         TestGmolmodelNative.cpp
-        TestContext.cpp
+        TestInitialContext.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})

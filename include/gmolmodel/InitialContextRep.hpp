@@ -5,19 +5,20 @@
 #include <vector>
 #include "bMoleculeReader.hpp"
 
-class ContextRep{
+class InitialContextRep{
 public:
 
     // Constructor
 
-    ContextRep();
+    InitialContextRep();
 
     // Destructor
 
-    ~ContextRep();
+    ~InitialContextRep();
 
-    // 
+    // Insert an atom
 
+    void addAtom(int number);
 
     // Print functions
 
