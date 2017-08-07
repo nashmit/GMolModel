@@ -15,7 +15,8 @@ int main(int argc, char **argv){
 
     // Do whatever
 
-    initialContext.Print();
+    std::cout << "Initial context's atom list:" << std::endl;
+    initialContext.PrintAtomList();
 
     return 0;
 }

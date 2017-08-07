@@ -18,10 +18,13 @@ void InitialContext::addAtom(int number){
     ;
 }
 
-// Simple print function
+// Iterate through atoms and print
 
-void InitialContext::Print(void){
-    std::cout << "Hello World!" << std::endl;
+void InitialContext::PrintAtomList(void){
+
+    for(std::vector<int>::size_type i = 0; i != this->AtomList.size(); i++) {
+        ;
+    }
 }
 
 

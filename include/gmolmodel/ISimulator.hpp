@@ -1,6 +1,8 @@
 #ifndef __ISIMULATOR_HPP__
 #define __ISIMULATOR_HPP__
 
+#include "Robo.hpp"
+
 class ISimulator
 {
     public:

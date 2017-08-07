@@ -1,6 +1,10 @@
 #ifndef _MidVVIntegrator_h_
 #define _MidVVIntegrator_h_
 
+#include "bgeneral.hpp"
+//#include "bSystem.hpp"
+
+
 //@file This is included in bSysSystem.cpp
 class MidVVIntegratorRep;
 #include <boost/random/mersenne_twister.hpp>

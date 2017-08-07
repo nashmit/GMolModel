@@ -3,9 +3,10 @@
 
 #include <iostream>
 #include <vector>
+#include "IInitialContext.hpp"
 #include "bMoleculeReader.hpp"
 
-class InitialContext{
+class InitialContext : public IInitialContext{
 public:
 
     // Constructor
@@ -22,10 +23,10 @@ public:
 
     // Print functions
 
-    void Print(void);
+    void PrintAtomList(void);
 
 private:
-    std::vector<bSpecificAtom> bAtomList;
+    std::vector<bSpecificAtom> AtomList;
 
 };
 

@@ -1,6 +1,8 @@
 #ifndef __ICURRENTSTATE_HPP__
 #define __ICURRENTSTATE_HPP__
 
+#include "Robo.hpp"
+
 class ICurrentState : public SimTK::State
 {
     public:
