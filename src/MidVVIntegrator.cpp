@@ -1,4 +1,7 @@
 #include <math.h>
+// LAUR
+#include "MidVVIntegrator.hpp"
+// ====
 
 //==============================================================================
 //                           MIDVV INTEGRATOR

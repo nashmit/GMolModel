@@ -1,9 +1,9 @@
 #ifndef _MidVVIntegrator_h_
 #define _MidVVIntegrator_h_
 
-#include "bgeneral.hpp"
-//#include "bSystem.hpp"
-
+// LAUR
+#include "bSystem.hpp"
+// ====
 
 //@file This is included in bSysSystem.cpp
 class MidVVIntegratorRep;

@@ -9,11 +9,12 @@ class IInitialContext
 {
     public:
         //IInitialContext()=0;
-        virtual ~IInitialContext()=0;
+
+        virtual ~IInitialContext() {}
 
         virtual void PrintAtomList()=0;
 
-        virtual ICurrentState* GetState()=0;
+        //virtual ICurrentState* GetState()=0;
         //virtual MidVVIntegrator* GetIntegrator()=0;
 };
 
