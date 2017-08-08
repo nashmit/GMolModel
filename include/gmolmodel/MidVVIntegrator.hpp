@@ -39,7 +39,7 @@ class MidVVIntegratorRep : public SimTK::AbstractIntegratorRep {
   unsigned long int step;
   unsigned long int totStepsInCall;
   SimTK::CompoundSystem *compoundSystem;
-  SymSystem *Caller;
+  World *Caller;
   const SimTK::Compound& c;
   const SimTK::SimbodyMatterSubsystem& matter;
 
@@ -195,7 +195,7 @@ class MidVVIntegratorRep : public SimTK::AbstractIntegratorRep {
                        , TARGET_TYPE *PrmToAx_po
                        , TARGET_TYPE *MMTkToPrm_po
                        , SimTK::CompoundSystem *compoundSystem
-                       , SymSystem *Caller
+                       , World *Caller
                       );
  protected:
      bool attemptDAEStep
@@ -311,7 +311,7 @@ class SimTK_SIMMATH_EXPORT MidVVIntegrator : public SimTK::Integrator {
                            , TARGET_TYPE *PrmToAx_po
                            , TARGET_TYPE *MMTkToPrm_po
                            , SimTK::CompoundSystem *compoundSystem
-                           , SymSystem *Caller
+                           , World *Caller
                           );
   /**
    * Create a VerletIntegrator for integrating a System with fixed size steps.
@@ -320,7 +320,7 @@ class SimTK_SIMMATH_EXPORT MidVVIntegrator : public SimTK::Integrator {
                   , TARGET_TYPE *PrmToAx_po
                   , TARGET_TYPE *MMTkToPrm_po
                   , SimTK::CompoundSystem *compoundSystem
-                  , SymSystem *Caller
+                  , World *Caller
                   );
   ~MidVVIntegrator();
 };

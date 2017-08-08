@@ -80,7 +80,7 @@ GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatter
                      , TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
                      , int *fassno
                      , TARGET_TYPE *shm
-                     , SymSystem *Caller
+                     , World *Caller
                     ) : matter(matter){
   this->indexMap = Caller->indexMap;
   this->PrmToAx_po = PrmToAx_po;
@@ -173,7 +173,7 @@ bool GridForce::dependsOnlyOnPositions() const {
 ////// SYMBODY SYSTEM //////
 ////////////////////////////
 
-SymSystem::SymSystem(
+World::World(
   string mol2F, string rbF, string gaffF, string frcmodF,
   string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
   TARGET_TYPE *shm
@@ -232,7 +232,7 @@ SymSystem::SymSystem(
 
 }//end of constructor
 
-void SymSystem::InitSimulation(
+void World::InitSimulation(
   TARGET_TYPE **coords,
   TARGET_TYPE **vels,
   TARGET_TYPE **inivels,
@@ -408,7 +408,7 @@ void SymSystem::InitSimulation(
 
 
 
-void SymSystem::Advance(int nosteps){
+void World::Advance(int nosteps){
   #ifdef DEBUG_TIME
   boost::timer Advance_timer;
   #endif
@@ -472,7 +472,7 @@ void SymSystem::Advance(int nosteps){
 }
 
 // Destructor
-SymSystem::~SymSystem(){}
+World::~World(){}
 ////////////////////////////
 ////// END SYMBODY SYSTEM //
 ////////////////////////////

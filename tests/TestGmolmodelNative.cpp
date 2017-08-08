@@ -117,7 +117,7 @@ int main(int argc, char **argv)
 
     // Build Gmolmodel simulation system
 
-    SymSystem *sys = new SymSystem(
+    World *sys = new World(
         mol2FN, rbFN, gaffFN, frcmodFN,
         ictd, 
         PrmToAx_po, MMTkToPrm_po,

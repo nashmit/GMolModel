@@ -9,7 +9,7 @@
 
 class GCHMCIntegrator{
  public:
-  SymSystem *sys;
+  World *sys;
   TARGET_TYPE *shm;
   PyFFEvaluatorObject *pyFFEvaluatorObject;
   energy_data *p_energy_po;
@@ -192,7 +192,7 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
   //(((PyFFEnergyTermObject **)(pyFFEvaluatorObject)->terms->data)[5])->param[0] = 0.5;
   // LS EU
 
-  sys = new SymSystem(
+  sys = new World(
     parser.mol2F, parser.rbF, parser.gaffF, parser.frcmodF,
     parser.ictdF, 
     PrmToAx_po, MMTkToPrm_po,

@@ -11,7 +11,7 @@ MidVVIntegrator::MidVVIntegrator(const SimTK::System& sys
                                  , TARGET_TYPE *PrmToAx_po
                                  , TARGET_TYPE *MMTkToPrm_po
                                  , SimTK::CompoundSystem *compoundSystem
-                                 , SymSystem *Caller
+                                 , World *Caller
                                  ) {
     rep = new MidVVIntegratorRep(this, sys, PrmToAx_po, MMTkToPrm_po, compoundSystem, Caller);
 }
@@ -20,7 +20,7 @@ MidVVIntegrator::MidVVIntegrator(const SimTK::System& sys, SimTK::Real stepSize
                                  , TARGET_TYPE *PrmToAx_po
                                  , TARGET_TYPE *MMTkToPrm_po
                                  , SimTK::CompoundSystem *compoundSystem
-                                 , SymSystem *Caller
+                                 , World *Caller
                                  ) {
     rep = new MidVVIntegratorRep(this, sys, PrmToAx_po, MMTkToPrm_po, compoundSystem, Caller);
     setFixedStepSize(stepSize);
@@ -39,7 +39,7 @@ MidVVIntegratorRep::MidVVIntegratorRep(SimTK::Integrator* handle, const SimTK::S
                                        , TARGET_TYPE *PrmToAx_po
                                        , TARGET_TYPE *MMTkToPrm_po
                                        , SimTK::CompoundSystem *compoundSystem
-                                       , SymSystem *Caller
+                                       , World *Caller
                                        )
 :   SimTK::AbstractIntegratorRep(handle, sys, 2, 3, "Verlet",  true)
     , c(compoundSystem->getCompound(SimTK::CompoundSystem::CompoundIndex(0)))

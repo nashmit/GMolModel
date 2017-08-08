@@ -87,7 +87,7 @@ void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
 
 void writePdb(SimTK::PdbStructure pdb, const char *FN);
 
-class SymSystem;
+class World;
 
 //==============================================================================
 //                           CLASS GridForce
@@ -108,14 +108,14 @@ class GridForce : public SimTK::Force::Custom::Implementation {
   int *fassno;
   int *flag;
   TARGET_TYPE *shm;
-  SymSystem *Caller;
+  World *Caller;
 
   GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
             , TARGET_TYPE **indexMap, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
             , TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
             , int *fassno
             , TARGET_TYPE *shm
-            , SymSystem *Caller
+            , World *Caller
             );
 
   void calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
@@ -145,12 +145,12 @@ class MidVVIntegrator;
 /////////////////////////////
 
 //==============================================================================
-//                           CLASS SymSystem
+//                           CLASS World
 //==============================================================================
 /**
  *  Symbols System Class. Manages Molmodel-gMolmodel-MMTK communication.
  **/
-class SymSystem{
+class World{
  public:
   SimTK::CompoundSystem *system;
   SimTK::SimbodyMatterSubsystem *matter;
@@ -206,7 +206,7 @@ class SymSystem{
   int metroFixmanOpt;
   double lj14sf; //-- MMTK default
   
-  SymSystem(
+  World(
     string mol2F, string rbF, string gaffF, string frcmodF,
     string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
     TARGET_TYPE *shm
@@ -225,7 +225,7 @@ class SymSystem{
   // Manages the TimeStepper actions
   void Advance(int nosteps);
 
-  ~SymSystem(); // destructor
+  ~World(); // destructor
 };
 
 #endif /*BSYSTEM_H_*/
