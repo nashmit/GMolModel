@@ -93,7 +93,7 @@ set(LIBGMOLMODEL_SRC
 	bAddParams.cpp 
 	bMainResidue.cpp 
 	bMoleculeReader.cpp 
-	bSystem.cpp
+	World.cpp
 	bgeneral.cpp
 	)
 

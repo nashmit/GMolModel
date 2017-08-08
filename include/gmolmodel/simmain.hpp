@@ -18,7 +18,7 @@ using namespace boost::python;
 #include "Molmodel.h"
 #include "bMoleculeReader.hpp"
 #include "bAddParams.hpp"
-#include "bSystem.hpp"
+#include "World.hpp"
 #include "server.hpp"
 #include "InitialContext.hpp"
 

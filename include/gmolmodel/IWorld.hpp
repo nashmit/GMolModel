@@ -3,10 +3,10 @@
 
 #include "Robo.hpp"
 
-class ISimulator
+class IWorld
 {
     public:
-        virtual ~Simulator()=0;
+        virtual ~IWorld()=0;
 };
 
 #endif // __ISIMULATOR_HPP__

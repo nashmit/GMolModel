@@ -1,4 +1,4 @@
-#include "bSystem.hpp"
+#include "World.hpp"
 
 void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
          const char *dirname, const char *prefix, int midlength, const char *sufix)
