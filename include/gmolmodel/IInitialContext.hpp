@@ -8,9 +8,8 @@
 class IInitialContext
 {
     public:
-        //IInitialContext()=0;
 
-        virtual ~IInitialContext() {}
+        virtual ~IInitialContext() = 0;
 
         virtual void PrintAtomList()=0;
 

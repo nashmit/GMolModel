@@ -88,8 +88,12 @@ LINK_DIRECTORIES(${BOOST_LIBRARY_DIRS})
 LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/lib)
 
 set(LIBGMOLMODEL_SRC
+        IInitialContext.cpp # LAUR
         InitialContext.cpp # LAUR
+        ICurrentState.cpp # LAUR
+        CurrentState.cpp # LAUR
         MidVVIntegrator.cpp # LAUR
+        Sampler.cpp # LAUR
 	bAddParams.cpp 
 	bMainResidue.cpp 
 	bMoleculeReader.cpp 

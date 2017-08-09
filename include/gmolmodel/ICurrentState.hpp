@@ -3,10 +3,10 @@
 
 #include "Robo.hpp"
 
-class ICurrentState : public SimTK::State
+class ICurrentState
 {
-    public:
-        virtual ~ICurrentState()=0;
+public:
+    virtual ~ICurrentState()=0;
 };
 
 #endif // __ICURRENTSTATE_HPP__
