@@ -94,6 +94,8 @@ set(LIBGMOLMODEL_SRC
         CurrentState.cpp # LAUR
         MidVVIntegrator.cpp # LAUR
         Sampler.cpp # LAUR
+        IMonteCarloSampler.cpp # LAUR
+        MonteCarloSampler.cpp # LAUR
 	bAddParams.cpp 
 	bMainResidue.cpp 
 	bMoleculeReader.cpp 
