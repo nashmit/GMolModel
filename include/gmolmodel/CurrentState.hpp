@@ -11,7 +11,7 @@ public:
 
     // Constructor
 
-    CurrentState(bMainResidue *residue, CurrentState *gmolstate);
+    CurrentState();
 
     // Destructor
 

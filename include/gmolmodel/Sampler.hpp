@@ -2,13 +2,15 @@
 #define __SAMPLER_HPP__
 
 #include "Robo.hpp"
+#include "bMainResidue.hpp"
+#include "CurrentState.hpp"
 
 class Sampler
 {
 public:
     // Constructor
 
-    Sampler();
+    Sampler(bMainResidue *residue, CurrentState *currentState);
 
     // Destructor
 

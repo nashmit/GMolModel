@@ -95,6 +95,7 @@ set(TESTS_SRCS
 	TestMolmodelBasic.cpp
         TestGmolmodelNative.cpp
         TestInitialContext.cpp
+        TestMonteCarloSampler.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})

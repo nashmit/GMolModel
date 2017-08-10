@@ -2,17 +2,24 @@
 
 // Constructor
 
-MonteCarloSampler::MonteCarloSampler()
+//MonteCarloSampler::MonteCarloSampler()
+//{
+//
+//    ;
+//
+//}
+
+// Destructor
+
+MonteCarloSampler::~MonteCarloSampler()
 {
 
     ;
 
 }
 
-// Destructor
 
-MonteCarloSampler::~MonteCarloSampler()
-{
+void MonteCarloSampler::update(void){
 
     ;
 
