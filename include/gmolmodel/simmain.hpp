@@ -19,8 +19,9 @@ using namespace boost::python;
 #include "bMoleculeReader.hpp"
 #include "bAddParams.hpp"
 #include "World.hpp"
+#include "Sampler.hpp"
+#include "Context.hpp"
 #include "server.hpp"
-#include "InitialContext.hpp"
 
 #include "MMTK/universe.h"
 #include "MMTK/forcefield.h"

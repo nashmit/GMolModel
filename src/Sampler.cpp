@@ -2,9 +2,9 @@
 
 // Constructor
 
-Sampler::Sampler(bMainResidue *residue, CurrentState *currentState){
-    std::cout << "Sampler::Sampler hello" << std::endl;
-}
+//Sampler::Sampler(bMainResidue *residue, IState *currentState){
+//    std::cout << "Sampler::Sampler hello" << std::endl;
+//}
 
 // Destructor
 

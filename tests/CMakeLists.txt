@@ -94,7 +94,6 @@ set(TESTS_SRCS
 	TestSimbodyBasic.cpp
 	TestMolmodelBasic.cpp
         TestGmolmodelNative.cpp
-        TestInitialContext.cpp
         TestMonteCarloSampler.cpp
 	)
 

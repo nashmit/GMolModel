@@ -2,12 +2,12 @@
 
 // Constructor
 
-//MonteCarloSampler::MonteCarloSampler()
-//{
-//
+MonteCarloSampler::MonteCarloSampler(bMainResidue *residue, IState *currentState)
+{
+
 //    ;
-//
-//}
+
+}
 
 // Destructor
 
@@ -21,7 +21,7 @@ MonteCarloSampler::~MonteCarloSampler()
 
 void MonteCarloSampler::update(void){
 
-    ;
+    //;
 
 }
 

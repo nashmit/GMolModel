@@ -2,17 +2,15 @@
 #define __MONTECARLOSAMPLER_HPP__
 
 #include "Robo.hpp"
-#include "IMonteCarloSampler.hpp"
 #include "Sampler.hpp"
 #include "bMainResidue.hpp"
-#include "CurrentState.hpp"
 
-class MonteCarloSampler : public IMonteCarloSampler, public Sampler
+class MonteCarloSampler : public Sampler
 {
 public:
     // Constructor
 
-    MonteCarloSampler(bMainResidue *residue, CurrentState *currentState);
+    MonteCarloSampler(bMainResidue *residue, IState *currentState);
 
     // Destructor
 

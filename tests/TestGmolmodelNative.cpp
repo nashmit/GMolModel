@@ -115,21 +115,26 @@ int main(int argc, char **argv)
     );
     shm = new TARGET_TYPE[SHMSZ];
 
-    // Build Gmolmodel simulation system
+    // Build Gmolmodel simulation world
 
-    World *sys = new World(
+    Sampler *p_genericSampler = new Sampler;
+
+    World *p_world = new World(
         mol2FN, rbFN, gaffFN, frcmodFN,
         ictd, 
         PrmToAx_po, MMTkToPrm_po,
         shm
     );
 
+    Context *context = new Context(p_world, p_genericSampler);
+    World *world = context->getWorld(); // Just for Context function testing
+
     // Memory alloc for convinient arrays 
 
-    coords = new TARGET_TYPE*[sys->mr->natms];
-    TARGET_TYPE **vels = new TARGET_TYPE*[sys->mr->natms];
-    TARGET_TYPE **inivels = new TARGET_TYPE*[sys->mr->natms];
-    TARGET_TYPE **grads = new TARGET_TYPE*[sys->mr->natms];
+    coords = new TARGET_TYPE*[world->mr->natms];
+    TARGET_TYPE **vels = new TARGET_TYPE*[world->mr->natms];
+    TARGET_TYPE **inivels = new TARGET_TYPE*[world->mr->natms];
+    TARGET_TYPE **grads = new TARGET_TYPE*[world->mr->natms];
 
     // Seed the random number generator 
 
@@ -142,7 +147,7 @@ int main(int argc, char **argv)
 
     int cli;
     sweep = 0;
-    bool system_initialized = false;
+    bool world_initialized = false;
     int big_loop_i;
 
     shm[1] = CLIENT_FLAG;
@@ -279,8 +284,8 @@ int main(int argc, char **argv)
 
     // Build bMainResidue and fill indexMap
 
-    sys->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
-    system_initialized = true;
+    world->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
+    world_initialized = true;
 
     // Options for mass matrix, Lennard Jones
 
@@ -299,20 +304,20 @@ int main(int argc, char **argv)
 
     double **retConfsPois = new double* [ntrials];
     for(int r=0; r<ntrials; r++){
-        retConfsPois[r] = new double[3 * sys->mr->natms]; // WATCHOUT
+        retConfsPois[r] = new double[3 * world->mr->natms]; // WATCHOUT
     }
     double *retPotEsPoi = new double[ntrials];
     double *accs = new double;
 
-    *sys->pyseed = pyseed;
-    sys->massMatNumOpt = _massMatNumOpt;
-    sys->metroFixmanOpt = _metroFixmanOpt;
-    sys->lj14sf = _lj14sf; //--
-    sys->sysRetConfsPois = retConfsPois;
-    sys->sysRetPotEsPoi = retPotEsPoi;
-    sys->sysAccs = accs;
+    *world->pyseed = pyseed;
+    world->massMatNumOpt = _massMatNumOpt;
+    world->metroFixmanOpt = _metroFixmanOpt;
+    world->lj14sf = _lj14sf; //--
+    world->sysRetConfsPois = retConfsPois;
+    world->sysRetPotEsPoi = retPotEsPoi;
+    world->sysAccs = accs;
 
-    arrays_cut = 2 + 4*3*(sys->mr->natms);
+    arrays_cut = 2 + 4*3*(world->mr->natms);
     shm[arrays_cut + 0] = 0.0; // step (will be incremented in MidVV
     shm[arrays_cut + 1] = (TARGET_TYPE)(nosteps);
     shm[arrays_cut + 2] = temperature;
@@ -331,7 +336,7 @@ int main(int argc, char **argv)
 
    // Simulate
 
-    sys->Advance(nosteps); 
+    world->Advance(nosteps); 
     #ifdef DEBUG_TIME
         //std::cout<<"Time simmain nosteps"<<this->nosteps<<" time "<<boost_timer.elapsed()<<std::endl;
     #endif

@@ -3,14 +3,14 @@
 
 #include "Robo.hpp"
 #include "bMainResidue.hpp"
-#include "CurrentState.hpp"
+#include "IState.hpp"
 
 class Sampler
 {
 public:
     // Constructor
 
-    Sampler(bMainResidue *residue, CurrentState *currentState);
+    //Sampler(bMainResidue *residue, IState *currentState);
 
     // Destructor
 
