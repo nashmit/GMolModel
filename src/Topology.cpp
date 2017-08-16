@@ -3,8 +3,11 @@ using namespace SimTK;
 ////////////////////////////
 ////// BMAINRESIDUE ////////
 ////////////////////////////
+Topology::Topology(){}
+
+
 /*Any kind of molecule*/
-  Topology::Topology(
+void Topology::init(
     DuMMForceFieldSubsystem &dumm,
     unsigned int natms,
     bSpecificAtom *bAtomList,

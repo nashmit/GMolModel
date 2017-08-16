@@ -278,7 +278,9 @@ void World::InitSimulation(
   forceField->setCoulombGlobalScaleFactor(0);
   forceField->setGbsaGlobalScaleFactor(0);
 
-  lig1 = new Topology(
+  lig1 = new Topology();
+
+  lig1->init(
     *forceField,
     mr->natms,
     mr->bAtomList,

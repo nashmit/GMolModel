@@ -43,7 +43,13 @@ public:
   TARGET_TYPE *PrmToAx_po;
   TARGET_TYPE *MMTkToPrm_po;
 
-  Topology(
+  // Constructor
+  Topology();
+  // Destructor
+  ~Topology();
+
+  // In case we already know the graph and order
+  void init(
     SimTK::DuMMForceFieldSubsystem &dumm,
     unsigned int natms,
     bSpecificAtom *bAtomList,
@@ -58,7 +64,58 @@ public:
     std::string ictdF="IC"
   );
 
-  ~Topology();
+  // Interface
+
+  // Set graph
+
+  void insertAtom(bSpecificAtom *);
+  void insertBond(int, int, bondOrder);
+
+  // Parameters
+
+  void setDuMMAtomParams(int, vdw, well);
+  void setDuMMBondParams(int, int, Real k, Real equil);
+  void setDuMMAngleParams(int, int, int, Real k, Real equil);
+
+  void setDuMMDihedralParams(int, int, int, int,
+      int periodicity, Real ampInKJ, Real phaseInDegrees
+  );
+  void setDuMMDihedralParams(int, int, int, int, 
+      int periodicity1, Real ampInKJ1, Real phaseInDegrees1,
+      int periodicity2, Real ampInKJ2, Real phaseInDegrees2,
+  );
+  void setDuMMDihedralParams(int, int, int, int, 
+      int periodicity1, Real ampInKJ1, Real phaseInDegrees1,
+      int periodicity2, Real ampInKJ2, Real phaseInDegrees2,
+      int periodicity3, Real ampInKJ3, Real phaseInDegrees3,
+  );
+
+  void setDuMMImproperParams(int, int, int, int,
+      int periodicity, Real ampInKJ, Real phaseInDegrees
+  );
+  void setDuMMImproperParams(int, int, int, int, 
+      int periodicity1, Real ampInKJ1, Real phaseInDegrees1,
+      int periodicity2, Real ampInKJ2, Real phaseInDegrees2,
+  );
+  void setDuMMImproperParams(int, int, int, int, 
+      int periodicity1, Real ampInKJ1, Real phaseInDegrees1,
+      int periodicity2, Real ampInKJ2, Real phaseInDegrees2,
+      int periodicity3, Real ampInKJ3, Real phaseInDegrees3,
+  );
+
+  // Get
+
+  int getNAtoms(void) const;
+  int getNBonds(void) const;
+
+  bSpecificAtom * getAtomByNumber(int number) const;
+  bSpecificAtom * getAtomByAtomIx(int aIx) const;
+  bSpecificAtom * getAtomByName(std::string name) const;
+ 
+  std::vector<bSpecificAtom> getNeighbours(int) const;
+  bBond * getBond(int, int) const;
+  int getBondOrder(int, int) const;
+ 
 };
 
 #endif //TOPOLOGY_H_
