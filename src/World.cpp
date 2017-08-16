@@ -278,7 +278,7 @@ void World::InitSimulation(
   forceField->setCoulombGlobalScaleFactor(0);
   forceField->setGbsaGlobalScaleFactor(0);
 
-  lig1 = new bMainResidue(
+  lig1 = new Topology(
     *forceField,
     mr->natms,
     mr->bAtomList,
@@ -407,6 +407,17 @@ void World::InitSimulation(
 }//end of InitSimulation
 
 
+// Interface
+
+Topology * World::getTopology(void) const{
+    return lig1;
+}
+
+Topology * World::updTopology(void){
+    return lig1;
+}
+
+// Advance
 
 void World::Advance(int nosteps){
   #ifdef DEBUG_TIME

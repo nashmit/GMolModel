@@ -2,7 +2,7 @@
 #define __SAMPLER_HPP__
 
 #include "Robo.hpp"
-#include "bMainResidue.hpp"
+#include "Topology.hpp"
 #include "IState.hpp"
 
 class Sampler
@@ -10,7 +10,7 @@ class Sampler
 public:
     // Constructor
 
-    //Sampler(bMainResidue *residue, IState *currentState);
+    //Sampler(Topology *residue, IState *currentState);
 
     // Destructor
 

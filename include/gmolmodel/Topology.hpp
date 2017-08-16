@@ -1,5 +1,5 @@
-#ifndef BMAINRESIDUE_H_
-#define BMAINRESIDUE_H_
+#ifndef TOPOLOGY_H_
+#define TOPOLOGY_H_
 
 #include "bMoleculeReader.hpp"
 #include "bgeneral.hpp"
@@ -27,7 +27,7 @@ void mol_StructureChainsBuild (MolStructure *, int);
 /**
  * Main Residue Class. It represents the main compound.
  **/
-class bMainResidue : public SimTK::Compound{
+class Topology : public SimTK::Compound{
 public:
 
   MolAtom *bMolAtomList;
@@ -43,7 +43,7 @@ public:
   TARGET_TYPE *PrmToAx_po;
   TARGET_TYPE *MMTkToPrm_po;
 
-  bMainResidue(
+  Topology(
     SimTK::DuMMForceFieldSubsystem &dumm,
     unsigned int natms,
     bSpecificAtom *bAtomList,
@@ -58,7 +58,7 @@ public:
     std::string ictdF="IC"
   );
 
-  ~bMainResidue();
+  ~Topology();
 };
 
-#endif //BMAINRESIDUE_H_
+#endif //TOPOLOGY_H_

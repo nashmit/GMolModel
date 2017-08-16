@@ -1,10 +1,10 @@
-#include "bMainResidue.hpp"
+#include "Topology.hpp"
 using namespace SimTK;
 ////////////////////////////
 ////// BMAINRESIDUE ////////
 ////////////////////////////
 /*Any kind of molecule*/
-  bMainResidue::bMainResidue(
+  Topology::Topology(
     DuMMForceFieldSubsystem &dumm,
     unsigned int natms,
     bSpecificAtom *bAtomList,
@@ -28,7 +28,7 @@ using namespace SimTK;
     this->MMTkToPrm_po = MMTkToPrm_po;
 
     if (bAtomList == NULL){
-      std::cout<<"bMainResidue: NULL bAtomList"<<std::endl<<std::fflush;
+      std::cout<<"Topology: NULL bAtomList"<<std::endl<<std::fflush;
       exit(1);
     }
   
@@ -89,7 +89,7 @@ using namespace SimTK;
     dumm.setCoulombGlobalScaleFactor(0);
     dumm.setGbsaGlobalScaleFactor(0);
 
-    this->setCompoundName("bMainResidue");
+    this->setCompoundName("Topology");
 
     /*First atom*/
     int found = 0;
@@ -503,7 +503,7 @@ using namespace SimTK;
 
   }
 
-  bMainResidue::~bMainResidue(){
+  Topology::~Topology(){
   }
   
 ////////////////////////////

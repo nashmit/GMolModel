@@ -312,7 +312,7 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
       // ************************* /
       TARGET_TYPE timestep, mytimestep;
       mytimestep = shm[arrays_cut + 3];
-      // * Build bMainResidue and fill indexMap * /
+      // * Build Topology and fill indexMap * /
       sys->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
       system_initialized = true;
 }

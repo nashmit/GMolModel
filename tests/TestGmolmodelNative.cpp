@@ -282,7 +282,7 @@ int main(int argc, char **argv)
     TARGET_TYPE timestep, mytimestep;
     mytimestep = shm[arrays_cut + 3];
 
-    // Build bMainResidue and fill indexMap
+    // Build Topology and fill indexMap
 
     world->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
     world_initialized = true;

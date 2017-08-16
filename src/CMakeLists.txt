@@ -95,7 +95,7 @@ set(LIBGMOLMODEL_SRC
         Sampler.cpp # LAUR
         MonteCarloSampler.cpp # LAUR
 	bAddParams.cpp 
-	bMainResidue.cpp 
+	Topology.cpp 
 	bMoleculeReader.cpp 
 	World.cpp
 	bgeneral.cpp

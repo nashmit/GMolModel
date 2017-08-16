@@ -77,7 +77,7 @@
 #include "bMoleculeReader.hpp"
 #include "bAddParams.hpp"
 #include "server.hpp"
-#include "bMainResidue.hpp"
+#include "Topology.hpp"
 #include "bArgParser.hpp"
 
 typedef double Vector3[3];
@@ -159,7 +159,7 @@ class World{
   SimTK::DecorationSubsystem *decorations;
   SimTK::DuMMForceFieldSubsystem *forceField;
   bMoleculeReader *mr;  // local
-  bMainResidue *lig1;  // local
+  Topology *lig1;  // local
   SimTK::Visualizer *viz;
   #ifdef NOSETHERMOS
   SimTK::NoseHooverThermostat *thermo;
@@ -221,6 +221,12 @@ class World{
     TARGET_TYPE extTimestep,
     bool first_time
   );
+
+  
+  // Interface
+  Topology * getTopology(void) const;
+  Topology * updTopology(void);
+
 
   // Manages the TimeStepper actions
   void Advance(int nosteps);

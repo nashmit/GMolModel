@@ -3,14 +3,14 @@
 
 #include "Robo.hpp"
 #include "Sampler.hpp"
-#include "bMainResidue.hpp"
+#include "Topology.hpp"
 
 class MonteCarloSampler : public Sampler
 {
 public:
     // Constructor
 
-    MonteCarloSampler(bMainResidue *residue, IState *currentState);
+    MonteCarloSampler(Topology *residue, IState *currentState);
 
     // Destructor
 

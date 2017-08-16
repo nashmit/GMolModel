@@ -2,7 +2,7 @@
 
 // Constructor
 
-MonteCarloSampler::MonteCarloSampler(bMainResidue *residue, IState *currentState)
+MonteCarloSampler::MonteCarloSampler(Topology *residue, IState *currentState)
 {
 
 //    ;
