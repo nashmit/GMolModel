@@ -1,8 +1,7 @@
 #include "Topology.hpp"
+
 using namespace SimTK;
-////////////////////////////
-////// BMAINRESIDUE ////////
-////////////////////////////
+
 Topology::Topology(){}
 
 
@@ -508,8 +507,58 @@ void Topology::init(
 
   Topology::~Topology(){
   }
+
+  // Topology interface
+  // Set graph
+
+  void Topology::insertAtom(bSpecificAtom *){}
+  void Topology::insertBond(int, int, int bondOrder){}
+
+  // Parameters
+
+  void Topology::setDuMMAtomParams(int, SimTK::Real vdw, SimTK::Real well){}
+  void Topology::setDuMMBondParams(int, int, SimTK::Real k, SimTK::Real equil){}
+  void Topology::setDuMMAngleParams(int, int, int, SimTK::Real k, SimTK::Real equil){}
+
+  void Topology::setDuMMDihedralParams(int, int, int, int,
+      int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
+  ){}
+  void Topology::setDuMMDihedralParams(int, int, int, int,
+      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
+      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
+  ){}
+  void Topology::setDuMMDihedralParams(int, int, int, int,
+      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
+      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
+      int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
+  ){}
+
+  void Topology::setDuMMImproperParams(int, int, int, int,
+      int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
+  ){}
+  void Topology::setDuMMImproperParams(int, int, int, int,
+      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
+      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
+  ){}
+  void Topology::setDuMMImproperParams(int, int, int, int,
+      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
+      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
+      int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
+  ){}
+
+  // Get
+
+  int Topology::getNAtoms(void) const{}
+  int Topology::getNBonds(void) const{}
+
+  bSpecificAtom * Topology::getAtomByNumber(int number) const{}
+  bSpecificAtom * Topology::getAtomByAtomIx(int aIx) const{}
+  bSpecificAtom * Topology::getAtomByName(std::string name) const{}
+
+  std::vector<bSpecificAtom> Topology::getNeighbours(int) const{}
+  bBond * Topology::getBond(int, int) const{}
+  int Topology::getBondOrder(int, int) const{}
+
+
   
-////////////////////////////
-////// END BMAINRESIDUE ////
-////////////////////////////
 

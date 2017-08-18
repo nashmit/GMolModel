@@ -126,8 +126,9 @@ int main(int argc, char **argv)
         shm
     );
 
+    // Test Context
     Context *context = new Context(p_world, p_genericSampler);
-    World *world = context->getWorld(); // Just for Context function testing
+    World *world = context->getWorld();
 
     // Memory alloc for convinient arrays 
 

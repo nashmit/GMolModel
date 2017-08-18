@@ -68,39 +68,39 @@ public:
 
   // Set graph
 
-  void insertAtom(bSpecificAtom *);
-  void insertBond(int, int, bondOrder);
+  void insertAtom(bSpecificAtom *atom);
+  void insertBond(int atom_no1, int atom_no2, int bondOrder);
 
   // Parameters
 
-  void setDuMMAtomParams(int, vdw, well);
-  void setDuMMBondParams(int, int, Real k, Real equil);
-  void setDuMMAngleParams(int, int, int, Real k, Real equil);
+  void setDuMMAtomParams(int, SimTK::Real vdw, SimTK::Real well);
+  void setDuMMBondParams(int, int, SimTK::Real k, SimTK::Real equil);
+  void setDuMMAngleParams(int, int, int, SimTK::Real k, SimTK::Real equil);
 
   void setDuMMDihedralParams(int, int, int, int,
-      int periodicity, Real ampInKJ, Real phaseInDegrees
+      int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
   );
   void setDuMMDihedralParams(int, int, int, int, 
-      int periodicity1, Real ampInKJ1, Real phaseInDegrees1,
-      int periodicity2, Real ampInKJ2, Real phaseInDegrees2,
+      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
+      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
   );
   void setDuMMDihedralParams(int, int, int, int, 
-      int periodicity1, Real ampInKJ1, Real phaseInDegrees1,
-      int periodicity2, Real ampInKJ2, Real phaseInDegrees2,
-      int periodicity3, Real ampInKJ3, Real phaseInDegrees3,
+      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
+      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
+      int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
   );
 
   void setDuMMImproperParams(int, int, int, int,
-      int periodicity, Real ampInKJ, Real phaseInDegrees
+      int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
   );
   void setDuMMImproperParams(int, int, int, int, 
-      int periodicity1, Real ampInKJ1, Real phaseInDegrees1,
-      int periodicity2, Real ampInKJ2, Real phaseInDegrees2,
+      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
+      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
   );
   void setDuMMImproperParams(int, int, int, int, 
-      int periodicity1, Real ampInKJ1, Real phaseInDegrees1,
-      int periodicity2, Real ampInKJ2, Real phaseInDegrees2,
-      int periodicity3, Real ampInKJ3, Real phaseInDegrees3,
+      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
+      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
+      int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
   );
 
   // Get
