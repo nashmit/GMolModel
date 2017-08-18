@@ -2,7 +2,9 @@
 #define _MidVVIntegrator_h_
 
 // LAUR
-#include "World.hpp"
+//#include "World.hpp"
+#include "bgeneral.hpp"
+class World;
 // ====
 
 //@file This is included in bSysSystem.cpp

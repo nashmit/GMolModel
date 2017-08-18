@@ -17,6 +17,18 @@
 #include <locale>
 #include <assert.h>
 
+// Molmodel specific headers
+
+#include "Molmodel.h"
+#include "mol.h"
+
+#include "SimTKcommon.h"
+#include "molmodel/internal/common.h"
+#include "molmodel/internal/GrinPointer.h"
+#include "molmodel/internal/units.h"
+
+
+
 #ifndef TARGET_TYPE
 #define TARGET_TYPE double
 #endif

@@ -2,7 +2,7 @@
 #define TOPOLOGY_H_
 
 #include "bMoleculeReader.hpp"
-#include "bgeneral.hpp"
+//#include "bgeneral.hpp"
 #include "server.hpp"
 
 /*

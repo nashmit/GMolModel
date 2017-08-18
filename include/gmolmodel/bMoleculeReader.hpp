@@ -11,13 +11,13 @@
  **/
 
 #include "bgeneral.hpp"
-#include "Molmodel.h"
-#include "mol.h"
+//#include "Molmodel.h"
+//#include "mol.h"
 
-#include "SimTKcommon.h"
-#include "molmodel/internal/common.h"
-#include "molmodel/internal/GrinPointer.h"
-#include "molmodel/internal/units.h"
+//#include "SimTKcommon.h"
+//#include "molmodel/internal/common.h"
+//#include "molmodel/internal/GrinPointer.h"
+//#include "molmodel/internal/units.h"
 
 /*
 */

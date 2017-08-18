@@ -7,8 +7,9 @@
 #include <fstream>
 #include <sstream>
 
-#include "Simbody.h"
-#include "Molmodel.h"
+#include "bgeneral.hpp"
+//#include "Simbody.h"
+//#include "Molmodel.h"
 #include "bMoleculeReader.hpp"
 
 #ifndef DEBUG_PARAMS_LEVEL01
