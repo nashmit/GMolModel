@@ -16,6 +16,16 @@ public:
 
     ~MyState();
 
+    // Interface
+
+    SimTK::Vec3 getCartesian(int atom_no);
+
+    void updCartesian(int atom_no, SimTK::Real x, SimTK::Real y, SimTK::Real z);
+
+    void setCartesian(int atom_no, SimTK::Real x, SimTK::Real y, SimTK::Real z);
+
+
+
 };
 
 #endif // __IMYSTATE_HPP__
