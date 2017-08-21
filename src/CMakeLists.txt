@@ -119,7 +119,7 @@ TARGET_LINK_LIBRARIES( GCHMC
 		boost_python 
 		GMOLMODEL_static
                 ${Simbody_LIBRARIES}
-                SimTKmolmodel_d #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
+                SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
                 ${BOOST_LIBRARIES}
                 ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code..
                 m )
@@ -128,7 +128,7 @@ TARGET_LINK_LIBRARIES( GCHMC
 
 TARGET_LINK_LIBRARIES( GMOLMODEL_test 
                 ${Simbody_LIBRARIES}
-                SimTKmolmodel_d #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
+                SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
                 ${BOOST_LIBRARIES}
                 ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code..
                 m )
@@ -137,14 +137,14 @@ TARGET_LINK_LIBRARIES( GMOLMODEL_test
 # link Simbody libraries
 TARGET_LINK_LIBRARIES(GMOLMODEL_dynamic 
 		${Simbody_LIBRARIES}
-		SimTKmolmodel_d #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable 
+		SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable 
 		${BOOST_LIBRARIES} 
                 ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code...
 		m )
 		#${mmtk_libs} )
 TARGET_LINK_LIBRARIES(GMOLMODEL_static 
 		${Simbody_LIBRARIES}
-		SimTKmolmodel_d #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
+		SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
 		${BOOST_LIBRARIES}
                 ${PYTHON_LIBRARIES}  # same as for dynamic lib... I don't think python shoud be part of this lib...
 		m )

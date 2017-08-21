@@ -103,7 +103,7 @@ foreach(TEST_SRC ${TESTS_SRCS})
     add_executable(${TEST_EXE} ${TEST_SRC} )
     TARGET_LINK_LIBRARIES( ${TEST_EXE}
                 ${Simbody_LIBRARIES}
-                SimTKmolmodel_d #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
+                SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
                 ${Boost_LIBRARIES}
                 ${BOOST_LIBS_BYHAND}
                 ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense...

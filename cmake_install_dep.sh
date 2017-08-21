@@ -10,6 +10,8 @@ sudo apt-get install doxygen
 sudo apt-get install subversion
 sudo apt-get install libblas-dev liblapack-dev
 sudo apt-get install libboost-all-dev
+sudo apt-get install swig
+sudo apt-get install ocl-icd-opencl-dev
 
 cd ../molmodel_legacy/simbody
 mkdir build-debug
@@ -25,7 +27,16 @@ cd build-debug
 cmake ..
 make -j4
 sudo make install
-cd ../../build-debug
 
-cmake .. -DMakeDownload_mmtk_environment=true -DInstallEnvironment=true -DAnacondaEnvironmentPath="/home/laurentiu/anaconda2/envs/"
+cd ../../openmm
+mkdir build-debug
+cd build-debug
+cmake ..
+make -j4
+sudo make install
+
+cd ../../build-debug/
+
+
+cmake .. -DMakeDownload_mmtk_environment=true -DInstallEnvironment=true -DAnacondaEnvironmentPath="/home/nash_mit/Anaconda/envs/"
 
