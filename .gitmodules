@@ -7,3 +7,6 @@
 [submodule "mmtk_legacy"]
 	path = mmtk_legacy
 	url = http://nash_mit@mybioinformaticslab.xyz:7990/scm/rob/mmtk_legacy.git
+[submodule "openmm"]
+	path = openmm
+	url = ssh://git@mybioinformaticslab.xyz:7999/rob/openmm.git
