@@ -134,7 +134,7 @@ int main(int argc, char **argv)
 
     // Test Monte Carlo sampler
 
-    MonteCarloSampler *MCsampler = new MonteCarloSampler(world->system, world->matter, world->lig1);
+    Sampler *MCsampler = new MonteCarloSampler(world->system, world->matter, world->lig1);
 
     // Memory alloc for convinient arrays 
 
@@ -347,6 +347,8 @@ int main(int argc, char **argv)
     #ifdef DEBUG_TIME
         //std::cout<<"Time simmain nosteps"<<this->nosteps<<" time "<<boost_timer.elapsed()<<std::endl;
     #endif
+
+    delete MCsampler;
 
 }
 
