@@ -13,8 +13,6 @@ MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem, S
     this->matter = argMatter;
     this->residue = argResidue;
     TVector = new SimTK::Transform[matter->getNumBodies()];
-    eng.seed(4294653137UL);
-
 }
 
 // Destructor
@@ -31,7 +29,7 @@ MonteCarloSampler::~MonteCarloSampler()
 void MonteCarloSampler::assignConfFromTVector(SimTK::State& advanced)
 {
   int i = 0;
-  for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter->getNumBodies(); ++mbx){
+  for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
     mobod.setQToFitTransform(advanced, TVector[i]);
     i++;
@@ -42,25 +40,18 @@ void MonteCarloSampler::assignConfFromTVector(SimTK::State& advanced)
  
 void MonteCarloSampler::assignRandomConf(SimTK::State& advanced)
 {
-    //boost::random::mt19937 eng = boost::random::mt19937();
-    //boost::random::uniform_real_distribution<double> urd =
-    //    boost::random::uniform_real_distribution<double>(0.0, 3.14);
+    eng.seed(4294653137UL);
 
-    //eng.seed(4294653137UL);
+    std::cout << "MonteCarloSampler state Qs " << advanced.getQ() << std::endl;
 
-    std::cout << "MonteCarloSampler state Qs " << advanced.updQ() << std::endl;
-
-    int i = 0;
-    for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter->getNumBodies(); ++mbx){
+    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-
         SimTK::Real rand_no = urd(eng);
-
-        std::cout << "MonteCarloSampler boostQRealRand " << rand_no << std::endl;
-
-        //mobod.updQ(advanced, rand_no);
-        i++;
+        mobod.setOneQ(advanced, 0, rand_no);
     }
+
+    std::cout << "MonteCarloSampler state Qs " << advanced.getQ() << std::endl;
+
 }
 
 
