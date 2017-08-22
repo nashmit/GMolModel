@@ -1,4 +1,4 @@
-//#include "openmm/OpenMM.h"
+#include "OpenMM.h"
 
 int main(int argc, char **argv){
 

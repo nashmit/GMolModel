@@ -41,19 +41,25 @@ void MonteCarloSampler::assignConfFromTVector(SimTK::State& advanced)
  
 void MonteCarloSampler::assignRandomConf(SimTK::State& advanced)
 {
+boost::random::mt19937 eng = boost::random::mt19937();
+boost::random::uniform_real_distribution<double> urd =
+   boost::random::uniform_real_distribution<double>(0.0, 3.14);
 
-  std::cout << "MonteCarloSampler state Qs " << advanced.updQ() << std::endl;
+    eng.seed(4294653137UL);
 
-  int i = 0;
-  for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter->getNumBodies(); ++mbx){
-    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+    std::cout << "MonteCarloSampler state Qs " << advanced.updQ() << std::endl;
 
-    SimTK::Real rand_no = boostQRealRand(0.0, 3.14);
-    std::cout << "MonteCarloSampler boostQRealRand " << rand_no << std::endl;
+    int i = 0;
+    for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter->getNumBodies(); ++mbx){
+        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
 
-    //mobod.updQ(advanced, rand_no);
-    i++;
-  }
+        SimTK::Real rand_no = urd(eng);
+
+        std::cout << "MonteCarloSampler boostQRealRand " << rand_no << std::endl;
+
+        //mobod.updQ(advanced, rand_no);
+        i++;
+    }
 }
 
 

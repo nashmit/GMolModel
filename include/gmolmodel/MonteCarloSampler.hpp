@@ -36,9 +36,6 @@ private:
     Topology *residue;
     SimTK::Transform *TVector;
 
-    boost::random::mt19937 rng;
-    boost::random::uniform_real_distribution boostQRealRand(SimTK::Real min = 0.0, SimTK::Real max = 3.14);
-
 };
 
 #endif // __MONTECARLOSAMPLER_HPP__
