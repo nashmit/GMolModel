@@ -36,6 +36,11 @@ private:
     Topology *residue;
     SimTK::Transform *TVector;
 
+    boost::random::mt19937 eng = boost::random::mt19937();
+    boost::random::uniform_real_distribution<double> urd =
+        boost::random::uniform_real_distribution<double>(0.0, 3.14);
+
+
 };
 
 #endif // __MONTECARLOSAMPLER_HPP__

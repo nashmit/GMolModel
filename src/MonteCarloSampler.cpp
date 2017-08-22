@@ -13,6 +13,7 @@ MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem, S
     this->matter = argMatter;
     this->residue = argResidue;
     TVector = new SimTK::Transform[matter->getNumBodies()];
+    eng.seed(4294653137UL);
 
 }
 
@@ -41,11 +42,11 @@ void MonteCarloSampler::assignConfFromTVector(SimTK::State& advanced)
  
 void MonteCarloSampler::assignRandomConf(SimTK::State& advanced)
 {
-boost::random::mt19937 eng = boost::random::mt19937();
-boost::random::uniform_real_distribution<double> urd =
-   boost::random::uniform_real_distribution<double>(0.0, 3.14);
+    //boost::random::mt19937 eng = boost::random::mt19937();
+    //boost::random::uniform_real_distribution<double> urd =
+    //    boost::random::uniform_real_distribution<double>(0.0, 3.14);
 
-    eng.seed(4294653137UL);
+    //eng.seed(4294653137UL);
 
     std::cout << "MonteCarloSampler state Qs " << advanced.updQ() << std::endl;
 
