@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 
     temperature = 300.0;
     delta_t = 0.0015; // ps
-    nosteps = 200; // RESTORE DEL
+    nosteps = 10; // RESTORE DEL
     ntrials = 10; // RESTORE DEL
     steps_per_trial = nosteps / ntrials;
     std::cout<<"main ntrials: "<<ntrials<<std::endl;
@@ -134,7 +134,7 @@ int main(int argc, char **argv)
 
     // Test Monte Carlo sampler
 
-    Sampler *MCsampler = new MonteCarloSampler(world->system, world->matter, world->lig1);
+    MonteCarloSampler *MCsampler = new MonteCarloSampler(world->system, world->matter, world->lig1);
 
     // Memory alloc for convinient arrays 
 
@@ -343,7 +343,19 @@ int main(int argc, char **argv)
 
    // Simulate
 
-    world->Advance(nosteps); 
+    bool shouldTerminate = false;
+    SimTK::Real timeReached = 0.0;
+    for(int i = 0; i<5; i++){
+        //world->integ->reinitialize(SimTK::Stage::Position, shouldTerminate);
+        SimTK::State& state = world->integ->updAdvancedState();
+        std::cout << "trying to make integrator to step to " << timeReached + (nosteps * delta_t) << std::endl;
+        world->integ->stepTo(timeReached + (nosteps * delta_t));
+        //SimTK::State& state = world->integ->updAdvancedState();
+        //(world->forces->getSystem()).realize(state, SimTK::Stage::Position);
+        //MCsampler->assignRandomConf(state);
+        //(world->forces->getSystem()).realize(state, SimTK::Stage::Position);
+    }
+
     #ifdef DEBUG_TIME
         //std::cout<<"Time simmain nosteps"<<this->nosteps<<" time "<<boost_timer.elapsed()<<std::endl;
     #endif

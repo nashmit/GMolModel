@@ -424,9 +424,6 @@ Topology * World::updTopology(void){
 // Advance
 
 void World::Advance(int nosteps){
-  #ifdef DEBUG_TIME
-  boost::timer Advance_timer;
-  #endif
 
   TARGET_TYPE myrealtime=0;
   //myrealtime = (TARGET_TYPE)nosteps * (*sysTimestep);
@@ -434,7 +431,7 @@ void World::Advance(int nosteps){
   std::cout<<"myrealtime: "<<myrealtime<<std::endl;
 
   SimTK::State& advanced = integ->updAdvancedState();
-  std::cout<<"Advance: integ->updAdvancedState: "<<std::endl;
+  std::cout<<"Advance start: integ->updAdvancedState: "<< advanced.getQ() <<std::endl;
 
 /*
   integ->dropBeginFlag();
@@ -481,9 +478,7 @@ void World::Advance(int nosteps){
 */
   ts->stepTo(advanced.getTime() + myrealtime);
 
-  #ifdef DEBUG_TIME
-  printf("Advance: stepTo time %.8lf\n", Advance_timer.elapsed());
-  #endif
+  std::cout<<"Advance stop: integ->updAdvancedState: "<< advanced.getQ() <<std::endl;
   
 }
 
