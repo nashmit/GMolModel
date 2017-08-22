@@ -169,8 +169,8 @@ class World{
   #endif
   SimTK::Real startT;
   //RungeKuttaMersonIntegrator *integ;
-  //VerletIntegrator *integ;
-  MidVVIntegrator *integ;
+  SimTK::VerletIntegrator *integ;
+  //MidVVIntegrator *integ;
   SimTK::TimeStepper *ts;
   TARGET_TYPE *PrmToAx_po;
   TARGET_TYPE *MMTkToPrm_po;

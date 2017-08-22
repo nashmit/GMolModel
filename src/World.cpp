@@ -404,7 +404,8 @@ void World::InitSimulation(
     }
   }
 
-  integ = new MidVVIntegrator(*system, (*sysTimestep), PrmToAx_po, MMTkToPrm_po, system, this);
+  //integ = new MidVVIntegrator(*system, (*sysTimestep), PrmToAx_po, MMTkToPrm_po, system, this);
+  integ = new SimTK::VerletIntegrator(*system);
   ts = new SimTK::TimeStepper(*system, *integ);
   ts->initialize(system->getDefaultState());
 }//end of InitSimulation
@@ -435,6 +436,7 @@ void World::Advance(int nosteps){
   SimTK::State& advanced = integ->updAdvancedState();
   std::cout<<"Advance: integ->updAdvancedState: "<<std::endl;
 
+/*
   integ->dropBeginFlag();
   integ->dropStep0Flag();
   integ->dropMetroFlag();
@@ -476,7 +478,7 @@ void World::Advance(int nosteps){
   #ifdef DEBUG_SPECIFIC
   //printf("ts time advanced.getTime() %lf myrealtime %lf stepTo %lf\n", advanced.getTime(), myrealtime, advanced.getTime() + myrealtime);
   #endif
-
+*/
   ts->stepTo(advanced.getTime() + myrealtime);
 
   #ifdef DEBUG_TIME
