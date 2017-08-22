@@ -1,5 +1,16 @@
 cmake_minimum_required(VERSION 3.0)
 
+# Permit use of custom FindOpenMM module
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules")
+
+set(CMAKE_VERBOSE_MAKEFILE OFF CACHE BOOL "Control volume of build output" )
+
+set(OpenMM_ON OFF)
+find_package(OpenMM)
+if(OpenMM_FOUND)
+    set(OpenMM_ON ON)
+endif()
+
 find_package(Simbody 3.6 CONFIG REQUIRED) # you may have to set a path for config file location e.g.  modify the environment variable list specific for find_package..
 INCLUDE_DIRECTORIES( ${Simbody_INCLUDE_DIR} )
 LINK_DIRECTORIES( ${Simbody_LIB_DIR} )
