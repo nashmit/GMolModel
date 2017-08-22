@@ -2,8 +2,10 @@
 #define __SAMPLER_HPP__
 
 #include "Robo.hpp"
-#include "Topology.hpp"
-#include "IState.hpp"
+//#include "Topology.hpp"
+//#include "IState.hpp"
+
+class Topology;
 
 class Sampler
 {

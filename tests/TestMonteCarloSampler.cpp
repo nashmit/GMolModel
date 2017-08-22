@@ -1,6 +1,6 @@
 #include "Robo.hpp"
 #include "MonteCarloSampler.hpp"
-
+#include "Topology.hpp"
 
 int main (int argc, char **argv)
 {

@@ -1,5 +1,10 @@
 #include "Context.hpp"
 
+// Includes to get the structure of additional classes
+
+#include "World.hpp"
+#include "Sampler.hpp"
+
 // Constructor
 
 Context::Context(World *inp_p_world, Sampler * inp_p_sampler){

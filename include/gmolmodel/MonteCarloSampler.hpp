@@ -3,7 +3,9 @@
 
 #include "Robo.hpp"
 #include "Sampler.hpp"
-#include "Topology.hpp"
+
+class Topology;
+class IState;
 
 class MonteCarloSampler : public Sampler
 {

@@ -1,1 +1,8 @@
-#include "openmm/OpenMM.h"
+//#include "openmm/OpenMM.h"
+
+int main(int argc, char **argv){
+
+    return 0;
+
+}
+

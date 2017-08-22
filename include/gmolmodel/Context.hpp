@@ -1,6 +1,7 @@
 #include "Robo.hpp"
-#include "World.hpp"
-#include "Sampler.hpp"
+
+class Sampler;
+class World;
 
 class Context{
 private:
