@@ -12,6 +12,7 @@ sudo apt-get install libblas-dev liblapack-dev
 sudo apt-get install libboost-all-dev
 sudo apt-get install swig
 sudo apt-get install ocl-icd-opencl-dev
+sudo apt-get install fftw2
 
 cd ../molmodel_legacy/simbody
 mkdir build-debug
