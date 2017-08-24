@@ -32,6 +32,7 @@ public:
     void setOldPE(SimTK::Real argPE);
     void setOldKE(SimTK::Real argKE);
     SimTK::Real getPEFromEvaluator(void); 
+
     SimTK::Real getTemperature(void);
     void writeConfToEvaluator(void);
 

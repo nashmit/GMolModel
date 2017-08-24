@@ -67,51 +67,30 @@ void MonteCarloSampler::assignRandomConf(SimTK::State& advanced)
 }
 
 
-
+// Acception - rejection step
 void MonteCarloSampler::update(SimTK::State& advanced){
-      int nu = advanced.getNU();
-      SimTK::Real rand_no = urd01(eng);
-      bool accept_flag = false;
+    SimTK::Real rand_no = urd01(eng);
+    SimTK::Real RT = getTemperature() * SimTK_BOLTZMANN_CONSTANT_MD;
 
-      //Real ke_n = compoundSystem->calcKineticEnergy(advanced); // SimTK::CompoundSystem
-      SimTK::Real pe_n = getPEFromEvaluator(); // Get potential energy from OPENMM
-      SimTK::Real pe_o = getOldPE();
+    // Get energies
+    SimTK::Real pe_o = getOldPE();
+    SimTK::Real pe_n = getPEFromEvaluator(); // Get potential energy from OPENMM
 
-      // Get numerical quantities
-      SimTK::Real RT = getTemperature() * SimTK_BOLTZMANN_CONSTANT_MD;
-      //Real en = ke_n + pe_n;
-      //Real eo = getOldKE() + getOldPE();
-
-      // Apply Metropolis criterion
-      if(isnan(pe_n)){
-        accept_flag = false;
-        std::cout << "en is nan" << std::endl;
-      }else{
-        //if ((en < eo) or (rand_no < exp(-(en - eo)/RT))){
-        if ((pe_n < pe_o) or (rand_no < exp(-(pe_n - pe_o)/RT))){
-          accept_flag = true;
-        }else{
-          accept_flag = false;
-        }
-      }
-
-      if(accept_flag == false){ // Move not accepted - assign old conf TVector
+    // Apply Metropolis criterion
+    assert(!isnan(pe_n));
+    if ((pe_n < pe_o) or (rand_no < exp(-(pe_n - pe_o)/RT))){
+        setTVector(advanced);
+        writeConfToEvaluator(); // Insert configuratin in OPENMM
+        setOldPE(pe_n);
+    }else{
         assignConfFromTVector(advanced);
         setOldPE(getOldPE());
-      }
-      else{                          // Move accepted - set new TVector
-        setTVector(advanced);
-        writeConfToEvaluator(); // INSERT CONF IN OPENMM
-        setOldPE(pe_n);
-      }
-
-
+    }
 }
 
-SimTK::Real MonteCarloSampler::getOldPE(void){return -1.0;}
+SimTK::Real MonteCarloSampler::getOldPE(void){return 1.0;}
 SimTK::Real MonteCarloSampler::getOldKE(void){}
 void MonteCarloSampler::setOldPE(SimTK::Real argPE){}
-
 void MonteCarloSampler::setOldKE(SimTK::Real argKE){}
 SimTK::Real MonteCarloSampler::getPEFromEvaluator(void){return 0.0;}
 SimTK::Real MonteCarloSampler::getTemperature(void){}
