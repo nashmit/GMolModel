@@ -27,19 +27,32 @@ public:
     void assignConfFromTVector(SimTK::State& advanced);
     void assignRandomConf(SimTK::State& advanced);
 
+    SimTK::Real getOldPE(void);
+    SimTK::Real getOldKE(void);
+    void setOldPE(SimTK::Real argPE);
+    void setOldKE(SimTK::Real argKE);
+    SimTK::Real getPEFromEvaluator(void); 
+    SimTK::Real getTemperature(void);
+    void writeConfToEvaluator(void);
+
+
     // Performs the acception-rejection step and sets the state of the compound
     // to the appropriate conformation
-    void update(void);
+    void update(SimTK::State&);
 
 private:
     SimTK::CompoundSystem *compoundSystem;
     SimTK::SimbodyMatterSubsystem *matter;
     Topology *residue;
     SimTK::Transform *TVector;
+    SimTK::Real pe_o;
 
     boost::random::mt19937 eng = boost::random::mt19937();
     boost::random::uniform_real_distribution<double> urd =
         boost::random::uniform_real_distribution<double>(0.0, 3.14);
+
+    boost::random::uniform_real_distribution<double> urd01 =
+        boost::random::uniform_real_distribution<double>(0.0, 1);
 
 
 };

@@ -85,6 +85,15 @@ typedef double Vector3[3];
 void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
          const char *dirname, const char *prefix, int midlength, const char *sufix);
 
+void writePdb(      SimTK::Compound& c, SimTK::State& advanced,
+         const char *dirname, const char *prefix, int midlength, const char *sufix);
+
+void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
+         const char *dirname, const char *prefix, int midlength, const char *sufix, double aTime);
+
+void writePdb(      SimTK::Compound& c, SimTK::State& advanced,
+         const char *dirname, const char *prefix, int midlength, const char *sufix, double aTime);
+
 void writePdb(SimTK::PdbStructure pdb, const char *FN);
 
 class World;

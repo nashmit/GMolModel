@@ -16,7 +16,37 @@ void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
   fb.close();
 }
 
+void writePdb(SimTK::Compound& c, SimTK::State& advanced,
+         const char *dirname, const char *prefix, int midlength, const char *sufix)
+{
+  double mult = 10000*advanced.getTime(); // pico to femto
+  SimTK::PdbStructure  pdb(advanced, c);
+  std::stringstream sstream;
+  sstream<<dirname<<"/"<<prefix<<decimal_prefix(mult, std::pow(10, midlength))<<int(mult)<<sufix<<".pdb";
+  string ofilename = sstream.str();
+  std::filebuf fb;
+  fb.open(ofilename.c_str(), std::ios::out);
+  std::ostream os(&fb);
+  pdb.write(os); // automatically multiplies by ten (nm to A)
+  fb.close();
+}
+
 void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
+         const char *dirname, const char *prefix, int midlength, const char *sufix, double aTime)
+{
+  double mult = 10000*aTime; // pico to femto
+  SimTK::PdbStructure  pdb(advanced, c);
+  std::stringstream sstream;
+  sstream<<dirname<<"/"<<prefix<<decimal_prefix(mult, std::pow(10, midlength))<<int(mult)<<sufix<<".pdb";
+  string ofilename = sstream.str();
+  std::filebuf fb;
+  fb.open(ofilename.c_str(), std::ios::out);
+  std::ostream os(&fb);
+  pdb.write(os); // automatically multiplies by ten (nm to A)
+  fb.close();
+}
+
+void writePdb(SimTK::Compound& c, SimTK::State& advanced,
          const char *dirname, const char *prefix, int midlength, const char *sufix, double aTime)
 {
   double mult = 10000*aTime; // pico to femto

@@ -349,27 +349,32 @@ int main(int argc, char **argv)
     const SimTK::State& tsState = world->ts->getState(); // less than or equal to integ advanced state
     std::cout << std::fixed;
     std::cout << std::setprecision(4);
-    //world->ts->initialize(integAdvancedState);
 
-    timeToReach += (nosteps * delta_t);
-    world->ts->stepTo(timeToReach);
+    world->ts->initialize(integAdvancedState); // TS
+    timeToReach += (nosteps * delta_t); // TS
+    world->ts->stepTo(timeToReach);  // TS
     for(int i = 0; i<30; i++){
         //world->integ->reinitialize(SimTK::Stage::Position, shouldTerminate);
         //world->ts->initialize(tsState);
-        //world->ts->initialize(integAdvancedState); // NECESSARY
-        timeToReach += (nosteps * delta_t);
+        world->ts->initialize(integAdvancedState); // TS NECESSARY
+        timeToReach += (nosteps * delta_t); // TS
         std::cout << "trying to make integrator to step to " << timeToReach << std::endl;
         std::cout << "Time: " << world->ts->getTime()  << "; Stage before stepping: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
-        //world->ts->stepTo(timeToReach);
+        world->ts->stepTo(timeToReach); // TS
         std::cout << "Time: " << world->ts->getTime()  << "; Stage after stepping: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
         MCsampler->assignRandomConf(integAdvancedState);
+
+        world->ts->initialize(integAdvancedState); // TS NECESSARY
+
+        MCsampler->update(integAdvancedState);
         std::cout << "Time: " << world->ts->getTime()  << "; Stage after MCsampler: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
         //(world->forces->getSystem()).realize(integAdvancedState, SimTK::Stage::Acceleration);
         //std::cout << "Time: " << world->ts->getTime()  << "; Stage after realize: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
+        writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "MCs", i);
     }
 
 
-    delete MCsampler;
+    //delete MCsampler;
 
 }
 
