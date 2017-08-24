@@ -345,19 +345,26 @@ int main(int argc, char **argv)
 
     bool shouldTerminate = false;
     SimTK::Real timeToReach = 0.0;
-    for(int i = 0; i<5; i++){
+    SimTK::State& integAdvancedState = world->integ->updAdvancedState();
+    const SimTK::State& tsState = world->ts->getState(); // less than or equal to integ advanced state
+    std::cout << std::fixed;
+    std::cout << std::setprecision(4);
+    //world->ts->initialize(integAdvancedState);
+    for(int i = 0; i<30; i++){
         //world->integ->reinitialize(SimTK::Stage::Position, shouldTerminate);
+        //world->ts->initialize(tsState);
+        world->ts->initialize(integAdvancedState);
         timeToReach += (nosteps * delta_t);
         std::cout << "trying to make integrator to step to " << timeToReach << std::endl;
-        world->integ->stepTo(timeToReach );
-        SimTK::State& state = world->integ->updAdvancedState();
-        MCsampler->assignRandomConf(state);
-        //(world->forces->getSystem()).realize(state, SimTK::Stage::Position);
+        std::cout << "Time: " << world->ts->getTime()  << "; Stage before stepping: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
+        world->ts->stepTo(timeToReach);
+        std::cout << "Time: " << world->ts->getTime()  << "; Stage after stepping: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
+        MCsampler->assignRandomConf(integAdvancedState);
+        std::cout << "Time: " << world->ts->getTime()  << "; Stage after MCsampler: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
+        //(world->forces->getSystem()).realize(integAdvancedState, SimTK::Stage::Acceleration);
+        //std::cout << "Time: " << world->ts->getTime()  << "; Stage after realize: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
     }
 
-    #ifdef DEBUG_TIME
-        //std::cout<<"Time simmain nosteps"<<this->nosteps<<" time "<<boost_timer.elapsed()<<std::endl;
-    #endif
 
     delete MCsampler;
 

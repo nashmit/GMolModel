@@ -40,9 +40,9 @@ void MonteCarloSampler::assignConfFromTVector(SimTK::State& advanced)
  
 void MonteCarloSampler::assignRandomConf(SimTK::State& advanced)
 {
-    eng.seed(4294653137UL);
+    //eng.seed(4294653137UL);
 
-    std::cout << "MonteCarloSampler state Qs " << advanced.getQ() << std::endl;
+    std::cout << "MonteCarloSampler state Qs before " << advanced.getQ() << std::endl;
 
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
@@ -50,7 +50,7 @@ void MonteCarloSampler::assignRandomConf(SimTK::State& advanced)
         mobod.setOneQ(advanced, 0, rand_no);
     }
 
-    std::cout << "MonteCarloSampler state Qs " << advanced.getQ() << std::endl;
+    std::cout << "MonteCarloSampler state Qs after " << advanced.getQ() << std::endl;
 
 }
 
