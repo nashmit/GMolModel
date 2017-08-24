@@ -95,4 +95,4 @@ void MonteCarloSampler::setOldKE(SimTK::Real argKE){}
 SimTK::Real MonteCarloSampler::getPEFromEvaluator(void){return 0.0;}
 SimTK::Real MonteCarloSampler::getTemperature(void){}
 void MonteCarloSampler::writeConfToEvaluator(void){}
-
+void MonteCarloSampler::setTemperature(SimTK::Real argTemperature){temperature = argTemperature;}

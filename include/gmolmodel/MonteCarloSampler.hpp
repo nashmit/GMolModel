@@ -21,6 +21,11 @@ public:
 
     ~MonteCarloSampler();
 
+    // 
+
+    SimTK::Real getTemperature(void);
+    void setTemperature(SimTK::Real);
+
     // Helper functions
 
     void setTVector(SimTK::State& advanced);
@@ -33,7 +38,6 @@ public:
     void setOldKE(SimTK::Real argKE);
     SimTK::Real getPEFromEvaluator(void); 
 
-    SimTK::Real getTemperature(void);
     void writeConfToEvaluator(void);
 
 
@@ -47,6 +51,7 @@ private:
     Topology *residue;
     SimTK::Transform *TVector;
     SimTK::Real pe_o;
+    SimTK::Real temperature;
 
     boost::random::mt19937 eng = boost::random::mt19937();
     boost::random::uniform_real_distribution<double> urd =
