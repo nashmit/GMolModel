@@ -23,6 +23,7 @@ public:
 
     // Helper functions
 
+    void setTVector(SimTK::State& advanced);
     void assignConfFromTVector(SimTK::State& advanced);
     void assignRandomConf(SimTK::State& advanced);
 

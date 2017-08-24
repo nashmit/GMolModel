@@ -24,6 +24,19 @@ MonteCarloSampler::~MonteCarloSampler()
 
 }
 
+// * Set TVector of transforms from mobods * //
+void MonteCarloSampler::setTVector(SimTK::State& advanced)
+{
+  int i = 0;
+  for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+    const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
+    TVector[i] = mobod.getMobilizerTransform(advanced);
+    i++;
+  }
+}
+
+
 // Transfer coordinates from TVector to compound
  
 void MonteCarloSampler::assignConfFromTVector(SimTK::State& advanced)
