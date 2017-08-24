@@ -344,15 +344,14 @@ int main(int argc, char **argv)
    // Simulate
 
     bool shouldTerminate = false;
-    SimTK::Real timeReached = 0.0;
+    SimTK::Real timeToReach = 0.0;
     for(int i = 0; i<5; i++){
         //world->integ->reinitialize(SimTK::Stage::Position, shouldTerminate);
+        timeToReach += (nosteps * delta_t);
+        std::cout << "trying to make integrator to step to " << timeToReach << std::endl;
+        world->integ->stepTo(timeToReach );
         SimTK::State& state = world->integ->updAdvancedState();
-        std::cout << "trying to make integrator to step to " << timeReached + (nosteps * delta_t) << std::endl;
-        world->integ->stepTo(timeReached + (nosteps * delta_t));
-        //SimTK::State& state = world->integ->updAdvancedState();
-        //(world->forces->getSystem()).realize(state, SimTK::Stage::Position);
-        //MCsampler->assignRandomConf(state);
+        MCsampler->assignRandomConf(state);
         //(world->forces->getSystem()).realize(state, SimTK::Stage::Position);
     }
 
