@@ -1,3 +1,6 @@
+/**@file
+Implementation of MonteCarloSampler class. **/
+
 #include "MonteCarloSampler.hpp"
 
 // Includes to get the structure of additional classes
@@ -24,7 +27,8 @@ MonteCarloSampler::~MonteCarloSampler()
 
 }
 
-// * Set TVector of transforms from mobods * //
+// Stores the configuration into an internal vector of transforms TVector
+
 void MonteCarloSampler::setTVector(SimTK::State& advanced)
 {
   int i = 0;
@@ -37,8 +41,8 @@ void MonteCarloSampler::setTVector(SimTK::State& advanced)
 }
 
 
-// Transfer coordinates from TVector to compound
- 
+// Restores configuration from the internal vector of transforms TVector
+
 void MonteCarloSampler::assignConfFromTVector(SimTK::State& advanced)
 {
   int i = 0;
@@ -53,23 +57,19 @@ void MonteCarloSampler::assignConfFromTVector(SimTK::State& advanced)
  
 void MonteCarloSampler::assignRandomConf(SimTK::State& advanced)
 {
-    //eng.seed(4294653137UL);
-
-    std::cout << "MonteCarloSampler state Qs before " << advanced.getQ() << std::endl;
-
+    //randomEngine.seed(4294653137UL); // for reproductibility
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-        SimTK::Real rand_no = urd(eng);
+        SimTK::Real rand_no = uniformRealDistribution_0_2pi(randomEngine);
         mobod.setOneQ(advanced, 0, rand_no);
     }
-
-    std::cout << "MonteCarloSampler state Qs after " << advanced.getQ() << std::endl;
 }
 
-
+// The update step in Monte Carlo methods consists in:
 // Acception - rejection step
+
 void MonteCarloSampler::update(SimTK::State& advanced){
-    SimTK::Real rand_no = urd01(eng);
+    SimTK::Real rand_no = uniformRealDistribution(randomEngine);
     SimTK::Real RT = getTemperature() * SimTK_BOLTZMANN_CONSTANT_MD;
 
     // Get energies
@@ -80,7 +80,7 @@ void MonteCarloSampler::update(SimTK::State& advanced){
     assert(!isnan(pe_n));
     if ((pe_n < pe_o) or (rand_no < exp(-(pe_n - pe_o)/RT))){
         setTVector(advanced);
-        writeConfToEvaluator(); // Insert configuratin in OPENMM
+        sendConfToEvaluator(); // Insert configuratin in OPENMM
         setOldPE(pe_n);
     }else{
         assignConfFromTVector(advanced);
@@ -88,11 +88,42 @@ void MonteCarloSampler::update(SimTK::State& advanced){
     }
 }
 
+// Get stored potential energy
+
 SimTK::Real MonteCarloSampler::getOldPE(void){return 1.0;}
+
+// Get stored kinetic energy - only necessary for Hamiltonian Monte Carlo
+
 SimTK::Real MonteCarloSampler::getOldKE(void){}
+
+// Store the potential energy
+
 void MonteCarloSampler::setOldPE(SimTK::Real argPE){}
+
+// Store the kintetic energy - only necessary for Hamiltonian Monte Carlo
+
 void MonteCarloSampler::setOldKE(SimTK::Real argKE){}
+
+// Get the potential energy from an external source as far as the sampler
+// is concerned - OPENMM has to be inserted here
+
 SimTK::Real MonteCarloSampler::getPEFromEvaluator(void){return 0.0;}
+
+// Get the simulation temperature
+
 SimTK::Real MonteCarloSampler::getTemperature(void){}
-void MonteCarloSampler::writeConfToEvaluator(void){}
+
+// Set the simulatin temperature
+
 void MonteCarloSampler::setTemperature(SimTK::Real argTemperature){temperature = argTemperature;}
+
+// Send configuration to an external evaluator
+
+void MonteCarloSampler::sendConfToEvaluator(void){}
+
+
+
+
+
+
+

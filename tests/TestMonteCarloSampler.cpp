@@ -362,7 +362,10 @@ int main(int argc, char **argv)
         std::cout << "Time: " << world->ts->getTime()  << "; Stage before stepping: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
         world->ts->stepTo(timeToReach); // TS
         std::cout << "Time: " << world->ts->getTime()  << "; Stage after stepping: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
+
+        std::cout << "state Qs before assignRandomConf " << integAdvancedState.getQ() << std::endl;
         MCsampler->assignRandomConf(integAdvancedState);
+        std::cout << "state Qs after assignRandomConf " << integAdvancedState.getQ() << std::endl;
 
         world->ts->initialize(integAdvancedState); // TS NECESSARY
 

@@ -21,24 +21,34 @@ public:
 
     ~MonteCarloSampler();
 
-    // 
+    // Simulation temperature related
 
     SimTK::Real getTemperature(void);
     void setTemperature(SimTK::Real);
 
-    // Helper functions
+    // Store/restore the configuration from the internal TVector variable
 
     void setTVector(SimTK::State& advanced);
     void assignConfFromTVector(SimTK::State& advanced);
+
+    // Assign a random conformation
+
     void assignRandomConf(SimTK::State& advanced);
+
+    // Store/restore potential energy
 
     SimTK::Real getOldPE(void);
     SimTK::Real getOldKE(void);
     void setOldPE(SimTK::Real argPE);
     void setOldKE(SimTK::Real argKE);
+
+    // Evaluate the potential energy at current state
+
     SimTK::Real getPEFromEvaluator(void); 
 
-    void writeConfToEvaluator(void);
+    // Send configuration to an external evaluator
+
+    void sendConfToEvaluator(void);
 
 
     // Performs the acception-rejection step and sets the state of the compound
@@ -49,17 +59,21 @@ private:
     SimTK::CompoundSystem *compoundSystem;
     SimTK::SimbodyMatterSubsystem *matter;
     Topology *residue;
+
     SimTK::Transform *TVector;
     SimTK::Real pe_o;
     SimTK::Real temperature;
 
-    boost::random::mt19937 eng = boost::random::mt19937();
-    boost::random::uniform_real_distribution<double> urd =
-        boost::random::uniform_real_distribution<double>(0.0, 3.14);
+ 
+    // Random number generators - not sure if I need two
+    // Needs testing
 
-    boost::random::uniform_real_distribution<double> urd01 =
-        boost::random::uniform_real_distribution<double>(0.0, 1);
+    boost::random::mt19937 randomEngine = boost::random::mt19937();
+    boost::random::uniform_real_distribution<double> uniformRealDistribution_0_2pi =
+        boost::random::uniform_real_distribution<double>(SimTK::Zero, SimTK::Pi);
 
+    boost::random::uniform_real_distribution<double> uniformRealDistribution =
+        boost::random::uniform_real_distribution<double>(SimTK::Zero, SimTK::One);
 
 };
 
