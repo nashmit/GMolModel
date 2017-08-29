@@ -15,7 +15,7 @@ class MonteCarloSampler : public Sampler
 public:
     // Constructor
 
-    MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem, SimTK::SimbodyMatterSubsystem *argMatter, Topology *argResidue);
+    MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem, SimTK::SimbodyMatterSubsystem *argMatter, Topology *argResidue, SimTK::TimeStepper *argTimeStepper);
 
     // Destructor
 
@@ -28,7 +28,7 @@ public:
 
     // Store/restore the configuration from the internal TVector variable
 
-    void setTVector(SimTK::State& advanced);
+    void setTVector(const SimTK::State& advanced);
     void assignConfFromTVector(SimTK::State& advanced);
 
     // Assign a random conformation
@@ -59,6 +59,7 @@ private:
     SimTK::CompoundSystem *compoundSystem;
     SimTK::SimbodyMatterSubsystem *matter;
     Topology *residue;
+    SimTK::TimeStepper *timeStepper;
 
     SimTK::Transform *TVector;
     SimTK::Real pe_o;

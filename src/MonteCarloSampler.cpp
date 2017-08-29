@@ -9,12 +9,14 @@ Implementation of MonteCarloSampler class. **/
 
 // Constructor
 
-MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem, SimTK::SimbodyMatterSubsystem *argMatter, Topology *argResidue)
+MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem, SimTK::SimbodyMatterSubsystem *argMatter, Topology *argResidue, SimTK::TimeStepper *argTimeStepper)
 {
 
     this->compoundSystem = argCompoundSystem;
     this->matter = argMatter;
     this->residue = argResidue;
+    this->timeStepper = argTimeStepper;
+
     TVector = new SimTK::Transform[matter->getNumBodies()];
 }
 
@@ -29,13 +31,15 @@ MonteCarloSampler::~MonteCarloSampler()
 
 // Stores the configuration into an internal vector of transforms TVector
 
-void MonteCarloSampler::setTVector(SimTK::State& advanced)
+void MonteCarloSampler::setTVector(const SimTK::State& someState)
 {
   int i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-    const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
-    TVector[i] = mobod.getMobilizerTransform(advanced);
+    std::cout << "isolate error 0"<< std::endl;
+    const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
+    std::cout << "isolate error 1"<< std::endl;
+    TVector[i] = mobod.getMobilizerTransform(someState);
     i++;
   }
 }
@@ -43,48 +47,80 @@ void MonteCarloSampler::setTVector(SimTK::State& advanced)
 
 // Restores configuration from the internal vector of transforms TVector
 
-void MonteCarloSampler::assignConfFromTVector(SimTK::State& advanced)
+void MonteCarloSampler::assignConfFromTVector(SimTK::State& someState)
 {
   int i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-    mobod.setQToFitTransform(advanced, TVector[i]);
+    mobod.setQToFitTransform(someState, TVector[i]);
     i++;
   }
 }
 
 // Assign random conformation
  
-void MonteCarloSampler::assignRandomConf(SimTK::State& advanced)
+void MonteCarloSampler::assignRandomConf(SimTK::State& someState)
 {
     //randomEngine.seed(4294653137UL); // for reproductibility
-    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+
+    std::cout << "State info before updQ" << std::endl;
+    for(int i = 0; i < someState.getNumSubsystems(); i++){
+        std::cout << someState.getSubsystemName(SimTK::SubsystemIndex(i)) << " ";
+        std::cout << someState.getSubsystemStage(SimTK::SubsystemIndex(i)) << " ";
+        std::cout << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
+    }
+
+    int i = 1;
+    for (SimTK::MobilizedBodyIndex mbx(i); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         SimTK::Real rand_no = uniformRealDistribution_0_2pi(randomEngine);
-        mobod.setOneQ(advanced, 0, rand_no);
+        //mobod.setOneQ(someState, 0, rand_no);
+        someState.updQ()[i] = rand_no;
+        i++;
     }
+
+    someState.advanceSystemToStage(SimTK::Stage::Acceleration);
+
+    std::cout << "State info after updQ" << std::endl;
+    for(int i = 0; i < someState.getNumSubsystems(); i++){
+        std::cout << someState.getSubsystemName(SimTK::SubsystemIndex(i)) << " ";
+        std::cout << someState.getSubsystemStage(SimTK::SubsystemIndex(i)) << " ";
+        std::cout << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
+    }
+
 }
 
 // The update step in Monte Carlo methods consists in:
 // Acception - rejection step
 
-void MonteCarloSampler::update(SimTK::State& advanced){
+void MonteCarloSampler::update(SimTK::State& someState){
     SimTK::Real rand_no = uniformRealDistribution(randomEngine);
     SimTK::Real RT = getTemperature() * SimTK_BOLTZMANN_CONSTANT_MD;
 
-    // Get energies
+    // Get old energy
     SimTK::Real pe_o = getOldPE();
-    SimTK::Real pe_n = getPEFromEvaluator(); // Get potential energy from OPENMM
+
+    // Assign random configuration
+
+    assignRandomConf(someState);
+    //timeStepper->initialize(someState); // should develop timestepper class ??
+
+    // Send configuration to evaluator  
+
+    sendConfToEvaluator(); // OPENMM
+
+    // Get current potential energy from evaluator
+
+    SimTK::Real pe_n = getPEFromEvaluator(); // OPENMM
 
     // Apply Metropolis criterion
+
     assert(!isnan(pe_n));
-    if ((pe_n < pe_o) or (rand_no < exp(-(pe_n - pe_o)/RT))){
-        setTVector(advanced);
-        sendConfToEvaluator(); // Insert configuratin in OPENMM
+    if ((pe_n < pe_o) or (rand_no < exp(-(pe_n - pe_o)/RT))){ // Accept
+        setTVector(someState);
         setOldPE(pe_n);
-    }else{
-        assignConfFromTVector(advanced);
-        setOldPE(getOldPE());
+    }else{ // Reject
+        assignConfFromTVector(someState);
     }
 }
 

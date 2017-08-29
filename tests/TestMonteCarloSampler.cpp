@@ -134,7 +134,7 @@ int main(int argc, char **argv)
 
     // Test Monte Carlo sampler
 
-    MonteCarloSampler *MCsampler = new MonteCarloSampler(world->system, world->matter, world->lig1);
+    MonteCarloSampler *MCsampler = new MonteCarloSampler(world->system, world->matter, world->lig1, world->ts);
 
     // Memory alloc for convinient arrays 
 
@@ -343,37 +343,56 @@ int main(int argc, char **argv)
 
    // Simulate
 
-    bool shouldTerminate = false;
+    std::cout << std::fixed;
+    std::cout << std::setprecision(4);
     SimTK::Real timeToReach = 0.0;
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
     const SimTK::State& tsState = world->ts->getState(); // less than or equal to integ advanced state
-    std::cout << std::fixed;
-    std::cout << std::setprecision(4);
-
-    world->ts->initialize(integAdvancedState); // TS
-    timeToReach += (nosteps * delta_t); // TS
-    world->ts->stepTo(timeToReach);  // TS
     for(int i = 0; i<30; i++){
-        //world->integ->reinitialize(SimTK::Stage::Position, shouldTerminate);
-        //world->ts->initialize(tsState);
-        world->ts->initialize(integAdvancedState); // TS NECESSARY
-        timeToReach += (nosteps * delta_t); // TS
-        std::cout << "trying to make integrator to step to " << timeToReach << std::endl;
-        std::cout << "Time: " << world->ts->getTime()  << "; Stage before stepping: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
-        world->ts->stepTo(timeToReach); // TS
-        std::cout << "Time: " << world->ts->getTime()  << "; Stage after stepping: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
+        // -- STEPTO -- 
+        timeToReach += (nosteps * delta_t);
 
-        std::cout << "state Qs before assignRandomConf " << integAdvancedState.getQ() << std::endl;
-        MCsampler->assignRandomConf(integAdvancedState);
-        std::cout << "state Qs after assignRandomConf " << integAdvancedState.getQ() << std::endl;
+        std::cout << "trying to make integrator to step to " << timeToReach 
+                  << std::endl;
+        std::cout << "Time: " << world->ts->getTime()  
+                  << "; integAdvancedState Stage before stepping: " 
+                  << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+                  << "; tsState Stage before stepping: " 
+                  << (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
+                  << std::endl;
 
-        world->ts->initialize(integAdvancedState); // TS NECESSARY
+        //world->ts->stepTo(timeToReach);
+        //world->integ->reinitialize(SimTK::Stage::Instance, true);
+        //integAdvancedState.invalidateAllCacheAtOrAbove(SimTK::Stage::Time);
 
-        MCsampler->update(integAdvancedState);
-        std::cout << "Time: " << world->ts->getTime()  << "; Stage after MCsampler: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
+        std::cout << "Time: " << world->ts->getTime()  
+                  << "; integAdvancedState Stage after stepping: " 
+                  << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+                  << "; tsState Stage before stepping: " 
+                  << (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
+                  << std::endl;
+
+        // -- UPDATE --
+        std::cout << "before update integAdvancedState.getQ()" 
+                  << integAdvancedState.getQ() << std::endl;
+
+        MCsampler->update((world->ts->updIntegrator()).updAdvancedState());
+
+        std::cout << "after update integAdvancedState.getQ()" 
+                  << integAdvancedState.getQ() << std::endl;
+        std::cout << "Time: " << world->ts->getTime()  
+                  << "; integAdvancedState Stage after MCsampler: " 
+                  << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+                  << "; tsState Stage before stepping: " 
+                  << (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
+                  << std::endl;
+
         //(world->forces->getSystem()).realize(integAdvancedState, SimTK::Stage::Acceleration);
-        //std::cout << "Time: " << world->ts->getTime()  << "; Stage after realize: " << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() << std::endl;
-        writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "MCs", i);
+        //std::cout << "Time: " << world->ts->getTime()  
+        //            << "; Stage after realize: " 
+        //            << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName()
+        //            << std::endl;
+        //writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "MCs", i);
     }
 
 
