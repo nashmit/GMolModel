@@ -12,11 +12,23 @@ class Sampler
 public:
     // Constructor
 
-    //Sampler(Topology *residue, IState *currentState);
+    Sampler(SimTK::CompoundSystem *argCompoundSystem,
+            SimTK::SimbodyMatterSubsystem *argMatter,
+            Topology *argResidue,
+            SimTK::TimeStepper *argTimeStepper);
+
 
     // Destructor
 
     ~Sampler();
+
+protected:
+    const SimTK::System *system;
+    SimTK::CompoundSystem *compoundSystem;
+    SimTK::SimbodyMatterSubsystem *matter;
+    Topology *residue;
+    SimTK::TimeStepper *timeStepper;
+
 };
 
 

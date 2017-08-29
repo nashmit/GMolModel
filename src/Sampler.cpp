@@ -6,9 +6,18 @@
 
 // Constructor
 
-//Sampler::Sampler(Topology *residue, IState *currentState){
-//    std::cout << "Sampler::Sampler hello" << std::endl;
-//}
+Sampler::Sampler(SimTK::CompoundSystem *argCompoundSystem,
+                 SimTK::SimbodyMatterSubsystem *argMatter,
+                 Topology *argResidue,
+                 SimTK::TimeStepper *argTimeStepper)
+{
+
+    this->compoundSystem = argCompoundSystem;
+    this->matter = argMatter;
+    this->residue = argResidue;
+    this->timeStepper = argTimeStepper;
+    this->system = &(matter->getSystem());
+}
 
 // Destructor
 

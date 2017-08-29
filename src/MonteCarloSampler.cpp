@@ -9,15 +9,12 @@ Implementation of MonteCarloSampler class. **/
 
 // Constructor
 
-MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem, SimTK::SimbodyMatterSubsystem *argMatter, Topology *argResidue, SimTK::TimeStepper *argTimeStepper)
+MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
+                                     SimTK::SimbodyMatterSubsystem *argMatter,
+                                     Topology *argResidue,
+                                     SimTK::TimeStepper *argTimeStepper)
+    : Sampler(argCompoundSystem, argMatter, argResidue, argTimeStepper)
 {
-
-    this->compoundSystem = argCompoundSystem;
-    this->matter = argMatter;
-    this->residue = argResidue;
-    this->timeStepper = argTimeStepper;
-    
-    this->system = &(matter->getSystem());
 
     TVector = new SimTK::Transform[matter->getNumBodies()];
 }
@@ -75,13 +72,14 @@ void MonteCarloSampler::assignRandomConf(SimTK::State& someState)
     for (SimTK::MobilizedBodyIndex mbx(i); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         SimTK::Real rand_no = uniformRealDistribution_0_2pi(randomEngine);
-        mobod.setOneQ(someState, 0, rand_no);
-        //someState.updQ()[i] = rand_no;
+        for(int j=0; j<mobod.getNumQ(someState); j++){
+            mobod.setOneQ(someState, j, rand_no);
+            //someState.updQ()[i] = rand_no;
+        }
         i++;
     }
 
-    //someState.advanceSystemToStage(SimTK::Stage::Acceleration);
-    system->realize(someState, SimTK::Stage::Acceleration);
+    system->realize(someState, SimTK::Stage::Acceleration); // NECESSARY
 
     /*
     std::cout << "State info AFTER  updQ. Time = " << someState.getTime() << std::endl;

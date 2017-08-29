@@ -119,7 +119,6 @@ int main(int argc, char **argv)
 
     // Build Gmolmodel simulation world
 
-    Sampler *p_genericSampler = new Sampler;
 
     World *p_world = new World(
         mol2FN, rbFN, gaffFN, frcmodFN,
@@ -129,12 +128,10 @@ int main(int argc, char **argv)
     );
 
     // Test Context
+    Sampler *p_genericSampler = new Sampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
+    MonteCarloSampler *MCsampler = new MonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
     Context *context = new Context(p_world, p_genericSampler);
     World *world = context->getWorld();
-
-    // Test Monte Carlo sampler
-
-    MonteCarloSampler *MCsampler = new MonteCarloSampler(world->system, world->matter, world->lig1, world->ts);
 
     // Memory alloc for convinient arrays 
 
@@ -361,10 +358,9 @@ int main(int argc, char **argv)
                   //<< (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
                   << std::endl;
 
-        world->ts->initialize(tsState);
-        world->ts->stepTo(timeToReach);
-        world->integ->reinitialize(SimTK::Stage::Instance, true);
-        //integAdvancedState.invalidateAllCacheAtOrAbove(SimTK::Stage::Time);
+        //world->ts->initialize(tsState);
+        //world->ts->stepTo(timeToReach);
+        //world->integ->reinitialize(SimTK::Stage::Instance, true);
 
         std::cout << "Time after  stepping: " << world->ts->getTime()  
                   //<< "; integAdvancedState Stage after stepping: " 
@@ -387,13 +383,7 @@ int main(int argc, char **argv)
                   << "; tsState Stage before stepping: " 
                   << (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
                   << std::endl;
-
-        //(world->forces->getSystem()).realize(integAdvancedState, SimTK::Stage::Acceleration);
-        //std::cout << "Time: " << world->ts->getTime()  
-        //            << "; Stage after realize: " 
-        //            << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName()
-        //            << std::endl;
-        //writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "MCs", i);
+        writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "MCs", i);
     }
 
 

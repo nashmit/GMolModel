@@ -15,7 +15,10 @@ class MonteCarloSampler : public Sampler
 public:
     // Constructor
 
-    MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem, SimTK::SimbodyMatterSubsystem *argMatter, Topology *argResidue, SimTK::TimeStepper *argTimeStepper);
+      MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
+                        SimTK::SimbodyMatterSubsystem *argMatter,
+                        Topology *argResidue,
+                        SimTK::TimeStepper *argTimeStepper);
 
     // Destructor
 
@@ -56,12 +59,6 @@ public:
     void update(SimTK::State&);
 
 private:
-    const SimTK::System *system;
-    SimTK::CompoundSystem *compoundSystem;
-    SimTK::SimbodyMatterSubsystem *matter;
-    Topology *residue;
-    SimTK::TimeStepper *timeStepper;
-
     SimTK::Transform *TVector;
     SimTK::Real pe_o;
     SimTK::Real temperature;

@@ -117,8 +117,6 @@ int main(int argc, char **argv)
 
     // Build Gmolmodel simulation world
 
-    Sampler *p_genericSampler = new Sampler;
-
     World *p_world = new World(
         mol2FN, rbFN, gaffFN, frcmodFN,
         ictd, 
@@ -127,6 +125,7 @@ int main(int argc, char **argv)
     );
 
     // Test Context
+    Sampler *p_genericSampler = new Sampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
     Context *context = new Context(p_world, p_genericSampler);
     World *world = context->getWorld();
 
