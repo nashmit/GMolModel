@@ -56,6 +56,7 @@ public:
     void update(SimTK::State&);
 
 private:
+    const SimTK::System *system;
     SimTK::CompoundSystem *compoundSystem;
     SimTK::SimbodyMatterSubsystem *matter;
     Topology *residue;

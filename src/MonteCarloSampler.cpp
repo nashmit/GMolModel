@@ -16,6 +16,8 @@ MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem, S
     this->matter = argMatter;
     this->residue = argResidue;
     this->timeStepper = argTimeStepper;
+    
+    this->system = &(matter->getSystem());
 
     TVector = new SimTK::Transform[matter->getNumBodies()];
 }
@@ -36,9 +38,7 @@ void MonteCarloSampler::setTVector(const SimTK::State& someState)
   int i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-    std::cout << "isolate error 0"<< std::endl;
     const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
-    std::cout << "isolate error 1"<< std::endl;
     TVector[i] = mobod.getMobilizerTransform(someState);
     i++;
   }
@@ -63,30 +63,34 @@ void MonteCarloSampler::assignRandomConf(SimTK::State& someState)
 {
     //randomEngine.seed(4294653137UL); // for reproductibility
 
-    std::cout << "State info before updQ" << std::endl;
+    /*
+    std::cout << "State info BEFORE updQ. Time = " << someState.getTime() << std::endl;
     for(int i = 0; i < someState.getNumSubsystems(); i++){
         std::cout << someState.getSubsystemName(SimTK::SubsystemIndex(i)) << " ";
         std::cout << someState.getSubsystemStage(SimTK::SubsystemIndex(i)) << " ";
         std::cout << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
     }
-
+    */
     int i = 1;
     for (SimTK::MobilizedBodyIndex mbx(i); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         SimTK::Real rand_no = uniformRealDistribution_0_2pi(randomEngine);
-        //mobod.setOneQ(someState, 0, rand_no);
-        someState.updQ()[i] = rand_no;
+        mobod.setOneQ(someState, 0, rand_no);
+        //someState.updQ()[i] = rand_no;
         i++;
     }
 
-    someState.advanceSystemToStage(SimTK::Stage::Acceleration);
+    //someState.advanceSystemToStage(SimTK::Stage::Acceleration);
+    system->realize(someState, SimTK::Stage::Acceleration);
 
-    std::cout << "State info after updQ" << std::endl;
+    /*
+    std::cout << "State info AFTER  updQ. Time = " << someState.getTime() << std::endl;
     for(int i = 0; i < someState.getNumSubsystems(); i++){
         std::cout << someState.getSubsystemName(SimTK::SubsystemIndex(i)) << " ";
         std::cout << someState.getSubsystemStage(SimTK::SubsystemIndex(i)) << " ";
         std::cout << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
     }
+    */
 
 }
 

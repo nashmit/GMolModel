@@ -354,22 +354,23 @@ int main(int argc, char **argv)
 
         std::cout << "trying to make integrator to step to " << timeToReach 
                   << std::endl;
-        std::cout << "Time: " << world->ts->getTime()  
-                  << "; integAdvancedState Stage before stepping: " 
-                  << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
-                  << "; tsState Stage before stepping: " 
-                  << (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
+        std::cout << "Time before stepping: " << world->ts->getTime()  
+                  //<< "; integAdvancedState Stage before stepping: " 
+                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+                  //<< "; tsState Stage before stepping: " 
+                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
                   << std::endl;
 
-        //world->ts->stepTo(timeToReach);
-        //world->integ->reinitialize(SimTK::Stage::Instance, true);
+        world->ts->initialize(tsState);
+        world->ts->stepTo(timeToReach);
+        world->integ->reinitialize(SimTK::Stage::Instance, true);
         //integAdvancedState.invalidateAllCacheAtOrAbove(SimTK::Stage::Time);
 
-        std::cout << "Time: " << world->ts->getTime()  
-                  << "; integAdvancedState Stage after stepping: " 
-                  << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
-                  << "; tsState Stage before stepping: " 
-                  << (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
+        std::cout << "Time after  stepping: " << world->ts->getTime()  
+                  //<< "; integAdvancedState Stage after stepping: " 
+                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+                  //<< "; tsState Stage before stepping: " 
+                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
                   << std::endl;
 
         // -- UPDATE --
@@ -380,7 +381,7 @@ int main(int argc, char **argv)
 
         std::cout << "after update integAdvancedState.getQ()" 
                   << integAdvancedState.getQ() << std::endl;
-        std::cout << "Time: " << world->ts->getTime()  
+        std::cout << "Time after  update: " << world->ts->getTime()  
                   << "; integAdvancedState Stage after MCsampler: " 
                   << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
                   << "; tsState Stage before stepping: " 
