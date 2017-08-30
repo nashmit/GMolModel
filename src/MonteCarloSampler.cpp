@@ -55,6 +55,9 @@ void MonteCarloSampler::assignConfFromTVector(SimTK::State& someState)
 }
 
 // Assign random conformation
+// In torsional dynamics the first body has 7 Q variables for 6 dofs - one
+// quaternion (q) and 3 Cartesian coordinates (x). updQ will return: 
+// [qw, qx, qy, qz, x1, x2, x3]
  
 void MonteCarloSampler::assignRandomConf(SimTK::State& someState)
 {

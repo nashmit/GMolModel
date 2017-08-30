@@ -22,6 +22,11 @@ public:
 
     ~Sampler();
 
+    // Compute mass matrix determinant
+
+    SimTK::Real calcMassDeterminant(const SimTK::State& );
+    SimTK::Real calcMassDeterminant(SimTK::State& );
+
 protected:
     const SimTK::System *system;
     SimTK::CompoundSystem *compoundSystem;

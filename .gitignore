@@ -4,3 +4,4 @@ build-debug/*
 #!build-debug/CMakeCache.txt
 test_GCHMC.out
 VelocityVerlet.pyc
+.*.swp

@@ -25,4 +25,20 @@ Sampler::~Sampler(){
     ;
 }
 
+// Compute mass matrix determinant
+
+SimTK::Real Sampler::calcMassDeterminant(SimTK::State& someState)
+{
+    return 0;
+}
+
+// Compute mass matrix determinant
+
+SimTK::Real Sampler::calcMassDeterminant(const SimTK::State& someState)
+{
+    return 0;
+}
+
+
+
 
