@@ -108,7 +108,6 @@ void MonteCarloSampler::update(SimTK::State& someState){
     // Assign random configuration
 
     assignRandomConf(someState);
-    //timeStepper->initialize(someState); // should develop timestepper class ??
 
     // Send configuration to evaluator  
 

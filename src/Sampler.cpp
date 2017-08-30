@@ -39,6 +39,7 @@ SimTK::Real Sampler::calcMassDeterminant(const SimTK::State& someState)
     return 0;
 }
 
+// Update - to be implemented by every specific sampler
 
-
+void Sampler::update(SimTK::State& somState){}
 

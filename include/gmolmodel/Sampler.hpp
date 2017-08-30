@@ -27,6 +27,10 @@ public:
     SimTK::Real calcMassDeterminant(const SimTK::State& );
     SimTK::Real calcMassDeterminant(SimTK::State& );
 
+    // Update
+
+    virtual void update(SimTK::State&);
+
 protected:
     const SimTK::System *system;
     SimTK::CompoundSystem *compoundSystem;
