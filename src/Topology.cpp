@@ -516,31 +516,31 @@ void Topology::init(
 
   // Parameters
 
-  void Topology::setDuMMAtomParams(int, SimTK::Real vdw, SimTK::Real well){}
-  void Topology::setDuMMBondParams(int, int, SimTK::Real k, SimTK::Real equil){}
-  void Topology::setDuMMAngleParams(int, int, int, SimTK::Real k, SimTK::Real equil){}
+  void Topology::setDuMMAtomParam(int, SimTK::Real vdw, SimTK::Real well){}
+  void Topology::setDuMMBondParam(int, int, SimTK::Real k, SimTK::Real equil){}
+  void Topology::setDuMMAngleParam(int, int, int, SimTK::Real k, SimTK::Real equil){}
 
-  void Topology::setDuMMDihedralParams(int, int, int, int,
+  void Topology::setDuMMDihedralParam(int, int, int, int,
       int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
   ){}
-  void Topology::setDuMMDihedralParams(int, int, int, int,
+  void Topology::setDuMMDihedralParam(int, int, int, int,
       int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
       int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
   ){}
-  void Topology::setDuMMDihedralParams(int, int, int, int,
+  void Topology::setDuMMDihedralParam(int, int, int, int,
       int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
       int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
       int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
   ){}
 
-  void Topology::setDuMMImproperParams(int, int, int, int,
+  void Topology::setDuMMImproperParam(int, int, int, int,
       int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
   ){}
-  void Topology::setDuMMImproperParams(int, int, int, int,
+  void Topology::setDuMMImproperParam(int, int, int, int,
       int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
       int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
   ){}
-  void Topology::setDuMMImproperParams(int, int, int, int,
+  void Topology::setDuMMImproperParam(int, int, int, int,
       int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
       int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
       int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
