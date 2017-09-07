@@ -116,7 +116,7 @@ set(TESTS_SRCS
         TestGmolmodelNative.cpp
         TestMonteCarloSampler.cpp
         TestOpenMMBasic.cpp
-        TestMassDeterminant.cpp
+        TestMassSqrtAndDet.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})
