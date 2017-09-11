@@ -23,11 +23,11 @@ using namespace boost::python;
 #include "Context.hpp"
 #include "server.hpp"
 
-#include "MMTK/universe.h"
-#include "MMTK/forcefield.h"
+//#include "MMTK/universe.h"
+//#include "MMTK/forcefield.h"
 //#include "MMTK/trajectory.h"
 
-#include <numpy/arrayobject.h>
+//#include <numpy/arrayobject.h>
 
 
 #endif // SIMMAIN_HPP

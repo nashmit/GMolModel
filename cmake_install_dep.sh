@@ -39,5 +39,5 @@ sudo make install
 cd ../../build-debug/
 
 
-cmake .. -DMakeDownload_mmtk_environment=true -DInstallEnvironment=true -DAnacondaEnvironmentPath="/home/laurentiu/anaconda2/envs/"
+cmake ..
 

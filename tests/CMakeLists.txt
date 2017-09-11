@@ -27,7 +27,7 @@ MESSAGE("Simbody_INCLUDE_DIR: ${Simbody_INCLUDE_DIR}")
 MESSAGE("Simbody_LIB_DIR: ${Simbody_LIB_DIR}")
 
 set( Integrators_PATH 
-     "${CMAKE_CURRENT_LIST_DIR}/../simbody/SimTKmath/Integrators/src"
+     "${CMAKE_CURRENT_LIST_DIR}/../simbody/molmodel_legacy/SimTKmath/Integrators/src"
      CACHE FILEPATH "Path to Integrator.h from Simbody..." )
 INCLUDE_DIRECTORIES( ${Integrators_PATH} )
 MESSAGE("Integrators_PATH: ${Integrators_PATH}")
@@ -42,8 +42,8 @@ find_package(Eigen3 REQUIRED)
 include_directories( ${EIGEN3_INCLUDE_DIRS} )
 MESSAGE("EIGEN3_INCLUDE_DIRS: ${EIGEN3_INCLUDE_DIRS}")
 
-add_definitions(-DNUMPY=1)
-MESSAGE("ADD DEFINITION: DNUMPY=1")
+#add_definitions(-DNUMPY=1)
+#MESSAGE("ADD DEFINITION: DNUMPY=1")
 
 set(Python_ADDITIONAL_VERSIONS 2)
 FIND_PACKAGE(PythonInterp)
@@ -53,38 +53,38 @@ link_directories( ${PYTHON_LIBRARIES} )
 MESSAGE("PYTHON_INCLUDE_DIRS: ${PYTHON_INCLUDE_DIRS}")
 MESSAGE("PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
 
-set(mmtk_include 
-    "${PYTHON_INCLUDE_DIRS}/MMTK" 
-    CACHE FILEPATH "Adding header path to MMTK installed location")
-include_directories( ${mmtk_include} )
-MESSAGE("mmtk_include: ${mmtk_include}")
+#set(mmtk_include 
+#    "${PYTHON_INCLUDE_DIRS}/MMTK" 
+#    CACHE FILEPATH "Adding header path to MMTK installed location")
+#include_directories( ${mmtk_include} )
+#MESSAGE("mmtk_include: ${mmtk_include}")
 
-execute_process(
-  COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" 
-  OUTPUT_VARIABLE PYTHON_SITE_PATH
-  OUTPUT_STRIP_TRAILING_WHITESPACE ) 
+#execute_process(
+#  COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" 
+#  OUTPUT_VARIABLE PYTHON_SITE_PATH
+#  OUTPUT_STRIP_TRAILING_WHITESPACE ) 
 
-set(PYTHON_SITE-PACKAGES_PATH
-    ${PYTHON_SITE_PATH} 
-    CACHE FILEPATH "side-packages python path")
-MESSAGE("PYTHON_SITE_PATH: ${PYTHON_SITE_PATH}")
+#set(PYTHON_SITE-PACKAGES_PATH
+#    ${PYTHON_SITE_PATH} 
+#    CACHE FILEPATH "side-packages python path")
+#MESSAGE("PYTHON_SITE_PATH: ${PYTHON_SITE_PATH}")
 
-set(mmtk_libs 
-    "${PYTHON_SITE-PACKAGES_PATH}/MMTK/linux2"
-    CACHE FILEPATH "Addinng path to MMTK libs folder")
-link_directories( ${mmtk_libs} )
-MESSAGE("mmtk_libs: ${mmtk_libs}")
+#set(mmtk_libs 
+#    "${PYTHON_SITE-PACKAGES_PATH}/MMTK/linux2"
+#    CACHE FILEPATH "Addinng path to MMTK libs folder")
+#link_directories( ${mmtk_libs} )
+#MESSAGE("mmtk_libs: ${mmtk_libs}")
 
-execute_process(
-  COMMAND ls "${mmtk_libs}"
-  OUTPUT_VARIABLE mmtk_LIBRARIES
-  OUTPUT_STRIP_TRAILING_WHITESPACE )
+#execute_process(
+#  COMMAND ls "${mmtk_libs}"
+#  OUTPUT_VARIABLE mmtk_LIBRARIES
+#  OUTPUT_STRIP_TRAILING_WHITESPACE )
 
-set(numpy_include 
-    "${PYTHON_SITE-PACKAGES_PATH}/numpy/core/include" 
-    CACHE FILEPATH "Header path to numpy installed location")
-include_directories( ${numpy_include} )
-MESSAGE("numpy_include: ${numpy_include}")
+#set(numpy_include 
+#    "${PYTHON_SITE-PACKAGES_PATH}/numpy/core/include" 
+#    CACHE FILEPATH "Header path to numpy installed location")
+#include_directories( ${numpy_include} )
+#MESSAGE("numpy_include: ${numpy_include}")
 
 #set(Boost_USE_STATIC_LIBS OFF)
 #set(Boost_USE_MULTITHREADED ON)
