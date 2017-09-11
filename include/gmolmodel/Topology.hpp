@@ -64,6 +64,15 @@ public:
     std::string ictdF="IC"
   );
 
+
+  // Set a MolModel and a MolStructure - to be removed
+
+  void setMolModel(void);
+
+  // Scale all DuMM force field terms by scale_factor
+
+  void setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor);
+
   // Interface
 
   // Set graph
