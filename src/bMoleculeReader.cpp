@@ -353,16 +353,8 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
       bZeroCharArray(line_c, MAX_LINE_LENGTH);
     }
     bZeroCharArray(line_c, MAX_LINE_LENGTH);
-    bAtomList = new bSpecificAtom[natms + noDummies]; /*Alloc - 1 for dummy*/
 
-    #ifdef DEBUG_LEVEL02
-    if(bAtomList == NULL){
-      std::cout<<"bMoleculeReader: bAtomList is NULL"<<std::endl<<std::flush;
-    }
-    else{
-      std::cout<<"bMoleculeReader: bAtomList allocated"<<std::endl<<std::flush;
-    }
-    #endif
+    bAtomList = new bSpecificAtom[natms + noDummies]; /*Alloc - 1 for dummy*/
 
     /*Jump to the atom section*/
     while(fgets(line_c, MAX_LINE_LENGTH, fpo)){

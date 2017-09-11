@@ -5,6 +5,56 @@ using namespace SimTK;
 Topology::Topology(){}
 
 
+/* ==================================================
+ *    BUILD AN UNLINKED MolModel NESTED IN THIS CLASS 
+ * ================================================== */
+void Topology::setMolModel(void){
+    bMolAtomList = new MolAtom[natms];
+    mol_MolModelCreate ("MainModel", &model);
+
+    for(int k=0; k<natms; k++){
+        bAtomAssign(&bMolAtomList[k], &bAtomList[k]);
+        bMolAtomList[k].id = k;
+        bMolAtomList[k].insertion_code = ' ';
+        bMolAtomList[k].het = 1;
+        bMolAtomList[k].chain_id = 'A';
+
+       mol_MolModelCurrStrucGet (model, &struc);
+       mol_StructureAtomAdd (struc, MOL_FALSE, &bMolAtomList[k]);
+    }
+    #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
+    for(int tz=0; tz<natms; tz++){
+        std::cout<<"bMainRes SpecAtom tz name bonds freebonds: "
+        <<tz<<' '<<bAtomList[tz].name<<' '<<bAtomList[tz].nbonds<<' '<<bAtomList[tz].freebonds<<std::endl;
+    }
+    #endif
+
+    mol_StructureChainsBuild(struc, 1);
+    struc[0].chain_names = new char*[1];
+    struc[0].chain_names[0] = &bMolAtomList[0].chain_id;
+}
+
+/* ==================================================
+ *    Scale all DuMM force field terms by scale_factor
+ * ================================================== */
+void Topology::setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor){    
+    dumm.setBondStretchGlobalScaleFactor(scale_factor);
+    dumm.setBondBendGlobalScaleFactor(scale_factor);
+    dumm.setBondTorsionGlobalScaleFactor(scale_factor);
+    dumm.setAmberImproperTorsionGlobalScaleFactor(scale_factor);
+    dumm.setVdw12ScaleFactor(scale_factor);
+    dumm.setVdw13ScaleFactor(scale_factor);
+    dumm.setVdw14ScaleFactor(scale_factor);
+    dumm.setVdw15ScaleFactor(scale_factor);
+    dumm.setVdwGlobalScaleFactor(scale_factor);
+    dumm.setCoulomb12ScaleFactor(scale_factor);
+    dumm.setCoulomb13ScaleFactor(scale_factor);
+    dumm.setCoulomb14ScaleFactor(scale_factor);
+    dumm.setCoulomb15ScaleFactor(scale_factor);
+    dumm.setCoulombGlobalScaleFactor(scale_factor);
+    dumm.setGbsaGlobalScaleFactor(scale_factor);
+}
+
 /*Any kind of molecule*/
 void Topology::init(
     DuMMForceFieldSubsystem &dumm,
@@ -44,52 +94,12 @@ void Topology::init(
     int bi[nbnds], bj[nbnds]; // EU
     unsigned int k;
 
-     /* =================================================
-      *    BUILD AN UNLINKED MolModel NESTED IN THIS CLASS 
-      * =================================================*/
-    bMolAtomList = new MolAtom[natms];
-    mol_MolModelCreate ("MainModel", &model);
-
-    for(k=0; k<natms; k++){
-      bAtomAssign(&bMolAtomList[k], &bAtomList[k]);
-      bMolAtomList[k].id = k;
-      bMolAtomList[k].insertion_code = ' ';
-      bMolAtomList[k].het = 1;
-      bMolAtomList[k].chain_id = 'A';
-
-      mol_MolModelCurrStrucGet (model, &struc);
-      mol_StructureAtomAdd (struc, MOL_FALSE, &bMolAtomList[k]);
-    }
-    #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
-    for(int tz=0; tz<natms; tz++){
-      std::cout<<"bMainRes SpecAtom tz name bonds freebonds: "
-        <<tz<<' '<<bAtomList[tz].name<<' '<<bAtomList[tz].nbonds<<' '<<bAtomList[tz].freebonds<<std::endl;
-    }
-    #endif
-
-    mol_StructureChainsBuild(struc, 1);
-    struc[0].chain_names = new char*[1];
-    struc[0].chain_names[0] = &bMolAtomList[0].chain_id;
-
+    // Reinsert setMolModel here if needed
      /* ========================================
       *    BUILD THIS CLASS' MOLECULE TOPOLOGY
       * ========================================*/
 
-    dumm.setBondStretchGlobalScaleFactor(0);
-    dumm.setBondBendGlobalScaleFactor(0);
-    dumm.setBondTorsionGlobalScaleFactor(0);
-    dumm.setAmberImproperTorsionGlobalScaleFactor(0);
-    dumm.setVdw12ScaleFactor(0);
-    dumm.setVdw13ScaleFactor(0);
-    dumm.setVdw14ScaleFactor(0);
-    dumm.setVdw15ScaleFactor(0);
-    dumm.setVdwGlobalScaleFactor(0);
-    dumm.setCoulomb12ScaleFactor(0);
-    dumm.setCoulomb13ScaleFactor(0);
-    dumm.setCoulomb14ScaleFactor(0);
-    dumm.setCoulomb15ScaleFactor(0);
-    dumm.setCoulombGlobalScaleFactor(0);
-    dumm.setGbsaGlobalScaleFactor(0);
+    setDuMMScaleFactor(dumm, 0.0);
 
     this->setCompoundName("Topology");
 
