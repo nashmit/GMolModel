@@ -5,3 +5,4 @@ build-debug/*
 test_GCHMC.out
 VelocityVerlet.pyc
 .*.swp
+laur_cmake_install_dep.sh
