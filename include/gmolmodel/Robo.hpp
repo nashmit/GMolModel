@@ -5,3 +5,9 @@
 #include <Eigen/Eigenvalues>
 #include <Eigen/LU>
 
+#include <boost/algorithm/string.hpp>
+
+#include <algorithm>
+#include <string>
+#include <iostream>
+#include <cctype>

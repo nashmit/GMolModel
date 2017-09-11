@@ -11,6 +11,7 @@
  **/
 
 #include "bgeneral.hpp"
+#include "Robo.hpp"
 //#include "Molmodel.h"
 //#include "mol.h"
 
