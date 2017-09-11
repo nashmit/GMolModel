@@ -67,34 +67,70 @@ class bPDBReader{
  * This incorporates additional Amber forcefield data.
 **/
 class bSpecificAtom{ /*Information like in sdf*/
- public:
-  int nbonds;
-  int freebonds;
-  char name[5];
-  char inName[5];
-  int number;
-  char elem;
-  float x;
-  float y;
-  float z;
-  char fftype[20];
-  char biotype[20];
-  SimTK::Compound::SingleAtom *bAtomType;
-  SimTK::Compound::AtomIndex atomIndex;
-  double charge;
-  int mobile;
-  int visited;
+public:
+    int nbonds;
+    int freebonds;
+    char name[5];
+    char inName[5];
+    int number;
+    char elem;
+    float x;
+    float y;
+    float z;
+    char fftype[20];
+    char biotype[20];
+    SimTK::Compound::SingleAtom *bAtomType;
+    SimTK::Compound::AtomIndex atomIndex;
+    double charge;
+    int mobile;
+    int visited;
+    
+    // Suggested by Eliza
+    std::string residueName;
+    long int residueIndex;
+    std::string chain;
+    int moleculeIndex;
   
-  // Suggested by Eliza
-  std::string residueName;
-  long int residueIndex;
-  std::string chain;
-  int moleculeIndex;
+    bSpecificAtom();
+    ~bSpecificAtom();
+    void Print(void);
+    void Zero(void);
+  
+    // Interface
+  
+    int getNbonds(void);
+    int getFreebonds(void);
+    std::string getName(void);
+    std::string getInName(void);
+    int getNumber(void);
+    char getElem(void);
+    SimTK::Real getX(void);
+    SimTK::Real getY(void);
+    SimTK::Real getZ(void);
+    std::string getFftype(void);
+    std::string getBiotype(void);
+    SimTK::Compound::SingleAtom * getBAtomType(void);
+    SimTK::Compound::AtomIndex getCompoundAtomIndex(void);
+    SimTK::Real getCharge(void);
+    int getIsMobile(void);
+    int getIsVisited(void);
 
-  bSpecificAtom();
-  ~bSpecificAtom();
-  void Print(void);
-  void Zero(void);
+    void setNbonds(int);
+    void setFreebonds(int);
+    void setName(std::string);
+    void setInName(std::string);
+    void setNumber(int);
+    void setElem(char);
+    void setX(SimTK::Real);
+    void setY(SimTK::Real);
+    void setZ(SimTK::Real);
+    void setFftype(std::string);
+    void setBiotype(std::string);
+    void setBAtomType(SimTK::Compound::SingleAtom *);
+    void setCompoundAtomIndex(SimTK::Compound::AtomIndex);
+    void setCharge(SimTK::Real);
+    void setIsMobile(int);
+    void setIsVisited(int);
 
 };
 

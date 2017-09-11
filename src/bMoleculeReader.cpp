@@ -88,6 +88,50 @@ void bSpecificAtom::Print(void)
     <<" charge "<<charge<<" mobile "<<mobile<<std::endl;
 }
 
+
+// bSpecificAtom Interface
+ 
+int bSpecificAtom::getNbonds(void){}
+int bSpecificAtom::getFreebonds(void){}
+std::string bSpecificAtom::getName(void){}
+std::string bSpecificAtom::getInName(void){}
+int bSpecificAtom::getNumber(void){}
+char bSpecificAtom::getElem(void){}
+SimTK::Real bSpecificAtom::getX(void){}
+SimTK::Real bSpecificAtom::getY(void){}
+SimTK::Real bSpecificAtom::getZ(void){}
+std::string bSpecificAtom::getFftype(void){}
+std::string bSpecificAtom::getBiotype(void){}
+SimTK::Compound::SingleAtom * bSpecificAtom::getBAtomType(void){}
+SimTK::Compound::AtomIndex bSpecificAtom::getCompoundAtomIndex(void){}
+SimTK::Real bSpecificAtom::getCharge(void){}
+int bSpecificAtom::getIsMobile(void){}
+int bSpecificAtom::getIsVisited(void){}
+
+void bSpecificAtom::setNbonds(int){}
+void bSpecificAtom::setFreebonds(int){}
+void bSpecificAtom::setName(std::string){}
+void bSpecificAtom::setInName(std::string){}
+
+// Set number
+void bSpecificAtom::setNumber(int inpNumber){
+    this->number = inpNumber;
+}
+
+void bSpecificAtom::setElem(char){}
+void bSpecificAtom::setX(SimTK::Real){}
+void bSpecificAtom::setY(SimTK::Real){}
+void bSpecificAtom::setZ(SimTK::Real){}
+void bSpecificAtom::setFftype(std::string){}
+void bSpecificAtom::setBiotype(std::string){}
+void bSpecificAtom::setBAtomType(SimTK::Compound::SingleAtom *){}
+void bSpecificAtom::setCompoundAtomIndex(SimTK::Compound::AtomIndex){}
+void bSpecificAtom::setCharge(SimTK::Real){}
+void bSpecificAtom::setIsMobile(int){}
+void bSpecificAtom::setIsVisited(int){}
+
+
+
 /********************
  *     FUNCTIONS
  * ******************/
@@ -377,10 +421,12 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
       //bZeroStr(bAtomList[lno-1].fftype); // RESTORE
       bAtomList[lno-1].Zero();
       //elem = line.at(8); // RESTORE
-      elem = line_c[8]; // EU
+      elem = line_c[8]; 
       sprintf(buff, "%c%d", elem, lno); /*This is not the name from mol2*/
       strncpy(bAtomList[lno-1].name, buff, 4);
-      bAtomList[lno-1].number = lno;
+      //bAtomList[lno-1].number = lno; // NO INTERFACE
+      bAtomList[lno-1].setNumber(lno);
+
       bAtomList[lno-1].elem = elem;
       bZeroCharArray(buff, 80);
       bSubstr(buff, line_c, 47,2);
