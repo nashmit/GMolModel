@@ -83,7 +83,7 @@ void bSpecificAtom::Zero(void){
 
 void bSpecificAtom::Print(void)
 {
-  std::cout<<"bSpecificAtom: nbonds "<<nbonds<<" freebonds "<<freebonds<<" name "<<name<<" inName "<<inName<<std::endl
+  std::cout<<"bSpecificAtom Print: nbonds "<<nbonds<<" freebonds "<<freebonds<<" name "<<name<<" inName "<<inName
     <<" number "<<number<<" elem "<<elem<<" x "<<x<<" y "<< y<<" z "<<z<<" fftype "<<fftype<<" biotype "<<biotype
     <<" charge "<<charge<<" mobile "<<mobile<<std::endl;
 }
@@ -110,8 +110,17 @@ int bSpecificAtom::getIsVisited(void){}
 
 void bSpecificAtom::setNbonds(int){}
 void bSpecificAtom::setFreebonds(int){}
-void bSpecificAtom::setName(std::string){}
-void bSpecificAtom::setInName(std::string){}
+
+// Set atom unique name
+void bSpecificAtom::setName(std::string inpName){
+    strncpy(this->name, inpName.c_str(), 4);
+}
+
+// Set initial name
+
+void bSpecificAtom::setInName(std::string inpInName){
+    strncpy(this->inName, inpInName.c_str(), 4);
+}
 
 // Set number
 void bSpecificAtom::setNumber(int inpNumber){
@@ -123,9 +132,20 @@ void bSpecificAtom::setElem(char inpElem){
     this->elem = inpElem;
 }
 
-void bSpecificAtom::setX(SimTK::Real){}
-void bSpecificAtom::setY(SimTK::Real){}
-void bSpecificAtom::setZ(SimTK::Real){}
+// Set the X coordinate
+void bSpecificAtom::setX(SimTK::Real inpX){
+    this->x = inpX;
+}
+
+// Set the Y coordinate
+void bSpecificAtom::setY(SimTK::Real inpY){
+    this->y = inpY;
+}
+
+// Set the Z coordinate
+void bSpecificAtom::setZ(SimTK::Real inpZ){
+    this->z = inpZ;
+}
 
 //
 void bSpecificAtom::setFftype(std::string inpFftype){
@@ -435,45 +455,61 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
       line = line_c; // INTERFACE
       bAtomList[lno-1].Zero();
 
-      //elem = line.at(8); // RESTORE
-      elem = line_c[8];
-      sprintf(buff, "%c%d", elem, lno); /* Create new unique name for atom */
-      strncpy(bAtomList[lno-1].name, buff, 4);
+      // Create new unique name for atom
+      //elem = line_c[8]; // NO INTERFACE
+      //bAtomList[lno-1].elem = elem; // NO INTERFACE
+      elem = line.at(8);
+      bAtomList[lno-1].setElem(elem);
+
+      //sprintf(buff, "%c%d", elem, lno); // NO INTERFACE
+      //strncpy(bAtomList[lno-1].name, buff, 4); // NO INTERFACE
+      str_buf = elem;
+      str_buf += std::to_string(lno);
+      bAtomList[lno-1].setName(str_buf);
 
       //bAtomList[lno-1].number = lno; // NO INTERFACE
       bAtomList[lno-1].setNumber(lno);
-
-      //bAtomList[lno-1].elem = elem; // NO INTERFACE
-      bAtomList[lno-1].setElem(elem);
 
       //bZeroCharArray(buff, 80); // NO INTERFACE
       //bSubstr(buff, line_c, 47,2); // NO INTERFACE
       //sprintf(bAtomList[lno-1].fftype, "gaff_%s", buff); // NO INTERFACE
       //if(bAtomList[lno-1].fftype[6] == ' '){bAtomList[lno-1].fftype[6] = '\0';} // NO INTERFACE
-
       str_buf = "gaff_";
       str_buf += line.substr(47, 2);
-      str_buf.erase(std::remove_if(str_buf.begin(), str_buf.end(), ::isspace), str_buf.end());
+      //str_buf.erase(std::remove_if(str_buf.begin(), str_buf.end(), ::isspace), str_buf.end());
+      boost::trim(str_buf);
       bAtomList[lno-1].setFftype(str_buf);
 
       //bZeroCharArray(buff, 80); // NO INTERFACE
       //bSubstr(buff, line_c, 67,9); // NO INTERFACE
       //bAtomList[lno-1].charge = atof(buff); // NO INTERFACE
-      bAtomList[lno-1].setCharge(std::stod(line.substr(67,9)));
+      str_buf = line.substr(67,9);
+      bAtomList[lno-1].setCharge(std::stod(str_buf));
 
-      bZeroCharArray(buff, 80);
-      bSubstr(buff, line_c, 8,4);
-      strncpy(bAtomList[lno-1].inName, buff, 4);
+      //bZeroCharArray(buff, 80); // NO INTERFACE
+      //bSubstr(buff, line_c, 8,4); // NO INTERFACE
+      //strncpy(bAtomList[lno-1].inName, buff, 4); // NO INTERFACE
+      str_buf = line.substr(8, 4);
+      bAtomList[lno-1].setInName(str_buf);
 
-      bZeroCharArray(buff, 80);
-      bSubstr(buff, line_c, 17,9);
-      bAtomList[lno-1].x = atof(buff);
-      bZeroCharArray(buff, 80);
-      bSubstr(buff, line_c, 27,9);
-      bAtomList[lno-1].y = atof(buff);
-      bZeroCharArray(buff, 80);
-      bSubstr(buff, line_c, 37,9);
-      bAtomList[lno-1].z = atof(buff);
+      //bZeroCharArray(buff, 80); // NO INTERFACE
+      //bSubstr(buff, line_c, 17,9); // NO INTERFACE
+      //bAtomList[lno-1].x = atof(buff); // NO INTERFACE
+      str_buf = line.substr(17,9);
+      bAtomList[lno-1].setX(std::stod(str_buf));
+
+      //bZeroCharArray(buff, 80); // NO INTERFACE
+      //bSubstr(buff, line_c, 27,9); // NO INTERFACE
+      //bAtomList[lno-1].y = atof(buff); // NO INTERFACE
+      str_buf = line.substr(27,9);
+      bAtomList[lno-1].setY(std::stod(str_buf));
+
+      //bZeroCharArray(buff, 80); // NO INTERFACE
+      //bSubstr(buff, line_c, 37,9); // NO INTERFACE
+      //bAtomList[lno-1].z = atof(buff); // NO INTERFACE
+      str_buf = line.substr(37,9);
+      bAtomList[lno-1].setZ(std::stod(str_buf));
+
       bAtomList[lno-1].Print(); // EU
     }
 
