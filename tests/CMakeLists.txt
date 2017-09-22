@@ -114,9 +114,10 @@ set(TESTS_SRCS
 	TestSimbodyBasic.cpp
 	TestMolmodelBasic.cpp
         TestGmolmodelNative.cpp
-        TestMonteCarloSampler.cpp
-        TestOpenMMBasic.cpp
         TestMassSqrtAndDet.cpp
+        TestMonteCarloSampler.cpp
+        TestHamiltonianMonteCarlo.cpp
+        TestOpenMMBasic.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})
