@@ -127,10 +127,11 @@ int main(int argc, char **argv)
     );
 
 
-    // Test Context
-    Sampler *p_genericSampler = new Sampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
-    HamiltonianMonteCarloSampler *HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
-    Context *context = new Context(p_world, p_genericSampler);
+    // Test Context 1
+    //Sampler *p_genericSampler = new Sampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
+    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
+    //Context *context = new Context(p_world, p_genericSampler);
+    Context *context = new Context(p_world, p_HMCsampler);
     World *world = context->getWorld();
 
     // Memory alloc for convinient arrays 
@@ -291,6 +292,12 @@ int main(int argc, char **argv)
     world->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
     world_initialized = true;
 
+    // Test Context 2
+    //Sampler *p_genericSampler = new Sampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
+    //HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
+    //Context *context = new Context(p_world, p_genericSampler);
+    //World *world = context->getWorld();
+
     // Options for mass matrix, Lennard Jones
 
     TARGET_TYPE temp_arg;
@@ -343,52 +350,56 @@ int main(int argc, char **argv)
     std::cout << std::fixed;
     std::cout << std::setprecision(4);
     SimTK::Real timeToReach = 0.001;
-    SimTK::State& integAdvancedState = world->integ->updAdvancedState();
     const SimTK::State& tsState = world->ts->getState(); // less than or equal to integ advanced state
-    world->ts->initialize(tsState);
+    SimTK::State& integAdvancedState = world->integ->updAdvancedState();
+    //SimTK::State& tsState = world->ts->updState();
+    //world->ts->initialize(tsState);
     for(int i = 0; i<30; i++){
         // -- STEPTO -- 
 
-        std::cout << "trying to make integrator to step to " << timeToReach
-                  << std::endl;
-        std::cout << "Time before stepping: " << world->ts->getTime()
+        //std::cout << "Time before stepping: " << world->ts->getTime()
                   //<< "; integAdvancedState Stage before stepping: " 
                   //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
-                  //<< "; tsState Stage before stepping: " 
-                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
-                  << std::endl;
+                  //<< "; integAdvancedState Stage before stepping: " 
+                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+                  //<< std::endl;
 
-        //world->ts->initialize(tsState);
+        //world->ts->initialize(integAdvancedState);
         //world->ts->stepTo(timeToReach);
         //world->integ->reinitialize(SimTK::Stage::Instance, true);
 
         //std::cout << "Time after  stepping: " << world->ts->getTime()
                   //<< "; integAdvancedState Stage after stepping: " 
                   //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
-                  //<< "; tsState Stage before stepping: " 
-                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
+                  //<< "; integAdvancedState Stage before stepping: " 
+                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
                   //<< std::endl;
 
 
         // -- UPDATE --
-        std::cout << "before update integAdvancedState.getQ()" 
+        std::cout << "=========================================" << std::endl;
+        std::cout << "Q before update integAdvancedState " 
                   << integAdvancedState.getQ() << std::endl;
+        std::cout << "U before update integAdvancedState " 
+                  << integAdvancedState.getU() << std::endl;
+        std::cout << "Time before update: " << world->ts->getTime() << std::endl;
 
-        HMCsampler->update((world->ts->updIntegrator()).updAdvancedState());
+        //p_HMCsampler->update((world->ts->updIntegrator()).updAdvancedState());
+        p_HMCsampler->update(integAdvancedState);
 
-        std::cout << "after update integAdvancedState.getQ()" 
+        std::cout << "Q after update integAdvancedState " 
                   << integAdvancedState.getQ() << std::endl;
-        std::cout << "Time after  update: " << world->ts->getTime()  
-                  << "; integAdvancedState Stage after HMCsampler: " 
+        std::cout << "Time after update: " << world->ts->getTime()  
+                  << "; integAdvancedState Stage after p_HMCsampler: " 
                   << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
-                  << "; tsState Stage before stepping: " 
-                  << (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
+                  << "; integAdvancedState Stage before stepping: " 
+                  << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
                   << std::endl;
-        writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "MCs", i);
+        //writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "MCs", i);
     }
 
 
-    //delete HMCsampler;
+    //delete p_HMCsampler;
 
 }
 

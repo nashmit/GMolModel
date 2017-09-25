@@ -11,20 +11,11 @@ Sampler::Sampler(SimTK::CompoundSystem *argCompoundSystem,
                  Topology *argResidue,
                  SimTK::TimeStepper *argTimeStepper)
 {
-    std::cout << "Sampler constructor: "
-        << argCompoundSystem << " " << argMatter << " " << argResidue
-        << " " << argTimeStepper << std::endl;
-
     this->compoundSystem = argCompoundSystem;
     this->matter = argMatter;
     this->residue = argResidue;
     this->timeStepper = argTimeStepper;
     this->system = &(matter->getSystem());
-
-    std::cout << "Sampler object: "
-        << compoundSystem << " " << matter << " " << residue
-        << " " << timeStepper << std::endl;
-
 }
 
 // Destructor

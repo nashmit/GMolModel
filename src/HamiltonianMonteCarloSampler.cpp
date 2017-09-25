@@ -15,9 +15,6 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
                                      SimTK::TimeStepper *argTimeStepper)
     : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argTimeStepper)
 {
-    std::cout << "HamiltonianMonteCarloSampler constructor: " 
-        << argCompoundSystem << " " << argMatter << " " << argResidue
-        << " " << argTimeStepper << std::endl;
 }
 
 // Destructor
@@ -43,12 +40,27 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
         std::cout << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
     }
     */
+    std::cout << "HamiltonianMonteCarloSampler::propose Q: " << someState.getQ() 
+        << std::endl << std::flush;
+    std::cout << "HamiltonianMonteCarloSampler::propose U: " << someState.getU()
+        << std::endl << std::flush;
+    std::cout << "HamiltonianMonteCarloSampler::propose trying to step to: "
+        << someState.getTime() + (timestep*nosteps) << std::endl;
 
+    // After an event handler has made a discontinuous change to the 
+    // Integrator's "advanced state", this method must be called to 
+    // reinitialize the Integrator.
+    std::cout << "HamiltonianMonteCarloSampler::propose time before step: "
+        << this->timeStepper->getTime() << std::endl;
+
+    (this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Instance, false);
+    system->realize(someState, SimTK::Stage::Acceleration); // NECESSARY
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
-    (this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Instance, true);
-    //timeStepper->stepTo(0.001);
+    //timeStepper->stepTo(0.0150);
 
-    //system->realize(someState, SimTK::Stage::Acceleration); // NECESSARY
+    std::cout << "HamiltonianMonteCarloSampler::propose time after step: "
+        << this->timeStepper->getTime() << std::endl;
+
 
     /*
     std::cout << "State info AFTER  updQ. Time = " << someState.getTime() << std::endl;
