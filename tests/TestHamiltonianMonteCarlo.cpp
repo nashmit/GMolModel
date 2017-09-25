@@ -129,17 +129,16 @@ int main(int argc, char **argv)
 
     // Test Context 1
     //Sampler *p_genericSampler = new Sampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
-    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
-    //Context *context = new Context(p_world, p_genericSampler);
-    Context *context = new Context(p_world, p_HMCsampler);
-    World *world = context->getWorld();
+    //HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
+    //Context *context = new Context(p_world, p_HMCsampler);
+    //World *world = context->getWorld();
 
     // Memory alloc for convinient arrays 
 
-    coords = new TARGET_TYPE*[world->mr->natms];
-    TARGET_TYPE **vels = new TARGET_TYPE*[world->mr->natms];
-    TARGET_TYPE **inivels = new TARGET_TYPE*[world->mr->natms];
-    TARGET_TYPE **grads = new TARGET_TYPE*[world->mr->natms];
+    coords = new TARGET_TYPE*[p_world->mr->natms];
+    TARGET_TYPE **vels = new TARGET_TYPE*[p_world->mr->natms];
+    TARGET_TYPE **inivels = new TARGET_TYPE*[p_world->mr->natms];
+    TARGET_TYPE **grads = new TARGET_TYPE*[p_world->mr->natms];
 
     // Seed the random number generator 
 
@@ -289,14 +288,14 @@ int main(int argc, char **argv)
 
     // Build Topology and fill indexMap
 
-    world->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
+    p_world->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
     world_initialized = true;
 
     // Test Context 2
-    //Sampler *p_genericSampler = new Sampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
-    //HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
-    //Context *context = new Context(p_world, p_genericSampler);
-    //World *world = context->getWorld();
+    Sampler *p_genericSampler = new Sampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
+    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
+    Context *context = new Context(p_world, p_HMCsampler);
+    World *world = context->getWorld();
 
     // Options for mass matrix, Lennard Jones
 

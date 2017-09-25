@@ -374,6 +374,7 @@ void World::InitSimulation(
   SimTK::State state = system->updDefaultState();
 
   // * Build a symetric matrix that describes the mobods indeces tree * //
+  /*
   // Allocate
   int nmbx = matter->getNumBodies();
   int nmbx_1 = nmbx + 1;
@@ -436,11 +437,11 @@ void World::InitSimulation(
       }
     }
   }
+  */
 
   //integ = new MidVVIntegrator(*system, (*sysTimestep), PrmToAx_po, MMTkToPrm_po, system, this);
   //integ = new SimTK::VerletIntegrator(*system); // RESTORE
   //ts = new SimTK::TimeStepper(*system, *integ); // RESTORE
-  std::cout << "World constructor ts " << ts << std::endl;
   ts->initialize(system->getDefaultState());
 }//end of InitSimulation
 
