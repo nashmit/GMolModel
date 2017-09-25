@@ -15,6 +15,9 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
                                      SimTK::TimeStepper *argTimeStepper)
     : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argTimeStepper)
 {
+
+    this->fix_n = this->fix_o = 0.0;
+
 }
 
 // Destructor
@@ -40,21 +43,6 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 {
     //randomEngine.seed(4294653137UL); // for reproductibility
 
-    /*
-    std::cout << "State info BEFORE updQ. Time = " << someState.getTime() << std::endl;
-    for(int i = 0; i < someState.getNumSubsystems(); i++){
-        std::cout << someState.getSubsystemName(SimTK::SubsystemIndex(i)) << " ";
-        std::cout << someState.getSubsystemStage(SimTK::SubsystemIndex(i)) << " ";
-        std::cout << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
-    }
-    */
-    std::cout << "HamiltonianMonteCarloSampler::propose Q: " << someState.getQ() 
-        << std::endl << std::flush;
-    std::cout << "HamiltonianMonteCarloSampler::propose U: " << someState.getU()
-        << std::endl << std::flush;
-    std::cout << "HamiltonianMonteCarloSampler::propose trying to step to: "
-        << someState.getTime() + (timestep*nosteps) << std::endl;
-
     // Assign velocities according to Maxwell-Boltzmann distribution
     int nu = someState.getNU();
     double kTb = SimTK_BOLTZMANN_CONSTANT_MD * 300.0;
@@ -68,8 +56,6 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
     SqrtMInvV *= sqrtkTb; // Set stddev according to temperature
     someState.updU() = SqrtMInvV;
-
-
 
     // After an event handler has made a discontinuous change to the 
     // Integrator's "advanced state", this method must be called to 
@@ -91,14 +77,15 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState){
     SimTK::Real rand_no = uniformRealDistribution(randomEngine);
     SimTK::Real RT = getTemperature() * SimTK_BOLTZMANN_CONSTANT_MD;
 
-    std::cout << "HamiltonianMonteCarloSampler::update" << std::endl;
-
     // Get old energy
     SimTK::Real pe_o = getOldPE();
 
     // Assign random configuration
 
     propose(someState, 0.0015, 10);
+
+    //system->realize(someState, SimTK::Stage::Acceleration);
+    fix_n = calcFixman(someState);
 
     // Send configuration to evaluator  
 
@@ -115,9 +102,12 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState){
     // Apply Metropolis criterion
 
     assert(!isnan(pe_n));
-    if ((pe_n < pe_o) or (rand_no < exp(-(pe_n - pe_o)/RT))){ // Accept
+    SimTK::Real etot_n = pe_n + ke_n + fix_n;
+    SimTK::Real etot_o = pe_o + ke_o + fix_o;
+    if ((etot_n < etot_o) or (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
         setTVector(someState);
         setOldPE(pe_n);
+        setOldFixman(someState);
     }else{ // Reject
         assignConfFromTVector(someState);
     }

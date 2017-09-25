@@ -46,9 +46,18 @@ public:
     void setOldPE(SimTK::Real argPE);
     void setOldKE(SimTK::Real argKE);
 
+    // Set/get Fixman potential
+
+    void setOldFixman(SimTK::State& someState);
+    SimTK::Real getOldFixman(SimTK::State& someState);
+
     // Evaluate the potential energy at current state
 
     SimTK::Real getPEFromEvaluator(void); 
+
+    // Compute Fixman potential
+
+    SimTK::Real calcFixman(SimTK::State& someState);
 
     // Send configuration to an external evaluator
 
@@ -63,6 +72,8 @@ protected:
     SimTK::Transform *TVector;
     SimTK::Real pe_o;
     SimTK::Real temperature;
+    
+    SimTK::Real fix_o, fix_n;
  
     // Random number generators - not sure if I need two
     // Needs testing

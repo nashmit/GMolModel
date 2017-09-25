@@ -28,6 +28,42 @@ MonteCarloSampler::~MonteCarloSampler()
 
 }
 
+// Compute Fixman potential
+
+SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState)
+{
+    int nu = someState.getNU();
+    SimTK::Real detM = 1.0;
+    SimTK::Vector V(nu);
+    SimTK::Vector DetV(nu);
+    SimTK::Matrix D0(6, 6);
+    Eigen::MatrixXd EiD0(6, 6);
+    matter->calcDetM(someState, V, DetV, D0);
+    for(int i=0; i<6; i++){
+        for(int j=0; j<6; j++){
+            EiD0(i, j) = D0(i, j);
+        }
+    }
+    SimTK::Real EiDetD0 = EiD0.determinant();
+    for(int i=6; i<nu; i++){
+        EiDetD0 *= DetV[i];
+    }
+    return EiDetD0;
+
+}
+
+// Set/get Fixman potential
+
+void MonteCarloSampler::setOldFixman(SimTK::State& someState)
+{
+    this->fix_o = calcFixman(someState);
+}
+
+SimTK::Real MonteCarloSampler::getOldFixman(SimTK::State& someState)
+{
+    return this->fix_o;
+}
+
 // Stores the configuration into an internal vector of transforms TVector
 
 void MonteCarloSampler::setTVector(const SimTK::State& someState)
