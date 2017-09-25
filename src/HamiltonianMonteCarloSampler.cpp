@@ -23,6 +23,14 @@ HamiltonianMonteCarloSampler::~HamiltonianMonteCarloSampler()
 {
 }
 
+// Set old kinetic energy
+
+void HamiltonianMonteCarloSampler::setOldKE(SimTK::Real inpKE)
+{
+    this->ke_o = inpKE;
+}
+
+
 // Assign random conformation
 // In torsional dynamics the first body has 7 Q variables for 6 dofs - one
 // quaternion (q) and 3 Cartesian coordinates (x). updQ will return: 
@@ -47,29 +55,32 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     std::cout << "HamiltonianMonteCarloSampler::propose trying to step to: "
         << someState.getTime() + (timestep*nosteps) << std::endl;
 
+    // Assign velocities according to Maxwell-Boltzmann distribution
+    int nu = someState.getNU();
+    double kTb = SimTK_BOLTZMANN_CONSTANT_MD * 300.0;
+    double sqrtkTb = std::sqrt(kTb);
+    SimTK::Vector V(nu);
+    SimTK::Vector SqrtMInvV(nu);
+    for (int i=0; i < nu; ++i){
+        V[i] = gaurand(randomEngine);
+    }
+    system->realize(someState, SimTK::Stage::Position);
+    matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
+    SqrtMInvV *= sqrtkTb; // Set stddev according to temperature
+    someState.updU() = SqrtMInvV;
+
+
+
     // After an event handler has made a discontinuous change to the 
     // Integrator's "advanced state", this method must be called to 
     // reinitialize the Integrator.
-    std::cout << "HamiltonianMonteCarloSampler::propose time before step: "
-        << this->timeStepper->getTime() << std::endl;
+    system->realize(someState, SimTK::Stage::Acceleration);
+    (this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
+    setOldKE(matter->calcKineticEnergy(someState));
 
-    (this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Instance, false);
-    system->realize(someState, SimTK::Stage::Acceleration); // NECESSARY
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
     //timeStepper->stepTo(0.0150);
 
-    std::cout << "HamiltonianMonteCarloSampler::propose time after step: "
-        << this->timeStepper->getTime() << std::endl;
-
-
-    /*
-    std::cout << "State info AFTER  updQ. Time = " << someState.getTime() << std::endl;
-    for(int i = 0; i < someState.getNumSubsystems(); i++){
-        std::cout << someState.getSubsystemName(SimTK::SubsystemIndex(i)) << " ";
-        std::cout << someState.getSubsystemStage(SimTK::SubsystemIndex(i)) << " ";
-        std::cout << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
-    }
-    */
 
 }
 
@@ -96,6 +107,10 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState){
     // Get current potential energy from evaluator
 
     SimTK::Real pe_n = getPEFromEvaluator(); // OPENMM
+
+    // Get current kinetic energy from Simbody
+
+    SimTK::Real ke_n = matter->calcKineticEnergy(someState);
 
     // Apply Metropolis criterion
 

@@ -26,7 +26,15 @@ public:
 
     // Performs the acception-rejection step and sets the state of the compound
     // to the appropriate conformation
+
     void update(SimTK::State&);
+
+    // Set kinetic energies    
+
+    void setOldKE(SimTK::Real);
+
+protected:
+       SimTK::Real ke_o; 
 
 };
 
