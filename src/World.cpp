@@ -261,6 +261,9 @@ World::World(
     frcmodF.c_str()
   );
 
+  integ = new SimTK::VerletIntegrator(*system); // RESTORE
+  ts = new SimTK::TimeStepper(*system, *integ); // RESTORE
+
 }//end of constructor
 
 void World::InitSimulation(
@@ -435,8 +438,9 @@ void World::InitSimulation(
   }
 
   //integ = new MidVVIntegrator(*system, (*sysTimestep), PrmToAx_po, MMTkToPrm_po, system, this);
-  integ = new SimTK::VerletIntegrator(*system);
-  ts = new SimTK::TimeStepper(*system, *integ);
+  //integ = new SimTK::VerletIntegrator(*system); // RESTORE
+  //ts = new SimTK::TimeStepper(*system, *integ); // RESTORE
+  std::cout << "World constructor ts " << ts << std::endl;
   ts->initialize(system->getDefaultState());
 }//end of InitSimulation
 

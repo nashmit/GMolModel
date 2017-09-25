@@ -53,16 +53,15 @@ public:
 
     void sendConfToEvaluator(void);
 
-
     // Performs the acception-rejection step and sets the state of the compound
     // to the appropriate conformation
+
     void update(SimTK::State&);
 
 protected:
     SimTK::Transform *TVector;
     SimTK::Real pe_o;
     SimTK::Real temperature;
-
  
     // Random number generators - not sure if I need two
     // Needs testing

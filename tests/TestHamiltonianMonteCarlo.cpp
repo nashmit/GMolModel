@@ -119,13 +119,13 @@ int main(int argc, char **argv)
 
     // Build Gmolmodel simulation world
 
-
     World *p_world = new World(
         mol2FN, rbFN, gaffFN, frcmodFN,
         ictd, 
         PrmToAx_po, MMTkToPrm_po,
         shm
     );
+
 
     // Test Context
     Sampler *p_genericSampler = new Sampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
@@ -342,16 +342,16 @@ int main(int argc, char **argv)
 
     std::cout << std::fixed;
     std::cout << std::setprecision(4);
-    SimTK::Real timeToReach = 0.0;
+    SimTK::Real timeToReach = 0.001;
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
     const SimTK::State& tsState = world->ts->getState(); // less than or equal to integ advanced state
+    world->ts->initialize(tsState);
     for(int i = 0; i<30; i++){
         // -- STEPTO -- 
-        timeToReach += (nosteps * delta_t);
 
-        std::cout << "trying to make integrator to step to " << timeToReach 
+        std::cout << "trying to make integrator to step to " << timeToReach
                   << std::endl;
-        std::cout << "Time before stepping: " << world->ts->getTime()  
+        std::cout << "Time before stepping: " << world->ts->getTime()
                   //<< "; integAdvancedState Stage before stepping: " 
                   //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
                   //<< "; tsState Stage before stepping: " 
@@ -362,12 +362,13 @@ int main(int argc, char **argv)
         //world->ts->stepTo(timeToReach);
         //world->integ->reinitialize(SimTK::Stage::Instance, true);
 
-        std::cout << "Time after  stepping: " << world->ts->getTime()  
+        //std::cout << "Time after  stepping: " << world->ts->getTime()
                   //<< "; integAdvancedState Stage after stepping: " 
                   //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
                   //<< "; tsState Stage before stepping: " 
                   //<< (((SimTK::Subsystem *)(world->matter))->getStage(tsState)).getName() 
-                  << std::endl;
+                  //<< std::endl;
+
 
         // -- UPDATE --
         std::cout << "before update integAdvancedState.getQ()" 

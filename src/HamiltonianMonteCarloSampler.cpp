@@ -15,6 +15,9 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
                                      SimTK::TimeStepper *argTimeStepper)
     : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argTimeStepper)
 {
+    std::cout << "HamiltonianMonteCarloSampler constructor: " 
+        << argCompoundSystem << " " << argMatter << " " << argResidue
+        << " " << argTimeStepper << std::endl;
 }
 
 // Destructor
@@ -28,7 +31,7 @@ HamiltonianMonteCarloSampler::~HamiltonianMonteCarloSampler()
 // quaternion (q) and 3 Cartesian coordinates (x). updQ will return: 
 // [qw, qx, qy, qz, x1, x2, x3]
  
-void HamiltonianMonteCarloSampler::propose(SimTK::State& someState)
+void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real timestep, int nosteps)
 {
     //randomEngine.seed(4294653137UL); // for reproductibility
 
@@ -40,19 +43,12 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState)
         std::cout << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
     }
     */
-    std::cout << "HamiltonianMonteCarloSampler::propose" << std::endl;
-    int i = 1;
-    for (SimTK::MobilizedBodyIndex mbx(i); mbx < matter->getNumBodies(); ++mbx){
-        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-        SimTK::Real rand_no = uniformRealDistribution_0_2pi(randomEngine);
-        for(int j=0; j<mobod.getNumQ(someState); j++){
-            mobod.setOneQ(someState, j, rand_no);
-            //someState.updQ()[i] = rand_no;
-        }
-        i++;
-    }
 
-    system->realize(someState, SimTK::Stage::Acceleration); // NECESSARY
+    this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
+    (this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Instance, true);
+    //timeStepper->stepTo(0.001);
+
+    //system->realize(someState, SimTK::Stage::Acceleration); // NECESSARY
 
     /*
     std::cout << "State info AFTER  updQ. Time = " << someState.getTime() << std::endl;
@@ -79,7 +75,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState){
 
     // Assign random configuration
 
-    propose(someState);
+    propose(someState, 0.0015, 10);
 
     // Send configuration to evaluator  
 
