@@ -15,10 +15,10 @@ class MonteCarloSampler : public Sampler
 public:
     // Constructor
 
-      MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
-                        SimTK::SimbodyMatterSubsystem *argMatter,
-                        Topology *argResidue,
-                        SimTK::TimeStepper *argTimeStepper);
+    MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
+                      SimTK::SimbodyMatterSubsystem *argMatter,
+                      Topology *argResidue,
+                      SimTK::TimeStepper *argTimeStepper);
 
     // Destructor
 
@@ -36,7 +36,7 @@ public:
 
     // Assign a random conformation
 
-    void assignRandomConf(SimTK::State& advanced);
+    void propose(SimTK::State& advanced);
 
     // Store/restore potential energy
 
@@ -53,16 +53,15 @@ public:
 
     void sendConfToEvaluator(void);
 
-
     // Performs the acception-rejection step and sets the state of the compound
     // to the appropriate conformation
+
     void update(SimTK::State&);
 
-private:
+protected:
     SimTK::Transform *TVector;
     SimTK::Real pe_o;
     SimTK::Real temperature;
-
  
     // Random number generators - not sure if I need two
     // Needs testing

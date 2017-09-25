@@ -114,6 +114,7 @@ set(LIBGMOLMODEL_SRC
         MidVVIntegrator.cpp # LAUR
         Sampler.cpp # LAUR
         MonteCarloSampler.cpp # LAUR
+        HamiltonianMonteCarloSampler.cpp # LAUR
 	bAddParams.cpp 
 	Topology.cpp 
 	bMoleculeReader.cpp 

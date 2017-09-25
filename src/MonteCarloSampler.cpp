@@ -59,7 +59,7 @@ void MonteCarloSampler::assignConfFromTVector(SimTK::State& someState)
 // quaternion (q) and 3 Cartesian coordinates (x). updQ will return: 
 // [qw, qx, qy, qz, x1, x2, x3]
  
-void MonteCarloSampler::assignRandomConf(SimTK::State& someState)
+void MonteCarloSampler::propose(SimTK::State& someState)
 {
     //randomEngine.seed(4294653137UL); // for reproductibility
 
@@ -107,7 +107,7 @@ void MonteCarloSampler::update(SimTK::State& someState){
 
     // Assign random configuration
 
-    assignRandomConf(someState);
+    propose(someState);
 
     // Send configuration to evaluator  
 
