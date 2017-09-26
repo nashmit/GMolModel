@@ -118,6 +118,7 @@ set(TESTS_SRCS
         TestMonteCarloSampler.cpp
         TestHamiltonianMonteCarlo.cpp
         TestOpenMMBasic.cpp
+        TestPrmCrd.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})

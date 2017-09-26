@@ -391,14 +391,13 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
   unsigned int lno = 0;
   int noDummies = 0;
 
-  /*+++++++++ SDF type ++++++++++*/
-  if(strstr(filetype, "sdf")){
-    ; // TODO
+  /*+++++++++ External readers ++++++++++*/
+  if(strstr(filetype, "external")){
+    ;
   }
 
   /*+++++++++ MOL2 type ++++++++++*/
   else if(strstr(filetype, "mol2")){
-    //bZeroCharArray(buff, 80); // RESTORE
     bZeroCharArray(buff, 80); // EU
     natms = 0;
     i = 0; j = 0;
@@ -408,24 +407,15 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     /*Read number of atoms*/
     bZeroCharArray(line_c, MAX_LINE_LENGTH); // EU
     while(fgets(line_c, MAX_LINE_LENGTH, fpo)){
-      #ifdef DEBUG_LEVEL02
-      std::cout<<"line: "<<line_c<<std::flush;
-      #endif
       ++lno;
       if(lno == 3){
         bSubstr(buff, line_c, 0, 5);
         natms = atoi(buff);
-        #ifdef DEBUG_LEVEL02
-        std::cout<<"natms "<<natms<<" noDummies "<<noDummies<<std::endl;
-        #endif
         bZeroCharArray(buff, 80);
 
         bSubstr(buff, line_c, 6, 6); // EU
         nbnds = atoi(buff); // EU
         bonds = new bBond[nbnds];
-        #ifdef DEBUG_LEVEL02 // EU
-        std::cout<<"nbnds: "<<nbnds<<std::endl<<std::flush; // EU
-        #endif // EU
         bZeroCharArray(buff, 80); // EU
 
         break;
