@@ -204,6 +204,57 @@ bool GridForce::dependsOnlyOnPositions() const {
 ////// SYMBODY SYSTEM //////
 ////////////////////////////
 
+World::World(readAmberInput *amberReader, std::string rbF){
+  passno = new int;
+  vassno = new int;
+  fassno = new int;
+  sassno = new int;
+  sysTimestep = new TARGET_TYPE;
+  *sysTimestep = 0.0015; // Default
+  //
+  this->mol2F = mol2F;
+  this->rbF = rbF;
+  this->gaffF = gaffF;
+  this->frcmodF = frcmodF;
+  this->ictdF = ictdF;
+  this->PrmToAx_po = PrmToAx_po;
+  this->MMTkToPrm_po = MMTkToPrm_po;
+  this->shm = shm;
+  this->pyseed = new unsigned long int;
+  this->lj14sf = 0.5;
+
+  system = new SimTK::CompoundSystem;
+  matter = new SimTK::SimbodyMatterSubsystem(*system);
+  forces = new SimTK::GeneralForceSubsystem(*system);
+  decorations = new SimTK::DecorationSubsystem(*system);
+  SimTK::Visualizer viz(*system);
+  system->addEventReporter( new SimTK::Visualizer::Reporter(viz, 0.0015));
+  forceField = new SimTK::DuMMForceFieldSubsystem(*system);
+  forceField->loadAmber99Parameters();
+  integ = new SimTK::VerletIntegrator(*system); // NEW
+  ts = new SimTK::TimeStepper(*system, *integ); // NEW
+
+
+  mr = new bMoleculeReader(amberReader, rbF.c_str());
+
+
+  if (mr->bAtomList == NULL){
+    std::cout<<"After bMoleculeReader: NULL bAtomList"<<std::endl;
+    exit(1);
+  }
+  bAddGaffParams(
+    *forceField,
+    gaffF.c_str(),
+    mr->natms,
+    mr->bAtomList,
+    mr->nbnds,
+    mr->bonds,
+    frcmodF.c_str()
+  );
+
+
+}
+
 World::World(
   string mol2F, string rbF, string gaffF, string frcmodF,
   string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
@@ -257,9 +308,6 @@ World::World(
     mr->bonds,
     frcmodF.c_str()
   );
-
-  //integ = new SimTK::VerletIntegrator(*system); // RESTORE
-  //ts = new SimTK::TimeStepper(*system, *integ); // RESTORE
 
 }//end of constructor
 

@@ -364,6 +364,311 @@ std::string intriad::getString(void){
 /****
  * bMoleculeReader
  ****/
+
+bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfilename)
+{
+    natms = 0;
+    bBond buffij;
+    char elem = 'x';
+    int noDummies = 0; 
+    std::string line;
+    char line_c[1000];
+    natms = amberReader->getNumberAtoms();
+
+    bAtomList = new bSpecificAtom[natms]; /*Alloc - 1 for dummy*/
+
+    // Read atoms READER
+
+    for(int i = 0; i < natms; i++){
+        bAtomList[i].Zero();
+        bAtomList[i].setElem( (amberReader->getAtomsName(i)).at(0) );
+        //bAtomList[i].setName(str_buf);
+        //bAtomList[i].setNumber(lno);
+        //bAtomList[i].setFftype(str_buf);
+        //bAtomList[i].setCharge(std::stod(str_buf));
+        //bAtomList[i].setInName(str_buf);
+        //bAtomList[i].setX(std::stod(str_buf));
+        //bAtomList[i].setY(std::stod(str_buf));
+        //bAtomList[i].setZ(std::stod(str_buf));
+        bAtomList[i].Print();
+    }
+
+    /*READ BONDS*/
+    //bonds[i-1].i = buffij.i; // EU
+    //bonds[i-1].j = buffij.j; // EU
+
+    /*Assign atoms nbonds and freebonds*/
+    for(int i=0; i<natms ; i++){
+      bAtomList[i].nbonds = 0;
+      for(int j=0; j<nbnds; j++){ 
+        if((bAtomList[i].number == bonds[j].i) ||\
+           (bAtomList[i].number == bonds[j].j)){
+          ++bAtomList[i].nbonds;
+          ++bAtomList[i].freebonds;
+        }
+      }
+    }
+
+
+    // Every *valentAtom is derived from SingleAtom in turn derived from Compound with one atom (AtomIndex 0)
+    for(int i=0; i<natms+noDummies; i++){
+      if(bAtomList[i].nbonds == 1){
+        if(toupper(bAtomList[i].elem) == 'H'){
+          bAtomList[i].bAtomType = new
+            //UnivalentAtom(bAtomList[i].name, MMTKElement(1, "MMTKHydrogen", "MMTKH", 1.00797598)); // MMTK mass
+            //UnivalentAtom(bAtomList[i].name, MMTKElement::MMTKHydrogen()); // Molmodel Mass
+            UnivalentAtom(bAtomList[i].name, Element::Hydrogen()); // Molmodel Mass
+        }
+        else if(toupper(bAtomList[i].name[0]) == 'C'){
+          bAtomList[i].bAtomType = new
+            //UnivalentAtom(bAtomList[i].name, Element(17, "Chlorine", "Cl", 35.45));
+            UnivalentAtom(bAtomList[i].name, Element::Chlorine());
+        }
+        else if(toupper(bAtomList[i].name[0]) == 'O'){
+          bAtomList[i].bAtomType = new
+            //UnivalentAtom(bAtomList[i].name, Element(8, "Oxygen", "O", 16.00));
+            UnivalentAtom(bAtomList[i].name, Element::Oxygen());
+        }
+        else if(toupper(bAtomList[i].name[0]) == 'F'){
+          bAtomList[i].bAtomType = new
+            //UnivalentAtom(bAtomList[i].name, Element(9, "Fluorine", "F", 19.00));
+            UnivalentAtom(bAtomList[i].name, Element::Fluorine());
+        }
+        else if(toupper(bAtomList[i].name[0]) == 'B'){
+          bAtomList[i].bAtomType = new
+            //UnivalentAtom(bAtomList[i].name, Element(35, "Bromine", "Br", 79.90));
+            UnivalentAtom(bAtomList[i].name, Element::Bromine());
+        }
+        else if(toupper(bAtomList[i].name[0]) == 'I'){
+          bAtomList[i].bAtomType = new
+            //UnivalentAtom(bAtomList[i].name, Element(53, "Iodine", "I", 126.9));
+            UnivalentAtom(bAtomList[i].name, Element::Iodine());
+        }
+        else if(toupper(bAtomList[i].name[0]) == 'N'){
+          bAtomList[i].bAtomType = new
+            //UnivalentAtom(bAtomList[i].name, Element(7, "Nitrogen", "N", 14.01));
+            UnivalentAtom(bAtomList[i].name, Element::Nitrogen());
+        }
+        bAtomList[i].bAtomType->setDefaultInboardBondLength(0.1112);
+      }
+      else if (bAtomList[i].nbonds == 2){
+        if(toupper(bAtomList[i].elem) == 'H'){
+          bAtomList[i].bAtomType = new
+            //BivalentAtom(bAtomList[i].name, Element(1, "MMTKHydrogen", "MMTKH", 1.00797598)); // MMTK mass
+            //BivalentAtom(bAtomList[i].name, MMTKElement::MMTKHydrogen()); // Molmodel Mass
+            BivalentAtom(bAtomList[i].name, Element::Hydrogen());
+        }
+        else if(toupper(bAtomList[i].elem) == 'C'){
+          bAtomList[i].bAtomType = new
+            //BivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", 12.01));
+            BivalentAtom(bAtomList[i].name,  Element::Carbon());
+        }
+        else if(toupper(bAtomList[i].elem) == 'O'){
+          bAtomList[i].bAtomType = new
+            //BivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", 16.00),
+            BivalentAtom(bAtomList[i].name,  Element::Oxygen(),
+            109.47*Deg2Rad);
+        }
+        else if(toupper(bAtomList[i].elem) == 'N'){
+          bAtomList[i].bAtomType = new
+            //BivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", 14.01));
+            BivalentAtom(bAtomList[i].name,  Element::Nitrogen());
+        }
+        else if(toupper(bAtomList[i].elem) == 'S'){
+          bAtomList[i].bAtomType = new
+            //BivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", 32.06),
+            BivalentAtom(bAtomList[i].name,  Element::Sulfur(),
+            109.47*Deg2Rad);
+        }
+        bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
+      }
+      else if (bAtomList[i].nbonds == 3){
+        if(toupper(bAtomList[i].elem) == 'C'){
+          bAtomList[i].bAtomType = new
+            //TrivalentAtom(bAtomList[i].name, Element(6, "Carbon", "C", 12.01),
+            TrivalentAtom(bAtomList[i].name, Element::Carbon(),
+              120*Deg2Rad, 120*Deg2Rad
+            );
+        }
+        else if(toupper(bAtomList[i].elem) == 'O'){
+          bAtomList[i].bAtomType = new
+            //TrivalentAtomTetra(bAtomList[i].name,  Element(8, "Oxygen", "O", 16.00));
+            TrivalentAtomTetra(bAtomList[i].name,  Element::Oxygen());
+        }
+        else if(toupper(bAtomList[i].elem) == 'N'){
+          bAtomList[i].bAtomType = new
+            //TrivalentAtomTetra(bAtomList[i].name,  Element(7, "Nitrogen", "N", 14.01));
+            TrivalentAtomTetra(bAtomList[i].name,  Element::Nitrogen());
+        }
+        else if(toupper(bAtomList[i].elem) == 'S'){
+          bAtomList[i].bAtomType = new
+            //TrivalentAtomTetra(bAtomList[i].name,  Element(16, "Sulfur", "S", 32.06));
+            TrivalentAtomTetra(bAtomList[i].name,  Element::Sulfur());
+        }
+        else if(toupper(bAtomList[i].elem) == 'P'){
+          bAtomList[i].bAtomType = new
+            //TrivalentAtomTetra(bAtomList[i].name,  Element(15, "Phosphorus", "P", 30.97));
+            TrivalentAtomTetra(bAtomList[i].name,  Element::Phosphorus());
+        }
+        bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
+      }
+      else if (bAtomList[i].nbonds == 4){
+        if(toupper(bAtomList[i].elem) == 'C'){
+          bAtomList[i].bAtomType = new
+            //QuadrivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", 12.01103690)); // MMTK mass
+            QuadrivalentAtom(bAtomList[i].name,  Element::Carbon()); // Molmodel mass
+        }
+        else if(toupper(bAtomList[i].elem) == 'O'){
+          bAtomList[i].bAtomType = new
+            //QuadrivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", 16.00));
+            QuadrivalentAtom(bAtomList[i].name,  Element::Oxygen());
+        }
+        else if(toupper(bAtomList[i].elem) == 'N'){
+          bAtomList[i].bAtomType = new
+            //QuadrivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", 14.01));
+            QuadrivalentAtom(bAtomList[i].name,  Element::Nitrogen());
+        }
+        else if(toupper(bAtomList[i].elem) == 'S'){
+          bAtomList[i].bAtomType = new
+            //QuadrivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", 32.06));
+            QuadrivalentAtom(bAtomList[i].name,  Element::Sulfur());
+        }
+        else if(toupper(bAtomList[i].elem) == 'P'){
+          bAtomList[i].bAtomType = new
+            //QuadrivalentAtom(bAtomList[i].name,  Element(15, "Phosphorus", "P", 30.97));
+            QuadrivalentAtom(bAtomList[i].name,  Element::Phosphorus());
+        }
+        bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
+      }
+
+      bZeroCharArray(bAtomList[i].biotype, 20);
+      sprintf(bAtomList[i].biotype, "%s_%s", \
+        bAtomList[i].name, bAtomList[i].fftype);
+
+    }
+
+    if (bAtomList == NULL){
+      std::cout<<"bMoleculeReader constructor exit: NULL bAtomList\n";fflush(stdout);
+    }
+    else{
+      std::cout<<"bMoleculeReader constructor: bAtomList not NULL\n";fflush(stdout);
+    }
+    
+  /* Just checking *////////
+  std::cout<<"Just checking\n";
+  for(int i=0; i<natms;i++){
+    printf(" -- name(%s) inName(%s) number(%d) elem(%c) fftype(%s) biotype(%s) charge(%f)\n", 
+      bAtomList[i].name, bAtomList[i].inName, bAtomList[i].number, 
+      bAtomList[i].elem, bAtomList[i].fftype,
+      bAtomList[i].biotype, bAtomList[i].charge);
+    fflush(stdout);
+  }
+  for(int i=0; i<nbnds; i++){ // EU
+    std::cout<<"bond: "<<bonds[i].i<<" "<<bonds[i].j<<std::endl;
+    fflush(stdout);
+  }
+  ///////////////////////////
+
+
+  /*Now read rigid bodies specifications*/
+  FILE *rfpo;
+  rfpo = fopen(rbfilename, "r");
+  if(rfpo == NULL){
+    printf("Usage:\n<program> -mol2 <mol2_file> -rb <rb_file> -gaff  gaff.dat -frcmod <frcmod_file>\n");
+    printf("rb_file not provided. Exiting...\n");
+    exit(1);
+  }
+
+  std::string sbuff;
+  std::vector<int> ring;
+  char curr_char;
+  int bond_found = 0;
+  unsigned int boi;
+  int par_open = 0;
+  int ring_no = -1;
+  int ring_closing = 0;
+
+  while(fgets(line_c, MAX_LINE_LENGTH, rfpo)){
+    line = line_c; //RESTORE
+    if((sbuff = line.substr(0,5)) == "rings"){ // RESTORE
+      sbuff = "";
+      for(int i=0; i<strlen(line_c); i++){ 
+        curr_char = line_c[i]; // RESTORE
+        if(curr_char == ']'){
+          ++ring_no;
+          ring.push_back(atoi(sbuff.c_str()));
+          sbuff = "";
+          bond_found = 0;
+          for(boi=0; boi<nbnds; boi++){ // EU
+            for(unsigned int ri=0; ri<ring.size(); ri++){
+              for(unsigned int rj=0; (rj<ring.size()) && (rj<ri); rj++){
+                if( ((ring[ri] == bonds[boi].i) && (ring[rj] == bonds[boi].j)) ||
+                  ((ring[ri] == bonds[boi].j) && (ring[rj] == bonds[boi].i))){
+                  bonds[boi].setInRing();
+                  bonds[boi].setRingNo(ring_no);
+                  if(ring_closing == 0){
+                    bonds[boi].setAsRingClosing();
+                  }
+                  ++ring_closing;
+                  bond_found = 1;
+                  break;
+                }
+              }
+            }
+          }
+          ring.clear();
+          ring_closing = 0;
+        }
+        else if(curr_char == ','){
+          ring.push_back(atoi(sbuff.c_str()));
+          sbuff = "";
+        }
+        else if((curr_char >= '0') && (curr_char <='9')){
+          sbuff += curr_char;
+        }
+      }
+    }
+
+    else if((sbuff = line.substr(0,17)) == "non_ring_pi_bonds"){ // RESTORE
+      sbuff = "";
+      for(int i=0; i<line.size(); i++){
+        curr_char = line_c[i]; // RESTORE
+        if(curr_char == ')'){
+          par_open = 0;
+          ring.push_back(atoi(sbuff.c_str()));
+          for(boi = 0; boi<nbnds; boi++){ // EU
+            if( (bonds[boi].i == ring[0]) && (bonds[boi].j == ring[1]) ||
+              (bonds[boi].i == ring[1]) && (bonds[boi].j == ring[0]) ){
+              bonds[boi].setAsRigid();
+              ring.clear();
+              sbuff = "";
+              break;
+            }
+          }
+        }
+        else if((curr_char == ',') && (par_open == 1)){
+          ring.push_back(atoi(sbuff.c_str()));
+          sbuff = "";
+        }
+        else if((curr_char >= '0') && (curr_char <='9')){
+          sbuff += curr_char;
+        }
+        else if(curr_char == '('){
+          par_open = 1;
+        }
+      }
+    }
+
+    else if((sbuff = line.substr(0,17)) == "rigid_bodies"){
+      // TODO
+    }
+
+  }
+
+  fclose(rfpo);
+
+}
+
 bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
         const char *filename,
         const char *filetype,
@@ -446,57 +751,33 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
       bAtomList[lno-1].Zero();
 
       // Create new unique name for atom
-      //elem = line_c[8]; // NO INTERFACE
-      //bAtomList[lno-1].elem = elem; // NO INTERFACE
       elem = line.at(8);
       bAtomList[lno-1].setElem(elem);
 
-      //sprintf(buff, "%c%d", elem, lno); // NO INTERFACE
-      //strncpy(bAtomList[lno-1].name, buff, 4); // NO INTERFACE
       str_buf = elem;
       str_buf += std::to_string(lno);
       bAtomList[lno-1].setName(str_buf);
 
-      //bAtomList[lno-1].number = lno; // NO INTERFACE
       bAtomList[lno-1].setNumber(lno);
 
-      //bZeroCharArray(buff, 80); // NO INTERFACE
-      //bSubstr(buff, line_c, 47,2); // NO INTERFACE
-      //sprintf(bAtomList[lno-1].fftype, "gaff_%s", buff); // NO INTERFACE
-      //if(bAtomList[lno-1].fftype[6] == ' '){bAtomList[lno-1].fftype[6] = '\0';} // NO INTERFACE
       str_buf = "gaff_";
       str_buf += line.substr(47, 2);
       //str_buf.erase(std::remove_if(str_buf.begin(), str_buf.end(), ::isspace), str_buf.end());
       boost::trim(str_buf);
       bAtomList[lno-1].setFftype(str_buf);
 
-      //bZeroCharArray(buff, 80); // NO INTERFACE
-      //bSubstr(buff, line_c, 67,9); // NO INTERFACE
-      //bAtomList[lno-1].charge = atof(buff); // NO INTERFACE
       str_buf = line.substr(67,9);
       bAtomList[lno-1].setCharge(std::stod(str_buf));
 
-      //bZeroCharArray(buff, 80); // NO INTERFACE
-      //bSubstr(buff, line_c, 8,4); // NO INTERFACE
-      //strncpy(bAtomList[lno-1].inName, buff, 4); // NO INTERFACE
       str_buf = line.substr(8, 4);
       bAtomList[lno-1].setInName(str_buf);
 
-      //bZeroCharArray(buff, 80); // NO INTERFACE
-      //bSubstr(buff, line_c, 17,9); // NO INTERFACE
-      //bAtomList[lno-1].x = atof(buff); // NO INTERFACE
       str_buf = line.substr(17,9);
       bAtomList[lno-1].setX(std::stod(str_buf));
 
-      //bZeroCharArray(buff, 80); // NO INTERFACE
-      //bSubstr(buff, line_c, 27,9); // NO INTERFACE
-      //bAtomList[lno-1].y = atof(buff); // NO INTERFACE
       str_buf = line.substr(27,9);
       bAtomList[lno-1].setY(std::stod(str_buf));
 
-      //bZeroCharArray(buff, 80); // NO INTERFACE
-      //bSubstr(buff, line_c, 37,9); // NO INTERFACE
-      //bAtomList[lno-1].z = atof(buff); // NO INTERFACE
       str_buf = line.substr(37,9);
       bAtomList[lno-1].setZ(std::stod(str_buf));
 
