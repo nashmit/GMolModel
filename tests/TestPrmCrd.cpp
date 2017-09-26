@@ -9,13 +9,13 @@
 #include "simmain.hpp"
 
 #include "HamiltonianMonteCarloSampler.hpp"
+#include "readAmberInput.hpp"
 
 int main(int argc, char **argv)
 {
     // Declare a shared memory pointer used by all the classes in the library
 
     TARGET_TYPE *shm;
-    TARGET_TYPE **coords; // convenient pointer to coordinates in shm
     int SHMSZ; // size
     int sweep;
 
@@ -75,6 +75,11 @@ int main(int argc, char **argv)
     mol2ifstream.close();
     std::cout<<"natoms read from mol2: "<<natoms<<std::endl;
 
+    // Read Amber prmtop and inpcrd
+
+    readAmberInput *amberReader = new readAmberInput();
+    amberReader->readAmberFiles(std::string("2but/ligand.inpcrd"), std::string("2but/ligand.prmtop"));
+
     // Read atom ordering from mol2
  
     int order[natoms+2]; // prmtop ORDER previously read from MMTK
@@ -127,6 +132,8 @@ int main(int argc, char **argv)
     );
 
 
+    //World *p_world = new World(); // ELIZA
+
     // Seed the random number generator 
 
     srand (time(NULL));
@@ -175,7 +182,7 @@ int main(int argc, char **argv)
     SimTK::Real **inivels;
     inivels = new SimTK::Real*[p_world->mr->natms]; // ELIZA
     for(int j=0; j<natoms; j++){inivels[j] = new SimTK::Real[3];}
-    SimTK::Real **indexMap;
+    //SimTK::Real **indexMap;
     indexMap = new SimTK::Real*[p_world->mr->natms]; // ELIZA
     for(int j=0; j<natoms; j++){indexMap[j] = new SimTK::Real[3];}
     SimTK::Real **grads;

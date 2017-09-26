@@ -2,8 +2,8 @@
 #define SIMMAIN_HPP
 //#include <boost/python/module.hpp>
 //#include <boost/python/def.hpp>
-#include <boost/python.hpp>
-using namespace boost::python;
+//#include <boost/python.hpp>
+//using namespace boost::python;
 
 #include <stdio.h>
 #include <stdlib.h>

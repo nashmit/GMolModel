@@ -209,7 +209,6 @@ World::World(
   string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
   TARGET_TYPE *shm
 ){
-  std::cout<<"hop 1"<<std::endl<<std::flush;
   passno = new int;
   vassno = new int;
   fassno = new int;
@@ -232,14 +231,12 @@ World::World(
   matter = new SimTK::SimbodyMatterSubsystem(*system);
   forces = new SimTK::GeneralForceSubsystem(*system);
   decorations = new SimTK::DecorationSubsystem(*system);
-
-  // LAUR
   SimTK::Visualizer viz(*system);
   system->addEventReporter( new SimTK::Visualizer::Reporter(viz, 0.0015));
-  // ====
-
   forceField = new SimTK::DuMMForceFieldSubsystem(*system);
   forceField->loadAmber99Parameters();
+  integ = new SimTK::VerletIntegrator(*system); // NEW
+  ts = new SimTK::TimeStepper(*system, *integ); // NEW
 
   mr = new bMoleculeReader(
     *forceField,
@@ -261,8 +258,8 @@ World::World(
     frcmodF.c_str()
   );
 
-  integ = new SimTK::VerletIntegrator(*system); // RESTORE
-  ts = new SimTK::TimeStepper(*system, *integ); // RESTORE
+  //integ = new SimTK::VerletIntegrator(*system); // RESTORE
+  //ts = new SimTK::TimeStepper(*system, *integ); // RESTORE
 
 }//end of constructor
 

@@ -52,11 +52,11 @@ include_directories( ${EIGEN3_INCLUDE_DIRS} )
 #and we only have numpy/oldnumeric.h
 #add_definitions(-DNUMPY=1)
 
-set(Python_ADDITIONAL_VERSIONS 2)
-FIND_PACKAGE(PythonInterp)
-FIND_PACKAGE(PythonLibs REQUIRED)
-include_directories( ${PYTHON_INCLUDE_DIRS} )
-link_directories( ${PYTHON_LIBRARIES} )
+#set(Python_ADDITIONAL_VERSIONS 2)
+#FIND_PACKAGE(PythonInterp)
+#FIND_PACKAGE(PythonLibs REQUIRED)
+#include_directories( ${PYTHON_INCLUDE_DIRS} )
+#link_directories( ${PYTHON_LIBRARIES} )
 
 #set(mmtk_include 
 #    "${PYTHON_INCLUDE_DIRS}/MMTK" 
@@ -119,6 +119,7 @@ set(LIBGMOLMODEL_SRC
 	Topology.cpp 
 	bMoleculeReader.cpp 
 	World.cpp
+        readAmberInput.cpp
 	bgeneral.cpp
 	)
 
@@ -155,7 +156,7 @@ TARGET_LINK_LIBRARIES( GMOLMODEL_test
                 ${Simbody_LIBRARIES}
                 SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
                 ${BOOST_LIBRARIES}
-                ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code..
+                #${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code..
 		${OpenMM_LIBRARIES}
                 m )
                 #${mmtk_libs} )
@@ -165,7 +166,7 @@ TARGET_LINK_LIBRARIES(GMOLMODEL_dynamic
 		${Simbody_LIBRARIES}
 		SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable 
 		${BOOST_LIBRARIES} 
-                ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code...
+                #${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code...
 		${OpenMM_LIBRARIES}
 		m )
 		#${mmtk_libs} )
@@ -173,7 +174,7 @@ TARGET_LINK_LIBRARIES(GMOLMODEL_static
 		${Simbody_LIBRARIES}
 		SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
 		${BOOST_LIBRARIES}
-                ${PYTHON_LIBRARIES}  # same as for dynamic lib... I don't think python shoud be part of this lib...
+                #${PYTHON_LIBRARIES}  # same as for dynamic lib... I don't think python shoud be part of this lib...
 		${OpenMM_LIBRARIES}
 		m )
                 #${mmtk_libs} )

@@ -45,13 +45,13 @@ MESSAGE("EIGEN3_INCLUDE_DIRS: ${EIGEN3_INCLUDE_DIRS}")
 #add_definitions(-DNUMPY=1)
 #MESSAGE("ADD DEFINITION: DNUMPY=1")
 
-set(Python_ADDITIONAL_VERSIONS 2)
-FIND_PACKAGE(PythonInterp)
-FIND_PACKAGE(PythonLibs REQUIRED)
-include_directories( ${PYTHON_INCLUDE_DIRS} )
-link_directories( ${PYTHON_LIBRARIES} )
-MESSAGE("PYTHON_INCLUDE_DIRS: ${PYTHON_INCLUDE_DIRS}")
-MESSAGE("PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
+#set(Python_ADDITIONAL_VERSIONS 2)
+#FIND_PACKAGE(PythonInterp)
+#FIND_PACKAGE(PythonLibs REQUIRED)
+#include_directories( ${PYTHON_INCLUDE_DIRS} )
+#link_directories( ${PYTHON_LIBRARIES} )
+#MESSAGE("PYTHON_INCLUDE_DIRS: ${PYTHON_INCLUDE_DIRS}")
+#MESSAGE("PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
 
 #set(mmtk_include 
 #    "${PYTHON_INCLUDE_DIRS}/MMTK" 
@@ -130,11 +130,11 @@ foreach(TEST_SRC ${TESTS_SRCS})
                 SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
                 ${Boost_LIBRARIES}
                 ${BOOST_LIBS_BYHAND}
-                ${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense...
+                #${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense...
                 libGMOLMODEL_dynamic.so
                 m )
 endforeach()
 
 MESSAGE("Simbody_LIBRARIES: ${Simbody_LIBRARIES}")
 MESSAGE("Boost_LIBRARIES: ${Boost_LIBRARIES}")
-MESSAGE("PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
+#MESSAGE("PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
