@@ -135,10 +135,10 @@ int main(int argc, char **argv)
 
     // Memory alloc for convinient arrays 
 
-    coords = new TARGET_TYPE*[p_world->mr->natms];
-    TARGET_TYPE **vels = new TARGET_TYPE*[p_world->mr->natms];
-    TARGET_TYPE **inivels = new TARGET_TYPE*[p_world->mr->natms];
-    TARGET_TYPE **grads = new TARGET_TYPE*[p_world->mr->natms];
+    coords = new TARGET_TYPE*[p_world->mr->natoms];
+    TARGET_TYPE **vels = new TARGET_TYPE*[p_world->mr->natoms];
+    TARGET_TYPE **inivels = new TARGET_TYPE*[p_world->mr->natoms];
+    TARGET_TYPE **grads = new TARGET_TYPE*[p_world->mr->natoms];
 
     // Seed the random number generator 
 
@@ -314,7 +314,7 @@ int main(int argc, char **argv)
 
     double **retConfsPois = new double* [ntrials];
     for(int r=0; r<ntrials; r++){
-        retConfsPois[r] = new double[3 * world->mr->natms]; // WATCHOUT
+        retConfsPois[r] = new double[3 * world->mr->natoms]; // WATCHOUT
     }
     double *retPotEsPoi = new double[ntrials];
     double *accs = new double;
@@ -327,7 +327,7 @@ int main(int argc, char **argv)
     world->sysRetPotEsPoi = retPotEsPoi;
     world->sysAccs = accs;
 
-    arrays_cut = 2 + 4*3*(world->mr->natms);
+    arrays_cut = 2 + 4*3*(world->mr->natoms);
     shm[arrays_cut + 0] = 0.0; // step (will be incremented in MidVV
     shm[arrays_cut + 1] = (TARGET_TYPE)(nosteps);
     shm[arrays_cut + 2] = temperature;

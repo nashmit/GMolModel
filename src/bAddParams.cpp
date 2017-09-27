@@ -61,6 +61,48 @@ bool Type2atomType(string Type, char *atomType, int ATOMTYPE_MAX_LEN){
 }
 
 void bAddGaffParams(
+    readAmberInput *amberReader,
+    SimTK::DuMMForceFieldSubsystem& dumm,
+    bSpecificAtom *bAtomList,
+    bBond *bonds
+
+)
+{
+    DuMM::AtomClassIndex aIx;
+    for(int i=0; i<amberReader->getNumberAtoms(); i++){
+        aIx = dumm.getNextUnusedAtomClassIndex();
+        bAtomList[i].setAtomClassIndex(aIx);
+        dumm.defineAtomClass(
+            aIx,
+	    (bAtomList[i].getFftype()).c_str(),
+            bAtomList[i].getAtomicNumber(), // int 	atomicNumber
+            bAtomList[i].getNBonds(),
+            bAtomList[i].getVdwRadius() / 10.0, // nm
+            bAtomList[i].getLJWellDepth() //Real 	vdwWellDepthInKJ 
+        );
+        
+    }
+
+    // Suppose or try to have the same order as the reader
+    for(int t=0; t<amberReader->getNumberBonds(); t++){
+        dumm.defineBondStretch(
+            (bAtomList[bonds[t].i]).getAtomClassIndex(), //(DuMM::AtomClassIndex)(Type2Ix["gaff_z"]),
+            (bAtomList[bonds[t].j]).getAtomClassIndex(),
+            amberReader->getBondsForceK(t),  //k1
+            amberReader->getBondsEqval(t)   //equil1
+        );
+
+    }
+
+    for(int i=0; i<amberReader->getNumberAngles(); i++){
+    }
+
+    for(int i=0; i<amberReader->getNumberDihedrals(); i++){
+    }
+}
+
+
+void bAddGaffParams(
     DuMMForceFieldSubsystem& dumm,
     const char *filename,
     int natms,

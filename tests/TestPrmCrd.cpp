@@ -176,19 +176,19 @@ int main(int argc, char **argv)
     // Aloc necessary memory for InitSimulation - temporary
 
     SimTK::Real **coords;
-    coords = new SimTK::Real*[p_world->mr->natms]; // ELIZA
+    coords = new SimTK::Real*[p_world->mr->natoms]; // ELIZA
     for(int j=0; j<natoms; j++){coords[j] = new SimTK::Real[3];}
     SimTK::Real **vels;
-    vels = new SimTK::Real*[p_world->mr->natms]; // ELIZA
+    vels = new SimTK::Real*[p_world->mr->natoms]; // ELIZA
     for(int j=0; j<natoms; j++){vels[j] = new SimTK::Real[3];}
     SimTK::Real **inivels;
-    inivels = new SimTK::Real*[p_world->mr->natms]; // ELIZA
+    inivels = new SimTK::Real*[p_world->mr->natoms]; // ELIZA
     for(int j=0; j<natoms; j++){inivels[j] = new SimTK::Real[3];}
     //SimTK::Real **indexMap;
-    indexMap = new SimTK::Real*[p_world->mr->natms]; // ELIZA
+    indexMap = new SimTK::Real*[p_world->mr->natoms]; // ELIZA
     for(int j=0; j<natoms; j++){indexMap[j] = new SimTK::Real[3];}
     SimTK::Real **grads;
-    grads = new SimTK::Real*[p_world->mr->natms]; // ELIZA
+    grads = new SimTK::Real*[p_world->mr->natoms]; // ELIZA
     for(int j=0; j<natoms; j++){grads[j] = new SimTK::Real[3];}
 
 
@@ -213,7 +213,7 @@ int main(int argc, char **argv)
 
     double **retConfsPois = new double* [ntrials];
     for(int r=0; r<ntrials; r++){
-        retConfsPois[r] = new double[3 * world->mr->natms]; // WATCHOUT
+        retConfsPois[r] = new double[3 * world->mr->natoms]; // WATCHOUT
     }
     double *retPotEsPoi = new double[ntrials];
     double *accs = new double;

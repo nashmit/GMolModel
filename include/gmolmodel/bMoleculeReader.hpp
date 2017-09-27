@@ -12,6 +12,8 @@
 
 #include "bgeneral.hpp"
 #include "Robo.hpp"
+#include "Simbody.h"
+#include "Molmodel.h"
 #include "readAmberInput.hpp"
 //#include "Molmodel.h"
 //#include "mol.h"
@@ -76,10 +78,15 @@ public:
     char inName[5];
     int number;
     char elem;
+    int atomicNumber;
+    SimTK::Real mass;
+    SimTK::Real vdwRadius;
+    SimTK::Real LJWellDepth; // Lennard-Jones well depth
     float x;
     float y;
     float z;
     char fftype[20];
+    SimTK::DuMM::AtomClassIndex atomClassIndex;
     char biotype[20];
     SimTK::Compound::SingleAtom *bAtomType;
     SimTK::Compound::AtomIndex atomIndex;
@@ -100,22 +107,33 @@ public:
   
     // Interface
   
-    int getNbonds(void);
+    int getNBonds(void);
     int getFreebonds(void);
     std::string getName(void);
     std::string getInName(void);
     int getNumber(void);
     char getElem(void);
+    SimTK::mdunits::Mass getMass(void);
+    void setMass(SimTK::Real);
     SimTK::Real getX(void);
     SimTK::Real getY(void);
     SimTK::Real getZ(void);
     std::string getFftype(void);
+    SimTK::DuMM::AtomClassIndex getAtomClassIndex(void);
+    void setAtomClassIndex(SimTK::DuMM::AtomClassIndex);
     std::string getBiotype(void);
     SimTK::Compound::SingleAtom * getBAtomType(void);
     SimTK::Compound::AtomIndex getCompoundAtomIndex(void);
     SimTK::Real getCharge(void);
     int getIsMobile(void);
     int getIsVisited(void);
+
+    int getAtomicNumber(void);
+    void setAtomicNumber(int);
+    SimTK::Real getVdwRadius(void);
+    void setVdwRadius(SimTK::Real);
+    SimTK::Real getLJWellDepth(void);
+    void setLJWellDepth(SimTK::Real);
 
     void setNbonds(int);
     void setFreebonds(int);
@@ -229,8 +247,8 @@ class bMoleculeReader{
   bSpecificAtom *bAtomList;
   //std::vector<bBond> bonds; // RESTORE
   bBond *bonds;
-  unsigned int natms;
-  unsigned int nbnds; // EU
+  unsigned int natoms;
+  unsigned int nbonds; // EU
   unsigned int MAX_LINE_LENGTH;
 
   bMoleculeReader(readAmberInput *amberReader, const char *);
