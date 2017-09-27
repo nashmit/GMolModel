@@ -1,6 +1,6 @@
 [submodule "molmodel_legacy"]
 	path = molmodel_legacy
-	url = http://nash_mit@mybioinformaticslab.xyz:7990/scm/rob/molmodel_legacy.git
+	url = http://mybioinformaticslab.xyz:7990/scm/rob/molmodel_legacy.git
 [submodule "openmm"]
 	path = openmm
-	url = ssh://git@mybioinformaticslab.xyz:7999/rob/openmm.git
+	url = http://mybioinformaticslab.xyz:7990/scm/rob/openmm.git
