@@ -21,6 +21,8 @@
 #include "Simbody.h"
 #include "Molmodel.h"
 
+#include "readAmberInput.hpp"
+
 #include <boost/timer.hpp>
 
 //#include "/home/lspirido/Installers/armadillo-6.400.3/include/armadillo.hpp"
@@ -214,6 +216,8 @@ class World{
   int massMatNumOpt;
   int metroFixmanOpt;
   double lj14sf; //-- MMTK default
+
+  World(readAmberInput *amberReader, std::string rbF);
   
   World(
     string mol2F, string rbF, string gaffF, string frcmodF,

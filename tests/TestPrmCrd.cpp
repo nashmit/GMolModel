@@ -79,6 +79,8 @@ int main(int argc, char **argv)
 
     readAmberInput *amberReader = new readAmberInput();
     amberReader->readAmberFiles(std::string("2but/ligand.inpcrd"), std::string("2but/ligand.prmtop"));
+    natoms = amberReader->getNumberAtoms();
+    std::cout << "natoms " << natoms << std::endl << std::flush;
 
     // Read atom ordering from mol2
  
@@ -124,15 +126,15 @@ int main(int argc, char **argv)
 
     // Build Gmolmodel simulation world
 
-    World *p_world = new World(
-        mol2FN, rbFN, gaffFN, frcmodFN,
-        ictd, 
-        PrmToAx_po, MMTkToPrm_po,
-        shm
-    );
+    //World *p_world = new World(
+    //    mol2FN, rbFN, gaffFN, frcmodFN,
+    //    ictd, 
+    //    PrmToAx_po, MMTkToPrm_po,
+    //    shm
+    //);
 
 
-    //World *p_world = new World(); // ELIZA
+    World *p_world = new World(amberReader, rbFN); // ELIZA
 
     // Seed the random number generator 
 

@@ -12,6 +12,7 @@
 
 #include "bgeneral.hpp"
 #include "Robo.hpp"
+#include "readAmberInput.hpp"
 //#include "Molmodel.h"
 //#include "mol.h"
 
@@ -231,6 +232,8 @@ class bMoleculeReader{
   unsigned int natms;
   unsigned int nbnds; // EU
   unsigned int MAX_LINE_LENGTH;
+
+  bMoleculeReader(readAmberInput *amberReader, const char *);
 
   bMoleculeReader(SimTK::DuMMForceFieldSubsystem& dumm,
           const char *filename,
