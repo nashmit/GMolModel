@@ -32,6 +32,18 @@ bool Type2atomType(string Type, char *atomType, int ATOMTYPE_MAX_LEN);
 //                           FUNCTION AddGaffParams
 //==============================================================================
 /**
+ * Add Parameters Function. It adds the parameters read from prmtop
+ * file to the DuMM force field.
+ **/
+void bAddGaffParams(
+    readAmberInput *amberReader,
+    SimTK::DuMMForceFieldSubsystem& dumm,
+    bSpecificAtom *bAtomList,
+    bBond *bonds
+
+);
+
+/**
  * Add gaff Parameters Function. It adds the parameters read from an Amber parameters
  * file to the DuMM force field.
  **/

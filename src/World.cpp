@@ -237,21 +237,12 @@ World::World(readAmberInput *amberReader, std::string rbF){
 
   mr = new bMoleculeReader(amberReader, rbF.c_str());
 
-
-  if (mr->bAtomList == NULL){
-    std::cout<<"After bMoleculeReader: NULL bAtomList"<<std::endl;
-    exit(1);
-  }
   bAddGaffParams(
+    amberReader,
     *forceField,
-    gaffF.c_str(),
-    mr->natms,
     mr->bAtomList,
-    mr->nbnds,
-    mr->bonds,
-    frcmodF.c_str()
+    mr->bonds
   );
-
 
 }
 
@@ -302,9 +293,9 @@ World::World(
   bAddGaffParams(
     *forceField,
     gaffF.c_str(),
-    mr->natms,
+    mr->natoms,
     mr->bAtomList,
-    mr->nbnds,
+    mr->nbonds,
     mr->bonds,
     frcmodF.c_str()
   );
@@ -361,9 +352,9 @@ void World::InitSimulation(
 
   lig1->init(
     *forceField,
-    mr->natms,
+    mr->natoms,
     mr->bAtomList,
-    mr->nbnds,
+    mr->nbonds,
     mr->bonds,
     coords,
     indexMap,

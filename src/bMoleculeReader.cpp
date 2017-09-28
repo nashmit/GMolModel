@@ -90,26 +90,47 @@ void bSpecificAtom::Print(void)
 
 
 // bSpecificAtom Interface
- 
-int bSpecificAtom::getNbonds(void){}
-int bSpecificAtom::getFreebonds(void){}
-std::string bSpecificAtom::getName(void){}
-std::string bSpecificAtom::getInName(void){}
-int bSpecificAtom::getNumber(void){}
-char bSpecificAtom::getElem(void){}
-SimTK::Real bSpecificAtom::getX(void){}
-SimTK::Real bSpecificAtom::getY(void){}
-SimTK::Real bSpecificAtom::getZ(void){}
-std::string bSpecificAtom::getFftype(void){}
-std::string bSpecificAtom::getBiotype(void){}
-SimTK::Compound::SingleAtom * bSpecificAtom::getBAtomType(void){}
-SimTK::Compound::AtomIndex bSpecificAtom::getCompoundAtomIndex(void){}
-SimTK::Real bSpecificAtom::getCharge(void){}
-int bSpecificAtom::getIsMobile(void){}
-int bSpecificAtom::getIsVisited(void){}
 
-void bSpecificAtom::setNbonds(int){}
-void bSpecificAtom::setFreebonds(int){}
+//  
+int bSpecificAtom::getNBonds(void){
+    return this->nbonds;
+}
+
+//
+int bSpecificAtom::getFreebonds(void)
+{
+    assert(!"Not implemented");
+}
+
+//
+std::string bSpecificAtom::getName(void){assert(!"Not implemented");}
+std::string bSpecificAtom::getInName(void){assert(!"Not implemented");}
+
+//
+int bSpecificAtom::getNumber(void)
+{
+    return this->number;
+}
+
+char bSpecificAtom::getElem(void){assert(!"Not implemented");}
+SimTK::Real bSpecificAtom::getX(void){assert(!"Not implemented");}
+SimTK::Real bSpecificAtom::getY(void){assert(!"Not implemented");}
+SimTK::Real bSpecificAtom::getZ(void){assert(!"Not implemented");}
+
+//
+std::string bSpecificAtom::getFftype(void)
+{
+    return this->fftype;
+}
+
+std::string bSpecificAtom::getBiotype(void){assert(!"Not implemented");}
+SimTK::Compound::SingleAtom * bSpecificAtom::getBAtomType(void){assert(!"Not implemented");}
+SimTK::Compound::AtomIndex bSpecificAtom::getCompoundAtomIndex(void){assert(!"Not implemented");}
+SimTK::Real bSpecificAtom::getCharge(void){assert(!"Not implemented");}
+int bSpecificAtom::getIsMobile(void){assert(!"Not implemented");}
+int bSpecificAtom::getIsVisited(void){assert(!"Not implemented");}
+void bSpecificAtom::setNbonds(int){assert(!"Not implemented");}
+void bSpecificAtom::setFreebonds(int){assert(!"Not implemented");}
 
 // Set atom unique name
 void bSpecificAtom::setName(std::string inpName){
@@ -147,23 +168,83 @@ void bSpecificAtom::setZ(SimTK::Real inpZ){
     this->z = inpZ;
 }
 
-//
+// Get atomic mass
+SimTK::mdunits::Mass bSpecificAtom::getMass(void)
+{
+    return this->mass;
+}
+
+// Set atomic mass
+void bSpecificAtom::setMass(SimTK::Real inpMass)
+{
+    this->mass = inpMass;
+}
+
+// Set force field atom type
 void bSpecificAtom::setFftype(std::string inpFftype){
     //strncpy(this->fftype, inpFftype.c_str(), 20);
     sprintf(this->fftype, "%s", inpFftype.c_str());
 }
 
-void bSpecificAtom::setBiotype(std::string){}
-void bSpecificAtom::setBAtomType(SimTK::Compound::SingleAtom *){}
-void bSpecificAtom::setCompoundAtomIndex(SimTK::Compound::AtomIndex){}
+void bSpecificAtom::setBiotype(std::string){assert(!"Not implemented");}
+void bSpecificAtom::setBAtomType(SimTK::Compound::SingleAtom *){assert(!"Not implemented");}
+void bSpecificAtom::setCompoundAtomIndex(SimTK::Compound::AtomIndex){assert(!"Not implemented");}
 
 // Set charge
 void bSpecificAtom::setCharge(SimTK::Real inpCharge){
     this->charge = inpCharge;
 }
 
-void bSpecificAtom::setIsMobile(int){}
-void bSpecificAtom::setIsVisited(int){}
+void bSpecificAtom::setIsMobile(int){assert(!"Not implemented");}
+void bSpecificAtom::setIsVisited(int){assert(!"Not implemented");}
+
+// Get the atom class index
+DuMM::AtomClassIndex bSpecificAtom::getAtomClassIndex(void)
+{
+    return this->atomClassIndex;
+}
+
+// Set the atom class index
+void bSpecificAtom::setAtomClassIndex(DuMM::AtomClassIndex inpAtomClassIndex)
+{
+    this->atomClassIndex = inpAtomClassIndex;
+}
+
+//
+int bSpecificAtom::getAtomicNumber(void)
+{
+    return this->atomicNumber;
+}
+
+//
+void bSpecificAtom::setAtomicNumber(int inpAtomicNumber)
+{
+    this->atomicNumber = inpAtomicNumber;
+}
+
+//
+void bSpecificAtom::setVdwRadius(SimTK::Real inpVdwRadius)
+{
+    this->vdwRadius = inpVdwRadius;
+}
+
+//
+SimTK::Real bSpecificAtom::getVdwRadius(void)
+{
+    return this->vdwRadius;
+}
+
+//
+void bSpecificAtom::setLJWellDepth(SimTK::Real inpLJWellDepth)
+{
+    this->LJWellDepth = inpLJWellDepth;
+}
+
+//
+SimTK::Real bSpecificAtom::getLJWellDepth(void)
+{
+    return this->LJWellDepth;
+}
 
 
 
@@ -362,45 +443,63 @@ std::string intriad::getString(void){
 /********************************/
 
 /****
- * bMoleculeReader
+ * bMoleculeReader PRMTOP
  ****/
 
 bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfilename)
 {
-    natms = 0;
+    natoms = 0;
     bBond buffij;
     char elem = 'x';
     int noDummies = 0; 
     std::string line;
     char line_c[1000];
-    natms = amberReader->getNumberAtoms();
+    natoms = amberReader->getNumberAtoms();
+    nbonds = amberReader->getNumberBonds();
 
-    bAtomList = new bSpecificAtom[natms]; /*Alloc - 1 for dummy*/
-
+    bAtomList = new bSpecificAtom[natoms]; /*Alloc - 1 for dummy*/
+    bonds = new bBond[nbonds];
     // Read atoms READER
 
-    for(int i = 0; i < natms; i++){
+    std::string str_buf;
+    SimTK::Real chargeMultiplier = 18.2223;
+    for(int i = 0; i < natoms; i++){
         bAtomList[i].Zero();
-        bAtomList[i].setElem( (amberReader->getAtomsName(i)).at(0) );
-        //bAtomList[i].setName(str_buf);
-        //bAtomList[i].setNumber(lno);
-        //bAtomList[i].setFftype(str_buf);
-        //bAtomList[i].setCharge(std::stod(str_buf));
-        //bAtomList[i].setInName(str_buf);
-        //bAtomList[i].setX(std::stod(str_buf));
-        //bAtomList[i].setY(std::stod(str_buf));
-        //bAtomList[i].setZ(std::stod(str_buf));
+
+        str_buf = amberReader->getAtomsName(i);
+        boost::trim(str_buf);
+        bAtomList[i].setElem(str_buf.at(0));
+        bAtomList[i].setName(str_buf);
+        bAtomList[i].setInName(str_buf);
+
+        bAtomList[i].setNumber(i);
+
+        str_buf = amberReader->getAtomsNameAlias(i);
+        boost::trim(str_buf);
+        bAtomList[i].setFftype(str_buf);
+
+        bAtomList[i].setCharge(amberReader->getAtomsCharge(i) / chargeMultiplier);
+        bAtomList[i].setX(amberReader->getAtomsXcoord(i));
+        bAtomList[i].setY(amberReader->getAtomsYcoord(i));
+        bAtomList[i].setZ(amberReader->getAtomsZcoord(i));
+        bAtomList[i].setMass(amberReader->getAtomsMass(i));
+
+        bAtomList[i].setVdwRadius(amberReader->getAtomsRVdW(i));
+        bAtomList[i].setLJWellDepth(amberReader->getAtomsEpsilon(i));
+
         bAtomList[i].Print();
     }
 
     /*READ BONDS*/
-    //bonds[i-1].i = buffij.i; // EU
-    //bonds[i-1].j = buffij.j; // EU
+    for(int i=0; i<nbonds; i++){
+        bonds[i].i = amberReader->getBondsAtomsIndex1(i);
+        bonds[i].j = amberReader->getBondsAtomsIndex2(i);
+    }
 
     /*Assign atoms nbonds and freebonds*/
-    for(int i=0; i<natms ; i++){
+    for(int i=0; i<natoms ; i++){
       bAtomList[i].nbonds = 0;
-      for(int j=0; j<nbnds; j++){ 
+      for(int j=0; j<nbonds; j++){ 
         if((bAtomList[i].number == bonds[j].i) ||\
            (bAtomList[i].number == bonds[j].j)){
           ++bAtomList[i].nbonds;
@@ -411,132 +510,130 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
 
 
     // Every *valentAtom is derived from SingleAtom in turn derived from Compound with one atom (AtomIndex 0)
-    for(int i=0; i<natms+noDummies; i++){
+    for(int i=0; i<natoms+noDummies; i++){
       if(bAtomList[i].nbonds == 1){
         if(toupper(bAtomList[i].elem) == 'H'){
           bAtomList[i].bAtomType = new
-            //UnivalentAtom(bAtomList[i].name, MMTKElement(1, "MMTKHydrogen", "MMTKH", 1.00797598)); // MMTK mass
-            //UnivalentAtom(bAtomList[i].name, MMTKElement::MMTKHydrogen()); // Molmodel Mass
-            UnivalentAtom(bAtomList[i].name, Element::Hydrogen()); // Molmodel Mass
+            UnivalentAtom(bAtomList[i].name, SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() )); // Prmtop mass
+          bAtomList[i].setAtomicNumber(1);
         }
-        else if(toupper(bAtomList[i].name[0]) == 'C'){
+        else if((toupper(bAtomList[i].name[0]) == 'C') && (toupper(bAtomList[i].name[0]) == 'L')){
           bAtomList[i].bAtomType = new
-            //UnivalentAtom(bAtomList[i].name, Element(17, "Chlorine", "Cl", 35.45));
-            UnivalentAtom(bAtomList[i].name, Element::Chlorine());
+            UnivalentAtom(bAtomList[i].name, Element(17, "Chlorine", "Cl", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(17);
         }
         else if(toupper(bAtomList[i].name[0]) == 'O'){
           bAtomList[i].bAtomType = new
-            //UnivalentAtom(bAtomList[i].name, Element(8, "Oxygen", "O", 16.00));
-            UnivalentAtom(bAtomList[i].name, Element::Oxygen());
+            UnivalentAtom(bAtomList[i].name, Element(8, "Oxygen", "O", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(8);
         }
         else if(toupper(bAtomList[i].name[0]) == 'F'){
           bAtomList[i].bAtomType = new
-            //UnivalentAtom(bAtomList[i].name, Element(9, "Fluorine", "F", 19.00));
-            UnivalentAtom(bAtomList[i].name, Element::Fluorine());
+            UnivalentAtom(bAtomList[i].name, Element(9, "Fluorine", "F", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(9);
         }
-        else if(toupper(bAtomList[i].name[0]) == 'B'){
+        else if((toupper(bAtomList[i].name[0]) == 'B') && (toupper(bAtomList[i].name[0]) == 'R')){
           bAtomList[i].bAtomType = new
-            //UnivalentAtom(bAtomList[i].name, Element(35, "Bromine", "Br", 79.90));
-            UnivalentAtom(bAtomList[i].name, Element::Bromine());
+            UnivalentAtom(bAtomList[i].name, Element(35, "Bromine", "Br", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(35);
         }
         else if(toupper(bAtomList[i].name[0]) == 'I'){
           bAtomList[i].bAtomType = new
-            //UnivalentAtom(bAtomList[i].name, Element(53, "Iodine", "I", 126.9));
-            UnivalentAtom(bAtomList[i].name, Element::Iodine());
+            UnivalentAtom(bAtomList[i].name, Element(53, "Iodine", "I", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(53);
         }
         else if(toupper(bAtomList[i].name[0]) == 'N'){
           bAtomList[i].bAtomType = new
-            //UnivalentAtom(bAtomList[i].name, Element(7, "Nitrogen", "N", 14.01));
-            UnivalentAtom(bAtomList[i].name, Element::Nitrogen());
+            UnivalentAtom(bAtomList[i].name, Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(7);
         }
-        bAtomList[i].bAtomType->setDefaultInboardBondLength(0.1112);
+        bAtomList[i].bAtomType->setDefaultInboardBondLength(0.1112); // Just for initial construction
       }
       else if (bAtomList[i].nbonds == 2){
         if(toupper(bAtomList[i].elem) == 'H'){
           bAtomList[i].bAtomType = new
-            //BivalentAtom(bAtomList[i].name, Element(1, "MMTKHydrogen", "MMTKH", 1.00797598)); // MMTK mass
-            //BivalentAtom(bAtomList[i].name, MMTKElement::MMTKHydrogen()); // Molmodel Mass
-            BivalentAtom(bAtomList[i].name, Element::Hydrogen());
+            BivalentAtom(bAtomList[i].name, Element(1, "Hydrogen", "H", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(1);
         }
         else if(toupper(bAtomList[i].elem) == 'C'){
           bAtomList[i].bAtomType = new
-            //BivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", 12.01));
-            BivalentAtom(bAtomList[i].name,  Element::Carbon());
+            BivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(6);
         }
         else if(toupper(bAtomList[i].elem) == 'O'){
           bAtomList[i].bAtomType = new
-            //BivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", 16.00),
-            BivalentAtom(bAtomList[i].name,  Element::Oxygen(),
+            BivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()),
             109.47*Deg2Rad);
+          bAtomList[i].setAtomicNumber(8);
         }
         else if(toupper(bAtomList[i].elem) == 'N'){
           bAtomList[i].bAtomType = new
-            //BivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", 14.01));
-            BivalentAtom(bAtomList[i].name,  Element::Nitrogen());
+            BivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(7);
         }
         else if(toupper(bAtomList[i].elem) == 'S'){
           bAtomList[i].bAtomType = new
-            //BivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", 32.06),
-            BivalentAtom(bAtomList[i].name,  Element::Sulfur(),
+            BivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()),
             109.47*Deg2Rad);
+          bAtomList[i].setAtomicNumber(16);
         }
         bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
       }
       else if (bAtomList[i].nbonds == 3){
         if(toupper(bAtomList[i].elem) == 'C'){
           bAtomList[i].bAtomType = new
-            //TrivalentAtom(bAtomList[i].name, Element(6, "Carbon", "C", 12.01),
-            TrivalentAtom(bAtomList[i].name, Element::Carbon(),
+            TrivalentAtom(bAtomList[i].name, Element(6, "Carbon", "C", bAtomList[i].getMass()),
               120*Deg2Rad, 120*Deg2Rad
             );
+          bAtomList[i].setAtomicNumber(6);
         }
         else if(toupper(bAtomList[i].elem) == 'O'){
           bAtomList[i].bAtomType = new
-            //TrivalentAtomTetra(bAtomList[i].name,  Element(8, "Oxygen", "O", 16.00));
-            TrivalentAtomTetra(bAtomList[i].name,  Element::Oxygen());
+            TrivalentAtomTetra(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(8);
         }
         else if(toupper(bAtomList[i].elem) == 'N'){
           bAtomList[i].bAtomType = new
-            //TrivalentAtomTetra(bAtomList[i].name,  Element(7, "Nitrogen", "N", 14.01));
-            TrivalentAtomTetra(bAtomList[i].name,  Element::Nitrogen());
+            TrivalentAtomTetra(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(7);
         }
         else if(toupper(bAtomList[i].elem) == 'S'){
           bAtomList[i].bAtomType = new
-            //TrivalentAtomTetra(bAtomList[i].name,  Element(16, "Sulfur", "S", 32.06));
-            TrivalentAtomTetra(bAtomList[i].name,  Element::Sulfur());
+            TrivalentAtomTetra(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(16);
         }
         else if(toupper(bAtomList[i].elem) == 'P'){
           bAtomList[i].bAtomType = new
-            //TrivalentAtomTetra(bAtomList[i].name,  Element(15, "Phosphorus", "P", 30.97));
-            TrivalentAtomTetra(bAtomList[i].name,  Element::Phosphorus());
+            TrivalentAtomTetra(bAtomList[i].name,  Element(15, "Phosphorus", "P", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(15);
         }
         bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
       }
       else if (bAtomList[i].nbonds == 4){
         if(toupper(bAtomList[i].elem) == 'C'){
           bAtomList[i].bAtomType = new
-            //QuadrivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", 12.01103690)); // MMTK mass
-            QuadrivalentAtom(bAtomList[i].name,  Element::Carbon()); // Molmodel mass
+            QuadrivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(6);
         }
         else if(toupper(bAtomList[i].elem) == 'O'){
           bAtomList[i].bAtomType = new
-            //QuadrivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", 16.00));
-            QuadrivalentAtom(bAtomList[i].name,  Element::Oxygen());
+            QuadrivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(8);
         }
         else if(toupper(bAtomList[i].elem) == 'N'){
           bAtomList[i].bAtomType = new
-            //QuadrivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", 14.01));
-            QuadrivalentAtom(bAtomList[i].name,  Element::Nitrogen());
+            QuadrivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(7);
         }
         else if(toupper(bAtomList[i].elem) == 'S'){
           bAtomList[i].bAtomType = new
-            //QuadrivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", 32.06));
-            QuadrivalentAtom(bAtomList[i].name,  Element::Sulfur());
+            QuadrivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(16);
         }
         else if(toupper(bAtomList[i].elem) == 'P'){
           bAtomList[i].bAtomType = new
-            //QuadrivalentAtom(bAtomList[i].name,  Element(15, "Phosphorus", "P", 30.97));
-            QuadrivalentAtom(bAtomList[i].name,  Element::Phosphorus());
+            QuadrivalentAtom(bAtomList[i].name,  Element(15, "Phosphorus", "P", bAtomList[i].getMass()));
+          bAtomList[i].setAtomicNumber(15);
         }
         bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
       }
@@ -556,14 +653,14 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
     
   /* Just checking *////////
   std::cout<<"Just checking\n";
-  for(int i=0; i<natms;i++){
+  for(int i=0; i<natoms;i++){
     printf(" -- name(%s) inName(%s) number(%d) elem(%c) fftype(%s) biotype(%s) charge(%f)\n", 
       bAtomList[i].name, bAtomList[i].inName, bAtomList[i].number, 
       bAtomList[i].elem, bAtomList[i].fftype,
       bAtomList[i].biotype, bAtomList[i].charge);
     fflush(stdout);
   }
-  for(int i=0; i<nbnds; i++){ // EU
+  for(int i=0; i<nbonds; i++){ // EU
     std::cout<<"bond: "<<bonds[i].i<<" "<<bonds[i].j<<std::endl;
     fflush(stdout);
   }
@@ -599,7 +696,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
           ring.push_back(atoi(sbuff.c_str()));
           sbuff = "";
           bond_found = 0;
-          for(boi=0; boi<nbnds; boi++){ // EU
+          for(boi=0; boi<nbonds; boi++){ // EU
             for(unsigned int ri=0; ri<ring.size(); ri++){
               for(unsigned int rj=0; (rj<ring.size()) && (rj<ri); rj++){
                 if( ((ring[ri] == bonds[boi].i) && (ring[rj] == bonds[boi].j)) ||
@@ -636,7 +733,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         if(curr_char == ')'){
           par_open = 0;
           ring.push_back(atoi(sbuff.c_str()));
-          for(boi = 0; boi<nbnds; boi++){ // EU
+          for(boi = 0; boi<nbonds; boi++){ // EU
             if( (bonds[boi].i == ring[0]) && (bonds[boi].j == ring[1]) ||
               (bonds[boi].i == ring[1]) && (bonds[boi].j == ring[0]) ){
               bonds[boi].setAsRigid();
@@ -684,7 +781,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
   char *buff = new char[80];
   //bZeroCharArray(buff, 80);
   bZeroCharArray(buff, 80);
-  natms = 0;
+  natoms = 0;
   //int nbonds = 0;
   bBond buffij;
   unsigned int i = 0;
@@ -704,7 +801,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
   /*+++++++++ MOL2 type ++++++++++*/
   else if(strstr(filetype, "mol2")){
     bZeroCharArray(buff, 80); // EU
-    natms = 0;
+    natoms = 0;
     i = 0; j = 0;
     char elem = 'x';
     unsigned int lno = 0;
@@ -715,12 +812,12 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
       ++lno;
       if(lno == 3){
         bSubstr(buff, line_c, 0, 5);
-        natms = atoi(buff);
+        natoms = atoi(buff);
         bZeroCharArray(buff, 80);
 
         bSubstr(buff, line_c, 6, 6); // EU
-        nbnds = atoi(buff); // EU
-        bonds = new bBond[nbnds];
+        nbonds = atoi(buff); // EU
+        bonds = new bBond[nbonds];
         bZeroCharArray(buff, 80); // EU
 
         break;
@@ -729,7 +826,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     }
     bZeroCharArray(line_c, MAX_LINE_LENGTH);
 
-    bAtomList = new bSpecificAtom[natms + noDummies]; /*Alloc - 1 for dummy*/
+    bAtomList = new bSpecificAtom[natoms + noDummies]; /*Alloc - 1 for dummy*/
 
     /*Jump to the atom section*/
     while(fgets(line_c, MAX_LINE_LENGTH, fpo)){
@@ -742,7 +839,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
 
     /*Read position, element, fftype and charge*/
     lno = 0;
-    while(fgets(line_c, MAX_LINE_LENGTH, fpo) && (lno < natms)){ 
+    while(fgets(line_c, MAX_LINE_LENGTH, fpo) && (lno < natoms)){ 
       ++lno;
       if(line_c != NULL){
         std::cout<<"bMoleculeReader::bMoleculeReader() line_c "<<strlen(line_c)<<" chars"<<std::endl<<std::flush;
@@ -791,8 +888,8 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     //fgets(line_c, MAX_LINE_LENGTH, fpo); // RESTORE
     lno = 0;
     //do{ // RESTORE
-    std::cout<<"bMoleculeReader hop nbnds "<<nbnds<<std::endl<<std::flush;
-    while(fgets(line_c, MAX_LINE_LENGTH, fpo) && (lno < nbnds)){ // EU 
+    std::cout<<"bMoleculeReader hop nbonds "<<nbonds<<std::endl<<std::flush;
+    while(fgets(line_c, MAX_LINE_LENGTH, fpo) && (lno < nbonds)){ // EU 
       #ifdef DEBUG_LEVEL02
       std::cout<<"bMoleculeReader::bMoleculeReader() bond line= "<<line_c<<std::flush;
       #endif
@@ -815,10 +912,10 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
 
     
     /*Assign atoms nbonds and freebonds*/
-    for(i=0; i<natms;i++){
+    for(i=0; i<natoms;i++){
       bAtomList[i].nbonds = 0;
       //for(j=0; j<bonds.size(); j++){ // RESTORE
-      for(j=0; j<nbnds; j++){ // EU
+      for(j=0; j<nbonds; j++){ // EU
         if((bAtomList[i].number == bonds[j].i) ||\
            (bAtomList[i].number == bonds[j].j)){
           ++bAtomList[i].nbonds;
@@ -834,7 +931,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
 
     /*TODO Develop TrivalentAtomTetra for adding custom angles*/
     // Every *valentAtom is derived from SingleAtom in turn derived from Compound with one atom (AtomIndex 0)
-    for(i=0; i<natms+noDummies; i++){
+    for(i=0; i<natoms+noDummies; i++){
       #ifdef DEBUG_LEVEL02
       //std::cout<<"bMoleculeReader::bMoleculeReader 3"<<std::endl<<std::flush;
       #endif
@@ -992,7 +1089,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
   /* Just checking *////////
   #ifdef DEBUG_LEVEL02
   std::cout<<"Just checking\n";
-  for(i=0; i<natms;i++){
+  for(i=0; i<natoms;i++){
     printf(" -- name(%s) inName(%s) number(%d) elem(%c) fftype(%s) biotype(%s) charge(%f)\n", 
       bAtomList[i].name, bAtomList[i].inName, bAtomList[i].number, 
       bAtomList[i].elem, bAtomList[i].fftype,
@@ -1000,7 +1097,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     fflush(stdout);
   }
   //for(i=0; i<bonds.size(); i++){ // RESTORE
-  for(i=0; i<nbnds; i++){ // EU
+  for(i=0; i<nbonds; i++){ // EU
     std::cout<<"bond: "<<bonds[i].i<<" "<<bonds[i].j<<std::endl;
     fflush(stdout);
   }
@@ -1062,7 +1159,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
           sbuff = "";
           bond_found = 0;
           //for(boi=0; boi<bonds.size(); boi++){ // RESTORE
-          for(boi=0; boi<nbnds; boi++){ // EU
+          for(boi=0; boi<nbonds; boi++){ // EU
             for(unsigned int ri=0; ri<ring.size(); ri++){
               for(unsigned int rj=0; (rj<ring.size()) && (rj<ri); rj++){
                 if( ((ring[ri] == bonds[boi].i) && (ring[rj] == bonds[boi].j)) ||
@@ -1113,7 +1210,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
           ring.push_back(atoi(sbuff.c_str()));
           // Set the bond as rigid
           //for(boi = 0; boi<bonds.size(); boi++){ // RESTORE
-          for(boi = 0; boi<nbnds; boi++){ // EU
+          for(boi = 0; boi<nbonds; boi++){ // EU
             if( (bonds[boi].i == ring[0]) && (bonds[boi].j == ring[1]) ||
               (bonds[boi].i == ring[1]) && (bonds[boi].j == ring[0]) ){
               bonds[boi].setAsRigid();
