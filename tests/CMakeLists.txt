@@ -119,6 +119,7 @@ set(TESTS_SRCS
         TestHamiltonianMonteCarlo.cpp
         TestOpenMMBasic.cpp
         TestPrmCrd.cpp
+	TestPDBReaderMolModel.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})
