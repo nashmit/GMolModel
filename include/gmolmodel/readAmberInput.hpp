@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-
+#include <utility>
 
 class readAmberInput{
 
@@ -75,6 +75,13 @@ class readAmberInput{
       int getDihedralsAtomsIndex2(int dih);
       int getDihedralsAtomsIndex3(int dih);
       int getDihedralsAtomsIndex4(int dih);
+      
+      //HOREA
+      int getDihedralsAtomsIndex(int dihIndex, int atomIndx);
+      void GeneratePairStartAndLen();
+ 
+      std::vector < std::pair<int, int> > getPairStartAndLen();
+
       TARGET_TYPE getDihedralsForceK(int dih);  // kcal / mol^-1 rad^-2
       TARGET_TYPE getDihedralsEqval(int dih); // rad
       TARGET_TYPE getDihedralsPeriod(int dih);
@@ -134,6 +141,7 @@ class readAmberInput{
 
     // DIHEDRALS
     std::vector <std::vector <int> > DihedralsAtomsIndex;
+    std::vector < std::pair<int, int> > PairStartAndLen;
     // Edih = k * cos (n*phi + psi)
     std::vector<TARGET_TYPE> DihedralsForceK;
     std::vector<TARGET_TYPE> DihedralsEqval;

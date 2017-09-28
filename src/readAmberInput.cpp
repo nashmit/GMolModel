@@ -1,4 +1,5 @@
 #include "readAmberInput.hpp"
+#include <assert.h>
 
 int readAmberInput::AtomNameSize = 4;
 TARGET_TYPE readAmberInput::chargemMultiplier = 18.2223;
@@ -90,7 +91,7 @@ catch(std::exception e){
   std::cout << e.what() << '\n';
 }
 
-
+	GeneratePairStartAndLen();
 }
 
 void readAmberInput::readInpcrd(){
@@ -485,6 +486,42 @@ int readAmberInput::getDihedralsAtomsIndex3(int dihedral){
 int readAmberInput::getDihedralsAtomsIndex4(int dihedral){
   return DihedralsAtomsIndex[dihedral][3];
 }
+
+int readAmberInput::getDihedralsAtomsIndex(int dihIndex, int atomIndx)
+{
+	assert( atomIndx > 0 && atomIndx < 4 );
+	return DihedralsAtomsIndex[ dihIndex ][ atomIndx ];
+}
+
+//HOREA
+void readAmberInput::GeneratePairStartAndLen()
+{
+	std::vector<int> currentDihedralIndices = DihedralsAtomsIndex[0];
+	
+	PairStartAndLen.push_back( std::make_pair(0,1) );
+
+	for(int idx = 1 ; idx < DihedralsAtomsIndex.size() ; idx++ )
+	{
+		if( currentDihedralIndices[0] == DihedralsAtomsIndex[i][0] &&
+		    currentDihedralIndices[1] == DihedralsAtomsIndex[i][1] &&
+		    currentDihedralIndices[2] == DihedralsAtomsIndex[i][2] &&
+		    currentDihedralIndices[3] == DihedralsAtomsIndex[i][3] )
+		{
+			PairStartAndLen[ PairStartAndLen.size() -1 ].second ++;
+		}
+		else {
+			int nextIndx = PairStartAndLen.back().first;
+			PairStartAndLen.push_back( std::make_pair( nextIndx + 1, 1) );
+		}
+	}
+}
+
+std::vector < std::pair<int, int> > readAmberInput::getPairStartAndLen()
+{
+	return PairStartAndLen;
+}
+
+
 TARGET_TYPE readAmberInput::getDihedralsForceK(int dihedral){
   return DihedralsForceK[dihedral];
 }
