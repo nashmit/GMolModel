@@ -16,7 +16,8 @@ void bAddGaffParams(
         bAtomList[i].setAtomClassIndex(aIx);
         dumm.defineAtomClass_KA(
             aIx,
-	    ( std::string("prmtop_") + bAtomList[i].getFftype() + std::to_string(bAtomList[i].getNumber()) ).c_str(),
+	    ( std::string("prmtop") + bAtomList[i].getFftype() 
+                + std::string("_") + std::to_string(bAtomList[i].getNumber()) ).c_str(),
             bAtomList[i].getAtomicNumber(), // int atomicNumber
             bAtomList[i].getNBonds(),
             bAtomList[i].getVdwRadius() / 10.0, // nm
@@ -46,9 +47,58 @@ void bAddGaffParams(
       );
     }
 
+
+    std::vector<std::pair<int, int>> pairStartAndLens = amberReader->getPairStartAndLen(); 
+
+    for(int index=0; index<pairStartAndLens.size(); index++){
+
+        int first    = pairStartAndLens[index].first;
+        int numberOf = pairStartAndLens[index].second;
+
+        for(int t=first; t<(first+numberOf); t++){
+            if(numberOf == 1){
+                dumm.defineBondTorsion_KA(
+                    bAtomList[amberReader->getDihedralsAtomsIndex1(t)].getAtomClassIndex(),
+                    bAtomList[amberReader->getDihedralsAtomsIndex2(t)].getAtomClassIndex(),
+                    bAtomList[amberReader->getDihedralsAtomsIndex3(t)].getAtomClassIndex(),
+                    bAtomList[amberReader->getDihedralsAtomsIndex4(t)].getAtomClassIndex(),
+                    amberReader->getDihedralsPeriod(t),   amberReader->getDihedralsForceK(t),   
+                    ANG_360_TO_180(SimTK_RADIAN_TO_DEGREE * amberReader->getDihedralsPhase(t))
+                );
+            }
+            else if(numberOf == 2){
+                dumm.defineBondTorsion_KA(
+                    bAtomList[amberReader->getDihedralsAtomsIndex1(t)].getAtomClassIndex(),
+                    bAtomList[amberReader->getDihedralsAtomsIndex2(t)].getAtomClassIndex(),
+                    bAtomList[amberReader->getDihedralsAtomsIndex3(t)].getAtomClassIndex(),
+                    bAtomList[amberReader->getDihedralsAtomsIndex4(t)].getAtomClassIndex(),
+                    amberReader->getDihedralsPeriod(t),   amberReader->getDihedralsForceK(t), 
+                    ANG_360_TO_180(SimTK_RADIAN_TO_DEGREE * amberReader->getDihedralsPhase(t)),
+                    amberReader->getDihedralsPeriod(t+1), amberReader->getDihedralsForceK(t+1), 
+                    ANG_360_TO_180(SimTK_RADIAN_TO_DEGREE * amberReader->getDihedralsPhase(t+1))
+                );
+            }
+            else if(numberOf == 3){
+                dumm.defineBondTorsion_KA(
+                    bAtomList[amberReader->getDihedralsAtomsIndex1(t)].getAtomClassIndex(),
+                    bAtomList[amberReader->getDihedralsAtomsIndex2(t)].getAtomClassIndex(),
+                    bAtomList[amberReader->getDihedralsAtomsIndex3(t)].getAtomClassIndex(),
+                    bAtomList[amberReader->getDihedralsAtomsIndex4(t)].getAtomClassIndex(),
+                    amberReader->getDihedralsPeriod(t),   amberReader->getDihedralsForceK(t),
+                    ANG_360_TO_180(SimTK_RADIAN_TO_DEGREE * amberReader->getDihedralsPhase(t)),
+                    amberReader->getDihedralsPeriod(t+1), amberReader->getDihedralsForceK(t+1),
+                    ANG_360_TO_180(SimTK_RADIAN_TO_DEGREE * amberReader->getDihedralsPhase(t+1)),
+                    amberReader->getDihedralsPeriod(t+2), amberReader->getDihedralsForceK(t+2),
+                    ANG_360_TO_180(SimTK_RADIAN_TO_DEGREE * amberReader->getDihedralsPhase(t+2))
+                );
+            }
+        }
+    }
+
+    /*
     for(int t=0; t<amberReader->getNumberDihedrals(); t++){
-        int periodicity = amberReader->getDihedralsPeriod(t);
-        if(periodicity == 1){
+        int noDihTerms = amberReader->getDihedralsPeriod(t);
+        if(noDihTerms == 1){
           dumm.defineBondTorsion_KA(
             bAtomList[amberReader->getDihedralsAtomsIndex1(t)].getAtomClassIndex(),
             bAtomList[amberReader->getDihedralsAtomsIndex2(t)].getAtomClassIndex(),
@@ -57,7 +107,7 @@ void bAddGaffParams(
             1, amberReader->getDihedralsForceK(t), amberReader->getDihedralsPhase(t)
             );
         }
-        else if(periodicity == 2){
+        else if(noDihTerms == 2){
           dumm.defineBondTorsion_KA(
             bAtomList[amberReader->getDihedralsAtomsIndex1(t)].getAtomClassIndex(),
             bAtomList[amberReader->getDihedralsAtomsIndex2(t)].getAtomClassIndex(),
@@ -67,7 +117,7 @@ void bAddGaffParams(
             2, 1.0, 1.0
             );
         }
-        else if(periodicity == 3){
+        else if(noDihTerms == 3){
           dumm.defineBondTorsion_KA(
             bAtomList[amberReader->getDihedralsAtomsIndex1(t)].getAtomClassIndex(),
             bAtomList[amberReader->getDihedralsAtomsIndex2(t)].getAtomClassIndex(),
@@ -80,6 +130,7 @@ void bAddGaffParams(
 
         }
     }
+    */
     std::cout << "Read Amber parameters from prmtop done." <<std::endl;
 }
 

@@ -42,7 +42,7 @@ using namespace std;
 //#endif
 
 #ifndef ANG_360_TO_180
-#define ANG_360_TO_180(x) (((x)>180) ? (180-(x)) : (x))
+#define ANG_360_TO_180(x) (((x)>180) ? ((x)-360) : (x))
 #endif
 
 // Check versus Velocity Verlet in cart coords

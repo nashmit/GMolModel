@@ -40,10 +40,14 @@ int main(int argc, char **argv)
 
     // Set input filenames
  
-    std::string mol2FN = "2but/ligand.mol2";
-    std::string rbFN = "2but/ligand.rb";
+    //std::string mol2FN = "2but/ligand.mol2";
+    //std::string rbFN = "2but/ligand.rb";
+    //std::string gaffFN = "gaff.dat";
+    //std::string frcmodFN = "2but/ligand.frcmod";
+    std::string mol2FN = "pani/ligand.mol2";
+    std::string rbFN = "pani/ligand.rb";
     std::string gaffFN = "gaff.dat";
-    std::string frcmodFN = "2but/ligand.frcmod";
+    std::string frcmodFN = "pani/ligand.frcmod";
 
     // Simulation type:
     // IC: Internal Coordinates Dynamics
@@ -78,7 +82,7 @@ int main(int argc, char **argv)
     // Read Amber prmtop and inpcrd
 
     readAmberInput *amberReader = new readAmberInput();
-    amberReader->readAmberFiles(std::string("2but/ligand.inpcrd"), std::string("2but/ligand.prmtop"));
+    amberReader->readAmberFiles(std::string("pani/ligand.inpcrd"), std::string("pani/ligand.prmtop"));
     natoms = amberReader->getNumberAtoms();
     std::cout << "natoms " << natoms << std::endl << std::flush;
 
