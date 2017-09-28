@@ -105,7 +105,13 @@ int bSpecificAtom::getFreebonds(void)
 //
 std::string bSpecificAtom::getName(void){assert(!"Not implemented");}
 std::string bSpecificAtom::getInName(void){assert(!"Not implemented");}
-int bSpecificAtom::getNumber(void){assert(!"Not implemented");}
+
+//
+int bSpecificAtom::getNumber(void)
+{
+    return this->number;
+}
+
 char bSpecificAtom::getElem(void){assert(!"Not implemented");}
 SimTK::Real bSpecificAtom::getX(void){assert(!"Not implemented");}
 SimTK::Real bSpecificAtom::getY(void){assert(!"Not implemented");}
@@ -478,7 +484,8 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         bAtomList[i].setZ(amberReader->getAtomsZcoord(i));
         bAtomList[i].setMass(amberReader->getAtomsMass(i));
 
-        bAtomList[i].setVdwRadius(amberReader->getAtomsRadii(i));
+        bAtomList[i].setVdwRadius(amberReader->getAtomsRVdW(i));
+        bAtomList[i].setLJWellDepth(amberReader->getAtomsEpsilon(i));
 
         bAtomList[i].Print();
     }

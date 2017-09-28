@@ -244,17 +244,6 @@ World::World(readAmberInput *amberReader, std::string rbF){
     mr->bonds
   );
 
-  bAddGaffParams(
-    *forceField,
-    gaffF.c_str(),
-    mr->natoms,
-    mr->bAtomList,
-    mr->nbonds,
-    mr->bonds,
-    frcmodF.c_str()
-  );
-
-
 }
 
 World::World(
