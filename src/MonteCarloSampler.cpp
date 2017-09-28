@@ -11,7 +11,8 @@ Implementation of MonteCarloSampler class. **/
 
 MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
                                      SimTK::SimbodyMatterSubsystem *argMatter,
-                                     Topology *argResidue,
+                                     //Topology *argResidue,
+                                     SimTK::Compound *argResidue,
                                      SimTK::TimeStepper *argTimeStepper)
     : Sampler(argCompoundSystem, argMatter, argResidue, argTimeStepper)
 {

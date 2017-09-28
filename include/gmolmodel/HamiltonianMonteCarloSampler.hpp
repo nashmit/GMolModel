@@ -13,12 +13,13 @@ public:
 
     HamiltonianMonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
                                  SimTK::SimbodyMatterSubsystem *argMatter,
-                                 Topology *argResidue,
+                                 //Topology *argResidue,
+                                 SimTK::Compound *argResidue,
                                  SimTK::TimeStepper *argTimeStepper);
 
     // Destructor
 
-    ~HamiltonianMonteCarloSampler();
+    virtual ~HamiltonianMonteCarloSampler();
 
     // Assign a random conformation. Time measured in picoseconds
 

@@ -46,7 +46,7 @@ public:
   // Constructor
   Topology();
   // Destructor
-  ~Topology();
+  virtual ~Topology();
 
   // In case we already know the graph and order
   void init(

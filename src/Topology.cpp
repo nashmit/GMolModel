@@ -99,7 +99,7 @@ void Topology::init(
       *    BUILD THIS CLASS' MOLECULE TOPOLOGY
       * ========================================*/
 
-    setDuMMScaleFactor(dumm, 0.0);
+    //setDuMMScaleFactor(dumm, 0.0);
 
     this->setCompoundName("Topology");
 

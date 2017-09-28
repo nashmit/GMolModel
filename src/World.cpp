@@ -327,11 +327,14 @@ void World::InitSimulation(
     , this
   ));
 
+
   #ifdef TRY_TO_USE_OPENMM
     forceField->setUseOpenMMAcceleration(true);
   #endif
   forceField->setTracing(true); // log OpenMM info to console
   forceField->setNumThreadsRequested(1); // default
+
+  /*
   forceField->setBondStretchGlobalScaleFactor(0);
   forceField->setBondBendGlobalScaleFactor(0);
   forceField->setBondTorsionGlobalScaleFactor(0);
@@ -347,6 +350,7 @@ void World::InitSimulation(
   forceField->setCoulomb15ScaleFactor(0);
   forceField->setCoulombGlobalScaleFactor(0);
   forceField->setGbsaGlobalScaleFactor(0);
+  */
 
   lig1 = new Topology();
 

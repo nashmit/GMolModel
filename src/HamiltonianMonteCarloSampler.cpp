@@ -11,7 +11,8 @@ Implementation of HamiltonianMonteCarloSampler class. **/
 
 HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
                                      SimTK::SimbodyMatterSubsystem *argMatter,
-                                     Topology *argResidue,
+                                     //Topology *argResidue,
+                                     SimTK::Compound *argResidue,
                                      SimTK::TimeStepper *argTimeStepper)
     : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argTimeStepper)
 {

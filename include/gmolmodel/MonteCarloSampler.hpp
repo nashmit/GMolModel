@@ -18,12 +18,13 @@ public:
 
     MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
                       SimTK::SimbodyMatterSubsystem *argMatter,
-                      Topology *argResidue,
+                      //Topology *argResidue,
+                      SimTK::Compound *argResidue,
                       SimTK::TimeStepper *argTimeStepper);
 
     // Destructor
 
-    ~MonteCarloSampler();
+    virtual ~MonteCarloSampler();
 
     // Simulation temperature related
 

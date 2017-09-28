@@ -14,13 +14,14 @@ public:
 
     Sampler(SimTK::CompoundSystem *argCompoundSystem,
             SimTK::SimbodyMatterSubsystem *argMatter,
-            Topology *argResidue,
+            //Topology *argResidue,
+            SimTK::Compound *argResidue,
             SimTK::TimeStepper *argTimeStepper);
 
 
     // Destructor
 
-    ~Sampler();
+    virtual ~Sampler();
 
     // Compute mass matrix determinant
 
@@ -35,7 +36,8 @@ protected:
     const SimTK::System *system;
     SimTK::CompoundSystem *compoundSystem;
     SimTK::SimbodyMatterSubsystem *matter;
-    Topology *residue;
+    //Topology *residue;
+    SimTK::Compound *residue;
     SimTK::TimeStepper *timeStepper;
 
 };

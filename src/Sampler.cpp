@@ -8,7 +8,8 @@
 
 Sampler::Sampler(SimTK::CompoundSystem *argCompoundSystem,
                  SimTK::SimbodyMatterSubsystem *argMatter,
-                 Topology *argResidue,
+                 //Topology *argResidue,
+                 SimTK::Compound *argResidue,
                  SimTK::TimeStepper *argTimeStepper)
 {
     this->compoundSystem = argCompoundSystem;
