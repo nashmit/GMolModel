@@ -79,13 +79,24 @@ void bSpecificAtom::Zero(void){
     y = -999;
     z = -999;
     visited = 0;
+    bAtomType = NULL;
 }
 
 void bSpecificAtom::Print(void)
 {
   std::cout<<"bSpecificAtom Print: nbonds "<<nbonds<<" freebonds "<<freebonds<<" name "<<name<<" inName "<<inName
-    <<" number "<<number<<" elem "<<elem<<" x "<<x<<" y "<< y<<" z "<<z<<" fftype "<<fftype<<" biotype "<<biotype
-    <<" charge "<<charge<<" mobile "<<mobile<<std::endl;
+    <<" number "<<number<<" atomIndex  "<<atomIndex<<" elem "<<elem<<" atomicNumber "<<atomicNumber<<" x "<<x<<" y "<< y<<" z "<<z
+    <<" mass "<<mass<<" vdwRadius  "<<vdwRadius<<" LJWellDepth  "<<LJWellDepth<<" fftype "<<fftype
+    <<" atomClassIndex  "<<atomClassIndex<<" biotype "<<biotype<<" bAtomType "<< bAtomType 
+    <<" charge "<<charge<<" mobile "<<mobile<<" visited "<<visited<<std::endl;
+
+    // Suggested by Eliza
+    //std::string residueName;
+    //long int residueIndex;
+    //std::string chain;
+    //int moleculeIndex;
+
+
 }
 
 
@@ -113,9 +124,21 @@ int bSpecificAtom::getNumber(void)
 }
 
 char bSpecificAtom::getElem(void){assert(!"Not implemented");}
-SimTK::Real bSpecificAtom::getX(void){assert(!"Not implemented");}
-SimTK::Real bSpecificAtom::getY(void){assert(!"Not implemented");}
-SimTK::Real bSpecificAtom::getZ(void){assert(!"Not implemented");}
+
+SimTK::Real bSpecificAtom::getX(void)
+{
+    return this->x;
+}
+
+SimTK::Real bSpecificAtom::getY(void)
+{
+    return this->y;
+}
+
+SimTK::Real bSpecificAtom::getZ(void)
+{
+    return this->z;
+}
 
 //
 std::string bSpecificAtom::getFftype(void)
@@ -195,6 +218,18 @@ void bSpecificAtom::setCharge(SimTK::Real inpCharge){
     this->charge = inpCharge;
 }
 
+// Get the DuMM ChargedAtomTypeIndex
+SimTK::DuMM::ChargedAtomTypeIndex bSpecificAtom::getChargedAtomTypeIndex(void)
+{
+    return this->chargedAtomTypeIndex;
+}
+
+// Set the DuMM ChargedAtomTypeIndex
+void bSpecificAtom::setChargedAtomTypeIndex(SimTK::DuMM::ChargedAtomTypeIndex inpChargedAtomTypeIndex)
+{
+    this->chargedAtomTypeIndex = inpChargedAtomTypeIndex;
+}
+
 void bSpecificAtom::setIsMobile(int){assert(!"Not implemented");}
 void bSpecificAtom::setIsVisited(int){assert(!"Not implemented");}
 
@@ -210,13 +245,13 @@ void bSpecificAtom::setAtomClassIndex(DuMM::AtomClassIndex inpAtomClassIndex)
     this->atomClassIndex = inpAtomClassIndex;
 }
 
-//
+// Get the atomic number
 int bSpecificAtom::getAtomicNumber(void)
 {
     return this->atomicNumber;
 }
 
-//
+// Set the atomic number
 void bSpecificAtom::setAtomicNumber(int inpAtomicNumber)
 {
     this->atomicNumber = inpAtomicNumber;
@@ -479,9 +514,11 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         bAtomList[i].setFftype(str_buf);
 
         bAtomList[i].setCharge(amberReader->getAtomsCharge(i) / chargeMultiplier);
-        bAtomList[i].setX(amberReader->getAtomsXcoord(i));
-        bAtomList[i].setY(amberReader->getAtomsYcoord(i));
-        bAtomList[i].setZ(amberReader->getAtomsZcoord(i));
+
+        bAtomList[i].setX(amberReader->getAtomsXcoord(i) / 10.0);
+        bAtomList[i].setY(amberReader->getAtomsYcoord(i) / 10.0);
+        bAtomList[i].setZ(amberReader->getAtomsZcoord(i) / 10.0);
+
         bAtomList[i].setMass(amberReader->getAtomsMass(i));
 
         bAtomList[i].setVdwRadius(amberReader->getAtomsRVdW(i));
@@ -651,20 +688,6 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
       std::cout<<"bMoleculeReader constructor: bAtomList not NULL\n";fflush(stdout);
     }
     
-  /* Just checking *////////
-  std::cout<<"Just checking\n";
-  for(int i=0; i<natoms;i++){
-    printf(" -- name(%s) inName(%s) number(%d) elem(%c) fftype(%s) biotype(%s) charge(%f)\n", 
-      bAtomList[i].name, bAtomList[i].inName, bAtomList[i].number, 
-      bAtomList[i].elem, bAtomList[i].fftype,
-      bAtomList[i].biotype, bAtomList[i].charge);
-    fflush(stdout);
-  }
-  for(int i=0; i<nbonds; i++){ // EU
-    std::cout<<"bond: "<<bonds[i].i<<" "<<bonds[i].j<<std::endl;
-    fflush(stdout);
-  }
-  ///////////////////////////
 
 
   /*Now read rigid bodies specifications*/
@@ -763,6 +786,18 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
   }
 
   fclose(rfpo);
+
+  /* Just checking *////////
+  std::cout<<"Checking after bMoleculeReader\n";
+  for(int i=0; i<natoms;i++){
+      bAtomList[i].Print();
+  }
+  for(int i=0; i<nbonds; i++){ // EU
+    std::cout<<"bond: "<<bonds[i].i<<" "<<bonds[i].j<<std::endl;
+    fflush(stdout);
+  }
+  ///////////////////////////
+
 
 }
 
@@ -878,7 +913,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
       str_buf = line.substr(37,9);
       bAtomList[lno-1].setZ(std::stod(str_buf));
 
-      bAtomList[lno-1].Print(); // EU
+      //bAtomList[lno-1].Print(); // EU
     }
 
     #ifdef DEBUG_LEVEL02

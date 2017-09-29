@@ -204,7 +204,9 @@ bool GridForce::dependsOnlyOnPositions() const {
 ////// SYMBODY SYSTEM //////
 ////////////////////////////
 
-World::World(readAmberInput *amberReader, std::string rbF){
+World::World(readAmberInput *amberReader, std::string rbF, std::string ictdF,
+TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, TARGET_TYPE *shm)
+{
   passno = new int;
   vassno = new int;
   fassno = new int;

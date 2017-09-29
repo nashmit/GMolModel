@@ -82,15 +82,17 @@ public:
     SimTK::Real mass;
     SimTK::Real vdwRadius;
     SimTK::Real LJWellDepth; // Lennard-Jones well depth
+    double charge;
+    char fftype[20];
+    SimTK::DuMM::AtomClassIndex atomClassIndex;
+    SimTK::DuMM::ChargedAtomTypeIndex chargedAtomTypeIndex;
+
     float x;
     float y;
     float z;
-    char fftype[20];
-    SimTK::DuMM::AtomClassIndex atomClassIndex;
     char biotype[20];
     SimTK::Compound::SingleAtom *bAtomType;
     SimTK::Compound::AtomIndex atomIndex;
-    double charge;
     int mobile;
     int visited;
     
@@ -134,6 +136,8 @@ public:
     void setVdwRadius(SimTK::Real);
     SimTK::Real getLJWellDepth(void);
     void setLJWellDepth(SimTK::Real);
+    SimTK::DuMM::ChargedAtomTypeIndex getChargedAtomTypeIndex(void);
+    void setChargedAtomTypeIndex(SimTK::DuMM::ChargedAtomTypeIndex);
 
     void setNbonds(int);
     void setFreebonds(int);

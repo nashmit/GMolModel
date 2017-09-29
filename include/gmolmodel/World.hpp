@@ -217,7 +217,8 @@ class World{
   int metroFixmanOpt;
   double lj14sf; //-- MMTK default
 
-  World(readAmberInput *amberReader, std::string rbF);
+  World(readAmberInput *amberReader, std::string rbF, std::string ictdF, 
+      TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, TARGET_TYPE *shm);
   
   World(
     string mol2F, string rbF, string gaffF, string frcmodF,

@@ -95,42 +95,17 @@ void bAddGaffParams(
         }
     }
 
-    /*
-    for(int t=0; t<amberReader->getNumberDihedrals(); t++){
-        int noDihTerms = amberReader->getDihedralsPeriod(t);
-        if(noDihTerms == 1){
-          dumm.defineBondTorsion_KA(
-            bAtomList[amberReader->getDihedralsAtomsIndex1(t)].getAtomClassIndex(),
-            bAtomList[amberReader->getDihedralsAtomsIndex2(t)].getAtomClassIndex(),
-            bAtomList[amberReader->getDihedralsAtomsIndex3(t)].getAtomClassIndex(),
-            bAtomList[amberReader->getDihedralsAtomsIndex4(t)].getAtomClassIndex(),
-            1, amberReader->getDihedralsForceK(t), amberReader->getDihedralsPhase(t)
-            );
-        }
-        else if(noDihTerms == 2){
-          dumm.defineBondTorsion_KA(
-            bAtomList[amberReader->getDihedralsAtomsIndex1(t)].getAtomClassIndex(),
-            bAtomList[amberReader->getDihedralsAtomsIndex2(t)].getAtomClassIndex(),
-            bAtomList[amberReader->getDihedralsAtomsIndex3(t)].getAtomClassIndex(),
-            bAtomList[amberReader->getDihedralsAtomsIndex4(t)].getAtomClassIndex(),
-            1, amberReader->getDihedralsForceK(t), amberReader->getDihedralsPhase(t),
-            2, 1.0, 1.0
-            );
-        }
-        else if(noDihTerms == 3){
-          dumm.defineBondTorsion_KA(
-            bAtomList[amberReader->getDihedralsAtomsIndex1(t)].getAtomClassIndex(),
-            bAtomList[amberReader->getDihedralsAtomsIndex2(t)].getAtomClassIndex(),
-            bAtomList[amberReader->getDihedralsAtomsIndex3(t)].getAtomClassIndex(),
-            bAtomList[amberReader->getDihedralsAtomsIndex4(t)].getAtomClassIndex(),
-            1, amberReader->getDihedralsForceK(t), amberReader->getDihedralsPhase(t),
-            2, 1.0, 1.0,
-            3, 1.0, 1.0
-            );
-
-        }
+    /* Just checking *////////
+    std::cout<<"Checking after bAddParams\n";
+    for(int i=0; i<amberReader->getNumberAtoms();i++){
+        bAtomList[i].Print();
     }
-    */
+    for(int i=0; i<amberReader->getNumberBonds(); i++){ // EU
+        std::cout<<"bond: "<<bonds[i].i<<" "<<bonds[i].j<<std::endl;
+        fflush(stdout);
+    }
+    ///////////////////////////
+
     std::cout << "Read Amber parameters from prmtop done." <<std::endl;
 }
 
