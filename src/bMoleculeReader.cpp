@@ -146,7 +146,11 @@ std::string bSpecificAtom::getFftype(void)
     return this->fftype;
 }
 
-std::string bSpecificAtom::getBiotype(void){assert(!"Not implemented");}
+// Get atom biotype
+const char * bSpecificAtom::getBiotype(void)
+{
+    return this->biotype;
+}
 SimTK::Compound::SingleAtom * bSpecificAtom::getBAtomType(void){assert(!"Not implemented");}
 SimTK::Compound::AtomIndex bSpecificAtom::getCompoundAtomIndex(void){assert(!"Not implemented");}
 SimTK::Real bSpecificAtom::getCharge(void){assert(!"Not implemented");}
@@ -209,8 +213,27 @@ void bSpecificAtom::setFftype(std::string inpFftype){
     sprintf(this->fftype, "%s", inpFftype.c_str());
 }
 
-void bSpecificAtom::setBiotype(std::string){assert(!"Not implemented");}
+// Set atom Biotype name - dangerous
+void bSpecificAtom::setBiotype(std::string inpBiotype)
+{
+    for(int i=0; i<20; i++){
+        this->biotype[i] = '\0';
+    }
+    std::strncpy(this->biotype, inpBiotype.c_str(), 20);
+}
+
+// Set atom Biotype name - dangerous
+void bSpecificAtom::setBiotype(const char * inpBiotype)
+{
+    for(int i=0; i<20; i++){
+        this->biotype[i] = '\0';
+    }
+    std::strncpy(this->biotype, inpBiotype, 20);
+}
+
+// Set 
 void bSpecificAtom::setBAtomType(SimTK::Compound::SingleAtom *){assert(!"Not implemented");}
+
 void bSpecificAtom::setCompoundAtomIndex(SimTK::Compound::AtomIndex){assert(!"Not implemented");}
 
 // Set charge
@@ -553,6 +576,17 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
           bAtomList[i].bAtomType = new
             UnivalentAtom(bAtomList[i].name, SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() )); // Prmtop mass
           bAtomList[i].setAtomicNumber(1);
+
+          // Is this needed ?
+          if (! Biotype::exists("bMainRes", "H", Ordinality::Any) ){
+              Biotype::defineBiotype(
+                  SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() ),
+                  1, // valence
+                  "bMainRes",
+                  "H");
+          }
+          ////
+
         }
         else if((toupper(bAtomList[i].name[0]) == 'C') && (toupper(bAtomList[i].name[0]) == 'L')){
           bAtomList[i].bAtomType = new

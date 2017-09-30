@@ -284,7 +284,7 @@ void Topology::init(
 
       bAtomList[k].setChargedAtomTypeIndex(tempChargedAtomTypeIndex);
 
-      // Why is this necessary ???
+      // Why is this necessary ??? 
       dumm.setBiotypeChargedAtomType( 
         bAtomList[k].getChargedAtomTypeIndex(),
         Biotype::get("mainRes", bAtomList[k].biotype).getIndex()

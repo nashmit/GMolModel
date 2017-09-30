@@ -123,7 +123,7 @@ public:
     std::string getFftype(void);
     SimTK::DuMM::AtomClassIndex getAtomClassIndex(void);
     void setAtomClassIndex(SimTK::DuMM::AtomClassIndex);
-    std::string getBiotype(void);
+    const char * getBiotype(void);
     SimTK::Compound::SingleAtom * getBAtomType(void);
     SimTK::Compound::AtomIndex getCompoundAtomIndex(void);
     SimTK::Real getCharge(void);
@@ -150,6 +150,7 @@ public:
     void setZ(SimTK::Real);
     void setFftype(std::string);
     void setBiotype(std::string);
+    void setBiotype(const char *);
     void setBAtomType(SimTK::Compound::SingleAtom *);
     void setCompoundAtomIndex(SimTK::Compound::AtomIndex);
     void setCharge(SimTK::Real);
