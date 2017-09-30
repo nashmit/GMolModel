@@ -152,7 +152,13 @@ const char * bSpecificAtom::getBiotype(void)
     return this->biotype;
 }
 SimTK::Compound::SingleAtom * bSpecificAtom::getBAtomType(void){assert(!"Not implemented");}
-SimTK::Compound::AtomIndex bSpecificAtom::getCompoundAtomIndex(void){assert(!"Not implemented");}
+
+// Get atom's index as held in Compound
+SimTK::Compound::AtomIndex bSpecificAtom::getCompoundAtomIndex(void)
+{
+    return this->atomIndex;
+}
+
 SimTK::Real bSpecificAtom::getCharge(void){assert(!"Not implemented");}
 int bSpecificAtom::getIsMobile(void){assert(!"Not implemented");}
 int bSpecificAtom::getIsVisited(void){assert(!"Not implemented");}
@@ -234,7 +240,10 @@ void bSpecificAtom::setBiotype(const char * inpBiotype)
 // Set 
 void bSpecificAtom::setBAtomType(SimTK::Compound::SingleAtom *){assert(!"Not implemented");}
 
-void bSpecificAtom::setCompoundAtomIndex(SimTK::Compound::AtomIndex){assert(!"Not implemented");}
+void bSpecificAtom::setCompoundAtomIndex(SimTK::Compound::AtomIndex inpAtomIndex)
+{
+    this->atomIndex = inpAtomIndex;
+}
 
 // Set charge
 void bSpecificAtom::setCharge(SimTK::Real inpCharge){
@@ -578,13 +587,13 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
           bAtomList[i].setAtomicNumber(1);
 
           // Is this needed ?
-          if (! Biotype::exists("bMainRes", "H", Ordinality::Any) ){
-              Biotype::defineBiotype(
-                  SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() ),
-                  1, // valence
-                  "bMainRes",
-                  "H");
-          }
+          //if (! Biotype::exists("bMainRes", "H", Ordinality::Any) ){
+          //    Biotype::defineBiotype(
+          //        SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() ),
+          //        1, // valence
+          //        "bMainRes",
+          //        "H");
+          //}
           ////
 
         }

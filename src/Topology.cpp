@@ -134,7 +134,7 @@ void Topology::init(
     #endif
     
     this->setBaseAtom( *(bAtomList[bondFirstAtom[firstBond]].bAtomType) );
-    //this->setAtomBiotype(bAtomList[bondFirstAtom[firstBond]].name, "mainRes", bAtomList[bondFirstAtom[firstBond]].biotype);
+    this->setAtomBiotype(bAtomList[bondFirstAtom[firstBond]].name, "mainRes", bAtomList[bondFirstAtom[firstBond]].biotype);
     this->convertInboardBondCenterToOutboard();
 
     sbuff.str("");
@@ -142,7 +142,7 @@ void Topology::init(
     buff[firstBond] = sbuff.str();
 
     this->bondAtom(*bAtomList[bondSecondAtom[firstBond]].bAtomType, buff[firstBond].c_str());
-    //this->setAtomBiotype(bAtomList[bondSecondAtom[firstBond]].name, "mainRes", bAtomList[bondSecondAtom[firstBond]].biotype);
+    this->setAtomBiotype(bAtomList[bondSecondAtom[firstBond]].name, "mainRes", bAtomList[bondSecondAtom[firstBond]].biotype);
     bAtomList[bondFirstAtom[firstBond]].freebonds = 2;    // linked to Ground and bj (++ in loop) // WATCHOUT freebonds hardcoded
     #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
     std::cout<<"MainRes: bond "<<bAtomList[bondSecondAtom[firstBond]].name<<" to "<<bAtomList[bondFirstAtom[firstBond]].name<<' '
@@ -165,8 +165,8 @@ void Topology::init(
           if(pushedIt1 != pushed.end()){boolI=true;}
           if(pushedIt2 != pushed.end()){boolJ=true;}
           #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
-          std::cout<<"bMainRes: conn bi bj boolI boolJ "
-            <<bondFirstAtom[m]<<' '<<bondSecondAtom[m]<<' '<<boolI<<' '<<boolJ<<std::endl;
+          //std::cout<<"bMainRes: conn bi bj boolI boolJ "
+          //  <<bondFirstAtom[m]<<' '<<bondSecondAtom[m]<<' '<<boolI<<' '<<boolJ<<std::endl;
           #endif
           
           if((pushedIt1 == pushed.end()) && (pushedIt2 != pushed.end())){
@@ -184,7 +184,7 @@ void Topology::init(
               sbuff<<bAtomList[bondFirstAtom[m]].name<<"/bond"<<bAtomList[bondFirstAtom[m]].freebonds;
               buff[m] = sbuff.str();
               this->bondAtom(*bAtomList[bondSecondAtom[m]].bAtomType, buff[m].c_str());
-              //this->setAtomBiotype(bAtomList[bondSecondAtom[m]].name, "mainRes", bAtomList[bondSecondAtom[m]].biotype);
+              this->setAtomBiotype(bAtomList[bondSecondAtom[m]].name, "mainRes", bAtomList[bondSecondAtom[m]].biotype);
               if(bondFirstAtom[m] == bondFirstAtom[firstBond]){
                 ++bAtomList[bondFirstAtom[m]].freebonds; // The first atom
               }
@@ -247,8 +247,8 @@ void Topology::init(
                 //BondMobility::Rigid
                 BondMobility::Torsion // TODO
                 );
-              //this->setAtomBiotype(bAtomList[bondFirstAtom[m]].name, "mainRes", bAtomList[bondFirstAtom[m]].biotype);
-              //this->setAtomBiotype(bAtomList[bondSecondAtom[m]].name, "mainRes", bAtomList[bondSecondAtom[m]].biotype);
+              this->setAtomBiotype(bAtomList[bondFirstAtom[m]].name, "mainRes", bAtomList[bondFirstAtom[m]].biotype);
+              this->setAtomBiotype(bAtomList[bondSecondAtom[m]].name, "mainRes", bAtomList[bondSecondAtom[m]].biotype);
               if(bondFirstAtom[m] == bondFirstAtom[firstBond]){
                 ++bAtomList[bondFirstAtom[m]].freebonds; // The first atom
               }
@@ -305,32 +305,36 @@ void Topology::init(
       }
     }
     #ifdef MAIN_RESIDUE_DEBUG_SPECIFIC
-    std::cout<<"bAtomList[ix].atomIndexs assigend"<<std::endl<<std::flush;
+    std::cout<<"bAtomList[ix].atomIndeces assigned"<<std::endl<<std::flush;
     #endif
 
     // Assign BondIndex values to bonds in bonds[] REVISE CHANGE
     int inumber, jnumber;
     Compound::AtomIndex iIx, jIx;
-    for (unsigned int r=0 ; r<getNumBonds(); r++){
-      iIx = getBondAtomIndex(Compound::BondIndex(r), 0);
-      jIx = getBondAtomIndex(Compound::BondIndex(r), 1);
+    for ( Compound::BondIndex bondIx(0);
+          bondIx < this->getNumBonds();
+          ++bondIx){
+    //for (unsigned int bondIx=0 ; bondIx<getNumBonds(); bondIx++){
+      iIx = getBondAtomIndex(Compound::BondIndex(bondIx), 0);
+      jIx = getBondAtomIndex(Compound::BondIndex(bondIx), 1);
 
       for(ix = 0; ix<natms; ix++){
-        if(bAtomList[ix].atomIndex == iIx){
+        //if(bAtomList[ix].atomIndex == iIx){
+        if(bAtomList[ix].getCompoundAtomIndex() == iIx){
           inumber = bAtomList[ix].number;
         }
       }
       for(jx = 0; jx<natms; jx++){
-        if(bAtomList[jx].atomIndex == jIx){
+        //if(bAtomList[jx].atomIndex == jIx){
+        if(bAtomList[jx].getCompoundAtomIndex() == jIx){
           jnumber = bAtomList[jx].number;
         }
       }
 
-      //for(unsigned int m=0; m<bonds.size(); m++){ // RESTORE
       for(unsigned int m=0; m<nbnds; m++){ // EU
         if(((bonds[m].i == inumber) && (bonds[m].j == jnumber)) ||
            ((bonds[m].i == jnumber) && (bonds[m].j == inumber))){
-          bonds[m].setBondIndex(Compound::BondIndex(r));
+          bonds[m].setBondIndex(Compound::BondIndex(bondIx));
         }
       }
     }

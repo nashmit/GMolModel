@@ -119,6 +119,7 @@ set(TESTS_SRCS
         TestHamiltonianMonteCarlo.cpp
         TestOpenMMBasic.cpp
         TestPrmCrd.cpp
+        TestPrmCrdPeptide.cpp
 	TestPDBReaderMolModel.cpp
 	)
 
