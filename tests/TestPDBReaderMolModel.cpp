@@ -13,7 +13,7 @@ try {
     // Load the PDB file and construct the system.
     CompoundSystem system;
     SimbodyMatterSubsystem matter(system);
-    //DecorationSubsystem decorations(system);
+    DecorationSubsystem decorations(system);
     DuMMForceFieldSubsystem forceField(system);
     forceField.loadAmber99Parameters();
 
@@ -25,8 +25,8 @@ try {
     //    system, 293.15, 0.1));
 
     // Show me a movie
-    //Visualizer viz(system);
-    //system.addEventReporter( new Visualizer::Reporter(viz, 0.0015) );
+    Visualizer viz(system);
+    system.addEventReporter( new Visualizer::Reporter(viz, 0.0015) );
 
     system.realizeTopology();
     
