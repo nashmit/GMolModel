@@ -91,6 +91,7 @@ public:
     float y;
     float z;
     char biotype[20];
+    SimTK::BiotypeIndex biotypeIndex;
     SimTK::Compound::SingleAtom *bAtomType;
     SimTK::Compound::AtomIndex atomIndex;
     int mobile;

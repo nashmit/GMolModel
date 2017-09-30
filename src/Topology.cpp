@@ -135,6 +135,7 @@ void Topology::init(
     
     this->setBaseAtom( *(bAtomList[bondFirstAtom[firstBond]].bAtomType) );
     this->setAtomBiotype(bAtomList[bondFirstAtom[firstBond]].name, "mainRes", bAtomList[bondFirstAtom[firstBond]].biotype);
+    //this->setBiotypeIndex(bAtomList[bondFirstAtom[firstBond]].name, BiotypeIndex(bAtomList[bondFirstAtom[firstBond]].number)); // used to match atomIndeces
     this->convertInboardBondCenterToOutboard();
 
     sbuff.str("");
@@ -143,6 +144,7 @@ void Topology::init(
 
     this->bondAtom(*bAtomList[bondSecondAtom[firstBond]].bAtomType, buff[firstBond].c_str());
     this->setAtomBiotype(bAtomList[bondSecondAtom[firstBond]].name, "mainRes", bAtomList[bondSecondAtom[firstBond]].biotype);
+    //this->setBiotypeIndex(bAtomList[bondSecondAtom[firstBond]].name, BiotypeIndex(bAtomList[bondSecondAtom[firstBond]].number)); // used to match atomIndeces
     bAtomList[bondFirstAtom[firstBond]].freebonds = 2;    // linked to Ground and bj (++ in loop) // WATCHOUT freebonds hardcoded
     #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
     std::cout<<"MainRes: bond "<<bAtomList[bondSecondAtom[firstBond]].name<<" to "<<bAtomList[bondFirstAtom[firstBond]].name<<' '
@@ -185,6 +187,7 @@ void Topology::init(
               buff[m] = sbuff.str();
               this->bondAtom(*bAtomList[bondSecondAtom[m]].bAtomType, buff[m].c_str());
               this->setAtomBiotype(bAtomList[bondSecondAtom[m]].name, "mainRes", bAtomList[bondSecondAtom[m]].biotype);
+              //this->setBiotypeIndex(bAtomList[bondSecondAtom[m]].name, BiotypeIndex(bAtomList[bondSecondAtom[m]].number)); // used to match atomIndeces
               if(bondFirstAtom[m] == bondFirstAtom[firstBond]){
                 ++bAtomList[bondFirstAtom[m]].freebonds; // The first atom
               }
@@ -247,8 +250,12 @@ void Topology::init(
                 //BondMobility::Rigid
                 BondMobility::Torsion // TODO
                 );
+
               this->setAtomBiotype(bAtomList[bondFirstAtom[m]].name, "mainRes", bAtomList[bondFirstAtom[m]].biotype);
+              //this->setBiotypeIndex(bAtomList[bondFirstAtom[m]].name, BiotypeIndex(bAtomList[bondFirstAtom[m]].number)); // used to match atomIndeces
               this->setAtomBiotype(bAtomList[bondSecondAtom[m]].name, "mainRes", bAtomList[bondSecondAtom[m]].biotype);
+              //this->setBiotypeIndex(bAtomList[bondSecondAtom[m]].name, BiotypeIndex(bAtomList[bondSecondAtom[m]].number)); // used to match atomIndeces
+
               if(bondFirstAtom[m] == bondFirstAtom[firstBond]){
                 ++bAtomList[bondFirstAtom[m]].freebonds; // The first atom
               }
@@ -265,6 +272,12 @@ void Topology::init(
    Must be called AFTER first mainRes is declared,
    so Biotypes and atom classes will be defined
   */
+
+    // First set all biotypeIndeces to numbers according to setAtomBiotype calls
+    //for(int ix = 0; ix<natms; ix++){
+    //    bAtomList[ix].biotypeIndex = SimTK::BiotypeIndex(bAtomList[ix].number);
+    //}
+
     std::string abuff;
     for(k=0; k<natms; k++){
       abuff =  "rob";
@@ -296,6 +309,28 @@ void Topology::init(
     unsigned int ix = 0; // MINE change type
     unsigned int jx = 0; // MINE change type
     std::string cname, myname;
+ 
+    /* 
+    int intAtomIndex = 0;
+    for (Compound::AtomIndex aIx(0); aIx < this->getNumAtoms(); ++aIx){
+        SimTK::BiotypeIndex biotypeIx = SimTK::Compound::getAtomBiotypeIndex(aIx);
+        for(ix = 0; ix<natms; ix++){
+            if(bAtomList[ix].biotypeIndex == biotypeIx){
+                bAtomList[ix].atomIndex == aIx;
+            }
+        }
+        intAtomIndex++;
+    }
+    */
+
+    for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
+        std::cout << "this->getAtomName(aIx)" << this->getAtomName(aIx)  << std::endl;
+    }
+    std::cout << std::endl;
+    for(ix = 0; ix<natms; ix++){
+        std::cout << "std::string(bAtomList[ix].name)" << std::string(bAtomList[ix].name)  << std::endl;
+    }
+
     for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
       for(ix = 0; ix<natms; ix++){
         if(this->getAtomName(aIx) == std::string(bAtomList[ix].name)){ // compare SimTK::String with std::string
@@ -308,35 +343,32 @@ void Topology::init(
     std::cout<<"bAtomList[ix].atomIndeces assigned"<<std::endl<<std::flush;
     #endif
 
-    // Assign BondIndex values to bonds in bonds[] REVISE CHANGE
+    // Assign bBond::BondIndex values in bonds[] from Molmodel::BondIndex
     int inumber, jnumber;
     Compound::AtomIndex iIx, jIx;
-    for ( Compound::BondIndex bondIx(0);
-          bondIx < this->getNumBonds();
-          ++bondIx){
-    //for (unsigned int bondIx=0 ; bondIx<getNumBonds(); bondIx++){
-      iIx = getBondAtomIndex(Compound::BondIndex(bondIx), 0);
-      jIx = getBondAtomIndex(Compound::BondIndex(bondIx), 1);
+    for ( Compound::BondIndex bondIx(0); bondIx < this->getNumBonds(); ++bondIx){
+        iIx = this->getBondAtomIndex(Compound::BondIndex(bondIx), 0);
+        jIx = this->getBondAtomIndex(Compound::BondIndex(bondIx), 1);
 
-      for(ix = 0; ix<natms; ix++){
-        //if(bAtomList[ix].atomIndex == iIx){
-        if(bAtomList[ix].getCompoundAtomIndex() == iIx){
-          inumber = bAtomList[ix].number;
+        for(ix = 0; ix<natms; ix++){
+            std::cout << "bAtomList[ix].getCompoundAtomIndex() " << bAtomList[ix].getCompoundAtomIndex()
+                << " iIx " << iIx  << std::endl;
+            if(bAtomList[ix].getCompoundAtomIndex() == iIx){
+                inumber = bAtomList[ix].number;
+            }
         }
-      }
-      for(jx = 0; jx<natms; jx++){
-        //if(bAtomList[jx].atomIndex == jIx){
-        if(bAtomList[jx].getCompoundAtomIndex() == jIx){
-          jnumber = bAtomList[jx].number;
+        for(jx = 0; jx<natms; jx++){
+            if(bAtomList[jx].getCompoundAtomIndex() == jIx){
+                jnumber = bAtomList[jx].number;
+            }
         }
-      }
 
-      for(unsigned int m=0; m<nbnds; m++){ // EU
-        if(((bonds[m].i == inumber) && (bonds[m].j == jnumber)) ||
-           ((bonds[m].i == jnumber) && (bonds[m].j == inumber))){
-          bonds[m].setBondIndex(Compound::BondIndex(bondIx));
+        for(unsigned int m=0; m<nbnds; m++){ // EU
+            if(((bonds[m].i == inumber) && (bonds[m].j == jnumber)) ||
+              ((bonds[m].i == jnumber) && (bonds[m].j == inumber))){
+                bonds[m].setBondIndex(Compound::BondIndex(bondIx));
+            }
         }
-      }
     }
     #ifdef MAIN_RESIDUE_DEBUG_SPECIFIC
     std::cout<<"bonds[m].bondIndexes assigned"<<std::endl<<std::flush;
@@ -418,10 +450,13 @@ void Topology::init(
     matchDefaultTopLevelTransform(atomTargets);
     matchDefaultConfiguration(atomTargets, Match_Exact, true, 150.0); //Compound::Match_Idealized
     //matchDefaultConfiguration(atomTargets, Match_Idealized, true, 150.0); //Compound::Match_Idealized
+    std::cout << "Configuration matched" << std::endl << std::flush;
 
     // Reinsert coordinates after matching
     PdbStructure  pdb(*this);
+    /*
     for(unsigned int i=0; i<natms; i++){
+      std::cout << "String(bAtomList[i].name " << String(bAtomList[i].name) << std::endl << std::flush;
       const PdbAtom& P = pdb.getAtom(String(bAtomList[i].name), PdbResidueId(1), String(" "));
       std::string s(P.getName());
       const Vec3& PC = P.getCoordinates();
@@ -429,6 +464,7 @@ void Topology::init(
       bAtomList[i].y = PC[1];
       bAtomList[i].z = PC[2];
     }
+    */
 
     // Set rigidity
     if(ictdF=="IC"){

@@ -123,7 +123,11 @@ int bSpecificAtom::getNumber(void)
     return this->number;
 }
 
-char bSpecificAtom::getElem(void){assert(!"Not implemented");}
+// Return atom element
+char bSpecificAtom::getElem(void)
+{
+    return this->elem;
+}
 
 SimTK::Real bSpecificAtom::getX(void)
 {
@@ -167,7 +171,7 @@ void bSpecificAtom::setFreebonds(int){assert(!"Not implemented");}
 
 // Set atom unique name
 void bSpecificAtom::setName(std::string inpName){
-    strncpy(this->name, inpName.c_str(), 4);
+    strncpy(this->name, inpName.c_str(), 5);
 }
 
 // Set initial name
@@ -533,13 +537,15 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
     for(int i = 0; i < natoms; i++){
         bAtomList[i].Zero();
 
+        bAtomList[i].setNumber(i);
         str_buf = amberReader->getAtomsName(i);
         boost::trim(str_buf);
         bAtomList[i].setElem(str_buf.at(0));
-        bAtomList[i].setName(str_buf);
+        //bAtomList[i].setName(str_buf);
+        std::string elemStr = std::string(1, bAtomList[i].getElem());
+        bAtomList[i].setName(elemStr + std::to_string(bAtomList[i].getNumber()));
         bAtomList[i].setInName(str_buf);
 
-        bAtomList[i].setNumber(i);
 
         str_buf = amberReader->getAtomsNameAlias(i);
         boost::trim(str_buf);
@@ -585,17 +591,6 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
           bAtomList[i].bAtomType = new
             UnivalentAtom(bAtomList[i].name, SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() )); // Prmtop mass
           bAtomList[i].setAtomicNumber(1);
-
-          // Is this needed ?
-          //if (! Biotype::exists("bMainRes", "H", Ordinality::Any) ){
-          //    Biotype::defineBiotype(
-          //        SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() ),
-          //        1, // valence
-          //        "bMainRes",
-          //        "H");
-          //}
-          ////
-
         }
         else if((toupper(bAtomList[i].name[0]) == 'C') && (toupper(bAtomList[i].name[0]) == 'L')){
           bAtomList[i].bAtomType = new
