@@ -1,0 +1,10 @@
+
+source leaprc.protein.ff14SB
+set default PBRadii mbondi2
+
+system = loadpdb panitumumab_equilibrated.pdb
+
+saveAmberParm system  panitumumab.prmtop panitumumab.inpcrd
+savepdb system panitumumab.pdb
+quit
+
