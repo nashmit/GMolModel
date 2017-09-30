@@ -120,6 +120,7 @@ set(TESTS_SRCS
         TestOpenMMBasic.cpp
         TestPrmCrd.cpp
         TestPrmCrdPeptide.cpp
+        TestPrmCrdProtein.cpp
 	TestPDBReaderMolModel.cpp
 	)
 
