@@ -16,6 +16,7 @@
 #include <cctype>
 #include <locale>
 #include <assert.h>
+#include <cmath>
 
 // Molmodel specific headers
 

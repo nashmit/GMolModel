@@ -533,6 +533,10 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
     // Read atoms READER
 
     std::string str_buf;
+    int a=65, b=65, c=65, d=65;
+    int aRest=0, bRest=0, cRest=0, dRest=0;
+    std::string aStr, bStr, cStr, dStr;
+    int nameCounter = 0;
     SimTK::Real chargeMultiplier = 18.2223;
     for(int i = 0; i < natoms; i++){
         bAtomList[i].Zero();
@@ -542,8 +546,28 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         boost::trim(str_buf);
         bAtomList[i].setElem(str_buf.at(0));
         //bAtomList[i].setName(str_buf);
-        std::string elemStr = std::string(1, bAtomList[i].getElem());
-        bAtomList[i].setName(elemStr + std::to_string(bAtomList[i].getNumber()));
+        //std::string elemStr = std::string(1, bAtomList[i].getElem());
+        //bAtomList[i].setName(elemStr + std::to_string(bAtomList[i].getNumber()));
+
+        nameCounter++;
+        a = int(nameCounter / std::pow(25, 3));
+        aStr = (char)(a + 65);
+        aRest = nameCounter % int(std::pow(25, 3));
+
+        b = int(aRest / std::pow(25, 2));
+        bStr = (char)(b + 65);
+        bRest = aRest % int(std::pow(25, 2));
+
+        c = int(bRest / std::pow(25, 1));
+        cStr = (char)(c + 65);
+        cRest = bRest % int(std::pow(25, 1));
+
+        d = int(cRest / std::pow(25, 0));
+        dStr = (char)(d + 65);
+
+        std::string string_name = aStr + bStr + cStr + dStr;
+        bAtomList[i].setName(string_name);
+
         bAtomList[i].setInName(str_buf);
 
 
@@ -592,32 +616,36 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
             UnivalentAtom(bAtomList[i].name, SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() )); // Prmtop mass
           bAtomList[i].setAtomicNumber(1);
         }
+        /*
         else if((toupper(bAtomList[i].name[0]) == 'C') && (toupper(bAtomList[i].name[0]) == 'L')){
           bAtomList[i].bAtomType = new
             UnivalentAtom(bAtomList[i].name, Element(17, "Chlorine", "Cl", bAtomList[i].getMass()));
           bAtomList[i].setAtomicNumber(17);
         }
-        else if(toupper(bAtomList[i].name[0]) == 'O'){
+        */
+        else if(toupper(bAtomList[i].elem) == 'O'){
           bAtomList[i].bAtomType = new
             UnivalentAtom(bAtomList[i].name, Element(8, "Oxygen", "O", bAtomList[i].getMass()));
           bAtomList[i].setAtomicNumber(8);
         }
-        else if(toupper(bAtomList[i].name[0]) == 'F'){
+        else if(toupper(bAtomList[i].elem) == 'F'){
           bAtomList[i].bAtomType = new
             UnivalentAtom(bAtomList[i].name, Element(9, "Fluorine", "F", bAtomList[i].getMass()));
           bAtomList[i].setAtomicNumber(9);
         }
+        /*
         else if((toupper(bAtomList[i].name[0]) == 'B') && (toupper(bAtomList[i].name[0]) == 'R')){
           bAtomList[i].bAtomType = new
             UnivalentAtom(bAtomList[i].name, Element(35, "Bromine", "Br", bAtomList[i].getMass()));
           bAtomList[i].setAtomicNumber(35);
         }
-        else if(toupper(bAtomList[i].name[0]) == 'I'){
+        */
+        else if(toupper(bAtomList[i].elem) == 'I'){
           bAtomList[i].bAtomType = new
             UnivalentAtom(bAtomList[i].name, Element(53, "Iodine", "I", bAtomList[i].getMass()));
           bAtomList[i].setAtomicNumber(53);
         }
-        else if(toupper(bAtomList[i].name[0]) == 'N'){
+        else if(toupper(bAtomList[i].elem) == 'N'){
           bAtomList[i].bAtomType = new
             UnivalentAtom(bAtomList[i].name, Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
           bAtomList[i].setAtomicNumber(7);
