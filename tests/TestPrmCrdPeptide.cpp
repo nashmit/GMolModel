@@ -240,7 +240,8 @@ int main(int argc, char **argv)
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
     //SimTK::State& tsState = world->ts->updState();
     //world->ts->initialize(tsState);
-    for(int i = 0; i<30; i++){
+    p_HMCsampler->initialize(integAdvancedState, 0.0015, 10);
+    for(int i = 0; i<5; i++){
         // -- STEPTO -- 
 
         //std::cout << "Time before stepping: " << world->ts->getTime()
@@ -281,7 +282,7 @@ int main(int argc, char **argv)
                   << "; integAdvancedState Stage before stepping: " 
                   << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
                   << std::endl;
-        //writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "MCs", i);
+        writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "HMCs", i);
     }
 
 

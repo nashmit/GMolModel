@@ -53,6 +53,20 @@ SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState)
 
 }
 
+// Get set for stored potential energy
+SimTK::Real MonteCarloSampler::getOldPE(void)
+{
+    return this->pe_o;
+}
+
+//
+void MonteCarloSampler::setOldPE(SimTK::Real argPE)
+{
+    this->pe_o = argPE;
+}
+
+
+
 // Set/get Fixman potential
 
 void MonteCarloSampler::setOldFixman(SimTK::State& someState)
@@ -78,6 +92,11 @@ void MonteCarloSampler::setTVector(const SimTK::State& someState)
   }
 }
 
+// Return the old configuration
+SimTK::Transform * MonteCarloSampler::getTVector(void)
+{
+    return this->TVector;
+}
 
 // Restores configuration from the internal vector of transforms TVector
 
@@ -152,7 +171,7 @@ void MonteCarloSampler::update(SimTK::State& someState){
 
     // Get current potential energy from evaluator
 
-    SimTK::Real pe_n = getPEFromEvaluator(); // OPENMM
+    SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
 
     // Apply Metropolis criterion
 
@@ -165,17 +184,9 @@ void MonteCarloSampler::update(SimTK::State& someState){
     }
 }
 
-// Get stored potential energy
-
-SimTK::Real MonteCarloSampler::getOldPE(void){return 1.0;}
-
 // Get stored kinetic energy - only necessary for Hamiltonian Monte Carlo
 
-SimTK::Real MonteCarloSampler::getOldKE(void){}
-
-// Store the potential energy
-
-void MonteCarloSampler::setOldPE(SimTK::Real argPE){}
+//SimTK::Real MonteCarloSampler::getOldKE(void){SimTK::Real(!assert("Not implemented"));}
 
 // Store the kintetic energy - only necessary for Hamiltonian Monte Carlo
 
@@ -184,7 +195,9 @@ void MonteCarloSampler::setOldKE(SimTK::Real argKE){}
 // Get the potential energy from an external source as far as the sampler
 // is concerned - OPENMM has to be inserted here
 
-SimTK::Real MonteCarloSampler::getPEFromEvaluator(void){return 0.0;}
+SimTK::Real MonteCarloSampler::getPEFromEvaluator(SimTK::State& someState){
+    return matter->calcKineticEnergy(someState);
+}
 
 // Get the simulation temperature
 

@@ -34,6 +34,7 @@ public:
     // Store/restore the configuration from the internal TVector variable
 
     void setTVector(const SimTK::State& advanced);
+    SimTK::Transform * getTVector(void);
     void assignConfFromTVector(SimTK::State& advanced);
 
     // Assign a random conformation
@@ -54,7 +55,7 @@ public:
 
     // Evaluate the potential energy at current state
 
-    SimTK::Real getPEFromEvaluator(void); 
+    SimTK::Real getPEFromEvaluator(SimTK::State& someState); 
 
     // Compute Fixman potential
 

@@ -34,6 +34,21 @@ void HamiltonianMonteCarloSampler::setOldKE(SimTK::Real inpKE)
     this->ke_o = inpKE;
 }
 
+// Initialize variables (like TVector)
+
+void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps)
+{
+  // identical to setTVector
+  int i = 0;
+  for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+    const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
+    TVector[i] = mobod.getMobilizerTransform(someState);
+    i++;
+  }
+
+}
+
 
 // Assign random conformation
 // In torsional dynamics the first body has 7 Q variables for 6 dofs - one
@@ -62,7 +77,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     // Integrator's "advanced state", this method must be called to 
     // reinitialize the Integrator.
     system->realize(someState, SimTK::Stage::Acceleration);
-    (this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
+    //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
     setOldKE(matter->calcKineticEnergy(someState));
 
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
@@ -80,6 +95,10 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState){
 
     // Get old energy
     SimTK::Real pe_o = getOldPE();
+    
+    // Get old Fixman potential
+    system->realize(someState, SimTK::Stage::Acceleration);
+    fix_o = calcFixman(someState);
 
     // Assign random configuration
 
@@ -94,7 +113,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState){
 
     // Get current potential energy from evaluator
 
-    SimTK::Real pe_n = getPEFromEvaluator(); // OPENMM
+    SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
 
     // Get current kinetic energy from Simbody
 
@@ -105,11 +124,16 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState){
     assert(!isnan(pe_n));
     SimTK::Real etot_n = pe_n + ke_n + fix_n;
     SimTK::Real etot_o = pe_o + ke_o + fix_o;
+    std::cout << "pe_o " << pe_o << " ke_o " << ke_o << " fix_o " << fix_o << std::endl;
+    std::cout << "pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n << std::endl;
+    std::cout << "rand_no " << rand_no << std::endl;
     if ((etot_n < etot_o) or (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
+        std::cout << "Move accepted" << std::endl;
         setTVector(someState);
         setOldPE(pe_n);
         setOldFixman(someState);
     }else{ // Reject
+        std::cout << "Move not accepted" << std::endl;
         assignConfFromTVector(someState);
     }
 }
