@@ -297,7 +297,11 @@ void Topology::init(
 
       bAtomList[k].setChargedAtomTypeIndex(tempChargedAtomTypeIndex);
 
-      // Why is this necessary ??? 
+      // Associate a ChargedAtomTypeIndex with a Biotype index
+      std::cout << "setBiotypeChargedAtomType bAtomList["<< k << "].getChargedAtomTypeIndex() "
+          << bAtomList[k].getChargedAtomTypeIndex()
+          << " bAtomList[" << k << "].biotype " << bAtomList[k].biotype 
+          << std::endl << std::flush;
       dumm.setBiotypeChargedAtomType( 
         bAtomList[k].getChargedAtomTypeIndex(),
         Biotype::get("mainRes", bAtomList[k].biotype).getIndex()
