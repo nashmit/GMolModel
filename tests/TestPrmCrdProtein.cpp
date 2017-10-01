@@ -44,6 +44,7 @@ int main(int argc, char **argv)
     std::string rbFN = "pani/ligand.rb";
     std::string gaffFN = "gaff.dat";
     std::string frcmodFN = "pani/ligand.frcmod";
+    std::string flexFN = "pani/ligand.flex";
 
     // Simulation type:
     // IC: Internal Coordinates Dynamics
@@ -56,6 +57,7 @@ int main(int argc, char **argv)
     std::cout<<"rbFN "<<rbFN<<std::endl<<std::flush;
     std::cout<<"gaffFN "<<gaffFN<<std::endl<<std::flush;
     std::cout<<"frcmodFN "<<frcmodFN<<std::endl<<std::flush;
+    std::cout<<"flexFN "<<flexFN<<std::endl<<std::flush;
     std::cout<<"ictd "<<ictd<<std::endl<<std::flush;
 
     // Read number of atoms from mol2 file
@@ -136,7 +138,7 @@ int main(int argc, char **argv)
     //);
 
 
-    World *p_world = new World(amberReader, rbFN, ictd, PrmToAx_po, MMTkToPrm_po,
+    World *p_world = new World(amberReader, rbFN, flexFN, ictd, PrmToAx_po, MMTkToPrm_po,
         shm); // ELIZA
 
     // Seed the random number generator 
@@ -269,7 +271,7 @@ int main(int argc, char **argv)
         std::cout << "Time before update: " << world->ts->getTime() << std::endl;
 
         //p_HMCsampler->update((world->ts->updIntegrator()).updAdvancedState());
-        p_HMCsampler->update(integAdvancedState);
+        p_HMCsampler->update(integAdvancedState, 0.0015, 3);
 
         std::cout << "Q after update integAdvancedState " 
                   << integAdvancedState.getQ() << std::endl;

@@ -190,7 +190,7 @@ class World{
   SimTK::TimeStepper *ts;
   TARGET_TYPE *PrmToAx_po;
   TARGET_TYPE *MMTkToPrm_po;
-  string mol2F, rbF, gaffF, frcmodF, ictdF;
+  string mol2F, rbF, gaffF, frcmodF, flexFN, ictdF;
 
   TARGET_TYPE **coords;
   TARGET_TYPE **vels;
@@ -222,8 +222,9 @@ class World{
   int metroFixmanOpt;
   double lj14sf; //-- MMTK default
 
-  World(readAmberInput *amberReader, std::string rbF, std::string ictdF, 
-      TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, TARGET_TYPE *shm);
+  World(readAmberInput *amberReader, std::string rbF, std::string flexFN,
+        std::string ictdF, 
+        TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, TARGET_TYPE *shm);
   
   World(
     string mol2F, string rbF, string gaffF, string frcmodF,

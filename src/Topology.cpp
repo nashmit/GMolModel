@@ -68,6 +68,7 @@ void Topology::init(
     TARGET_TYPE *PrmToAx_po,
     TARGET_TYPE *MMTkToPrm_po,
     bool first_time,
+    std::string flexFN,
     std::string ictdF
 )
 {
@@ -471,29 +472,69 @@ void Topology::init(
     */
 
     // Set rigidity
-    if(ictdF=="IC"){
-      for (int r=0 ; r<getNumBonds(); r++){
-        setBondMobility(BondMobility::Free, Compound::BondIndex(r));
-      }
+    
+    if(ictdF=="RB"){
+
+        std::cout << "General regimen: " << "RB" << std::endl;
+        std::cout << "Reading specs from " << flexFN << std::endl;
+
+        std::ifstream flexIfStream(flexFN);
+
+        int noFlexBonds;
+        std::string line;
+        std::getline(flexIfStream, line);
+        std::istringstream iss(line);
+        iss >> noFlexBonds;
+        std::cout << "No of bonds " << noFlexBonds << std::endl;
+
+        std::vector<int> flexBondsIxs (noFlexBonds, 0);
+        std::getline(flexIfStream, line);
+        std::istringstream iss2(line);
+        std::cout << "Bonds indeces";
+        for(int i=0; i<noFlexBonds; i++){
+            iss2 >> flexBondsIxs[i];
+            std::cout << " " << flexBondsIxs[i];
+        }
+        std::cout << std::endl;
+        flexIfStream.close();
+
+        for (int r=0 ; r<getNumBonds(); r++){
+            if(std::find(flexBondsIxs.begin(), flexBondsIxs.end(), r) != flexBondsIxs.end()){
+                setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
+            }
+            else{
+                setBondMobility(BondMobility::Rigid, Compound::BondIndex(r));
+            }
+        }
+
+    }
+
+    else if(ictdF=="IC"){
+        std::cout << "General regimen: " << "IC" << std::endl; 
+        for (int r=0 ; r<getNumBonds(); r++){
+            setBondMobility(BondMobility::Free, Compound::BondIndex(r));
+        }
     }
     else if(ictdF=="TD"){
-      for (int r=0 ; r<getNumBonds(); r++){
-        setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
-      }
+        std::cout << "General regimen: " << "TD" << std::endl; 
+        for (int r=0 ; r<getNumBonds(); r++){
+            setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
+        }
     }
     else if(ictdF=="RR"){ // Torsional dynamics with rigid rings
-      for(unsigned int m=0; m<nbnds; m++){ // EU
-        if(bonds[m].isInRing()){
-          setBondMobility(BondMobility::Rigid, bonds[m].getBondIndex());
-          std::cout<<"Bond "<<m<<"("<<bonds[m].getBondIndex()<<")"<<" rigidized ";
-          for(ix = 0; ix < getNumAtoms(); ++ix){
-            if(bAtomList[ix].number == bonds[m].i || bAtomList[ix].number == bonds[m].j){
-              std::cout<<" inName "<<bAtomList[ix].inName<<" name  "<<bAtomList[ix].name;
+        std::cout << "General regimen: " << "RR" << std::endl; 
+        for(unsigned int m=0; m<nbnds; m++){ // EU
+            if(bonds[m].isInRing()){
+                setBondMobility(BondMobility::Rigid, bonds[m].getBondIndex());
+                std::cout<<"Bond "<<m<<"("<<bonds[m].getBondIndex()<<")"<<" rigidized ";
+                for(ix = 0; ix < getNumAtoms(); ++ix){
+                    if(bAtomList[ix].number == bonds[m].i || bAtomList[ix].number == bonds[m].j){
+                        std::cout<<" inName "<<bAtomList[ix].inName<<" name  "<<bAtomList[ix].name;
+                    }
+                }
+                std::cout<<std::endl;
             }
-          }
-          std::cout<<std::endl;
         }
-      }
     }
     else{
       fprintf(stderr, "Dynamics type unknown\n");

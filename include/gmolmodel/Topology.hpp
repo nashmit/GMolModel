@@ -6,7 +6,6 @@
 #include "server.hpp"
 
 /*
-*/
 #ifndef MAIN_RESIDUE_DEBUG_SPECIFIC
 #define MAIN_RESIDUE_DEBUG_SPECIFIC 1
 #endif
@@ -17,6 +16,7 @@
 #ifndef MAIN_RESIDUE_DEBUG_LEVEL02
 #define MAIN_RESIDUE_DEBUG_LEVEL02
 #endif
+*/
 //using namespace SimTK;
 
 void mol_StructureChainsBuild (MolStructure *, int);
@@ -61,6 +61,7 @@ public:
     TARGET_TYPE *PrmToAx_po,
     TARGET_TYPE *MMTkToPrm_po,
     bool first_time=true,
+    std::string flexFN="ligand.flex",
     std::string ictdF="IC"
   );
 

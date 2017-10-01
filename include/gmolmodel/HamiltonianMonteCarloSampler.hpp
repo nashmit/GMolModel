@@ -27,12 +27,12 @@ public:
 
     // Assign a random conformation. Time measured in picoseconds
 
-    void propose(SimTK::State& advanced, SimTK::Real timestep, int nosteps);
+    void propose(SimTK::State& someState, SimTK::Real timestep, int nosteps);
 
     // Performs the acception-rejection step and sets the state of the compound
     // to the appropriate conformation
 
-    void update(SimTK::State&);
+    void update(SimTK::State& someState, SimTK::Real timestep, int nosteps);
 
     // Set kinetic energies    
 

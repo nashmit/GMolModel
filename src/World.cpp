@@ -204,7 +204,8 @@ bool GridForce::dependsOnlyOnPositions() const {
 ////// SYMBODY SYSTEM //////
 ////////////////////////////
 
-World::World(readAmberInput *amberReader, std::string rbF, std::string ictdF,
+World::World(readAmberInput *amberReader, std::string rbF, std::string flexFN,
+std::string ictdF,
 TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, TARGET_TYPE *shm)
 {
   passno = new int;
@@ -218,6 +219,7 @@ TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, TARGET_TYPE *shm)
   this->rbF = rbF;
   this->gaffF = gaffF;
   this->frcmodF = frcmodF;
+  this->flexFN = flexFN;
   this->ictdF = ictdF;
   this->PrmToAx_po = PrmToAx_po;
   this->MMTkToPrm_po = MMTkToPrm_po;
@@ -367,6 +369,7 @@ void World::InitSimulation(
     PrmToAx_po,
     MMTkToPrm_po,
     first_time,
+    flexFN,
     ictdF
   );
   system->adoptCompound(*lig1);

@@ -384,7 +384,7 @@ int main(int argc, char **argv)
         std::cout << "Time before update: " << world->ts->getTime() << std::endl;
 
         //p_HMCsampler->update((world->ts->updIntegrator()).updAdvancedState());
-        p_HMCsampler->update(integAdvancedState);
+        p_HMCsampler->update(integAdvancedState, 0.0015, 10);
 
         std::cout << "Q after update integAdvancedState " 
                   << integAdvancedState.getQ() << std::endl;

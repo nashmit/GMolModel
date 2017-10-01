@@ -89,7 +89,8 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 // The update step in Monte Carlo methods consists in:
 // Acception - rejection step
 
-void HamiltonianMonteCarloSampler::update(SimTK::State& someState){
+void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real timestep, int nosteps)
+{
     SimTK::Real rand_no = uniformRealDistribution(randomEngine);
     SimTK::Real RT = getTemperature() * SimTK_BOLTZMANN_CONSTANT_MD;
 
@@ -102,7 +103,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState){
 
     // Assign random configuration
 
-    propose(someState, 0.0015, 10);
+    propose(someState, timestep, nosteps);
 
     //system->realize(someState, SimTK::Stage::Acceleration);
     fix_n = calcFixman(someState);

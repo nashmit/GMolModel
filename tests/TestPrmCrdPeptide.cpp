@@ -44,18 +44,21 @@ int main(int argc, char **argv)
     std::string rbFN = std::string(argv[1]) + std::string("/ligand.rb");
     std::string gaffFN = "gaff.dat";
     std::string frcmodFN = std::string(argv[1]) + std::string("/ligand.frcmod");
+    std::string flexFN = std::string(argv[1]) + std::string("/ligand.flex");
 
     // Simulation type:
     // IC: Internal Coordinates Dynamics
     // TD: Torsional Dynamics
     // RR: Rigid Rings Torsional Dynamics
+    // RB: Rigid Bodies
 
-    std::string ictd = "TD";
+    std::string ictd = "RB";
 
     std::cout<<"mol2FN "<<mol2FN<<std::endl<<std::flush;
     std::cout<<"rbFN "<<rbFN<<std::endl<<std::flush;
     std::cout<<"gaffFN "<<gaffFN<<std::endl<<std::flush;
     std::cout<<"frcmodFN "<<frcmodFN<<std::endl<<std::flush;
+    std::cout<<"flexFN "<<flexFN<<std::endl<<std::flush;
     std::cout<<"ictd "<<ictd<<std::endl<<std::flush;
 
     // Read number of atoms from mol2 file
@@ -138,7 +141,7 @@ int main(int argc, char **argv)
     //);
 
 
-    World *p_world = new World(amberReader, rbFN, ictd, PrmToAx_po, MMTkToPrm_po,
+    World *p_world = new World(amberReader, rbFN, flexFN, ictd, PrmToAx_po, MMTkToPrm_po,
         shm); // ELIZA
 
     // Seed the random number generator 
@@ -241,7 +244,7 @@ int main(int argc, char **argv)
     //SimTK::State& tsState = world->ts->updState();
     //world->ts->initialize(tsState);
     p_HMCsampler->initialize(integAdvancedState, 0.0015, 10);
-    for(int i = 0; i<5; i++){
+    for(int i = 0; i<atoi(argv[2]); i++){
         // -- STEPTO -- 
 
         //std::cout << "Time before stepping: " << world->ts->getTime()
@@ -272,7 +275,7 @@ int main(int argc, char **argv)
         std::cout << "Time before update: " << world->ts->getTime() << std::endl;
 
         //p_HMCsampler->update((world->ts->updIntegrator()).updAdvancedState());
-        p_HMCsampler->update(integAdvancedState);
+        p_HMCsampler->update(integAdvancedState, 0.0015, 2);
 
         std::cout << "Q after update integAdvancedState " 
                   << integAdvancedState.getQ() << std::endl;
