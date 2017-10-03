@@ -253,8 +253,8 @@ class bMoleculeReader{
   bSpecificAtom *bAtomList;
   //std::vector<bBond> bonds; // RESTORE
   bBond *bonds;
-  unsigned int natoms;
-  unsigned int nbonds; // EU
+  int natoms;
+  int nbonds; // EU
   unsigned int MAX_LINE_LENGTH;
 
   bMoleculeReader(readAmberInput *amberReader, const char *);

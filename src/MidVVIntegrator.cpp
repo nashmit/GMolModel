@@ -170,9 +170,8 @@ void MidVVIntegratorRep::printForcesNorms(const SimTK::Compound& c, SimTK::State
     for (SimTK::Compound::AtomIndex aIx(0); aIx < c.getNumAtoms(); ++aIx){
       acc = c.calcAtomAccelerationInGroundFrame(advanced, aIx);// * c.getAtomMass(aIx);
       mass = c.getAtomElement(aIx).getMass();
-      //HOREA 
-      //std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
-      //  <<"[ "<<sqrt(sqr(acc[0]*mass) + sqr(acc[1]*mass) + sqr(acc[2]*mass))<<" ]"<<std::endl;
+      std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
+        <<"[ "<<sqrt( std::pow(acc[0]*mass, 2) + std::pow(acc[1]*mass, 2) + std::pow(acc[2]*mass, 2) )<<" ]"<<std::endl;
     }
     std::cout<<std::endl;
 }
@@ -259,16 +258,16 @@ SimTK::Real MidVVIntegratorRep::getUncorrAnglesSinesSq(const SimTK::Compound& c,
 // Compute BAT mass matrix determinant (Jain et al, 2013) - used for Fixman potential
 SimTK::Real MidVVIntegratorRep::calcDetMBATct(const SimTK::Compound& c, SimTK::State& advanced)
 {
-  const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
+  //const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
   SimTK::Real dist_term = 1.0;
   SimTK::Real *angl_term = new SimTK::Real;
   *angl_term = 1.0;
   SimTK::Real mass_term = 1.0;
-  SimTK::Real costheta = 0.0;
+  //SimTK::Real costheta = 0.0;
   SimTK::Compound::AtomIndex aIx1, aIx2;
   SimTK::Vec3 v1, v2;
   SimTK::Vec3 v21;
-  SimTK::Real dist, theta, mass;
+  SimTK::Real dist, mass;
 
   // Get distance term
   int counter = 0;
@@ -327,7 +326,7 @@ SimTK::Real MidVVIntegratorRep::calcDetMBATct(const SimTK::Compound& c, SimTK::S
 SimTK::Real MidVVIntegratorRep::calcDetMBAT(const SimTK::Compound& c, SimTK::State& advanced)
 {
   SimTK::Real detMBAT   = 1.0;
-  SimTK::Real costheta = 0.0;
+  //SimTK::Real costheta = 0.0;
   SimTK::Real sintheta = 0.0;
   SimTK::Real theta = 0.0;
   SimTK::Real E = 0.0;
@@ -356,7 +355,7 @@ SimTK::Real MidVVIntegratorRep::calcDetMBAT(const SimTK::Compound& c, SimTK::Sta
 // 
 SimTK::Real MidVVIntegratorRep::calcDetM(const SimTK::Compound& c, SimTK::State& advanced)
 {
-  const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
+  //const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
 
   // Get detM
   SimTK::Real detM = 1.0;
@@ -415,7 +414,8 @@ SimTK::Real MidVVIntegratorRep::calcDetM(const SimTK::Compound& c, SimTK::State&
 // Compute mass matrix and its determinant
 SimTK::Real MidVVIntegratorRep::calcMAndDetM(const SimTK::Compound& c, SimTK::State& advanced)
 {
-  ; // TODO for Fixman potential
+  !assert("Not implemented");
+  return 0.0
 }
 
 // Compute Fixman potential

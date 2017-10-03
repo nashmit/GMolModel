@@ -34,10 +34,10 @@ public:
   MolStructure *struc;
   MolModel *model;
   bool hasBuiltSystem;
-  unsigned int natms;
+  int natms;
   bSpecificAtom *bAtomList;
   //std::vector<bBond> bonds; // RESTORE
-  unsigned int nbnds; // EU
+  int nbnds; // EU
   bBond *bonds; // EU
   std::string ictdF;
   TARGET_TYPE *PrmToAx_po;
@@ -51,9 +51,9 @@ public:
   // In case we already know the graph and order
   void init(
     SimTK::DuMMForceFieldSubsystem &dumm,
-    unsigned int natms,
+    int natms,
     bSpecificAtom *bAtomList,
-    unsigned int nbnds,
+    int nbnds,
     //std::vector<bBond> bonds, // RESTORE
     bBond *bonds, // EU
     TARGET_TYPE **coords,

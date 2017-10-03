@@ -58,10 +58,10 @@ void Topology::setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::R
 /*Any kind of molecule*/
 void Topology::init(
     DuMMForceFieldSubsystem &dumm,
-    unsigned int natms,
+    int natms,
     bSpecificAtom *bAtomList,
     //std::vector<bBond> bonds, // RESTORE
-    unsigned int nbnds, // EU
+    int nbnds, // EU
     bBond *bonds, // EU
     TARGET_TYPE **coords,
     TARGET_TYPE **indexMap,
