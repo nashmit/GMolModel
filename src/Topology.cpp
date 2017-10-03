@@ -490,7 +490,7 @@ void Topology::init(
         std::vector<int> flexBondsIxs (noFlexBonds, 0);
         std::getline(flexIfStream, line);
         std::istringstream iss2(line);
-        std::cout << "Bonds indeces";
+        std::cout << "Bonds indeces read";
         for(int i=0; i<noFlexBonds; i++){
             iss2 >> flexBondsIxs[i];
             std::cout << " " << flexBondsIxs[i];
@@ -498,13 +498,20 @@ void Topology::init(
         std::cout << std::endl;
         flexIfStream.close();
 
+        std::cout << "Bonds set mobility:" << std::endl;
         for (int r=0 ; r<getNumBonds(); r++){
             if(std::find(flexBondsIxs.begin(), flexBondsIxs.end(), r) != flexBondsIxs.end()){
                 setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
+                std::cout << "Bond " << r << " set to torsion" << std::endl;
             }
             else{
                 setBondMobility(BondMobility::Rigid, Compound::BondIndex(r));
+                std::cout << "Bond " << r << " set to rigid" << std::endl;
             }
+        }
+        std::cout << "Bonds rigidity:" << std::endl;
+        for ( Compound::BondIndex bondIx(0); bondIx < this->getNumBonds(); ++bondIx){
+            
         }
 
     }
