@@ -53,7 +53,7 @@ void bAddGaffParams(
   int natms,
   bSpecificAtom *bAtomList,
   //vector<bBond> bonds, // RESTORE
-  unsigned int nbnds, // EU
+  int nbnds, // EU
   bBond *bonds, // EU
   string frcmodfn
 );

@@ -50,7 +50,7 @@ void bAddGaffParams(
 
     std::vector<std::pair<int, int>> pairStartAndLens = amberReader->getPairStartAndLen(); 
 
-    for(int index=0; index<pairStartAndLens.size(); index++){
+    for(unsigned int index=0; index<pairStartAndLens.size(); index++){
 
         int first    = pairStartAndLens[index].first;
         int numberOf = pairStartAndLens[index].second;
@@ -118,7 +118,7 @@ SimTK::Real bDihedral(SimTK::Vec3 pos0, SimTK::Vec3 pos1, SimTK::Vec3 pos2, SimT
   SimTK::Vec3 diffs[3];
   SimTK::Vec3 normals[2];
   double dots[2];
-  double psin, pcos, dih;
+  double psin, pcos; // double dih;
 
   diffs[0] = pos1 - pos0;
   diffs[1] = pos2 - pos1;
@@ -177,7 +177,7 @@ void bAddGaffParams(
     int natms,
     bSpecificAtom *bAtomList,
     //vector<bBond> bonds, // RESTORE
-    unsigned int nbnds,
+    int nbnds,
     bBond *bonds, // EU
     string frcmodfn
   ){
@@ -345,10 +345,10 @@ void bAddGaffParams(
   int aIx;
   FILE *fpo;    // gaff file pointer
   FILE *frcmod;  // frcmod file pointer
-  int atomTypeFlag = 0;
-  int bondFlag = 0;
-  int angleFlag = 0;
-  int torsFlag = 0;
+  //int atomTypeFlag;
+  //int bondFlag;
+  //int angleFlag;
+  //int torsFlag;
   //int imprFlag = 0;
   string line;
 
@@ -420,7 +420,7 @@ void bAddGaffParams(
   }
 
   //2nd level
-  for(unsigned int k=0; k<nbnds; k++){
+  for(int k=0; k<nbnds; k++){
     if(l1no == bonds[k].i){
       if(strcmp(bAtomList[bonds[k].j-1].fftype, "gaff_x")){
         l2no.push_back(bonds[k].j);
@@ -437,7 +437,7 @@ void bAddGaffParams(
   ///////////////////////////////////
 
   //3rd level
-  for(unsigned int k=0; k<nbnds; k++){
+  for(int k=0; k<nbnds; k++){
     for(unsigned int i=0; i<l2no.size(); i++){
         if(l2no[i] == bonds[k].i){
           if(bonds[k].j != l1no){
@@ -479,7 +479,7 @@ void bAddGaffParams(
     if((line_c[0] == '\n') || (line_c[0] == '\r')){
       break;
     }
-    sscanf(line_c, "%s%f", &atomType1, &vdwValue);
+    sscanf(line_c, "%s%f", atomType1, &vdwValue);
     buff1 = atomType1;
     vdw.insert (std::pair<string, float>(buff1, vdwValue));
   }
@@ -490,7 +490,7 @@ void bAddGaffParams(
   /*Skip the first line*/
   rewind(fpo);
   fgets(line_c, 200, fpo);
-  atomTypeFlag = 1;
+  //atomTypeFlag = 1;
 
   /*READ ATOM TYPES*/
   /*First deal with the dummy atoms*/
@@ -546,12 +546,12 @@ void bAddGaffParams(
     #endif
     line = line_c;
     if((line_c[0] == '\n') || (line_c[0] == '\r')){
-      atomTypeFlag = 0;
-      bondFlag = 1;
+      //atomTypeFlag = 0;
+      //bondFlag = 1;
       break;
     }
     aIx = dumm.getNextUnusedAtomClassIndex();
-    sscanf(line_c, "%s%f%f", &atomType1, &atomicMass, &well);
+    sscanf(line_c, "%s%f%f", atomType1, &atomicMass, &well);
     buff1 = "gaff_";
     buff1 += atomType1;
     if((tolower(atomType1[0]) == 'c') && (tolower(atomType1[1]) == 'l')){
@@ -622,8 +622,8 @@ void bAddGaffParams(
   fgets(line_c, 200, fpo);
   while(fgets(line_c, 200, fpo)){
     if((line_c[0] == '\n') || (line_c[0] == '\r')){
-      bondFlag = 0;
-      angleFlag = 1;
+      //bondFlag = 0;
+      //angleFlag = 1;
       break;
     }
     line = line_c;
@@ -843,8 +843,8 @@ void bAddGaffParams(
 
   while(fgets(line_c, 200, fpo)){
     if((line_c[0] == '\n') || (line_c[0] == '\r')){
-      angleFlag = 0;
-      torsFlag = 1;
+      //angleFlag = 0;
+      //torsFlag = 1;
       break;
     }
     line = line_c;
@@ -918,7 +918,7 @@ void bAddGaffParams(
   std::vector<string>::iterator uspit4;
   std::vector<float> uspTk1;
   std::vector<float> uspTequil1;
-  char *atomType = new char[ATOMTYPE_MAX_LEN];
+  //char *atomType = new char[ATOMTYPE_MAX_LEN];
 
 
   /*Deal with dummy atoms*/
@@ -937,8 +937,8 @@ void bAddGaffParams(
         0.1,
         0.0
       );
-      Type2atomType("gaff_z", atomType1, ATOMTYPE_MAX_LEN);
-      Type2atomType("gaff_x", atomType2, ATOMTYPE_MAX_LEN);
+      Type2atomType(std::string("gaff_z"), atomType1, ATOMTYPE_MAX_LEN);
+      Type2atomType(std::string("gaff_x"), atomType2, ATOMTYPE_MAX_LEN);
       Type2atomType((*l1it).c_str(), atomType3, ATOMTYPE_MAX_LEN);
       Type2atomType((*l2it).c_str(), atomType4, ATOMTYPE_MAX_LEN);
       spTaT1.push_back(atomType1);
@@ -966,7 +966,7 @@ void bAddGaffParams(
             0.1,
             0.0
           );
-          Type2atomType("gaff_x", atomType1, ATOMTYPE_MAX_LEN);
+          Type2atomType(std::string("gaff_x"), atomType1, ATOMTYPE_MAX_LEN);
           Type2atomType((*l1it).c_str(), atomType2, ATOMTYPE_MAX_LEN);
           Type2atomType((*l2it).c_str(), atomType3, ATOMTYPE_MAX_LEN);
           Type2atomType((*l3it).c_str(), atomType4, ATOMTYPE_MAX_LEN);
@@ -1002,7 +1002,7 @@ void bAddGaffParams(
 
   while(fgets(line_c, 200, frcmod)){
     if((line_c[0] == '\n') || (line_c[0] == '\r')){
-      torsFlag = 0;
+      //torsFlag = 0;
       break;
     }
     line = line_c;
@@ -1155,7 +1155,7 @@ void bAddGaffParams(
   atomType4[0] = '\0'; atomType4[1] = '\0';
   while(fgets(line_c, 200, fpo)){
     if((line_c[0] == '\n') || (line_c[0] == '\r')){
-      torsFlag = 0;
+      //torsFlag = 0;
       break;
     }
     line = line_c;
@@ -1322,10 +1322,10 @@ void bAddGaffParams(
   cen = bonds;
   l   = bonds;
   r   = bonds;
-  unsigned int ceni=0, li=0, ri=0;
-  int CORRECT = 1;  // boolean like
-  int INCORRECT = 0;  // l or r need to be swapped
-  int lpos, rpos;
+  int ceni=0, li=0, ri=0;
+  //int CORRECT = 1;  // boolean like
+  //int INCORRECT = 0;  // l or r need to be swapped
+  //int lpos, rpos;
   int found_in_specifics = 0;
   int found_in_unspecifics = 0;
   set<string> toBeAdd;
@@ -1341,10 +1341,10 @@ void bAddGaffParams(
         for(ri=0; ri<nbnds; ri++){
           if( ((cen[ceni].j == r[ri].i) && (cen[ceni].i != r[ri].j)) ||
             ((cen[ceni].j == r[ri].j) && (cen[ceni].i != r[ri].i)) ){ // l-cen-r is a quad
-            if(cen[ceni].i == l[li].j){lpos=CORRECT;}
-            else{lpos=INCORRECT; l[li].swap();}
-            if(cen[ceni].j == r[ri].i){rpos=CORRECT;}
-            else{rpos=INCORRECT; r[ri].swap();}
+            if(cen[ceni].i == l[li].j){}//lpos=CORRECT;}
+            else{l[li].swap();} //lpos=INCORRECT;}
+            if(cen[ceni].j == r[ri].i){}//rpos=CORRECT;}
+            else{r[ri].swap();} //rpos=INCORRECT}
             buff1 = bAtomList[l[li].i-1].fftype[5];
             if(bAtomList[l[li].i-1].fftype[6]){buff1 += bAtomList[l[li].i-1].fftype[6];}
             buff2 = bAtomList[cen[ceni].i-1].fftype[5];
