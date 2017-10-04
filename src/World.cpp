@@ -91,7 +91,7 @@ void printPossVels(const SimTK::Compound& c, SimTK::State& advanced)
 
 void shmDump(TARGET_TYPE *shm, unsigned int natms)
 {
-  unsigned long int shm_len = 2 + 3*4*natms + 11;
+  int shm_len = 2 + 3*4*natms + 11;
   printf("Shm dump:");
   printf("%.1f, %.1f\n", shm[0], shm[1]);
   for(int a=2; a<shm_len; a++){
@@ -141,12 +141,12 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
   const SimTK::Compound& c = compoundSystem->getCompound(SimTK::CompoundSystem::CompoundIndex(0));
   int arrays_cut = 2 + 4*3*(c.getNumAtoms());
 
-  float conversion_factor = -1; // Gradients to forces
-  int natoms3 = 3*(c.getNumAtoms());
-  int i=0;
-  int tx, tshm;
-  Vector3 *x, *v, *f;
-  int ix = 0;
+  //float conversion_factor = -1; // Gradients to forces
+  //int natoms3 = 3*(c.getNumAtoms());
+  //int i=0;
+  //int tx, tshm;
+  //Vector3 *x, *v, *f;
+  //int ix = 0;
   
   if((*fassno>0)){ // Get forces from MMTK
 
@@ -154,15 +154,11 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
     for(int a=0; a<c.getNumAtoms(); a++){
       SimTK::Compound::AtomIndex aIx(Caller->_indexMap[ a ][1]);
       const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(c.getAtomMobilizedBodyIndex(aIx));
-      // LAUR
-      SimTK::Vec3 v_check(0, 0, -10.0);
-      //====
+      SimTK::Vec3 v_check(0.0, 0.0, 0.0);
       mobod.applyForceToBodyPoint(state, c.getAtomLocationInMobilizedBodyFrame(aIx), v_check, bodyForces);
     }
 
-    // LAUR
     shm[arrays_cut + 5] = 0.0;
-    //====
 
   } // * fassno % nosteps
 
@@ -173,11 +169,11 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
 
 }
 
+
+// This should be carefully analyzed. Intended to be taken from somewhere else.
 SimTK::Real GridForce::calcPotentialEnergy(const SimTK::State& state) const {
-  const SimTK::Compound& c = compoundSystem->getCompound(SimTK::CompoundSystem::CompoundIndex(0));
-  // LAUR
+  //const SimTK::Compound& c = compoundSystem->getCompound(SimTK::CompoundSystem::CompoundIndex(0));
   double energy = 0.0;
-  //====
   return energy;
 }
 
@@ -399,11 +395,11 @@ void World::InitSimulation(
   TVector = new SimTK::Transform[matter->getNumBodies()];
 
   // Check versus Velocity Verlet in cart coords
-  double *vv_vals = new double[27];
+  //double *vv_vals = new double[27];
 
   arrays_cut = 2 + 4*3*(lig1->natms);
-  int step = (int)(round(shm[arrays_cut + 0]));
-  int nosteps = (int)(round(shm[arrays_cut + 1]));
+  //int step = (int)(round(shm[arrays_cut + 0]));
+  //int nosteps = (int)(round(shm[arrays_cut + 1]));
   *sysTimestep = shm[arrays_cut + 3];
   startT = shm[arrays_cut + 2];
 
@@ -556,7 +552,7 @@ void World::Advance(int nosteps){
   //printf("ts time advanced.getTime() %lf myrealtime %lf stepTo %lf\n", advanced.getTime(), myrealtime, advanced.getTime() + myrealtime);
   #endif
 */
-  ts->stepTo(advanced.getTime() + myrealtime);
+  ts->stepTo(advanced.getTime() + nosteps*0.0015);
 
   std::cout<<"Advance stop: integ->updAdvancedState: "<< advanced.getQ() <<std::endl;
   
