@@ -87,7 +87,7 @@ void Topology::init(
     std::string buff[nbnds]; // EU
     std::string otbuff;        // other buff
     int bondFirstAtom[nbnds], bondSecondAtom[nbnds]; // EU
-    unsigned int k;
+    int k;
 
     // Reinsert setMolModel here if needed
      /* ========================================
@@ -101,7 +101,7 @@ void Topology::init(
     /*First atom*/
     int found = 0;
     int inter = -1;
-    unsigned int firstBond = 0;  // First bond to be used
+    int firstBond = 0;  // First bond to be used
     std::vector<int> pushed;
     std::vector<int> crbonds;
     std::vector<int>::iterator pushedIt1;
@@ -156,20 +156,20 @@ void Topology::init(
     pushed.push_back(bondSecondAtom[firstBond]);
     
     // Rearrange and connect in Molmodel Compound
-    bool boolI, boolJ;
-    while(pushed.size() < 2*nbnds){ // EU
-      for(unsigned int m=0; m<nbnds; m++){ // EU
+    assert(nbnds > 0);
+    while(pushed.size() < (unsigned int)(2*nbnds)){ // EU
+      for(int m=0; m<nbnds; m++){ // EU
         if(!bonds[m].isRingClosing()){
           pushedIt1 = find(pushed.begin(), pushed.end(), bondSecondAtom[m]);
           pushedIt2 = find(pushed.begin(), pushed.end(), bondFirstAtom[m]);
           found = 0;
 
-          boolI = boolJ = false;
+          #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
+          bool boolI = false, boolJ = false;
           if(pushedIt1 != pushed.end()){boolI=true;}
           if(pushedIt2 != pushed.end()){boolJ=true;}
-          #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
-          //std::cout<<"bMainRes: conn bi bj boolI boolJ "
-          //  <<bondFirstAtom[m]<<' '<<bondSecondAtom[m]<<' '<<boolI<<' '<<boolJ<<std::endl;
+          std::cout<<"bMainRes: conn bi bj boolI boolJ "
+            <<bondFirstAtom[m]<<' '<<bondSecondAtom[m]<<' '<<boolI<<' '<<boolJ<<std::endl;
           #endif
           
           if((pushedIt1 == pushed.end()) && (pushedIt2 != pushed.end())){
@@ -212,7 +212,7 @@ void Topology::init(
     }
     // Close the rings in Molmodel Compound
       //for(unsigned int m=0; m<bonds.size(); m++){ // RESTORE
-      for(unsigned int m=0; m<nbnds; m++){ // EU
+      for(int m=0; m<nbnds; m++){ // EU
         if(bonds[m].isRingClosing()){
           #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
           std::cout<<"MainRes: RingClosing bonds found"<<std::endl;
@@ -311,8 +311,8 @@ void Topology::init(
     }
 
     // Assign AtomIndex values to atoms in bAtomList[] by name REVISE CHANGE
-    unsigned int ix = 0; // MINE change type
-    unsigned int jx = 0; // MINE change type
+    int ix = 0; // MINE change type
+    int jx = 0; // MINE change type
     std::string cname, myname;
  
     /* 
@@ -368,7 +368,7 @@ void Topology::init(
             }
         }
 
-        for(unsigned int m=0; m<nbnds; m++){ // EU
+        for(int m=0; m<nbnds; m++){ // EU
             if(((bonds[m].i == inumber) && (bonds[m].j == jnumber)) ||
               ((bonds[m].i == jnumber) && (bonds[m].j == inumber))){
                 bonds[m].setBondIndex(Compound::BondIndex(bondIx));
@@ -392,27 +392,27 @@ void Topology::init(
     std::cout << " natms " << natms << std::endl;
     assert(PrmToAx_po);
     
-    for(unsigned int i=0; i<natms; i++){ // invert
+    for(int i=0; i<natms; i++){ // invert
       Inverse[ (int)(indexMap[i][1]) ] = i;
     }
-    for(unsigned int i=0; i<natms; i++){ // copy
+    for(int i=0; i<natms; i++){ // copy
       PrmToAx_po[i] = TARGET_TYPE(Inverse[i]);
     }
 
-    for(unsigned int i=0; i<natms; i++){ // invert
+    for(int i=0; i<natms; i++){ // invert
       Inverse[ (int)(indexMap[i][2]) ] = i;
     }
-    for(unsigned int i=0; i<natms; i++){ // copy
+    for(int i=0; i<natms; i++){ // copy
       MMTkToPrm_po[i] = TARGET_TYPE(Inverse[i]);
     }
 
     #ifdef MAIN_RESIDUE_DEBUG_SPECIFIC
     std::cout<<"PrmToAx_po filled "<<std::endl<<std::flush;
-    for(unsigned int k=0; k<natms; k++){
+    for(int k=0; k<natms; k++){
         std::cout<<"PrmToAx_po["<<k<<"]: "<<PrmToAx_po[k]<<std::endl;
     }
     std::cout<<"MMTkToPrm_po filled"<<std::endl<<std::flush;
-    for(unsigned int k=0; k<natms; k++){
+    for(int k=0; k<natms; k++){
         std::cout<<"MMTkToPrm_po["<<k<<"]: "<<MMTkToPrm_po[k]<<std::endl;
     }
     std::cout<<"indexMap filled "<<std::endl<<std::flush;
@@ -438,10 +438,11 @@ void Topology::init(
     }
     else{ // Take coordinates from REVISE CHANGE
       std::cout<<"Take coordinates from MMTK"<<std::endl;
-      int ixi, prmtopi_from_SimTK, prmtopi_from_MMTK;
+      //int ixi, prmtopi_from_SimTK;
+      int prmtopi_from_MMTK;
       for(ix = 0; ix < getNumAtoms(); ++ix){
-        ixi                 = indexMap[ix][0];
-        prmtopi_from_SimTK  = indexMap[ix][1];
+        //ixi                 = indexMap[ix][0];
+        //prmtopi_from_SimTK  = indexMap[ix][1];
         prmtopi_from_MMTK   = indexMap[ix][2];
         Vec3 v(coords[prmtopi_from_MMTK][0]/10, coords[prmtopi_from_MMTK][1]/10, coords[prmtopi_from_MMTK][2]/10);
 
@@ -499,7 +500,7 @@ void Topology::init(
         flexIfStream.close();
 
         std::cout << "Bonds set mobility:" << std::endl;
-        for (int r=0 ; r<getNumBonds(); r++){
+        for (unsigned int r=0 ; r<getNumBonds(); r++){
             if(std::find(flexBondsIxs.begin(), flexBondsIxs.end(), r) != flexBondsIxs.end()){
                 setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
                 std::cout << "Bond " << r << " set to torsion" << std::endl;
@@ -518,19 +519,19 @@ void Topology::init(
 
     else if(ictdF=="IC"){
         std::cout << "General regimen: " << "IC" << std::endl; 
-        for (int r=0 ; r<getNumBonds(); r++){
+        for (unsigned int r=0 ; r<getNumBonds(); r++){
             setBondMobility(BondMobility::Free, Compound::BondIndex(r));
         }
     }
     else if(ictdF=="TD"){
         std::cout << "General regimen: " << "TD" << std::endl; 
-        for (int r=0 ; r<getNumBonds(); r++){
+        for (unsigned int r=0 ; r<getNumBonds(); r++){
             setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
         }
     }
     else if(ictdF=="RR"){ // Torsional dynamics with rigid rings
         std::cout << "General regimen: " << "RR" << std::endl; 
-        for(unsigned int m=0; m<nbnds; m++){ // EU
+        for(int m=0; m<nbnds; m++){ // EU
             if(bonds[m].isInRing()){
                 setBondMobility(BondMobility::Rigid, bonds[m].getBondIndex());
                 std::cout<<"Bond "<<m<<"("<<bonds[m].getBondIndex()<<")"<<" rigidized ";
@@ -571,48 +572,48 @@ void Topology::init(
 
   // Parameters
 
-  void Topology::setDuMMAtomParam(int, SimTK::Real vdw, SimTK::Real well){}
-  void Topology::setDuMMBondParam(int, int, SimTK::Real k, SimTK::Real equil){}
-  void Topology::setDuMMAngleParam(int, int, int, SimTK::Real k, SimTK::Real equil){}
+  void Topology::setDuMMAtomParam(int, SimTK::Real vdw, SimTK::Real well){assert(!"Not implemented.");}
+  void Topology::setDuMMBondParam(int, int, SimTK::Real k, SimTK::Real equil){assert(!"Not implemented.");}
+  void Topology::setDuMMAngleParam(int, int, int, SimTK::Real k, SimTK::Real equil){assert(!"Not implemented.");}
 
   void Topology::setDuMMDihedralParam(int, int, int, int,
       int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
-  ){}
+  ){assert(!"Not implemented.");}
   void Topology::setDuMMDihedralParam(int, int, int, int,
       int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
       int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
-  ){}
+  ){assert(!"Not implemented.");}
   void Topology::setDuMMDihedralParam(int, int, int, int,
       int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
       int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
       int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
-  ){}
+  ){assert(!"Not implemented.");}
 
   void Topology::setDuMMImproperParam(int, int, int, int,
       int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
-  ){}
+  ){assert(!"Not implemented.");}
   void Topology::setDuMMImproperParam(int, int, int, int,
       int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
       int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
-  ){}
+  ){assert(!"Not implemented.");}
   void Topology::setDuMMImproperParam(int, int, int, int,
       int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
       int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
       int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
-  ){}
+  ){assert(!"Not implemented.");}
 
   // Get
 
-  int Topology::getNAtoms(void) const{}
-  int Topology::getNBonds(void) const{}
+  int Topology::getNAtoms(void) const{assert(!"Not implemented.");}
+  int Topology::getNBonds(void) const{assert(!"Not implemented.");}
 
-  bSpecificAtom * Topology::getAtomByNumber(int number) const{}
-  bSpecificAtom * Topology::getAtomByAtomIx(int aIx) const{}
-  bSpecificAtom * Topology::getAtomByName(std::string name) const{}
+  bSpecificAtom * Topology::getAtomByNumber(int number) const{assert(!"Not implemented.");}
+  bSpecificAtom * Topology::getAtomByAtomIx(int aIx) const{assert(!"Not implemented.");}
+  bSpecificAtom * Topology::getAtomByName(std::string name) const{assert(!"Not implemented.");}
 
-  std::vector<bSpecificAtom> Topology::getNeighbours(int) const{}
-  bBond * Topology::getBond(int, int) const{}
-  int Topology::getBondOrder(int, int) const{}
+  std::vector<bSpecificAtom> Topology::getNeighbours(int) const{assert(!"Not implemented.");}
+  bBond * Topology::getBond(int, int) const{assert(!"Not implemented.");}
+  int Topology::getBondOrder(int, int) const{assert(!"Not implemented.");}
 
 
   
