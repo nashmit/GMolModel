@@ -31,15 +31,15 @@ class MidVVIntegratorRep : public SimTK::AbstractIntegratorRep {
   TARGET_TYPE **grads;
   TARGET_TYPE *shm;
   int arrays_cut;
-  unsigned int natms;
+  int natms;
   long int trial;
-  unsigned long int noSteps;
+  long int noSteps;
   int massMatNumOpt;
   int metroFixmanOpt;
-  unsigned long int stepsPerTrial;
-  unsigned long int ntrials;
-  unsigned long int step;
-  unsigned long int totStepsInCall;
+  long int stepsPerTrial;
+  long int ntrials;
+  long int step;
+  long int totStepsInCall;
   SimTK::CompoundSystem *compoundSystem;
   World *Caller;
   const SimTK::Compound& c;
@@ -164,8 +164,8 @@ class MidVVIntegratorRep : public SimTK::AbstractIntegratorRep {
   long int getTrial(void);
   void incrTrial(void);
 
-  unsigned long int getNoSteps(void);
-  void setNoSteps(unsigned long int);
+  long int getNoSteps(void);
+  void setNoSteps(long int);
 
   int getMassMatNumOpt(void);
   void setMassMatNumOpt(int);
@@ -173,24 +173,24 @@ class MidVVIntegratorRep : public SimTK::AbstractIntegratorRep {
   int getMetroFixmanOpt(void);
   void setMetroFixmanOpt(int);
 
-  unsigned long int getStepsPerTrial(void);
-  void setStepsPerTrial(unsigned long int);
+  long int getStepsPerTrial(void);
+  void setStepsPerTrial(long int);
 
-  unsigned long int getNtrials(void);
-  void setNtrials(unsigned long int);
+  long int getNtrials(void);
+  void setNtrials(long int);
 
   void resetStep(void);
-  unsigned long int getStep(void);
+  long int getStep(void);
   void incrStep(void);
-  void incrStep(unsigned int);
+  void incrStep(int);
 
   void resetTotStepsInCall(void);
-  unsigned long int getTotStepsInCall(void);
+  long int getTotStepsInCall(void);
   void incrTotStepsInCall(void);
-  void incrTotStepsInCall(unsigned int);
+  void incrTotStepsInCall(int);
 
   void metropolis(const SimTK::Compound&, SimTK::State&); // Metropolis function
-  void try_finalize(const SimTK::Compound&, SimTK::State&, int, int); 
+  void try_finalize(const SimTK::Compound&, SimTK::State&, long int, long int); 
 
  public:
     MidVVIntegratorRep(SimTK::Integrator* handle, const SimTK::System& sys
@@ -278,8 +278,8 @@ class SimTK_SIMMATH_EXPORT MidVVIntegrator : public SimTK::Integrator {
   long int getTrial(void);
   void incrTrial(void);
 
-  unsigned long int getNoSteps(void);
-  void setNoSteps(unsigned long int);
+  long int getNoSteps(void);
+  void setNoSteps(long int);
 
   int getMassMatNumOpt(void);
   void setMassMatNumOpt(int);
@@ -287,21 +287,21 @@ class SimTK_SIMMATH_EXPORT MidVVIntegrator : public SimTK::Integrator {
   int getMetroFixmanOpt(void);
   void setMetroFixmanOpt(int);
 
-  unsigned long int getStepsPerTrial(void);
-  void setStepsPerTrial(unsigned long int);
+  long int getStepsPerTrial(void);
+  void setStepsPerTrial(long int);
 
-  unsigned long int getNtrials(void);
-  void setNtrials(unsigned long int);
+  long int getNtrials(void);
+  void setNtrials(long int);
 
   void resetStep(void);
-  unsigned long int getStep(void);
+  long int getStep(void);
   void incrStep(void);
-  void incrStep(unsigned int);
+  void incrStep(int);
 
   void resetTotStepsInCall(void);
-  unsigned long int getTotStepsInCall(void);
+  long int getTotStepsInCall(void);
   void incrTotStepsInCall(void);
-  void incrTotStepsInCall(unsigned int);
+  void incrTotStepsInCall(int);
 
   void metropolis(const SimTK::Compound&, SimTK::State&); // Metropolis function
 

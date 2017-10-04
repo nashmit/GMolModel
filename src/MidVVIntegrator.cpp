@@ -237,7 +237,7 @@ SimTK::Real MidVVIntegratorRep::getUncorrAnglesSinesSq(const SimTK::Compound& c,
     // Move down
     bAtListIx1 = bAtListIx2;
     molecule_tree.push_back(bAtListIx3);
-    getUncorrAnglesSinesSq(c, advanced, molecule_tree, angl_term, counter);
+    return getUncorrAnglesSinesSq(c, advanced, molecule_tree, angl_term, counter);
   }
   else{
     // Move up
@@ -249,8 +249,10 @@ SimTK::Real MidVVIntegratorRep::getUncorrAnglesSinesSq(const SimTK::Compound& c,
       bAtListIx1 = bAtListIx0;
       molecule_tree.pop_back();
     }
-    getUncorrAnglesSinesSq(c, advanced, molecule_tree, angl_term, counter);
+    return getUncorrAnglesSinesSq(c, advanced, molecule_tree, angl_term, counter);
   }
+   
+  return 0;
 
 }
 
@@ -414,8 +416,8 @@ SimTK::Real MidVVIntegratorRep::calcDetM(const SimTK::Compound& c, SimTK::State&
 // Compute mass matrix and its determinant
 SimTK::Real MidVVIntegratorRep::calcMAndDetM(const SimTK::Compound& c, SimTK::State& advanced)
 {
-  !assert("Not implemented");
-  return 0.0
+  assert("!Not implemented");
+  return 0.0;
 }
 
 // Compute Fixman potential
@@ -444,7 +446,7 @@ SimTK::Real MidVVIntegratorRep::calcUFixNum(const SimTK::Compound& c, SimTK::Sta
     }
   }
 
-  //UFix = 0.5 * RT * (std::log(EiM.determinant() / calcDetMBAT(c, advanced))); // Jain
+  UFix = 0.5 * RT * (std::log(EiM.determinant() / calcDetMBAT(c, advanced))); // Jain
   //UFix =  -0.5 * RT * std::log(EiM.determinant()); // Patriciu
   return UFix;
 }
@@ -498,7 +500,7 @@ void MidVVIntegratorRep::initializeVelsFromRandU(const SimTK::Compound& c, SimTK
 {
   //const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
   const SimTK::System& system   = getSystem();
-  const SimTK::Vector& Qs = advanced.getQ();
+  //const SimTK::Vector& Qs = advanced.getQ();
   int nu = advanced.getNU();
 
   //Eigen::VectorXd EiV(nu);
@@ -670,10 +672,10 @@ void MidVVIntegratorRep::initializeVelsFromVRT(const SimTK::Compound& c, SimTK::
 
   const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
   const SimTK::System& system   = getSystem();
-  int nq = advanced.getNQ();
+  //int nq = advanced.getNQ();
   int nu = advanced.getNU();
-  int nb = matter.getNumBodies();
-  const int m  = advanced.getNMultipliers();
+  //int nb = matter.getNumBodies();
+  //const int m  = advanced.getNMultipliers();
 
   SimTK::Vector V(nu);
   SimTK::Vector Vmod(nu);
@@ -871,7 +873,7 @@ void MidVVIntegratorRep::initializeVelsFromAtoms(const SimTK::Compound& c, SimTK
   advanced.updU() = 0.0;
   SimTK::Vec3 vertex;
   SimTK::Real kT = SimTK_BOLTZMANN_CONSTANT_MD*TbTemp;
-  SimTK::Real invKT = 1/(SimTK_BOLTZMANN_CONSTANT_MD*TbTemp);
+  //SimTK::Real invKT = 1/(SimTK_BOLTZMANN_CONSTANT_MD*TbTemp);
   SimTK::Real sqrtInvBeta = std::sqrt(kT);
 
   const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
@@ -927,7 +929,7 @@ void MidVVIntegratorRep::initializeVelsFromAtoms(const SimTK::Compound& c, SimTK
     int mbxi = int(mbx);
     int mbx_1 = mbxi-1;
     const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
-    const SimTK::Vec3& p_GB = mobod.getBodyOriginLocation(advanced);
+    //const SimTK::Vec3& p_GB = mobod.getBodyOriginLocation(advanced);
 
     SimTK::Random::Gaussian vrand(0.0, sigma[mbx_1]);
     vrand.setSeed(*Caller->pyseed);
@@ -946,7 +948,7 @@ void MidVVIntegratorRep::initializeVelsFromAtoms(const SimTK::Compound& c, SimTK
   }
 
   system.realize(advanced, SimTK::Stage::Velocity);
-  SimTK::Real T = (2*compoundSystem->calcKineticEnergy(advanced)) / ((c.getNumAtoms()*3-6)*SimTK_BOLTZMANN_CONSTANT_MD); // !!!????
+  //SimTK::Real T = (2*compoundSystem->calcKineticEnergy(advanced)) / ((c.getNumAtoms()*3-6)*SimTK_BOLTZMANN_CONSTANT_MD); // !!!????
   float KETbTemp = 0.5*TbTemp*SimTK_BOLTZMANN_CONSTANT_MD*(3*c.getNumAtoms());
   const SimTK::Real scale = std::sqrt( KETbTemp / compoundSystem->calcKineticEnergy(advanced) );
   advanced.updU() *= scale;
@@ -960,26 +962,26 @@ void MidVVIntegratorRep::initializeVelsFromMobods(const SimTK::Compound& c, SimT
   system.realize(advanced, SimTK::Stage::Acceleration);
 
   advanced.updU() = 0.0;
-  SimTK::Real sigma;
-  SimTK::Real wsigma;
-  SimTK::Real vxsigma, vysigma, vzsigma;
-  SimTK::Real wxsigma, wysigma, wzsigma;
+  //SimTK::Real sigma;
+  //SimTK::Real wsigma;
+  //SimTK::Real vxsigma, vysigma, vzsigma;
+  //SimTK::Real wxsigma, wysigma, wzsigma;
   SimTK::Real wx, wy, wz, vx, vy, vz;
   wx = wy = wz = vx = vy = vz = 0.0;
   SimTK::Real kT = SimTK_BOLTZMANN_CONSTANT_MD*TbTemp;
   SimTK::Real invKT = 1/(SimTK_BOLTZMANN_CONSTANT_MD*TbTemp);
-  SimTK::Real sqrtInvBeta = std::sqrt(kT);
+  //SimTK::Real sqrtInvBeta = std::sqrt(kT);
 
 
   this->unirand.setSeed(*Caller->pyseed + time(NULL) + getTrial() + getpid());
   this->gaurand.setSeed(*Caller->pyseed + time(NULL) + getTrial() + getpid());
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter.getNumBodies(); ++mbx){
     const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
-    const SimTK::Transform&  X_GF = mobod.getDefaultInboardFrame(); // X_GF.p = dist mobod-mobod
-    const SimTK::Transform&  X_FM = mobod.getMobilizerTransform(advanced);
+    //const SimTK::Transform&  X_GF = mobod.getDefaultInboardFrame(); // X_GF.p = dist mobod-mobod
+    //const SimTK::Transform&  X_FM = mobod.getMobilizerTransform(advanced);
     const SimTK::Transform&  X_GB = mobod.getBodyTransform(advanced);
-    const SimTK::Rotation&   R_GB = mobod.getBodyRotation(advanced);
-    const SimTK::Vec3& p_GB = mobod.getBodyOriginLocation(advanced);
+    //const SimTK::Rotation&   R_GB = mobod.getBodyRotation(advanced);
+    //const SimTK::Vec3& p_GB = mobod.getBodyOriginLocation(advanced);
 
     SimTK::MassProperties M_Bo_B = mobod.getBodyMassProperties(advanced);
     const SimTK::SpatialInertia SI_Bc_B(M_Bo_B.getMass(), M_Bo_B.getMassCenter(), M_Bo_B.getUnitInertia());
@@ -988,20 +990,20 @@ void MidVVIntegratorRep::initializeVelsFromMobods(const SimTK::Compound& c, SimT
     // Add parents Inertia
     for(int j=1; j<matter.getNumBodies(); j++){
       if(Caller->mbxTreeMat[mbx][j] == 0){ break;}
-      const SimTK::MobilizedBody& pamobod = matter.getMobilizedBody(SimTK::MobilizedBodyIndex(Caller->mbxTreeMat[mbx][j]));
+      //const SimTK::MobilizedBody& pamobod = matter.getMobilizedBody(SimTK::MobilizedBodyIndex(Caller->mbxTreeMat[mbx][j]));
       SimTK::MassProperties paM_Bo_B = mobod.getBodyMassProperties(advanced);
       const SimTK::SpatialInertia paSI_Bc_B(paM_Bo_B.getMass(), paM_Bo_B.getMassCenter(), paM_Bo_B.getUnitInertia());
       SimTK::SpatialInertia paSI_Bc_G = paSI_Bc_B.transform(~X_GB);
       SI_Bc_G += paSI_Bc_G;
     }
   
-    SimTK::SpatialMat mat = SI_Bc_G.toSpatialMat();
+    //SimTK::SpatialMat mat = SI_Bc_G.toSpatialMat();
   
-    const SimTK::Real mobod_mass = M_Bo_B.getMass();
-    int pseudoLocalSeed = int(p_GB[0])%10;
-    SimTK::Real OriginIInGround = mobod_mass*p_GB.norm();
+    //const SimTK::Real mobod_mass = M_Bo_B.getMass();
+    //int pseudoLocalSeed = int(p_GB[0])%10;
+    //SimTK::Real OriginIInGround = mobod_mass*p_GB.norm();
 
-    SimTK::Real sigma = sqrtInvBeta/std::sqrt(mobod_mass);
+    //SimTK::Real sigma = sqrtInvBeta/std::sqrt(mobod_mass);
 
     SimTK::SpatialVec TbTempSv(SimTK::Vec3(kT,kT,kT), SimTK::Vec3(kT,kT,kT));
     SimTK::SpatialVec invTbTempSv(SimTK::Vec3(invKT,invKT,invKT), SimTK::Vec3(invKT,invKT,invKT));
@@ -1039,7 +1041,7 @@ void MidVVIntegratorRep::initializeVelsFromJacobian(const SimTK::Compound& c, Si
   advanced.updU() = 0.0;
 
   SimTK::Real kT = SimTK_BOLTZMANN_CONSTANT_MD*TbTemp;
-  const int nq = advanced.getNQ();
+  //const int nq = advanced.getNQ();
   const int nu = advanced.getNU();
   const int nb = matter.getNumBodies();
 
@@ -1090,7 +1092,7 @@ void MidVVIntegratorRep::initializeVelsFromJacobian(const SimTK::Compound& c, Si
 
   // Scale to temperature
   float dofs = (c.getNumAtoms()*3-6);
-  SimTK::Real T = (2*compoundSystem->calcKineticEnergy(advanced)) / (dofs*SimTK_BOLTZMANN_CONSTANT_MD);
+  //SimTK::Real T = (2*compoundSystem->calcKineticEnergy(advanced)) / (dofs*SimTK_BOLTZMANN_CONSTANT_MD);
   SimTK::Real KETbTemp = 0.5*kT*dofs;
   const SimTK::Real scale = std::sqrt( KETbTemp / compoundSystem->calcKineticEnergy(advanced) );
   advanced.updU() *= scale;
@@ -1156,7 +1158,7 @@ void MidVVIntegratorRep::setTVector(SimTK::State& advanced)
   int i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter.getNumBodies(); ++mbx){
     const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
-    const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
+    //const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
     TVector[i] = mobod.getMobilizerTransform(advanced);
     i++;
   } 
@@ -1181,17 +1183,17 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm0(SimTK::State& advanced)
   // Declare vars
   int i;
   const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
-  Vector3 *xMid;
-  int tx, tshm; // x -> shm index correspondence
+  //Vector3 *xMid;
+  //int tx, tshm; // x -> shm index correspondence
   SimTK::Compound& mutc1 = compoundSystem->updCompound(SimTK::CompoundSystem::CompoundIndex(0));
   SimTK::Transform X_CoAt[mutc1.getNumAtoms()];
-  SimTK::Vec3 p_G[mutc1.getNumAtoms()];
+  //SimTK::Vec3 p_G[mutc1.getNumAtoms()];
 
   // Store initial configuration
   i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter.getNumBodies(); ++mbx){
     const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
-    const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
+    //const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
     TVector[i] = mobod.getMobilizerTransform(advanced);
     i++;
   }
@@ -1251,10 +1253,11 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm0(SimTK::State& advanced)
     SimTK::MobilizedBodyIndex ParentMbx = ParentMobod.getMobilizedBodyIndex();
     SimTK::Compound::AtomIndex ChildAix = mbx2aIx.at(ChildMbx); //which aIx correspond to Child  mobod
     SimTK::Compound::AtomIndex ParentAix = mbx2aIx.at(ParentMbx); //which aIx correspond to Parent mobod
-    int iChildMb=int(ChildMbx), iParentMb=int(ParentMbx);
-    int iChildAt=int(ChildAix), iParentAt=int(ParentAix);
+    int iChildMb=int(ChildMbx); //int iParentMb=int(ParentMbx);
+    //int iChildAt=int(ChildAix); 
+    //int iParentAt=int(ParentAix);
 
-    const SimTK::Vec3& vertex = ChildMobod.getBodyOriginLocation(advanced);
+    //const SimTK::Vec3& vertex = ChildMobod.getBodyOriginLocation(advanced);
     X_PF[iChildMb] = ChildMobod.getDefaultInboardFrame();
     if(iChildMb < matter.getNumBodies() - 1){
       X_BM[iChildMb] = ChildMobod.getDefaultOutboardFrame();
@@ -1287,8 +1290,8 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm0(SimTK::State& advanced)
   // Store initial configuration in TVector
   i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter.getNumBodies(); ++mbx){
-    const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
-    const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
+    //const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
+    //const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
     TVector[i] = X_FMAt[int(mbx)];
     i++;
   } 
@@ -1302,14 +1305,14 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm1(SimTK::State& advanced)
 {
   // Declare vars
   int i;
-  const SimTK::System& system   = getSystem();
+  //const SimTK::System& system   = getSystem();
   const SimTK::SimbodyMatterSubsystem& matter = Caller->system->getMatterSubsystem();
-  Vector3 *xMid;
-  int tx, tshm; // x -> shm index correspondence
+  //Vector3 *xMid;
+  //int tx; //int tshm; // x -> shm index correspondence
   SimTK::Compound& mutc1 = compoundSystem->updCompound(SimTK::CompoundSystem::CompoundIndex(0));
 
   SimTK::Transform X_CoAt[mutc1.getNumAtoms()];
-  SimTK::Vec3 p_G[mutc1.getNumAtoms()];
+ // SimTK::Vec3 p_G[mutc1.getNumAtoms()];
 
   // Declare maps
   std::map<SimTK::Compound::AtomIndex, SimTK::Vec3>           atomTargets;
@@ -1367,10 +1370,10 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm1(SimTK::State& advanced)
     SimTK::MobilizedBodyIndex ParentMbx = ParentMobod.getMobilizedBodyIndex();
     SimTK::Compound::AtomIndex ChildAix = mbx2aIx.at(ChildMbx); //which aIx correspond to Child  mobod
     SimTK::Compound::AtomIndex ParentAix = mbx2aIx.at(ParentMbx); //which aIx correspond to Parent mobod
-    int iChildMb=int(ChildMbx), iParentMb=int(ParentMbx);
-    int iChildAt=int(ChildAix), iParentAt=int(ParentAix);
+    int iChildMb=int(ChildMbx); //iParentMb=int(ParentMbx);
+    //int iChildAt=int(ChildAix), iParentAt=int(ParentAix);
 
-    const SimTK::Vec3& vertex = ChildMobod.getBodyOriginLocation(advanced);
+    //const SimTK::Vec3& vertex = ChildMobod.getBodyOriginLocation(advanced);
     X_PF[iChildMb] = ChildMobod.getDefaultInboardFrame();
     if(iChildMb < matter.getNumBodies() - 1){
       X_BM[iChildMb] = ChildMobod.getDefaultOutboardFrame();
@@ -1403,8 +1406,8 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm1(SimTK::State& advanced)
   // Store initial configuration in TVector
   i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter.getNumBodies(); ++mbx){
-    const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
-    const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
+    //const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
+    //const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
     TVector[i] = X_FMAt[int(mbx)];
     i++;
   } 
@@ -1472,12 +1475,12 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm2(SimTK::State& advanced)
   }
   ix = 0;
   AC->moveAllObservations(obss);
-  SimTK::AssemblyConditionIndex ACIx = assembler.adoptAssemblyGoal(AC);
+  //SimTK::AssemblyConditionIndex ACIx = assembler.adoptAssemblyGoal(AC);
 
   try{
     assembler.setUseRMSErrorNorm(true);
     assembler.initialize(advanced);
-    SimTK::Real tolerance = assembler.assemble();
+    //SimTK::Real tolerance = assembler.assemble();
     assembler.updateFromInternalState(advanced);
   }
   catch(const std::exception& exc){
@@ -1492,7 +1495,7 @@ void MidVVIntegratorRep::assignConfAndTVectorFromShm2(SimTK::State& advanced)
   i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter.getNumBodies(); ++mbx){
     const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
-    const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
+    //const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(advanced);
     TVector[i] = mobod.getMobilizerTransform(advanced);
     i++;
   } 
@@ -1589,9 +1592,9 @@ SimTK::State& MidVVIntegratorRep::assignConfAndTVectorFromShm3Opt(SimTK::State& 
   // Set stations and AtomPLacements for leftover atoms in DuMM
   for (SimTK::Compound::AtomIndex aIx(1); aIx < mutc1.getNumAtoms(); ++aIx){
     SimTK::MobilizedBodyIndex mbx = mutc1.getAtomMobilizedBodyIndex(aIx);
-    SimTK::MobilizedBody& mobod = matter.updMobilizedBody(mbx);
+    //SimTK::MobilizedBody& mobod = matter.updMobilizedBody(mbx);
       SimTK::DuMM::AtomIndex dAIx = mutc1.getDuMMAtomIndex(aIx);
-      SimTK::Transform mutc1B_X_atom = mutc1.getFrameInMobilizedBodyFrame(aIx);
+      //SimTK::Transform mutc1B_X_atom = mutc1.getFrameInMobilizedBodyFrame(aIx);
       Caller->forceField->bsetAtomStationOnBody( dAIx, locs[int(aIx)] );
       Caller->forceField->updIncludedAtomStation(dAIx) = (locs[int(aIx)]);
       Caller->forceField->bsetAtomPlacementStation(dAIx, mbx, locs[int(aIx)] );
@@ -1714,9 +1717,9 @@ SimTK::State& MidVVIntegratorRep::assignConfAndTVectorFromShm3(SimTK::State& adv
   // Set stations and AtomPLacements for leftover atoms in DuMM
   for (SimTK::Compound::AtomIndex aIx(1); aIx < mutc1.getNumAtoms(); ++aIx){
     SimTK::MobilizedBodyIndex mbx = mutc1.getAtomMobilizedBodyIndex(aIx);
-    SimTK::MobilizedBody& mobod = matter.updMobilizedBody(mbx);
+    //SimTK::MobilizedBody& mobod = matter.updMobilizedBody(mbx);
       SimTK::DuMM::AtomIndex dAIx = mutc1.getDuMMAtomIndex(aIx);
-      SimTK::Transform mutc1B_X_atom = mutc1.getFrameInMobilizedBodyFrame(aIx);
+      //SimTK::Transform mutc1B_X_atom = mutc1.getFrameInMobilizedBodyFrame(aIx);
       Caller->forceField->bsetAtomStationOnBody( dAIx, locs[int(aIx)] );
       Caller->forceField->updIncludedAtomStation(dAIx) = (locs[int(aIx)]);
       Caller->forceField->bsetAtomPlacementStation(dAIx, mbx, locs[int(aIx)] );
@@ -1855,7 +1858,7 @@ void MidVVIntegratorRep::resetStep(void)
   shm[arrays_cut] = 0;
 }
 
-unsigned long int MidVVIntegratorRep::getStep(void)
+long int MidVVIntegratorRep::getStep(void)
 {
   return this->step;
 }
@@ -1866,7 +1869,7 @@ void MidVVIntegratorRep::incrStep(void)
   shm[arrays_cut] += 1;
 }
 
-void MidVVIntegratorRep::incrStep(unsigned int amount)
+void MidVVIntegratorRep::incrStep(int amount)
 {
   this->step += amount;
   shm[arrays_cut] += amount;
@@ -1878,7 +1881,7 @@ void MidVVIntegratorRep::resetTotStepsInCall(void)
   this->totStepsInCall = 0;
 }
 
-unsigned long int MidVVIntegratorRep::getTotStepsInCall(void)
+long int MidVVIntegratorRep::getTotStepsInCall(void)
 {
   return this->totStepsInCall;
 }
@@ -1888,7 +1891,7 @@ void MidVVIntegratorRep::incrTotStepsInCall(void)
   this->totStepsInCall += 1;
 }
 
-void MidVVIntegratorRep::incrTotStepsInCall(unsigned int amount)
+void MidVVIntegratorRep::incrTotStepsInCall(int amount)
 {
   this->totStepsInCall += amount;
 }
@@ -1912,13 +1915,13 @@ void MidVVIntegratorRep::incrTrial(void)
 }
 
 // * No steps controls * //
-void MidVVIntegratorRep::setNoSteps(unsigned long int val)
+void MidVVIntegratorRep::setNoSteps(long int val)
 {
   this->noSteps = val;
   shm[arrays_cut + 1] = val;
 }
 
-unsigned long int MidVVIntegratorRep::getNoSteps(void)
+long int MidVVIntegratorRep::getNoSteps(void)
 {
   return this->noSteps;
 }
@@ -1947,23 +1950,23 @@ int MidVVIntegratorRep::getMetroFixmanOpt(void)
 
 // * Trials controls * //
 // * Trials controls * //
-void MidVVIntegratorRep::setStepsPerTrial(unsigned long int val)
+void MidVVIntegratorRep::setStepsPerTrial(long int val)
 {
   this->stepsPerTrial = val;
   shm[arrays_cut + 9] = val;
 }
 
-unsigned long int MidVVIntegratorRep::getStepsPerTrial(void)
+long int MidVVIntegratorRep::getStepsPerTrial(void)
 {
   return this->stepsPerTrial;
 }
 
-void MidVVIntegratorRep::setNtrials(unsigned long int val)
+void MidVVIntegratorRep::setNtrials(long int val)
 {
   this->ntrials = val;
 }
 
-unsigned long int MidVVIntegratorRep::getNtrials(void)
+long int MidVVIntegratorRep::getNtrials(void)
 {
   return this->ntrials;
 }
@@ -2010,7 +2013,7 @@ void MidVVIntegratorRep::metropolis(const SimTK::Compound& compound, SimTK::Stat
       TARGET_TYPE RT = getTb() * SimTK_BOLTZMANN_CONSTANT_MD;
       TARGET_TYPE en = ke_n + pe_n;
       TARGET_TYPE eo = getKe() + getPe();
-      TARGET_TYPE expression;
+      //TARGET_TYPE expression;
       SimTK::Real fixo, fixn;
 
 
@@ -2098,14 +2101,14 @@ void MidVVIntegratorRep::metropolis(const SimTK::Compound& compound, SimTK::Stat
 
 }
 
-void MidVVIntegratorRep::try_finalize(const SimTK::Compound& c, SimTK::State& advanced, int step, int steps_done)
+void MidVVIntegratorRep::try_finalize(const SimTK::Compound& c, SimTK::State& advanced, long int step, long int steps_done)
 {
   Vector3 *xMid;
   int tx, tshm; // x -> shm index correspondence
   #ifdef DEBUG_LEVEL02
   printf("startt %.4lf time %.4lf arr3 %.4lf ", starttime, advanced.getTime(), (shm[arrays_cut + 3]));
   printf("f(time) %.2lf ", (advanced.getTime() - starttime) / (shm[arrays_cut + 3]));
-  printf("steps_done %d step %d totStepsInCall %d \n", steps_done, step, totStepsInCall);
+  printf("steps_done %ld step %ld totStepsInCall %ld \n", steps_done, step, totStepsInCall);
   #endif
   if(steps_done){
     #ifdef DEBUG_WRITEALLPDBS
@@ -2119,7 +2122,7 @@ void MidVVIntegratorRep::try_finalize(const SimTK::Compound& c, SimTK::State& ad
     // * CHECKPOINT Metropolize * //
     if(step == stepsPerTrial){ // End of MD cycle 
       #ifdef DEBUG_LEVEL02
-      printf("step %d trial %d stepsPerTrial %d \n", step, trial -1, stepsPerTrial);
+      printf("step %ld trial %ld stepsPerTrial %ld \n", step, trial -1, stepsPerTrial);
       #endif
       metropolis(c, advanced);
 
@@ -2129,7 +2132,7 @@ void MidVVIntegratorRep::try_finalize(const SimTK::Compound& c, SimTK::State& ad
       #endif
 
       if((trial > ntrials) || (trial <= 0)){
-        fprintf(stderr, "MidVV: Return pointers index out of range: %d\n", trial - 1);
+        fprintf(stderr, "MidVV: Return pointers index out of range: %ld\n", trial - 1);
         exit(1);
       }
       this->Caller->sysRetPotEsPoi[trial - 1] = getPe(); // RetPotEsPoi[trial] = PE
@@ -2401,7 +2404,7 @@ void MidVVIntegrator::resetStep(void)
   ((MidVVIntegratorRep *)rep)->resetStep();
 }
 
-unsigned long int MidVVIntegrator::getStep(void)
+long int MidVVIntegrator::getStep(void)
 {
   return ((MidVVIntegratorRep *)rep)->getStep();
 }
@@ -2411,7 +2414,7 @@ void MidVVIntegrator::incrStep(void)
   ((MidVVIntegratorRep *)rep)->incrStep();
 }
 
-void MidVVIntegrator::incrStep(unsigned int amount)
+void MidVVIntegrator::incrStep(int amount)
 {
   ((MidVVIntegratorRep *)rep)->incrStep(amount);
 }
@@ -2422,7 +2425,7 @@ void MidVVIntegrator::resetTotStepsInCall(void)
   ((MidVVIntegratorRep *)rep)->resetTotStepsInCall();
 }
 
-unsigned long int MidVVIntegrator::getTotStepsInCall(void)
+long int MidVVIntegrator::getTotStepsInCall(void)
 {
   return ((MidVVIntegratorRep *)rep)->getTotStepsInCall();
 }
@@ -2432,7 +2435,7 @@ void MidVVIntegrator::incrTotStepsInCall(void)
   ((MidVVIntegratorRep *)rep)->incrTotStepsInCall();
 }
 
-void MidVVIntegrator::incrTotStepsInCall(unsigned int amount)
+void MidVVIntegrator::incrTotStepsInCall(int amount)
 {
   ((MidVVIntegratorRep *)rep)->incrTotStepsInCall(amount);
 }
@@ -2454,12 +2457,12 @@ void MidVVIntegrator::incrTrial(void)
 }
 
 // * No steps controls * //
-void MidVVIntegrator::setNoSteps(unsigned long int val)
+void MidVVIntegrator::setNoSteps(long int val)
 {
   ((MidVVIntegratorRep *)rep)->setNoSteps(val);
 }
 
-unsigned long int MidVVIntegrator::getNoSteps(void)
+long int MidVVIntegrator::getNoSteps(void)
 {
   return ((MidVVIntegratorRep *)rep)->getNoSteps();
 }
@@ -2489,22 +2492,22 @@ int MidVVIntegrator::getMetroFixmanOpt(void)
 // * Trials controls * //
 // * Trials controls * //
 // * Trials controls * //
-void MidVVIntegrator::setStepsPerTrial(unsigned long int val)
+void MidVVIntegrator::setStepsPerTrial(long int val)
 {
   ((MidVVIntegratorRep *)rep)->setStepsPerTrial(val);
 }
 
-unsigned long int MidVVIntegrator::getStepsPerTrial(void)
+long int MidVVIntegrator::getStepsPerTrial(void)
 {
   return ((MidVVIntegratorRep *)rep)->getStepsPerTrial();
 }
 
-void MidVVIntegrator::setNtrials(unsigned long int val)
+void MidVVIntegrator::setNtrials(long int val)
 {
   ((MidVVIntegratorRep *)rep)->setNtrials(val);
 }
 
-unsigned long int MidVVIntegrator::getNtrials(void)
+long int MidVVIntegrator::getNtrials(void)
 {
   return ((MidVVIntegratorRep *)rep)->getNtrials();
 }
@@ -2563,10 +2566,10 @@ bool MidVVIntegratorRep::attemptDAEStep
 
   try
   {
-    int i;
+    //int i;
     step = totStepsInCall % stepsPerTrial;
     #ifdef DEBUG_LEVEL02
-    printf("begin try step %d step0Flag %d, totStepsInCall %d, beginFlag %d\n", step, *step0Flag, totStepsInCall, *beginFlag);
+    printf("begin try step %ld step0Flag %d, totStepsInCall %ld, beginFlag %d\n", step, *step0Flag, totStepsInCall, *beginFlag);
     #endif
 
     if((step == 0) && (*step0Flag == 0)){ // Begining of new trial
@@ -2617,7 +2620,7 @@ bool MidVVIntegratorRep::attemptDAEStep
         initializeVelsFromRandU(c, advanced, getTb());
       }
       #ifdef DEBUG_LEVEL02
-      printf("out of totSteps and beginFlag step %d step0Flag %d, totStepsInCall %d, beginFlag %d\n", step, *step0Flag, totStepsInCall, *beginFlag);
+      printf("out of totSteps and beginFlag step %ld step0Flag %d, totStepsInCall %ld, beginFlag %d\n", step, *step0Flag, totStepsInCall, *beginFlag);
       #endif
       //this->UFixi = calcUFixNum(c, advanced);
       //this->UFixi = calcUFix(c, advanced);
@@ -2828,14 +2831,14 @@ bool MidVVIntegratorRep::attemptDAEStep
       //errOrder = qErrRMS > uzErrRMS ? 3 : 2;
 
       // * CHECKPOINT Increment step & total # of steps * //
-      int steps_done = rint( (advanced.getTime() - starttime) / (shm[arrays_cut + 3]) );
+      long int steps_done = rint( (advanced.getTime() - starttime) / (shm[arrays_cut + 3]) );
       //try_finalize(c, advanced, step, steps_done);
   Vector3 *xMid;
   int tx, tshm; // x -> shm index correspondence
   #ifdef DEBUG_LEVEL02
   printf("startt %.4lf time %.4lf arr3 %.4lf ", starttime, advanced.getTime(), (shm[arrays_cut + 3]));
   printf("f(time) %.2lf ", (advanced.getTime() - starttime) / (shm[arrays_cut + 3]));
-  printf("steps_done %d step %d totStepsInCall %d \n", steps_done, step, totStepsInCall);
+  printf("steps_done %ld step %ld totStepsInCall %ld \n", steps_done, step, totStepsInCall);
   #endif
   if(steps_done){
     #ifdef DEBUG_LEVEL02
@@ -2859,7 +2862,7 @@ bool MidVVIntegratorRep::attemptDAEStep
       printf("KE %.10f  PE %.10f\n", compoundSystem->calcKineticEnergy(advanced), calcPEFromMMTK());
       #endif
       #ifdef DEBUG_LEVEL02
-      printf("step %d trial %d stepsPerTrial %d \n", step, trial -1, stepsPerTrial);
+      printf("step %ld trial %ld stepsPerTrial %ld \n", step, trial -1, stepsPerTrial);
       #endif
       metropolis(c, advanced);
 
@@ -2869,7 +2872,7 @@ bool MidVVIntegratorRep::attemptDAEStep
       #endif
 
       if((trial > ntrials) || (trial <= 0)){
-        fprintf(stderr, "MidVV: Return pointers index out of range: %d\n", trial - 1);
+        fprintf(stderr, "MidVV: Return pointers index out of range: %ld\n", trial - 1);
         exit(1);
       }
       this->Caller->sysRetPotEsPoi[trial - 1] = getPe(); // RetPotEsPoi[trial] = PE
