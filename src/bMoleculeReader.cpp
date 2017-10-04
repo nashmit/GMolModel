@@ -521,7 +521,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
 {
     natoms = 0;
     bBond buffij;
-    char elem = 'x';
+    //char elem = 'x';
     int noDummies = 0; 
     std::string line;
     char line_c[1000];
@@ -534,7 +534,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
 
     std::string str_buf;
     int a=65, b=65, c=65, d=65;
-    int aRest=0, bRest=0, cRest=0, dRest=0;
+    int aRest=0, bRest=0, cRest=0;
     std::string aStr, bStr, cStr, dStr;
     int nameCounter = 0;
     SimTK::Real chargeMultiplier = 18.2223;
@@ -768,8 +768,8 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
   std::string sbuff;
   std::vector<int> ring;
   char curr_char;
-  int bond_found = 0;
-  unsigned int boi;
+  //int bond_found = 0;
+  int boi;
   int par_open = 0;
   int ring_no = -1;
   int ring_closing = 0;
@@ -778,13 +778,13 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
     line = line_c; //RESTORE
     if((sbuff = line.substr(0,5)) == "rings"){ // RESTORE
       sbuff = "";
-      for(int i=0; i<strlen(line_c); i++){ 
+      for(unsigned int i=0; i<strlen(line_c); i++){ 
         curr_char = line_c[i]; // RESTORE
         if(curr_char == ']'){
           ++ring_no;
           ring.push_back(atoi(sbuff.c_str()));
           sbuff = "";
-          bond_found = 0;
+          //bond_found = 0;
           for(boi=0; boi<nbonds; boi++){ // EU
             for(unsigned int ri=0; ri<ring.size(); ri++){
               for(unsigned int rj=0; (rj<ring.size()) && (rj<ri); rj++){
@@ -796,7 +796,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
                     bonds[boi].setAsRingClosing();
                   }
                   ++ring_closing;
-                  bond_found = 1;
+                  //bond_found = 1;
                   break;
                 }
               }
@@ -817,14 +817,14 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
 
     else if((sbuff = line.substr(0,17)) == "non_ring_pi_bonds"){ // RESTORE
       sbuff = "";
-      for(int i=0; i<line.size(); i++){
+      for(unsigned int i=0; i<line.size(); i++){
         curr_char = line_c[i]; // RESTORE
         if(curr_char == ')'){
           par_open = 0;
           ring.push_back(atoi(sbuff.c_str()));
           for(boi = 0; boi<nbonds; boi++){ // EU
-            if( (bonds[boi].i == ring[0]) && (bonds[boi].j == ring[1]) ||
-              (bonds[boi].i == ring[1]) && (bonds[boi].j == ring[0]) ){
+            if( ((bonds[boi].i == ring[0]) && (bonds[boi].j == ring[1])) ||
+              ((bonds[boi].i == ring[1]) && (bonds[boi].j == ring[0])) ){
               bonds[boi].setAsRigid();
               ring.clear();
               sbuff = "";
@@ -885,13 +885,13 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
   natoms = 0;
   //int nbonds = 0;
   bBond buffij;
-  unsigned int i = 0;
-  unsigned int j = 0;
+  int i = 0;
+  int j = 0;
   char line_c[MAX_LINE_LENGTH];
   std::string line;
   std::string str_buf;
-  char elem = 'x';
-  unsigned int lno = 0;
+  //char elem = 'x';
+  //unsigned int lno = 0;
   int noDummies = 0;
 
   /*+++++++++ External readers ++++++++++*/
@@ -905,7 +905,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     natoms = 0;
     i = 0; j = 0;
     char elem = 'x';
-    unsigned int lno = 0;
+    int lno = 0;
  
     /*Read number of atoms*/
     bZeroCharArray(line_c, MAX_LINE_LENGTH); // EU
@@ -1026,7 +1026,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     }
 
     #ifdef DEBUG_LEVEL02
-    std::cout<<"bMoleculeReader::bMoleculeReader() nbonds & freebonds assigned "<<line_c<<std::endl<<std::fflush;
+    std::cout<<"bMoleculeReader::bMoleculeReader() nbonds & freebonds assigned "<<line_c<<std::endl<<std::flush;
     #endif
 
 
@@ -1229,8 +1229,8 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
   std::string sbuff;
   std::vector<int> ring;
   char curr_char;
-  int bond_found = 0;
-  unsigned int boi;
+  //int bond_found = 0;
+  int boi;
   int par_open = 0;
   int ring_no = -1;
   int ring_closing = 0;
@@ -1242,10 +1242,8 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
       std::cout<<"bMoleculeReader::bMoleculeReader() sbuff"<<sbuff<<std::endl;
       #endif
       sbuff = "";
-      //for(i=0; i<line.size(); i++){ // RESTORE
-      for(i=0; i<strlen(line_c); i++){ // EU
-        //curr_char = line.at(i); // RESTORE
-        curr_char = line_c[i]; // RESTORE
+      for(unsigned int charIndex=0; charIndex<strlen(line_c); charIndex++){ // EU
+        curr_char = line_c[charIndex]; // RESTORE
         if(curr_char == ']'){
           ++ring_no;
           ring.push_back(atoi(sbuff.c_str()));
@@ -1254,12 +1252,11 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
           #endif
           #ifdef DEBUG_LEVEL02
           std::cout<<"ring "<<ring_no<<": ";
-          for(int tz; tz<ring.size(); tz++){std::cout<<ring[tz]<<' ';}
+          for(unsigned int tz; tz<ring.size(); tz++){std::cout<<ring[tz]<<' ';}
           std::cout<<std::endl;
           #endif
           sbuff = "";
-          bond_found = 0;
-          //for(boi=0; boi<bonds.size(); boi++){ // RESTORE
+          //bond_found = 0;
           for(boi=0; boi<nbonds; boi++){ // EU
             for(unsigned int ri=0; ri<ring.size(); ri++){
               for(unsigned int rj=0; (rj<ring.size()) && (rj<ri); rj++){
@@ -1276,7 +1273,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
                     <<bonds[boi].isRingClosing()<<std::endl;
                   #endif
                   ++ring_closing;
-                  bond_found = 1;
+                  //bond_found = 1;
                   break;
                 }
               }
@@ -1303,17 +1300,15 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
       std::cout<<std::endl<<sbuff<<std::endl<<std::flush;
       #endif
       sbuff = "";
-      for(i=0; i<line.size(); i++){
-        //curr_char = line.at(i); // RESTORE
-        curr_char = line_c[i]; // RESTORE
+      for(unsigned int charIndex=0; charIndex<line.size(); charIndex++){
+        curr_char = line_c[charIndex]; // RESTORE
         if(curr_char == ')'){
           par_open = 0;
           ring.push_back(atoi(sbuff.c_str()));
           // Set the bond as rigid
-          //for(boi = 0; boi<bonds.size(); boi++){ // RESTORE
           for(boi = 0; boi<nbonds; boi++){ // EU
-            if( (bonds[boi].i == ring[0]) && (bonds[boi].j == ring[1]) ||
-              (bonds[boi].i == ring[1]) && (bonds[boi].j == ring[0]) ){
+            if( ((bonds[boi].i == ring[0]) && (bonds[boi].j == ring[1])) ||
+              ((bonds[boi].i == ring[1]) && (bonds[boi].j == ring[0])) ){
               bonds[boi].setAsRigid();
               #ifdef DEBUG_LEVEL02
               std::cout<<"RIGID BOND: "<<bonds[boi].i
