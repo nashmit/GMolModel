@@ -34,7 +34,7 @@ MonteCarloSampler::~MonteCarloSampler()
 SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState)
 {
     int nu = someState.getNU();
-    SimTK::Real detM = 1.0;
+    //SimTK::Real detM = 1.0;
     SimTK::Vector V(nu);
     SimTK::Vector DetV(nu);
     SimTK::Matrix D0(6, 6);
@@ -86,7 +86,7 @@ void MonteCarloSampler::setTVector(const SimTK::State& someState)
   int i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-    const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
+    //const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
     TVector[i] = mobod.getMobilizerTransform(someState);
     i++;
   }
@@ -184,28 +184,24 @@ void MonteCarloSampler::update(SimTK::State& someState){
     }
 }
 
-// Get stored kinetic energy - only necessary for Hamiltonian Monte Carlo
-
-//SimTK::Real MonteCarloSampler::getOldKE(void){SimTK::Real(!assert("Not implemented"));}
-
-// Store the kintetic energy - only necessary for Hamiltonian Monte Carlo
-
-void MonteCarloSampler::setOldKE(SimTK::Real argKE){}
-
 // Get the potential energy from an external source as far as the sampler
 // is concerned - OPENMM has to be inserted here
-
 SimTK::Real MonteCarloSampler::getPEFromEvaluator(SimTK::State& someState){
     return matter->calcKineticEnergy(someState);
 }
 
-// Get the simulation temperature
+// Get the desired simulation temperature. Not to be confused with 
+// the instant temperature
+SimTK::Real MonteCarloSampler::getTemperature(void){
+    return this->temperature;
+}
 
-SimTK::Real MonteCarloSampler::getTemperature(void){}
-
-// Set the simulatin temperature
-
-void MonteCarloSampler::setTemperature(SimTK::Real argTemperature){temperature = argTemperature;}
+// Set the desired simulation temperature. Not to be confused with 
+// the instant temperature
+void MonteCarloSampler::setTemperature(SimTK::Real argTemperature)
+{
+    this->temperature = argTemperature;
+}
 
 // Send configuration to an external evaluator
 

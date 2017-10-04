@@ -44,9 +44,7 @@ public:
     // Store/restore potential energy
 
     SimTK::Real getOldPE(void);
-    SimTK::Real getOldKE(void);
     void setOldPE(SimTK::Real argPE);
-    void setOldKE(SimTK::Real argKE);
 
     // Set/get Fixman potential
 
