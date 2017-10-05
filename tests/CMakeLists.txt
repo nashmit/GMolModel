@@ -115,7 +115,6 @@ set(TESTS_SRCS
 	TestMolmodelBasic.cpp
         TestGmolmodelNative.cpp
         TestMassSqrtAndDet.cpp
-        TestHamiltonianMonteCarlo.cpp
         TestOpenMMBasic.cpp
         TestPrmCrd.cpp
         TestPrmCrdPeptide.cpp
