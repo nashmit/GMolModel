@@ -17,24 +17,24 @@ int main(int argc, char **argv)
 
     TARGET_TYPE *shm;
     int SHMSZ; // size
-    int sweep;
+    //int sweep;
 
     //  Declare variables for simulation parameters
 
     int natoms;
     int nosteps;
     int ntrials;
-    int steps_per_trial;
-    double temperature;
-    double delta_t;
+    //int steps_per_trial;
+    //double temperature;
+    //double delta_t;
 
     // Set simulation parameters
 
-    temperature = 300.0;
-    delta_t = 0.0015; // ps
+    //temperature = 300.0;
+    //delta_t = 0.0015; // ps
     nosteps = 10; // RESTORE DEL
     ntrials = 10; // RESTORE DEL
-    steps_per_trial = nosteps / ntrials;
+    //steps_per_trial = nosteps / ntrials;
     std::cout<<"main ntrials: "<<ntrials<<std::endl;
     std::cout<<"main nosteps: "<<nosteps<<std::endl;
 
@@ -92,11 +92,11 @@ int main(int argc, char **argv)
     // Read atom ordering from mol2
  
     int order[natoms+2]; // prmtop ORDER previously read from MMTK
-    int acceptance;
+    //int acceptance;
     TARGET_TYPE **indexMap = NULL;
     TARGET_TYPE *PrmToAx_po = NULL;
     TARGET_TYPE *MMTkToPrm_po = NULL;
-    int _indexMap[natoms][3];
+    //int _indexMap[natoms][3];
     indexMap = new TARGET_TYPE*[(natoms)];
     PrmToAx_po = new TARGET_TYPE[natoms];
     MMTkToPrm_po = new TARGET_TYPE[natoms];
@@ -104,17 +104,17 @@ int main(int argc, char **argv)
     for(int i=0; i<natoms; i++){
       order[i] = i; // instead of MMTK
     }
-    for(int i=0; i<natoms; i++){
-        _indexMap[i][2] = order[i];
-    }
+    //for(int i=0; i<natoms; i++){
+    //    _indexMap[i][2] = order[i];
+    //}
     order[natoms] = 1;
     order[natoms+1] = 1945;
-    acceptance = order[natoms];
+    //acceptance = order[natoms];
 
     // Set the shared memory size (SHMSZ)
 
     int natoms3 = 3*(natoms);
-    int arrays_cut = 2 + 4*natoms3;
+    //int arrays_cut = 2 + 4*natoms3;
 
     SHMSZ = (
         2*sizeof(TARGET_TYPE) +       // Counter and flag
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
 
     // Load initial shared memory values
 
-    bool world_initialized = false;
+    //bool world_initialized = false;
 
     // Assign convenient pointers for order
 
@@ -178,7 +178,7 @@ int main(int argc, char **argv)
 
     // Initialize Simulation
 
-    TARGET_TYPE timestep, mytimestep;
+    TARGET_TYPE mytimestep;
     mytimestep = 0.0015;
 
     // Aloc necessary memory for InitSimulation - temporary
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 
 
     p_world->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
-    world_initialized = true;
+    //world_initialized = true;
 
     // Initialize sampler
     HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
@@ -210,9 +210,9 @@ int main(int argc, char **argv)
 
     // Options for mass matrix, Lennard Jones
 
-    TARGET_TYPE temp_arg;
-    TARGET_TYPE ts;
-    int pyseed;
+    //TARGET_TYPE temp_arg;
+    //TARGET_TYPE ts;
+    int pyseed = 0;
     int _massMatNumOpt = 1; // EU
     int _metroFixmanOpt = 1; // EU
     double _lj14sf = 1; //--
@@ -238,8 +238,8 @@ int main(int argc, char **argv)
 
     std::cout << std::fixed;
     std::cout << std::setprecision(4);
-    SimTK::Real timeToReach = 0.001;
-    const SimTK::State& tsState = world->ts->getState(); // less than or equal to integ advanced state
+    //SimTK::Real timeToReach = 0.001;
+    //const SimTK::State& tsState = world->ts->getState(); // less than or equal to integ advanced state
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
     //SimTK::State& tsState = world->ts->updState();
     //world->ts->initialize(tsState);
