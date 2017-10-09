@@ -1,0 +1,15 @@
+
+source leaprc.protein.ff14SB
+set default PBRadii mbondi2
+
+system = loadpdb /home/eliza/namd/CCdomains/Rx_Xray/4m70A.pdb
+
+saveAmberParm system /home/eliza/namd/CCdomains/Rx_Xray/4m70A.prmtop /home/eliza/namd/CCdomains/Rx_Xray/4m70A.inpcrd
+
+saveMol2 system /home/eliza/namd/CCdomains/Rx_Xray/4m70A.mol2 0
+saveMol2 system /home/eliza/namd/CCdomains/Rx_Xray/4m70A.mol2.v1 1
+
+savepdb system /home/eliza/namd/CCdomains/Rx_Xray/4m70A_amber.pdb
+
+
+quit
