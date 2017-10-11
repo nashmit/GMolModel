@@ -123,14 +123,14 @@ class GridForce : public SimTK::Force::Custom::Implementation {
   //TARGET_TYPE **grads;
   int *fassno;
   int *flag;
-  TARGET_TYPE *shm;
+  //TARGET_TYPE *shm;
   World *Caller;
 
   GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
             //, TARGET_TYPE **indexMap, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
             //, TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
             , int *fassno
-            , TARGET_TYPE *shm
+            //, TARGET_TYPE *shm
             , World *Caller
             );
 
@@ -211,7 +211,7 @@ class World{
   SimTK::Real *branchMassVec; // branch masses self body included
 
 
-  TARGET_TYPE *shm;
+  //TARGET_TYPE *shm;
 
   double **sysRetConfsPois;
   double *sysRetPotEsPoi;
@@ -223,14 +223,15 @@ class World{
   double lj14sf; //-- MMTK default
 
   World(readAmberInput *amberReader, std::string rbF, std::string flexFN,
-        std::string ictdF, 
-        //TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, 
-        TARGET_TYPE *shm);
+        std::string ictdF
+        //, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, 
+        //, TARGET_TYPE *shm
+        );
   
   World(
     string mol2F, string rbF, string gaffF, string frcmodF,
-    string ictdF, //TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
-    TARGET_TYPE *shm
+    string ictdF //TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
+    //, TARGET_TYPE *shm
   );
 
   void InitSimulation(

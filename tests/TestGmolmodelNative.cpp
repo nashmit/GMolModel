@@ -97,8 +97,8 @@ int main(int argc, char **argv)
 
     // Build Gmolmodel simulation world
 
-    World *p_world = new World(amberReader, rbFN, flexFN, ictd, //PrmToAx_po, MMTkToPrm_po,
-        shm);
+    World *p_world = new World(amberReader, rbFN, flexFN, ictd //, PrmToAx_po, MMTkToPrm_po, shm
+        );
 
     // Seed the random number generator 
 

@@ -91,6 +91,8 @@ void printPossVels(const SimTK::Compound& c, SimTK::State& advanced)
 
 void shmDump(TARGET_TYPE *shm, unsigned int natms)
 {
+  assert(!"Not implemented");
+  /*
   int shm_len = 2 + 3*4*natms + 11;
   printf("Shm dump:");
   printf("%.1f, %.1f\n", shm[0], shm[1]);
@@ -101,6 +103,7 @@ void shmDump(TARGET_TYPE *shm, unsigned int natms)
     }
   }
   printf("\n");
+  */
 }
 
 ////////////////////////////
@@ -110,7 +113,7 @@ GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatter
                      //, TARGET_TYPE **indexMap, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
                      //, TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
                      , int *fassno
-                     , TARGET_TYPE *shm
+                     //, TARGET_TYPE *shm
                      , World *Caller
                     ) : matter(matter){
   //this->indexMap = Caller->indexMap;
@@ -127,7 +130,7 @@ GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatter
   //this->p_energy_po = Caller->p_energy_po;
   //this->configuration = Caller->configuration;
   //this->universe_spec = Caller->universe_spec;
-  this->shm = shm;
+  //this->shm = shm;
   this->Caller = Caller;
 }
 
@@ -159,7 +162,7 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
       mobod.applyForceToBodyPoint(state, c.getAtomLocationInMobilizedBodyFrame(aIx), v_check, bodyForces);
     }
 
-    shm[arrays_cut + 5] = 0.0;
+    //shm[arrays_cut + 5] = 0.0;
 
   } // * fassno % nosteps
 
@@ -204,7 +207,8 @@ bool GridForce::dependsOnlyOnPositions() const {
 World::World(readAmberInput *amberReader, std::string rbF, std::string flexFN,
 std::string ictdF
 //, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
-, TARGET_TYPE *shm)
+//, TARGET_TYPE *shm
+)
 {
   passno = new int;
   vassno = new int;
@@ -221,7 +225,7 @@ std::string ictdF
   this->ictdF = ictdF;
   //this->PrmToAx_po = PrmToAx_po;
   //this->MMTkToPrm_po = MMTkToPrm_po;
-  this->shm = shm;
+  //this->shm = shm;
   this->pyseed = new unsigned long int;
   this->lj14sf = 0.5;
 
@@ -250,8 +254,8 @@ std::string ictdF
 
 World::World(
   string mol2F, string rbF, string gaffF, string frcmodF,
-  string ictdF, //TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
-  TARGET_TYPE *shm
+  string ictdF //, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
+  //, TARGET_TYPE *shm
 ){
   passno = new int;
   vassno = new int;
@@ -267,7 +271,7 @@ World::World(
   this->ictdF = ictdF;
   //this->PrmToAx_po = PrmToAx_po;
   //this->MMTkToPrm_po = MMTkToPrm_po;
-  this->shm = shm;
+  //this->shm = shm;
   this->pyseed = new unsigned long int;
   this->lj14sf = 0.5;
 
@@ -326,7 +330,7 @@ void World::InitSimulation(
 
   ExtForce = new SimTK::Force::Custom(*forces, new GridForce(system, *matter //indexMap, PrmToAx_po, MMTkToPrm_po, coords, vels, grads, 
     , fassno
-    , shm
+    //, shm
     , this
   ));
 
@@ -403,8 +407,10 @@ void World::InitSimulation(
   arrays_cut = 2 + 4*3*(lig1->natms);
   //int step = (int)(round(shm[arrays_cut + 0]));
   //int nosteps = (int)(round(shm[arrays_cut + 1]));
-  *sysTimestep = shm[arrays_cut + 3];
-  startT = shm[arrays_cut + 2];
+  //*sysTimestep = shm[arrays_cut + 3];
+  //startT = shm[arrays_cut + 2];
+  *sysTimestep = 0.0015; // CHECK
+  startT = 300.0; // CHECK
 
   #ifdef NOSETHERMOS
   thermo = new NoseHooverThermostat(*forces, *matter, startT, (*sysTimestep)*(50)); // every (x*10000)th step
@@ -506,7 +512,8 @@ void World::Advance(int nosteps){
 
   TARGET_TYPE myrealtime=0;
   //myrealtime = (TARGET_TYPE)nosteps * (*sysTimestep);
-  myrealtime = (TARGET_TYPE)nosteps * (shm[arrays_cut + 3]);
+  //myrealtime = (TARGET_TYPE)nosteps * (shm[arrays_cut + 3]);
+  myrealtime = (TARGET_TYPE)nosteps * (*sysTimestep);
   std::cout<<"myrealtime: "<<myrealtime<<std::endl;
 
   SimTK::State& advanced = integ->updAdvancedState();
