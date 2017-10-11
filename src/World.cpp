@@ -281,14 +281,6 @@ void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
   system->adoptCompound(*lig1);
   system->modelCompounds();
   
-  QVector = new TARGET_TYPE*[matter->getNumBodies()-1];
-  for(int i=0; i<(matter->getNumBodies()-1); i++){
-    QVector[i] = new TARGET_TYPE[3];
-  }
-  for(int i=0; i<(matter->getNumBodies()-1); i++){
-    QVector[i][0] = QVector[i][1] = QVector[i][2] = 0.0;
-  }
-
   TVector = new SimTK::Transform[matter->getNumBodies()];
 
   arrays_cut = 2 + 4*3*(lig1->natms);

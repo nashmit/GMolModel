@@ -47,10 +47,7 @@ bPDBReader::~bPDBReader()
     ;
 }
 
-
-/****
- * bSpecificAtom
- ****/
+/*
 bSpecificAtom::bSpecificAtom(){
     nbonds = 0;
     freebonds = 0;
@@ -319,9 +316,6 @@ SimTK::Real bSpecificAtom::getLJWellDepth(void)
 
 
 
-/********************
- *     FUNCTIONS
- * ******************/
 int bAtomAssign(MolAtom *dest, const bSpecificAtom *src)
 {
   dest->name = new char[5];
@@ -346,11 +340,6 @@ int bAtomAssign(MolAtom *dest, const bSpecificAtom *src)
   return 0;
 }
 
-/********************************/
-
-/****
- * intpair
- ****/
 intpair::intpair(){
     i = 0; j = 0;
   }
@@ -398,12 +387,6 @@ std::string intpair::getString(void){
   return ret.str();
 }
 
-/********************************/
-
-
-/****
- * bBond
- ****/
 bBond::bBond(void) : intpair(){
   inring = 0;
   rigid = 0;
@@ -492,12 +475,8 @@ void bBond::setAsFirst(void)
 }
 
 
+ */
 
-/********************************/
-
-/****
- * intriad
- ****/
 intriad::intriad(){
   i=0; j=0; k=0;
 }
@@ -533,11 +512,7 @@ std::string intriad::getString(void){
   return ret.str();
 }
 
-/********************************/
 
-/****
- * bMoleculeReader PRMTOP
- ****/
 
 bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfilename)
 {

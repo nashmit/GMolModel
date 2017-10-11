@@ -108,6 +108,8 @@ LINK_DIRECTORIES(${BOOST_LIBRARY_DIRS})
 LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/lib)
 
 set(LIBGMOLMODEL_SRC
+        bSpecificAtom.cpp
+        bBond.cpp
         Context.cpp # LAUR
         IState.cpp # LAUR
         MyState.cpp # LAUR

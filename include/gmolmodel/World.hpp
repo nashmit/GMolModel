@@ -172,7 +172,6 @@ class World{
   int *fassno;
   int *sassno;
   TARGET_TYPE *sysTimestep;
-  TARGET_TYPE **QVector;
   SimTK::Transform *TVector;
   int **mbxTreeMat;    // tree representing the bonding
   SimTK::Real *branchMassVec; // branch masses self body included

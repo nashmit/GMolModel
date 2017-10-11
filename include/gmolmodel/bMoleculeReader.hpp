@@ -14,14 +14,9 @@
 #include "Robo.hpp"
 #include "Simbody.h"
 #include "Molmodel.h"
+#include "bSpecificAtom.hpp"
+#include "bBond.hpp"
 #include "readAmberInput.hpp"
-//#include "Molmodel.h"
-//#include "mol.h"
-
-//#include "SimTKcommon.h"
-//#include "molmodel/internal/common.h"
-//#include "molmodel/internal/GrinPointer.h"
-//#include "molmodel/internal/units.h"
 
 /*
 */
@@ -62,15 +57,11 @@ class bPDBReader{
   ~bPDBReader();
 };
 
-
+/*
 //==============================================================================
 //                           CLASS SpecificAtom
 //==============================================================================
-/** 
- * gMolmodel Specific Atom Type Class.
- * This incorporates additional Amber forcefield data.
-**/
-class bSpecificAtom{ /*Information like in sdf*/
+class bSpecificAtom{ Information like in sdf
 public:
     int nbonds;
     int freebonds;
@@ -166,9 +157,6 @@ int bAtomAssign(MolAtom *dest, const bSpecificAtom *src);
 //==============================================================================
 //                           CLASS intpair
 //==============================================================================
-/** 
- * Intpair Class is a two int vector used for connectivity definition in MoleculeReader.
-**/
 class intpair{
  public:
   int i; int j; // These will correspond to bSpecificAtom.number
@@ -187,9 +175,6 @@ class intpair{
 //==============================================================================
 //                           CLASS Bond
 //==============================================================================
-/** 
- * Bond Class used for connectivity definition in MoleculeReader.
-**/
 class bBond : public intpair{
  private:
   int inring;
@@ -223,13 +208,11 @@ class bBond : public intpair{
   void setAsFirst(void);
 };
 
+*/
 
 //==============================================================================
 //                           CLASS intrad
 //==============================================================================
-/** 
- * intriad Class is a three int vector used for connectivity definition in MoleculeReader.
-**/
 class intriad{
  public:
   int i;
@@ -244,7 +227,6 @@ class intriad{
   void dump(void);
   std::string getString(void);
 };
-
 
 //==============================================================================
 //                           CLASS MoleculeReader
