@@ -60,13 +60,8 @@ void Topology::init(
     DuMMForceFieldSubsystem &dumm,
     int natms,
     bSpecificAtom *bAtomList,
-    //std::vector<bBond> bonds, // RESTORE
     int nbnds, // EU
     bBond *bonds, // EU
-    //TARGET_TYPE **coords,
-    //TARGET_TYPE **indexMap,
-    //TARGET_TYPE *PrmToAx_po,
-    //TARGET_TYPE *MMTkToPrm_po,
     bool first_time,
     std::string flexFN,
     std::string ictdF
@@ -77,8 +72,6 @@ void Topology::init(
     this->nbnds = nbnds;
     this->bonds = bonds;
     this->ictdF = ictdF;
-    //this->PrmToAx_po = PrmToAx_po;
-    //this->MMTkToPrm_po = MMTkToPrm_po;
     assert(bAtomList != NULL);
   
     int noDummies = 0;
@@ -89,16 +82,10 @@ void Topology::init(
     int bondFirstAtom[nbnds], bondSecondAtom[nbnds]; // EU
     int k;
 
-    // Reinsert setMolModel here if needed
-     /* ========================================
-      *    BUILD THIS CLASS' MOLECULE TOPOLOGY
-      * ========================================*/
-
-    //setDuMMScaleFactor(dumm, 0.0);
-
     this->setCompoundName("Topology");
 
-    /*First atom*/
+    // Set up the connectivity
+    // First atom
     int found = 0;
     int inter = -1;
     int firstBond = 0;  // First bond to be used
@@ -106,8 +93,6 @@ void Topology::init(
     std::vector<int> crbonds;
     std::vector<int>::iterator pushedIt1;
     std::vector<int>::iterator pushedIt2;
-
-    // Set up the connectivity
 
     for (k=0; k < nbnds; k++){ // EU
       bondFirstAtom[k] = bonds[k].i;
@@ -285,12 +270,6 @@ void Topology::init(
     //Create charged atom types in DuMM
     //Must be called AFTER first mainRes is declared,
     //so Biotypes and atom classes will be defined
-
-    // First set all biotypeIndeces to numbers according to setAtomBiotype calls
-    //for(int ix = 0; ix<natms; ix++){
-    //    bAtomList[ix].biotypeIndex = SimTK::BiotypeIndex(bAtomList[ix].number);
-    //}
-
     std::string abuff;
     for(k=0; k<natms; k++){
       abuff =  "rob";
@@ -327,19 +306,6 @@ void Topology::init(
     int jx = 0; // MINE change type
     std::string cname, myname;
  
-    /* 
-    int intAtomIndex = 0;
-    for (Compound::AtomIndex aIx(0); aIx < this->getNumAtoms(); ++aIx){
-        SimTK::BiotypeIndex biotypeIx = SimTK::Compound::getAtomBiotypeIndex(aIx);
-        for(ix = 0; ix<natms; ix++){
-            if(bAtomList[ix].biotypeIndex == biotypeIx){
-                bAtomList[ix].atomIndex == aIx;
-            }
-        }
-        intAtomIndex++;
-    }
-    */
-
     // Set atomIndeces
     for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
         std::cout << "this->getAtomName(aIx)" << this->getAtomName(aIx)  << std::endl;
@@ -392,49 +358,6 @@ void Topology::init(
     std::cout<<"bonds[m].bondIndexes assigned"<<std::endl<<std::flush;
     #endif
 
-
-   // Fill indexMap
-   // ORDER
-   /*
-   for(ix = 0; ix<natms; ix++){
-      indexMap[ix][0] = ix;
-      indexMap[ix][1] = bAtomList[ix].atomIndex;
-    }
-
-    // Inverse indexMap
-    int Inverse[natms];
-    std::cout << " natms " << natms << std::endl;
-    assert(PrmToAx_po);
-    
-    for(int i=0; i<natms; i++){ // invert
-      Inverse[ (int)(indexMap[i][1]) ] = i;
-    }
-    for(int i=0; i<natms; i++){ // copy
-      PrmToAx_po[i] = TARGET_TYPE(Inverse[i]);
-    }
-
-    for(int i=0; i<natms; i++){ // invert
-      Inverse[ (int)(indexMap[i][2]) ] = i;
-    }
-    for(int i=0; i<natms; i++){ // copy
-      MMTkToPrm_po[i] = TARGET_TYPE(Inverse[i]);
-    }
-
-    #ifdef MAIN_RESIDUE_DEBUG_SPECIFIC
-    std::cout<<"PrmToAx_po filled "<<std::endl<<std::flush;
-    for(int k=0; k<natms; k++){
-        std::cout<<"PrmToAx_po["<<k<<"]: "<<PrmToAx_po[k]<<std::endl;
-    }
-    std::cout<<"MMTkToPrm_po filled"<<std::endl<<std::flush;
-    for(int k=0; k<natms; k++){
-        std::cout<<"MMTkToPrm_po["<<k<<"]: "<<MMTkToPrm_po[k]<<std::endl;
-    }
-    std::cout<<"indexMap filled "<<std::endl<<std::flush;
-    for(int i = 0; i<natms; i++){
-      std::cout<<"indexMap["<<i<<"]: "<<indexMap[i][0]<<" "<<indexMap[i][1]<<" "<<indexMap[i][2]<<std::endl;
-    }
-    #endif
-    */
     // Create atomTargets from passed coords array REVISE CHANGE
     std::cout<<"Create atomTargets from passed coords array"<<std::endl;
     std::map<AtomIndex, Vec3> atomTargets;  
@@ -447,21 +370,6 @@ void Topology::init(
         ix++;
       }
     }
-    //else{ // Take coordinates from REVISE CHANGE
-    //  std::cout<<"Take coordinates from MMTK"<<std::endl;
-      //int ixi, prmtopi_from_SimTK;
-      //int prmtopi_from_MMTK;
-      //for(ix = 0; ix < getNumAtoms(); ++ix){
-        //ixi                 = indexMap[ix][0];
-        //prmtopi_from_SimTK  = indexMap[ix][1];
-        //prmtopi_from_MMTK   = indexMap[ix][2];
-        //Vec3 v(coords[prmtopi_from_MMTK][0]/10, coords[prmtopi_from_MMTK][1]/10, coords[prmtopi_from_MMTK][2]/10);
-
-        //atomTargets.insert(pair<AtomIndex, Vec3>
-          //(bAtomList[ix].atomIndex, v)
-        //);
-      //}
-    //}
 
     // Assign Compound coordinates by matching bAtomList coordinates
     matchDefaultTopLevelTransform(atomTargets);
@@ -485,7 +393,6 @@ void Topology::init(
     */
 
     // Set rigidity
-    
     if(ictdF=="RB"){
 
         std::cout << "General regimen: " << "RB" << std::endl;

@@ -2,11 +2,8 @@
 #define TOPOLOGY_H_
 
 #include "bMoleculeReader.hpp"
-//#include "bgeneral.hpp"
 #include "server.hpp"
 
-/*
-*/
 #ifndef MAIN_RESIDUE_DEBUG_SPECIFIC
 #define MAIN_RESIDUE_DEBUG_SPECIFIC 1
 #endif
@@ -17,7 +14,6 @@
 #ifndef MAIN_RESIDUE_DEBUG_LEVEL02
 #define MAIN_RESIDUE_DEBUG_LEVEL02
 #endif
-//using namespace SimTK;
 
 void mol_StructureChainsBuild (MolStructure *, int);
 
@@ -36,12 +32,9 @@ public:
   bool hasBuiltSystem;
   int natms;
   bSpecificAtom *bAtomList;
-  //std::vector<bBond> bonds; // RESTORE
   int nbnds; // EU
   bBond *bonds; // EU
   std::string ictdF;
-  //TARGET_TYPE *PrmToAx_po;
-  //TARGET_TYPE *MMTkToPrm_po;
 
   // Constructor
   Topology();
@@ -54,12 +47,7 @@ public:
     int natms,
     bSpecificAtom *bAtomList,
     int nbnds,
-    //std::vector<bBond> bonds, // RESTORE
     bBond *bonds, // EU
-    //TARGET_TYPE **coords,
-    //TARGET_TYPE **indexMap,
-    //TARGET_TYPE *PrmToAx_po,
-    //TARGET_TYPE *MMTkToPrm_po,
     bool first_time=true,
     std::string flexFN="ligand.flex",
     std::string ictdF="IC"

@@ -115,22 +115,12 @@ class World;
 class GridForce : public SimTK::Force::Custom::Implementation {
  public:
   SimTK::CompoundSystem *compoundSystem;
-  //TARGET_TYPE **indexMap;
-  //TARGET_TYPE *PrmToAx_po;
-  //TARGET_TYPE *MMTkToPrm_po;
-  //TARGET_TYPE **coords;
-  //TARGET_TYPE **vels;
-  //TARGET_TYPE **grads;
   int *fassno;
   int *flag;
-  //TARGET_TYPE *shm;
   World *Caller;
 
   GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
-            //, TARGET_TYPE **indexMap, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
-            //, TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
             , int *fassno
-            //, TARGET_TYPE *shm
             , World *Caller
             );
 
@@ -144,21 +134,6 @@ class GridForce : public SimTK::Force::Custom::Implementation {
  private:
   SimTK::SimbodyMatterSubsystem& matter;
 };
-
-/////////////////////////////
-//////// MIDVV INTEGRATOR ///
-/////////////////////////////
-class MidVVIntegratorRep;
-// LAUR
-class MidVVIntegrator;
-// ====
-//#include "/home/lspirido/Installers/simbody/simbody-Simbody-3.0/SimTKmath/Integrators/src/AbstractIntegratorRep.h"
-//#include "AbstractIntegratorRep.h"
-//#include "SimTKmath/Integrators/src/AbstractIntegratorRep.h"
-//#include "MidVVIntegrator.hpp"
-/////////////////////////////
-//////// MIDVV INTEGRATOR ///
-/////////////////////////////
 
 //==============================================================================
 //                           CLASS World
@@ -188,16 +163,8 @@ class World{
   SimTK::VerletIntegrator *integ;
   //MidVVIntegrator *integ;
   SimTK::TimeStepper *ts;
-  //TARGET_TYPE *PrmToAx_po;
-  //TARGET_TYPE *MMTkToPrm_po;
   string mol2F, rbF, gaffF, frcmodF, flexFN, ictdF;
 
-  //TARGET_TYPE **coords;
-  //TARGET_TYPE **vels;
-  //TARGET_TYPE **inivels;
-  //TARGET_TYPE **indexMap;
-  //int **_indexMap;
-  //TARGET_TYPE **grads;
   int arrays_cut;
 
   int *passno;
@@ -210,9 +177,6 @@ class World{
   int **mbxTreeMat;    // tree representing the bonding
   SimTK::Real *branchMassVec; // branch masses self body included
 
-
-  //TARGET_TYPE *shm;
-
   double **sysRetConfsPois;
   double *sysRetPotEsPoi;
   double *sysAccs;
@@ -224,22 +188,14 @@ class World{
 
   World(readAmberInput *amberReader, std::string rbF, std::string flexFN,
         std::string ictdF
-        //, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, 
-        //, TARGET_TYPE *shm
         );
   
   World(
     string mol2F, string rbF, string gaffF, string frcmodF,
-    string ictdF //TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
-    //, TARGET_TYPE *shm
+    string ictdF 
   );
 
   void InitSimulation(
-    //TARGET_TYPE **coords,
-    //TARGET_TYPE **vels,
-    //TARGET_TYPE **inivels,
-    //TARGET_TYPE **indexMap,
-    //TARGET_TYPE **grads,
     TARGET_TYPE extTimestep,
     bool first_time
   );
