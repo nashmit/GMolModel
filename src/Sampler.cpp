@@ -1,3 +1,6 @@
+/**@file
+Implementation of Sampler class. **/
+
 #include "Sampler.hpp"
 
 // Includes to get the structure of additional classes

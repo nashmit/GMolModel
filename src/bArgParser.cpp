@@ -1,3 +1,7 @@
+/**@file
+Implementation of bArgParser class. **/
+
+
 #include "bArgParser.hpp"
 ////////////////////////////
 ////// ARGPARSER ///////////

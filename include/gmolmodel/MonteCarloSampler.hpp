@@ -14,62 +14,52 @@ class IState;
 class MonteCarloSampler : public Sampler
 {
 public:
-    // Constructor
 
+    // Constructor
     MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
                       SimTK::SimbodyMatterSubsystem *argMatter,
-                      //Topology *argResidue,
                       SimTK::Compound *argResidue,
                       SimTK::TimeStepper *argTimeStepper);
 
     // Destructor
-
     virtual ~MonteCarloSampler();
 
     // Simulation temperature related
-
     SimTK::Real getTemperature(void);
     void setTemperature(SimTK::Real);
 
-    // Store/restore the configuration from the internal TVector variable
-
+    // Store/restore the configuration from the internal transforms vector
+    // TVector
     void setTVector(const SimTK::State& advanced);
     SimTK::Transform * getTVector(void);
     void assignConfFromTVector(SimTK::State& advanced);
 
     // Assign a random conformation
-
     void propose(SimTK::State& advanced);
 
     // Store/restore potential energy
-
     SimTK::Real getOldPE(void);
     void setOldPE(SimTK::Real argPE);
 
     // Set/get Fixman potential
-
     void setOldFixman(SimTK::State& someState);
     SimTK::Real getOldFixman(SimTK::State& someState);
 
     // Evaluate the potential energy at current state
-
     SimTK::Real getPEFromEvaluator(SimTK::State& someState); 
 
     // Compute Fixman potential
-
     SimTK::Real calcFixman(SimTK::State& someState);
 
     // Send configuration to an external evaluator
-
     void sendConfToEvaluator(void);
 
     // Performs the acception-rejection step and sets the state of the compound
     // to the appropriate conformation
-
     void update(SimTK::State&);
 
 protected:
-    SimTK::Transform *TVector;
+    SimTK::Transform *TVector; // Transform matrices
     SimTK::Real pe_o;
     SimTK::Real temperature;
     

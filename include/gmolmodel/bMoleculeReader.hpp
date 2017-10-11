@@ -197,6 +197,7 @@ class bBond : public intpair{
   int rigid;
   int ring_no;
   SimTK::Compound::BondIndex bondIndex;
+  bool _isFirst;
 
  public:
   bBond(void);
@@ -215,6 +216,11 @@ class bBond : public intpair{
 
   SimTK::Compound::BondIndex getBondIndex(void);
   void setBondIndex(SimTK::Compound::BondIndex otherIx);
+
+  void Print(void);
+
+  bool isFirst(void);
+  void setAsFirst(void);
 };
 
 

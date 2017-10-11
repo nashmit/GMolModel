@@ -107,10 +107,9 @@ void Topology::init(
     std::vector<int>::iterator pushedIt1;
     std::vector<int>::iterator pushedIt2;
 
-    /* Set up the connectivity */
+    // Set up the connectivity
+
     for (k=0; k < nbnds; k++){ // EU
-      //bondFirstAtom[k] = bonds[k].i - 1; // ONLY FOR MOL2
-      //bondSecondAtom[k] = bonds[k].j - 1; // ONLY FOR MOL2
       bondFirstAtom[k] = bonds[k].i;
       bondSecondAtom[k] = bonds[k].j ;
       #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
@@ -118,9 +117,9 @@ void Topology::init(
       #endif
     }
     
-    /*Set base atom and link second one if dummies not present*/
+    // Set base atom and link second one if dummies not present
     if(noDummies == 0){
-      for (k=0; k < nbnds; k++){ //EU
+      for (k=0; k<nbnds; k++){
         if((!bonds[k].isRingClosing()) && (bAtomList[bondFirstAtom[k]].freebonds != 1)){
           firstBond = k;
           break;
@@ -128,7 +127,7 @@ void Topology::init(
       }
     }
     else{    // if dummies
-      firstBond = nbnds - 2;  // EU
+      firstBond = nbnds - 2;
     }
     #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
     std::cout<<"bMainRes: firstBond "<<firstBond<<std::endl;
@@ -136,7 +135,6 @@ void Topology::init(
     
     this->setBaseAtom( *(bAtomList[bondFirstAtom[firstBond]].bAtomType) );
     this->setAtomBiotype(bAtomList[bondFirstAtom[firstBond]].name, "mainRes", bAtomList[bondFirstAtom[firstBond]].biotype);
-    //this->setBiotypeIndex(bAtomList[bondFirstAtom[firstBond]].name, BiotypeIndex(bAtomList[bondFirstAtom[firstBond]].number)); // used to match atomIndeces
     this->convertInboardBondCenterToOutboard();
 
     sbuff.str("");
@@ -145,7 +143,6 @@ void Topology::init(
 
     this->bondAtom(*bAtomList[bondSecondAtom[firstBond]].bAtomType, buff[firstBond].c_str());
     this->setAtomBiotype(bAtomList[bondSecondAtom[firstBond]].name, "mainRes", bAtomList[bondSecondAtom[firstBond]].biotype);
-    //this->setBiotypeIndex(bAtomList[bondSecondAtom[firstBond]].name, BiotypeIndex(bAtomList[bondSecondAtom[firstBond]].number)); // used to match atomIndeces
     bAtomList[bondFirstAtom[firstBond]].freebonds = 2;    // linked to Ground and bj (++ in loop) // WATCHOUT freebonds hardcoded
     #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
     std::cout<<"MainRes: bond "<<bAtomList[bondSecondAtom[firstBond]].name<<" to "<<bAtomList[bondFirstAtom[firstBond]].name<<' '
@@ -158,60 +155,58 @@ void Topology::init(
     // Rearrange and connect in Molmodel Compound
     assert(nbnds > 0);
     while(pushed.size() < (unsigned int)(2*nbnds)){ // EU
-      for(int m=0; m<nbnds; m++){ // EU
-        if(!bonds[m].isRingClosing()){
-          pushedIt1 = find(pushed.begin(), pushed.end(), bondSecondAtom[m]);
-          pushedIt2 = find(pushed.begin(), pushed.end(), bondFirstAtom[m]);
-          found = 0;
+        for(int m=0; m<nbnds; m++){ // EU
+            if(!bonds[m].isRingClosing()){
+                pushedIt1 = find(pushed.begin(), pushed.end(), bondSecondAtom[m]);
+                pushedIt2 = find(pushed.begin(), pushed.end(), bondFirstAtom[m]);
+                found = 0;
 
-          #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
-          bool boolI = false, boolJ = false;
-          if(pushedIt1 != pushed.end()){boolI=true;}
-          if(pushedIt2 != pushed.end()){boolJ=true;}
-          std::cout<<"bMainRes: conn bi bj boolI boolJ "
-            <<bondFirstAtom[m]<<' '<<bondSecondAtom[m]<<' '<<boolI<<' '<<boolJ<<std::endl;
-          #endif
-          
-          if((pushedIt1 == pushed.end()) && (pushedIt2 != pushed.end())){
-          // bj not found, bi found
-            found = 1;
-          }
-          if((pushedIt1 != pushed.end()) && (pushedIt2 == pushed.end())){
-          // bj found, bi not found => swap
-            found = 1;
-            inter = bondFirstAtom[m]; bondFirstAtom[m] = bondSecondAtom[m]; bondSecondAtom[m] = inter; // swap
-          }
-          if(found == 1){
-            if(m != firstBond){
-              sbuff.str("");
-              sbuff<<bAtomList[bondFirstAtom[m]].name<<"/bond"<<bAtomList[bondFirstAtom[m]].freebonds;
-              buff[m] = sbuff.str();
-              this->bondAtom(*bAtomList[bondSecondAtom[m]].bAtomType, buff[m].c_str());
-              this->setAtomBiotype(bAtomList[bondSecondAtom[m]].name, "mainRes", bAtomList[bondSecondAtom[m]].biotype);
-              //this->setBiotypeIndex(bAtomList[bondSecondAtom[m]].name, BiotypeIndex(bAtomList[bondSecondAtom[m]].number)); // used to match atomIndeces
-              if(bondFirstAtom[m] == bondFirstAtom[firstBond]){
-                ++bAtomList[bondFirstAtom[m]].freebonds; // The first atom
-              }
-              else{
-                --bAtomList[bondFirstAtom[m]].freebonds;
-              }
-              #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
-              std::cout<<"MainRes: bond "<<bAtomList[bondSecondAtom[m]].name<<" to "<<bAtomList[bondFirstAtom[m]].name<<' '
-                <<buff[m].c_str()<<std::endl;
-              #endif
+                #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
+                bool boolI = false, boolJ = false;
+                if(pushedIt1 != pushed.end()){boolI=true;}
+                if(pushedIt2 != pushed.end()){boolJ=true;}
+                std::cout<<"bMainRes: conn bi bj boolI boolJ "
+                    <<bondFirstAtom[m]<<' '<<bondSecondAtom[m]<<' '<<boolI<<' '<<boolJ<<std::endl;
+                #endif
+                
+                if((pushedIt1 == pushed.end()) && (pushedIt2 != pushed.end())){
+                // bj not found, bi found
+                    found = 1;
+                }
+                if((pushedIt1 != pushed.end()) && (pushedIt2 == pushed.end())){
+                // bj found, bi not found => swap
+                    found = 1;
+                    inter = bondFirstAtom[m]; bondFirstAtom[m] = bondSecondAtom[m]; bondSecondAtom[m] = inter; // swap
+                }
+                if(found == 1){
+                    if(m != firstBond){
+                        sbuff.str("");
+                        sbuff<<bAtomList[bondFirstAtom[m]].name<<"/bond"<<bAtomList[bondFirstAtom[m]].freebonds;
+                        buff[m] = sbuff.str();
+                        this->bondAtom(*bAtomList[bondSecondAtom[m]].bAtomType, buff[m].c_str());
+                        this->setAtomBiotype(bAtomList[bondSecondAtom[m]].name, "mainRes", bAtomList[bondSecondAtom[m]].biotype);
+                        if(bondFirstAtom[m] == bondFirstAtom[firstBond]){
+                            ++bAtomList[bondFirstAtom[m]].freebonds; // The first atom
+                        }
+                        else{
+                            --bAtomList[bondFirstAtom[m]].freebonds;
+                        }
+                        #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
+                        std::cout<<"MainRes: bond "<<bAtomList[bondSecondAtom[m]].name<<" to "<<bAtomList[bondFirstAtom[m]].name<<' '
+                            <<buff[m].c_str()<<std::endl;
+                        #endif
+                    }
+                    pushed.push_back(bondFirstAtom[m]);
+                    pushed.push_back(bondSecondAtom[m]);
+                    break;
+                }
             }
-            pushed.push_back(bondFirstAtom[m]);
-            pushed.push_back(bondSecondAtom[m]);
-            break;
-          }
         }
-      }
-      if(found == 0){
-        break;
-      }
+        if(found == 0){
+            break;
+        }
     }
     // Close the rings in Molmodel Compound
-      //for(unsigned int m=0; m<bonds.size(); m++){ // RESTORE
       for(int m=0; m<nbnds; m++){ // EU
         if(bonds[m].isRingClosing()){
           #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
@@ -236,8 +231,6 @@ void Topology::init(
                 <<"/bond"<<bAtomList[bondSecondAtom[m]].freebonds;
               otbuff = otsbuff.str();
               
-              //std::cout<<bondSecondAtom[m]+1<<" "<<bondFirstAtom[m]+1<<std::endl
-              //  <<buff[m].c_str()<<' '<<otbuff.c_str()<<std::endl;
               #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
               std::cout<<"MainRes: attempt ring bond "<<bAtomList[bondFirstAtom[m]].name<<" to "<<bAtomList[bondSecondAtom[m]].name<<' '
                 <<buff[m].c_str()<<' '<<otbuff.c_str()<<' '<<bondFirstAtom[m]<<' '<<bondSecondAtom[m]<<std::endl;
@@ -248,14 +241,11 @@ void Topology::init(
                 otbuff.c_str(),
                 0.14,
                 109*Deg2Rad,
-                //BondMobility::Rigid
                 BondMobility::Torsion // TODO
                 );
 
               this->setAtomBiotype(bAtomList[bondFirstAtom[m]].name, "mainRes", bAtomList[bondFirstAtom[m]].biotype);
-              //this->setBiotypeIndex(bAtomList[bondFirstAtom[m]].name, BiotypeIndex(bAtomList[bondFirstAtom[m]].number)); // used to match atomIndeces
               this->setAtomBiotype(bAtomList[bondSecondAtom[m]].name, "mainRes", bAtomList[bondSecondAtom[m]].biotype);
-              //this->setBiotypeIndex(bAtomList[bondSecondAtom[m]].name, BiotypeIndex(bAtomList[bondSecondAtom[m]].number)); // used to match atomIndeces
 
               if(bondFirstAtom[m] == bondFirstAtom[firstBond]){
                 ++bAtomList[bondFirstAtom[m]].freebonds; // The first atom
@@ -267,12 +257,18 @@ void Topology::init(
           crbonds.push_back(m);
         }
       }
+    
+    std::cout << "Before connectivity:" << std::endl;
+    for (int bondIndex = 0; bondIndex < nbnds; bondIndex++){
+        bonds[bondIndex].Print();
+    }
+    for (int bondIndex = 0; bondIndex < nbnds; bondIndex++){
+    }
 
-  /*
-   Create charged atom types in DuMM
-   Must be called AFTER first mainRes is declared,
-   so Biotypes and atom classes will be defined
-  */
+
+    //Create charged atom types in DuMM
+    //Must be called AFTER first mainRes is declared,
+    //so Biotypes and atom classes will be defined
 
     // First set all biotypeIndeces to numbers according to setAtomBiotype calls
     //for(int ix = 0; ix<natms; ix++){

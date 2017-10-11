@@ -8,33 +8,25 @@ Implementation of MonteCarloSampler class. **/
 #include "Topology.hpp"
 
 // Constructor
-
 MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
                                      SimTK::SimbodyMatterSubsystem *argMatter,
-                                     //Topology *argResidue,
                                      SimTK::Compound *argResidue,
                                      SimTK::TimeStepper *argTimeStepper)
     : Sampler(argCompoundSystem, argMatter, argResidue, argTimeStepper)
 {
-
     TVector = new SimTK::Transform[matter->getNumBodies()];
 }
 
 // Destructor
-
 MonteCarloSampler::~MonteCarloSampler()
 {
-
     delete [] TVector;
-
 }
 
 // Compute Fixman potential
-
 SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState)
 {
     int nu = someState.getNU();
-    //SimTK::Real detM = 1.0;
     SimTK::Vector V(nu);
     SimTK::Vector DetV(nu);
     SimTK::Matrix D0(6, 6);
@@ -50,56 +42,50 @@ SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState)
         EiDetD0 *= DetV[i];
     }
     return EiDetD0;
-
 }
 
-// Get set for stored potential energy
+// Get the stored potential energy
 SimTK::Real MonteCarloSampler::getOldPE(void)
 {
     return this->pe_o;
 }
 
-//
+// Set stored potential energy
 void MonteCarloSampler::setOldPE(SimTK::Real argPE)
 {
     this->pe_o = argPE;
 }
 
-
-
-// Set/get Fixman potential
-
+// Set Fixman potential
 void MonteCarloSampler::setOldFixman(SimTK::State& someState)
 {
     this->fix_o = calcFixman(someState);
 }
 
+// Get Fixman potential
 SimTK::Real MonteCarloSampler::getOldFixman(SimTK::State& someState)
 {
     return this->fix_o;
 }
 
 // Stores the configuration into an internal vector of transforms TVector
-
 void MonteCarloSampler::setTVector(const SimTK::State& someState)
 {
   int i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-    //const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
     TVector[i] = mobod.getMobilizerTransform(someState);
     i++;
   }
 }
 
-// Return the old configuration
+// Get the stored configuration
 SimTK::Transform * MonteCarloSampler::getTVector(void)
 {
     return this->TVector;
 }
 
 // Restores configuration from the internal vector of transforms TVector
-
 void MonteCarloSampler::assignConfFromTVector(SimTK::State& someState)
 {
   int i = 0;
@@ -114,7 +100,6 @@ void MonteCarloSampler::assignConfFromTVector(SimTK::State& someState)
 // In torsional dynamics the first body has 7 Q variables for 6 dofs - one
 // quaternion (q) and 3 Cartesian coordinates (x). updQ will return: 
 // [qw, qx, qy, qz, x1, x2, x3]
- 
 void MonteCarloSampler::propose(SimTK::State& someState)
 {
     //randomEngine.seed(4294653137UL); // for reproductibility
@@ -153,7 +138,6 @@ void MonteCarloSampler::propose(SimTK::State& someState)
 
 // The update step in Monte Carlo methods consists in:
 // Acception - rejection step
-
 void MonteCarloSampler::update(SimTK::State& someState){
     SimTK::Real rand_no = uniformRealDistribution(randomEngine);
     SimTK::Real RT = getTemperature() * SimTK_BOLTZMANN_CONSTANT_MD;

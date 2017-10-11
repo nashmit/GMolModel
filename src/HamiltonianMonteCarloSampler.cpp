@@ -8,43 +8,35 @@ Implementation of HamiltonianMonteCarloSampler class. **/
 #include "Topology.hpp"
 
 // Constructor
-
 HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
                                      SimTK::SimbodyMatterSubsystem *argMatter,
-                                     //Topology *argResidue,
                                      SimTK::Compound *argResidue,
                                      SimTK::TimeStepper *argTimeStepper)
     : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argTimeStepper)
 {
-
     this->fix_n = this->fix_o = 0.0;
-
 }
 
 // Destructor
-
 HamiltonianMonteCarloSampler::~HamiltonianMonteCarloSampler()
 {
 }
 
 // Set old kinetic energy
-
 void HamiltonianMonteCarloSampler::setOldKE(SimTK::Real inpKE)
 {
     this->ke_o = inpKE;
 }
 
-// Initialize variables (like TVector)
-
+// Initialize variables (identical to setTVector)
 void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps)
 {
-  // identical to setTVector
   int i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-    const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
-    TVector[i] = mobod.getMobilizerTransform(someState);
-    i++;
+      const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+      const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
+      TVector[i] = mobod.getMobilizerTransform(someState);
+      i++;
   }
 
 }
@@ -54,7 +46,6 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
 // In torsional dynamics the first body has 7 Q variables for 6 dofs - one
 // quaternion (q) and 3 Cartesian coordinates (x). updQ will return: 
 // [qw, qx, qy, qz, x1, x2, x3]
- 
 void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real timestep, int nosteps)
 {
     //randomEngine.seed(4294653137UL); // for reproductibility

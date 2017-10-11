@@ -409,6 +409,7 @@ bBond::bBond(void) : intpair(){
   rigid = 0;
   ring_closing = 0; // later
   ring_no = 0; // later
+  _isFirst = false;
 }
 
 bBond::bBond(int a, int b) : intpair(a, b){
@@ -416,6 +417,7 @@ bBond::bBond(int a, int b) : intpair(a, b){
   rigid = 0;
   ring_closing = 0;
   ring_no = 0; // later
+  _isFirst = false;
 }
 
 bBond::~bBond(void){;}
@@ -467,6 +469,26 @@ Compound::BondIndex bBond::getBondIndex(void){
   
 void bBond::setBondIndex(Compound::BondIndex otherIx){
   this->bondIndex = otherIx;
+}
+
+// Print bond variables
+void bBond::Print(void)
+{
+    std::cout << "i " << i << " j " << j << " rigid " << rigid 
+        << " inring " << inring << " ring_no " << ring_no
+        << " ring_closing " << ring_closing << std::endl;
+}
+
+// Return true if this is set as the first bond in Compound
+bool bBond::isFirst(void)
+{
+    return _isFirst;
+}
+
+// Set this bond as the first one in a Compound
+void bBond::setAsFirst(void)
+{
+    _isFirst = true;
 }
 
 
