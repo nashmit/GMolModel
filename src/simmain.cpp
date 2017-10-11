@@ -26,7 +26,7 @@ class GCHMCIntegrator{
   int trouble;
   int sweep;
   int SHMSZ;
-  TARGET_TYPE **coords;
+  //TARGET_TYPE **coords;
 
   GCHMCIntegrator(PyObject *, std::string, std::string);
   boost::python::object Call(
@@ -154,15 +154,15 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
   bArgParser parser(argc, argv);
   parser.Print();
  
-  TARGET_TYPE **indexMap = NULL;
-  TARGET_TYPE *PrmToAx_po = NULL;
-  TARGET_TYPE *MMTkToPrm_po = NULL;
+  //TARGET_TYPE **indexMap = NULL;
+  //TARGET_TYPE *PrmToAx_po = NULL;
+  //TARGET_TYPE *MMTkToPrm_po = NULL;
 
-  std::cout<<"MMTK configuration->dimensions[0]"<<configuration->dimensions[0]<<std::endl<<std::flush;
-  indexMap = new TARGET_TYPE*[(configuration->dimensions[0])];
-  int _indexMap[natoms][3];
-  PrmToAx_po = new TARGET_TYPE[configuration->dimensions[0]];
-  MMTkToPrm_po = new TARGET_TYPE[configuration->dimensions[0]];
+  //std::cout<<"MMTK configuration->dimensions[0]"<<configuration->dimensions[0]<<std::endl<<std::flush;
+  //indexMap = new TARGET_TYPE*[(configuration->dimensions[0])];
+  //int _indexMap[natoms][3];
+  //PrmToAx_po = new TARGET_TYPE[configuration->dimensions[0]];
+  //MMTkToPrm_po = new TARGET_TYPE[configuration->dimensions[0]];
 
   int natoms3 = 3*(configuration->dimensions[0]);
   int arrays_cut = 2 + 4*natoms3;
@@ -195,7 +195,7 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
   sys = new World(
     parser.mol2F, parser.rbF, parser.gaffF, parser.frcmodF,
     parser.ictdF, 
-    PrmToAx_po, MMTkToPrm_po,
+    //PrmToAx_po, MMTkToPrm_po,
     // LAUR
     //pyFFEvaluatorObject,
     //p_energy_po,
@@ -204,15 +204,15 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
     // ====
     shm
   );
-  for(int i=0; i<natoms; i++){
-    _indexMap[i][2] = order[i];
-  }
+  //for(int i=0; i<natoms; i++){
+  //  _indexMap[i][2] = order[i];
+  //}
 
   // * Memory alloc for convinient arrays * //
-  coords = new TARGET_TYPE*[sys->mr->natms];
-  TARGET_TYPE **vels = new TARGET_TYPE*[sys->mr->natms];
-  TARGET_TYPE **inivels = new TARGET_TYPE*[sys->mr->natms];
-  TARGET_TYPE **grads = new TARGET_TYPE*[sys->mr->natms];
+  //coords = new TARGET_TYPE*[sys->mr->natms];
+  //TARGET_TYPE **vels = new TARGET_TYPE*[sys->mr->natms];
+  //TARGET_TYPE **inivels = new TARGET_TYPE*[sys->mr->natms];
+  //TARGET_TYPE **grads = new TARGET_TYPE*[sys->mr->natms];
 
   // * Seed the random number generator * //
   srand (time(NULL));
@@ -233,9 +233,9 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
 
         // * Assign convenient pointers for order * /
         start = 2 + natoms3 + natoms3; 
-        for(a=0; a<natoms; a++){
-          indexMap[a] = &(shm[a*3 + start]);
-        }
+        //for(a=0; a<natoms; a++){
+        //  indexMap[a] = &(shm[a*3 + start]);
+        //}
         // * Assign order in shm[][2] * //
         start = 2 + natoms3 + natoms3;
         cli = start;
@@ -278,9 +278,9 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
       int shm_coords_sup = (natoms3)+2;
       int j=-1, k=0;
       start = 2; 
-      for(j=0; j<natoms; j++){
-        coords[j] = &(shm[j*3 + start]);
-      }
+      //for(j=0; j<natoms; j++){
+      //  coords[j] = &(shm[j*3 + start]);
+      //}
 
       mysweep = shm[0] - CNT_START;
 
@@ -288,10 +288,10 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
       start = 2 + natoms3;
       start_1 = start - 1;
       stop = 2 + natoms3 + natoms3;
-      for(j=0; j<natoms; j++){
-        vels[j]    = &(shm[j*3 + start]);
-        inivels[j] = &(shm[j*3 + start]);
-      }
+      //for(j=0; j<natoms; j++){
+      //  vels[j]    = &(shm[j*3 + start]);
+      //  inivels[j] = &(shm[j*3 + start]);
+      //}
 
 
       // * Assign convenient pointers for gradients * //
@@ -313,7 +313,8 @@ GCHMCIntegrator::GCHMCIntegrator(PyObject *universe, std::string ligdir, std::st
       TARGET_TYPE timestep, mytimestep;
       mytimestep = shm[arrays_cut + 3];
       // * Build Topology and fill indexMap * /
-      sys->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
+      sys->InitSimulation(//coords, vels, inivels, indexMap, grads, 
+          mytimestep, true);
       system_initialized = true;
 }
 
@@ -370,8 +371,8 @@ boost::python::object GCHMCIntegrator::Call(
 
   // Put curr conf from universe into shm
   for(int a=0; a<sys->mr->natms; a++){
-    tx = (int)(sys->indexMap[ a ][2]);
-    tshm = ((int)(sys->indexMap[ a ][1]) * 3) + 2;
+    //tx = (int)(sys->indexMap[ a ][2]);
+    //tshm = ((int)(sys->indexMap[ a ][1]) * 3) + 2;
     shm[ tshm +0] = xCall[tx][0];
     shm[ tshm +1] = xCall[tx][1];
     shm[ tshm +2] = xCall[tx][2];
@@ -424,8 +425,8 @@ boost::python::object GCHMCIntegrator::Call(
   xCall = (vector3 *)configuration->data;
 
   for(int a=0; a<sys->mr->natms; a++){
-    tx = (int)(sys->indexMap[ a ][2]);
-    tshm = ((int)(sys->indexMap[ a ][1]) * 3) + 2;
+    //tx = (int)(sys->indexMap[ a ][2]);
+    //tshm = ((int)(sys->indexMap[ a ][1]) * 3) + 2;
     xCall[tx][0] = shm[ tshm +0];
     xCall[tx][1] = shm[ tshm +1];
     xCall[tx][2] = shm[ tshm +2];

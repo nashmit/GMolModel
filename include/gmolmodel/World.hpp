@@ -115,20 +115,20 @@ class World;
 class GridForce : public SimTK::Force::Custom::Implementation {
  public:
   SimTK::CompoundSystem *compoundSystem;
-  TARGET_TYPE **indexMap;
-  TARGET_TYPE *PrmToAx_po;
-  TARGET_TYPE *MMTkToPrm_po;
-  TARGET_TYPE **coords;
-  TARGET_TYPE **vels;
-  TARGET_TYPE **grads;
+  //TARGET_TYPE **indexMap;
+  //TARGET_TYPE *PrmToAx_po;
+  //TARGET_TYPE *MMTkToPrm_po;
+  //TARGET_TYPE **coords;
+  //TARGET_TYPE **vels;
+  //TARGET_TYPE **grads;
   int *fassno;
   int *flag;
   TARGET_TYPE *shm;
   World *Caller;
 
   GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
-            , TARGET_TYPE **indexMap, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
-            , TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
+            //, TARGET_TYPE **indexMap, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
+            //, TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
             , int *fassno
             , TARGET_TYPE *shm
             , World *Caller
@@ -188,16 +188,16 @@ class World{
   SimTK::VerletIntegrator *integ;
   //MidVVIntegrator *integ;
   SimTK::TimeStepper *ts;
-  TARGET_TYPE *PrmToAx_po;
-  TARGET_TYPE *MMTkToPrm_po;
+  //TARGET_TYPE *PrmToAx_po;
+  //TARGET_TYPE *MMTkToPrm_po;
   string mol2F, rbF, gaffF, frcmodF, flexFN, ictdF;
 
-  TARGET_TYPE **coords;
-  TARGET_TYPE **vels;
-  TARGET_TYPE **inivels;
-  TARGET_TYPE **indexMap;
-  int **_indexMap;
-  TARGET_TYPE **grads;
+  //TARGET_TYPE **coords;
+  //TARGET_TYPE **vels;
+  //TARGET_TYPE **inivels;
+  //TARGET_TYPE **indexMap;
+  //int **_indexMap;
+  //TARGET_TYPE **grads;
   int arrays_cut;
 
   int *passno;
@@ -224,20 +224,21 @@ class World{
 
   World(readAmberInput *amberReader, std::string rbF, std::string flexFN,
         std::string ictdF, 
-        TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, TARGET_TYPE *shm);
+        //TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, 
+        TARGET_TYPE *shm);
   
   World(
     string mol2F, string rbF, string gaffF, string frcmodF,
-    string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
+    string ictdF, //TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
     TARGET_TYPE *shm
   );
 
   void InitSimulation(
-    TARGET_TYPE **coords,
-    TARGET_TYPE **vels,
-    TARGET_TYPE **inivels,
-    TARGET_TYPE **indexMap,
-    TARGET_TYPE **grads,
+    //TARGET_TYPE **coords,
+    //TARGET_TYPE **vels,
+    //TARGET_TYPE **inivels,
+    //TARGET_TYPE **indexMap,
+    //TARGET_TYPE **grads,
     TARGET_TYPE extTimestep,
     bool first_time
   );

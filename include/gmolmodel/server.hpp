@@ -18,6 +18,7 @@
 #define CNT_STOP  1947
 #endif
 
+/*
 //TARGET_TYPE **indexMap;
 //TARGET_TYPE *PrmToAx_po;
 //TARGET_TYPE *MMTkToPrm_po;
@@ -43,6 +44,6 @@
 #ifndef MMTkToAx
 #define MMTkToAx(i) PrmToAx_po[(int)(MMTkToPrm_po[i])]
 #endif
-
+*/
 
 #endif //SERVER_H_

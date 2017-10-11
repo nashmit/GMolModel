@@ -40,8 +40,8 @@ public:
   int nbnds; // EU
   bBond *bonds; // EU
   std::string ictdF;
-  TARGET_TYPE *PrmToAx_po;
-  TARGET_TYPE *MMTkToPrm_po;
+  //TARGET_TYPE *PrmToAx_po;
+  //TARGET_TYPE *MMTkToPrm_po;
 
   // Constructor
   Topology();
@@ -56,10 +56,10 @@ public:
     int nbnds,
     //std::vector<bBond> bonds, // RESTORE
     bBond *bonds, // EU
-    TARGET_TYPE **coords,
-    TARGET_TYPE **indexMap,
-    TARGET_TYPE *PrmToAx_po,
-    TARGET_TYPE *MMTkToPrm_po,
+    //TARGET_TYPE **coords,
+    //TARGET_TYPE **indexMap,
+    //TARGET_TYPE *PrmToAx_po,
+    //TARGET_TYPE *MMTkToPrm_po,
     bool first_time=true,
     std::string flexFN="ligand.flex",
     std::string ictdF="IC"

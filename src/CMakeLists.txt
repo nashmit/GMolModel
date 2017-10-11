@@ -111,7 +111,7 @@ set(LIBGMOLMODEL_SRC
         Context.cpp # LAUR
         IState.cpp # LAUR
         MyState.cpp # LAUR
-        MidVVIntegrator.cpp # LAUR
+        #MidVVIntegrator.cpp # LAUR
         Sampler.cpp # LAUR
         MonteCarloSampler.cpp # LAUR
         HamiltonianMonteCarloSampler.cpp # LAUR

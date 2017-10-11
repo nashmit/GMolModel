@@ -1,5 +1,5 @@
 #include "World.hpp"
-#include "MidVVIntegrator.hpp"
+//#include "MidVVIntegrator.hpp"
 
 void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
          const char *dirname, const char *prefix, int midlength, const char *sufix)
@@ -107,18 +107,18 @@ void shmDump(TARGET_TYPE *shm, unsigned int natms)
 ////// GRID FORCE //////////
 ////////////////////////////
 GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
-                     , TARGET_TYPE **indexMap, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
-                     , TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
+                     //, TARGET_TYPE **indexMap, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
+                     //, TARGET_TYPE **coords, TARGET_TYPE **vels, TARGET_TYPE **grads
                      , int *fassno
                      , TARGET_TYPE *shm
                      , World *Caller
                     ) : matter(matter){
-  this->indexMap = Caller->indexMap;
-  this->PrmToAx_po = PrmToAx_po;
-  this->MMTkToPrm_po = MMTkToPrm_po;
-  this->coords = Caller->coords;
-  this->vels = Caller->vels;
-  this->grads = Caller->grads;
+  //this->indexMap = Caller->indexMap;
+  //this->PrmToAx_po = PrmToAx_po;
+  //this->MMTkToPrm_po = MMTkToPrm_po;
+  //this->coords = Caller->coords;
+  //this->vels = Caller->vels;
+  //this->grads = Caller->grads;
   this->compoundSystem = compoundSystem;
   this->fassno = fassno;
   flag = new int;
@@ -152,7 +152,8 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
 
     // Apply forces from MMTK
     for(int a=0; a<c.getNumAtoms(); a++){
-      SimTK::Compound::AtomIndex aIx(Caller->_indexMap[ a ][1]);
+      //SimTK::Compound::AtomIndex aIx(Caller->_indexMap[ a ][1]);
+      SimTK::Compound::AtomIndex aIx = (Caller->lig1->bAtomList)[a].atomIndex;
       const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(c.getAtomMobilizedBodyIndex(aIx));
       SimTK::Vec3 v_check(0.0, 0.0, 0.0);
       mobod.applyForceToBodyPoint(state, c.getAtomLocationInMobilizedBodyFrame(aIx), v_check, bodyForces);
@@ -201,8 +202,9 @@ bool GridForce::dependsOnlyOnPositions() const {
 ////////////////////////////
 
 World::World(readAmberInput *amberReader, std::string rbF, std::string flexFN,
-std::string ictdF,
-TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, TARGET_TYPE *shm)
+std::string ictdF
+//, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po
+, TARGET_TYPE *shm)
 {
   passno = new int;
   vassno = new int;
@@ -217,8 +219,8 @@ TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, TARGET_TYPE *shm)
   this->frcmodF = frcmodF;
   this->flexFN = flexFN;
   this->ictdF = ictdF;
-  this->PrmToAx_po = PrmToAx_po;
-  this->MMTkToPrm_po = MMTkToPrm_po;
+  //this->PrmToAx_po = PrmToAx_po;
+  //this->MMTkToPrm_po = MMTkToPrm_po;
   this->shm = shm;
   this->pyseed = new unsigned long int;
   this->lj14sf = 0.5;
@@ -248,7 +250,7 @@ TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po, TARGET_TYPE *shm)
 
 World::World(
   string mol2F, string rbF, string gaffF, string frcmodF,
-  string ictdF, TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
+  string ictdF, //TARGET_TYPE *PrmToAx_po, TARGET_TYPE *MMTkToPrm_po,
   TARGET_TYPE *shm
 ){
   passno = new int;
@@ -263,8 +265,8 @@ World::World(
   this->gaffF = gaffF;
   this->frcmodF = frcmodF;
   this->ictdF = ictdF;
-  this->PrmToAx_po = PrmToAx_po;
-  this->MMTkToPrm_po = MMTkToPrm_po;
+  //this->PrmToAx_po = PrmToAx_po;
+  //this->MMTkToPrm_po = MMTkToPrm_po;
   this->shm = shm;
   this->pyseed = new unsigned long int;
   this->lj14sf = 0.5;
@@ -303,26 +305,27 @@ World::World(
 }//end of constructor
 
 void World::InitSimulation(
-  TARGET_TYPE **coords,
-  TARGET_TYPE **vels,
-  TARGET_TYPE **inivels,
-  TARGET_TYPE **indexMap,
-  TARGET_TYPE **grads,
+  //TARGET_TYPE **coords,
+  //TARGET_TYPE **vels,
+  //TARGET_TYPE **inivels,
+  //TARGET_TYPE **indexMap,
+  //TARGET_TYPE **grads,
   TARGET_TYPE extTimestep,
   bool first_time
 ){
-  this->coords = coords;
-  this->vels = vels;
-  this->inivels = inivels;
-  this->indexMap = indexMap;
-  this->grads = grads;
+  //this->coords = coords;
+  //this->vels = vels;
+  //this->inivels = inivels;
+  //this->indexMap = indexMap;
+  //this->grads = grads;
 
   *passno = 0;
   *vassno = 0;
   *fassno = 0;
   *sassno = 0;
 
-  ExtForce = new SimTK::Force::Custom(*forces, new GridForce(system, *matter, indexMap, PrmToAx_po, MMTkToPrm_po, coords, vels, grads, fassno
+  ExtForce = new SimTK::Force::Custom(*forces, new GridForce(system, *matter //indexMap, PrmToAx_po, MMTkToPrm_po, coords, vels, grads, 
+    , fassno
     , shm
     , this
   ));
@@ -360,10 +363,10 @@ void World::InitSimulation(
     mr->bAtomList,
     mr->nbonds,
     mr->bonds,
-    coords,
-    indexMap,
-    PrmToAx_po,
-    MMTkToPrm_po,
+    //coords,
+    //indexMap,
+    //PrmToAx_po,
+    //MMTkToPrm_po,
     first_time,
     flexFN,
     ictdF
@@ -372,17 +375,17 @@ void World::InitSimulation(
   system->modelCompounds();
   
   // Alloc _indexMap[int]
-  _indexMap = new int*[lig1->natms];
-  for(int t=0; t<lig1->natms; t++){
-    _indexMap[t] = new int[3];
-  }
+  //_indexMap = new int*[lig1->natms];
+  //for(int t=0; t<lig1->natms; t++){
+  //  _indexMap[t] = new int[3];
+  //}
 
   // Assign _indexMap
-  for(int t=0; t<lig1->natms; t++){
-    _indexMap[t][0] = int(indexMap[t][0]);
-    _indexMap[t][1] = int(indexMap[t][1]);
-    _indexMap[t][2] = int(indexMap[t][2]);
-  }
+  //for(int t=0; t<lig1->natms; t++){
+  //  _indexMap[t][0] = int(indexMap[t][0]);
+  //  _indexMap[t][1] = int(indexMap[t][1]);
+  //  _indexMap[t][2] = int(indexMap[t][2]);
+  //}
 
   QVector = new TARGET_TYPE*[matter->getNumBodies()-1];
   for(int i=0; i<(matter->getNumBodies()-1); i++){

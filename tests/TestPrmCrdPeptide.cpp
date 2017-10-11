@@ -45,7 +45,7 @@ int main(int argc, char **argv)
     // RR: Rigid Rings Torsional Dynamics
     // RB: Rigid Bodies
 
-    std::string ictd = "TD";
+    std::string ictd = "IC";
 
     std::cout<<"mol2FN "<<mol2FN<<std::endl<<std::flush;
     std::cout<<"rbFN "<<rbFN<<std::endl<<std::flush;
@@ -104,7 +104,7 @@ int main(int argc, char **argv)
 
     // Build Gmolmodel simulation world
 
-    World *p_world = new World(amberReader, rbFN, flexFN, ictd, PrmToAx_po, MMTkToPrm_po,
+    World *p_world = new World(amberReader, rbFN, flexFN, ictd, //PrmToAx_po, MMTkToPrm_po,
         shm); 
 
     // Seed the random number generator 
@@ -163,7 +163,7 @@ int main(int argc, char **argv)
     for(int j=0; j<natoms; j++){grads[j] = new SimTK::Real[3];}
 
 
-    p_world->InitSimulation(coords, vels, inivels, indexMap, grads, mytimestep, true);
+    p_world->InitSimulation(/*coords, vels, inivels, indexMap, grads,*/ mytimestep, true);
 
     // Initialize sampler
     HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);

@@ -63,10 +63,10 @@ void Topology::init(
     //std::vector<bBond> bonds, // RESTORE
     int nbnds, // EU
     bBond *bonds, // EU
-    TARGET_TYPE **coords,
-    TARGET_TYPE **indexMap,
-    TARGET_TYPE *PrmToAx_po,
-    TARGET_TYPE *MMTkToPrm_po,
+    //TARGET_TYPE **coords,
+    //TARGET_TYPE **indexMap,
+    //TARGET_TYPE *PrmToAx_po,
+    //TARGET_TYPE *MMTkToPrm_po,
     bool first_time,
     std::string flexFN,
     std::string ictdF
@@ -77,8 +77,8 @@ void Topology::init(
     this->nbnds = nbnds;
     this->bonds = bonds;
     this->ictdF = ictdF;
-    this->PrmToAx_po = PrmToAx_po;
-    this->MMTkToPrm_po = MMTkToPrm_po;
+    //this->PrmToAx_po = PrmToAx_po;
+    //this->MMTkToPrm_po = MMTkToPrm_po;
     assert(bAtomList != NULL);
   
     int noDummies = 0;
@@ -180,6 +180,22 @@ void Topology::init(
                 }
                 if(found == 1){
                     if(m != firstBond){
+
+                        /*
+                        Compound & setDefaultBondLength (mdunits::Length length,
+                            const AtomPathName &atom1,
+                            const AtomPathName &atom2);
+                        Compound & setDefaultBondAngle (Angle angle, 
+                            const AtomPathName &atom1,
+                            const AtomPathName &atom2,
+                            const AtomPathName &atom3);
+                        Compound & setDefaultDihedralAngle (Angle angle, 
+                            Compound::AtomIndex atom1, 
+                            Compound::AtomIndex atom2,
+                            Compound::AtomIndex atom3,
+                            Compound::AtomIndex atom4);
+                        */
+
                         sbuff.str("");
                         sbuff<<bAtomList[bondFirstAtom[m]].name<<"/bond"<<bAtomList[bondFirstAtom[m]].freebonds;
                         buff[m] = sbuff.str();
@@ -324,12 +340,13 @@ void Topology::init(
     }
     */
 
+    // Set atomIndeces
     for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
         std::cout << "this->getAtomName(aIx)" << this->getAtomName(aIx)  << std::endl;
     }
     std::cout << std::endl;
     for(ix = 0; ix<natms; ix++){
-        std::cout << "std::string(bAtomList[ix].name)" << std::string(bAtomList[ix].name)  << std::endl;
+        std::cout << "std::string(bAtomList[ix].name) " << std::string(bAtomList[ix].name)  << std::endl;
     }
 
     for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
@@ -378,6 +395,7 @@ void Topology::init(
 
    // Fill indexMap
    // ORDER
+   /*
    for(ix = 0; ix<natms; ix++){
       indexMap[ix][0] = ix;
       indexMap[ix][1] = bAtomList[ix].atomIndex;
@@ -416,41 +434,39 @@ void Topology::init(
       std::cout<<"indexMap["<<i<<"]: "<<indexMap[i][0]<<" "<<indexMap[i][1]<<" "<<indexMap[i][2]<<std::endl;
     }
     #endif
-
+    */
     // Create atomTargets from passed coords array REVISE CHANGE
     std::cout<<"Create atomTargets from passed coords array"<<std::endl;
     std::map<AtomIndex, Vec3> atomTargets;  
     ix = 0;
-    if(first_time == true){ // Take coordinates from main (mol2 / previously MMTK)
+    if(first_time == true){ // Take coordinates from main (crd / previously MMTK)
       std::cout<<"Take coordinates from main (mol2)"<<std::endl;
       for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
-       //Vec3 v(coords[ ix ][0],
-       //       coords[ ix ][1],
-       //       coords[ ix ][2]);
         Vec3 v(bAtomList[ix].getX(), bAtomList[ix].getY(), bAtomList[ix].getZ());
         atomTargets.insert(pair<AtomIndex, Vec3> (bAtomList[ix].atomIndex, v));
         ix++;
       }
     }
-    else{ // Take coordinates from REVISE CHANGE
-      std::cout<<"Take coordinates from MMTK"<<std::endl;
+    //else{ // Take coordinates from REVISE CHANGE
+    //  std::cout<<"Take coordinates from MMTK"<<std::endl;
       //int ixi, prmtopi_from_SimTK;
-      int prmtopi_from_MMTK;
-      for(ix = 0; ix < getNumAtoms(); ++ix){
+      //int prmtopi_from_MMTK;
+      //for(ix = 0; ix < getNumAtoms(); ++ix){
         //ixi                 = indexMap[ix][0];
         //prmtopi_from_SimTK  = indexMap[ix][1];
-        prmtopi_from_MMTK   = indexMap[ix][2];
-        Vec3 v(coords[prmtopi_from_MMTK][0]/10, coords[prmtopi_from_MMTK][1]/10, coords[prmtopi_from_MMTK][2]/10);
+        //prmtopi_from_MMTK   = indexMap[ix][2];
+        //Vec3 v(coords[prmtopi_from_MMTK][0]/10, coords[prmtopi_from_MMTK][1]/10, coords[prmtopi_from_MMTK][2]/10);
 
-        atomTargets.insert(pair<AtomIndex, Vec3>
-          (bAtomList[ix].atomIndex, v)
-        );
-      }
-    }
+        //atomTargets.insert(pair<AtomIndex, Vec3>
+          //(bAtomList[ix].atomIndex, v)
+        //);
+      //}
+    //}
 
     // Assign Compound coordinates by matching bAtomList coordinates
     matchDefaultTopLevelTransform(atomTargets);
     matchDefaultConfiguration(atomTargets, Match_Exact, true, 150.0); //Compound::Match_Idealized
+    //fitDefaultConfiguration(atomTargets, 150.0);
     //matchDefaultConfiguration(atomTargets, Match_Idealized, true, 150.0); //Compound::Match_Idealized
     std::cout << "Configuration matched" << std::endl << std::flush;
 

@@ -24,11 +24,11 @@ class MidVVIntegratorRep;
  **/
 class MidVVIntegratorRep : public SimTK::AbstractIntegratorRep {
  public:
-  TARGET_TYPE *PrmToAx_po;
-  TARGET_TYPE *MMTkToPrm_po;
-  TARGET_TYPE **coords;
-  TARGET_TYPE **vels;
-  TARGET_TYPE **grads;
+  //TARGET_TYPE *PrmToAx_po;
+  //TARGET_TYPE *MMTkToPrm_po;
+  //TARGET_TYPE **coords;
+  //TARGET_TYPE **vels;
+  //TARGET_TYPE **grads;
   TARGET_TYPE *shm;
   int arrays_cut;
   int natms;
@@ -194,8 +194,8 @@ class MidVVIntegratorRep : public SimTK::AbstractIntegratorRep {
 
  public:
     MidVVIntegratorRep(SimTK::Integrator* handle, const SimTK::System& sys
-                       , TARGET_TYPE *PrmToAx_po
-                       , TARGET_TYPE *MMTkToPrm_po
+                       //, TARGET_TYPE *PrmToAx_po
+                       //, TARGET_TYPE *MMTkToPrm_po
                        , SimTK::CompoundSystem *compoundSystem
                        , World *Caller
                       );
@@ -310,8 +310,8 @@ class SimTK_SIMMATH_EXPORT MidVVIntegrator : public SimTK::Integrator {
    * Create a VerletIntegrator for integrating a System with variable size steps.
    **/
   explicit MidVVIntegrator(const SimTK::System& sys
-                           , TARGET_TYPE *PrmToAx_po
-                           , TARGET_TYPE *MMTkToPrm_po
+                           //, TARGET_TYPE *PrmToAx_po
+                           //, TARGET_TYPE *MMTkToPrm_po
                            , SimTK::CompoundSystem *compoundSystem
                            , World *Caller
                           );
@@ -319,8 +319,8 @@ class SimTK_SIMMATH_EXPORT MidVVIntegrator : public SimTK::Integrator {
    * Create a VerletIntegrator for integrating a System with fixed size steps.
    **/
   MidVVIntegrator(const SimTK::System& sys, SimTK::Real stepSize
-                  , TARGET_TYPE *PrmToAx_po
-                  , TARGET_TYPE *MMTkToPrm_po
+                  //, TARGET_TYPE *PrmToAx_po
+                  //, TARGET_TYPE *MMTkToPrm_po
                   , SimTK::CompoundSystem *compoundSystem
                   , World *Caller
                   );
