@@ -44,6 +44,7 @@ class intpair{
 **/
 class bBond : public intpair{
  private:
+  int visited;
   int inring;
   int ring_closing;
   int rigid;
@@ -73,6 +74,9 @@ class bBond : public intpair{
 
   bool isFirst(void);
   void setAsFirst(void);
+
+  int isThisBond(int argFirst, int argSecond);
+  void setVisited(int);
 };
 
 

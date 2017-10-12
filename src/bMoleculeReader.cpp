@@ -47,436 +47,9 @@ bPDBReader::~bPDBReader()
     ;
 }
 
-/*
-bSpecificAtom::bSpecificAtom(){
-    nbonds = 0;
-    freebonds = 0;
-    number = 0;
-    bZeroCharArray(name, 5);
-    bZeroCharArray(inName, 5);
-    bZeroCharArray(fftype, 20);
-    bZeroCharArray(biotype, 20);
-    x = -999;
-    y = -999;
-    z = -999;
-    visited = 0;
-}
-
-bSpecificAtom::~bSpecificAtom(){;}
-
-void bSpecificAtom::Zero(void){
-    nbonds = 0;
-    freebonds = 0;
-    number = 0;
-    bZeroCharArray(name, 5);
-    bZeroCharArray(inName, 5);
-    bZeroCharArray(fftype, 20);
-    bZeroCharArray(biotype, 20);
-    x = -999;
-    y = -999;
-    z = -999;
-    visited = 0;
-    bAtomType = NULL;
-}
-
-void bSpecificAtom::Print(void)
-{
-  std::cout<<"bSpecificAtom Print: nbonds "<<nbonds<<" freebonds "<<freebonds<<" name "<<name<<" inName "<<inName
-    <<" number "<<number<<" atomIndex  "<<atomIndex<<" elem "<<elem<<" atomicNumber "<<atomicNumber<<" x "<<x<<" y "<< y<<" z "<<z
-    <<" mass "<<mass<<" vdwRadius  "<<vdwRadius<<" LJWellDepth  "<<LJWellDepth<<" fftype "<<fftype
-    <<" atomClassIndex  "<<atomClassIndex<<" biotype "<<biotype<<" bAtomType "<< bAtomType 
-    <<" charge "<<charge<<" mobile "<<mobile<<" visited "<<visited<<std::endl;
-
-    // Suggested by Eliza
-    //std::string residueName;
-    //long int residueIndex;
-    //std::string chain;
-    //int moleculeIndex;
-
-
-}
-
-
-// bSpecificAtom Interface
-
-//  
-int bSpecificAtom::getNBonds(void){
-    return this->nbonds;
-}
-
-//
-int bSpecificAtom::getFreebonds(void)
-{
-    assert(!"Not implemented");
-}
-
-//
-std::string bSpecificAtom::getName(void){assert(!"Not implemented");}
-std::string bSpecificAtom::getInName(void){assert(!"Not implemented");}
-
-//
-int bSpecificAtom::getNumber(void)
-{
-    return this->number;
-}
-
-// Return atom element
-char bSpecificAtom::getElem(void)
-{
-    return this->elem;
-}
-
-SimTK::Real bSpecificAtom::getX(void)
-{
-    return this->x;
-}
-
-SimTK::Real bSpecificAtom::getY(void)
-{
-    return this->y;
-}
-
-SimTK::Real bSpecificAtom::getZ(void)
-{
-    return this->z;
-}
-
-//
-std::string bSpecificAtom::getFftype(void)
-{
-    return this->fftype;
-}
-
-// Get atom biotype
-const char * bSpecificAtom::getBiotype(void)
-{
-    return this->biotype;
-}
-SimTK::Compound::SingleAtom * bSpecificAtom::getBAtomType(void){assert(!"Not implemented");}
-
-// Get atom's index as held in Compound
-SimTK::Compound::AtomIndex bSpecificAtom::getCompoundAtomIndex(void)
-{
-    return this->atomIndex;
-}
-
-SimTK::Real bSpecificAtom::getCharge(void){assert(!"Not implemented");}
-int bSpecificAtom::getIsMobile(void){assert(!"Not implemented");}
-int bSpecificAtom::getIsVisited(void){assert(!"Not implemented");}
-void bSpecificAtom::setNbonds(int){assert(!"Not implemented");}
-void bSpecificAtom::setFreebonds(int){assert(!"Not implemented");}
-
-// Set atom unique name
-void bSpecificAtom::setName(std::string inpName){
-    strncpy(this->name, inpName.c_str(), 5);
-}
-
-// Set initial name
-
-void bSpecificAtom::setInName(std::string inpInName){
-    strncpy(this->inName, inpInName.c_str(), 4);
-}
-
-// Set number
-void bSpecificAtom::setNumber(int inpNumber){
-    this->number = inpNumber;
-}
-
-// Set element
-void bSpecificAtom::setElem(char inpElem){
-    this->elem = inpElem;
-}
-
-// Set the X coordinate
-void bSpecificAtom::setX(SimTK::Real inpX){
-    this->x = inpX;
-}
-
-// Set the Y coordinate
-void bSpecificAtom::setY(SimTK::Real inpY){
-    this->y = inpY;
-}
-
-// Set the Z coordinate
-void bSpecificAtom::setZ(SimTK::Real inpZ){
-    this->z = inpZ;
-}
-
-// Get atomic mass
-SimTK::mdunits::Mass bSpecificAtom::getMass(void)
-{
-    return this->mass;
-}
-
-// Set atomic mass
-void bSpecificAtom::setMass(SimTK::Real inpMass)
-{
-    this->mass = inpMass;
-}
-
-// Set force field atom type
-void bSpecificAtom::setFftype(std::string inpFftype){
-    //strncpy(this->fftype, inpFftype.c_str(), 20);
-    sprintf(this->fftype, "%s", inpFftype.c_str());
-}
-
-// Set atom Biotype name - dangerous
-void bSpecificAtom::setBiotype(std::string inpBiotype)
-{
-    for(int i=0; i<20; i++){
-        this->biotype[i] = '\0';
-    }
-    std::strncpy(this->biotype, inpBiotype.c_str(), 20);
-}
-
-// Set atom Biotype name - dangerous
-void bSpecificAtom::setBiotype(const char * inpBiotype)
-{
-    for(int i=0; i<20; i++){
-        this->biotype[i] = '\0';
-    }
-    std::strncpy(this->biotype, inpBiotype, 20);
-}
-
-// Set 
-void bSpecificAtom::setBAtomType(SimTK::Compound::SingleAtom *){assert(!"Not implemented");}
-
-void bSpecificAtom::setCompoundAtomIndex(SimTK::Compound::AtomIndex inpAtomIndex)
-{
-    this->atomIndex = inpAtomIndex;
-}
-
-// Set charge
-void bSpecificAtom::setCharge(SimTK::Real inpCharge){
-    this->charge = inpCharge;
-}
-
-// Get the DuMM ChargedAtomTypeIndex
-SimTK::DuMM::ChargedAtomTypeIndex bSpecificAtom::getChargedAtomTypeIndex(void)
-{
-    return this->chargedAtomTypeIndex;
-}
-
-// Set the DuMM ChargedAtomTypeIndex
-void bSpecificAtom::setChargedAtomTypeIndex(SimTK::DuMM::ChargedAtomTypeIndex inpChargedAtomTypeIndex)
-{
-    this->chargedAtomTypeIndex = inpChargedAtomTypeIndex;
-}
-
-void bSpecificAtom::setIsMobile(int){assert(!"Not implemented");}
-void bSpecificAtom::setIsVisited(int){assert(!"Not implemented");}
-
-// Get the atom class index
-DuMM::AtomClassIndex bSpecificAtom::getAtomClassIndex(void)
-{
-    return this->atomClassIndex;
-}
-
-// Set the atom class index
-void bSpecificAtom::setAtomClassIndex(DuMM::AtomClassIndex inpAtomClassIndex)
-{
-    this->atomClassIndex = inpAtomClassIndex;
-}
-
-// Get the atomic number
-int bSpecificAtom::getAtomicNumber(void)
-{
-    return this->atomicNumber;
-}
-
-// Set the atomic number
-void bSpecificAtom::setAtomicNumber(int inpAtomicNumber)
-{
-    this->atomicNumber = inpAtomicNumber;
-}
-
-//
-void bSpecificAtom::setVdwRadius(SimTK::Real inpVdwRadius)
-{
-    this->vdwRadius = inpVdwRadius;
-}
-
-//
-SimTK::Real bSpecificAtom::getVdwRadius(void)
-{
-    return this->vdwRadius;
-}
-
-//
-void bSpecificAtom::setLJWellDepth(SimTK::Real inpLJWellDepth)
-{
-    this->LJWellDepth = inpLJWellDepth;
-}
-
-//
-SimTK::Real bSpecificAtom::getLJWellDepth(void)
-{
-    return this->LJWellDepth;
-}
-
-
-
-int bAtomAssign(MolAtom *dest, const bSpecificAtom *src)
-{
-  dest->name = new char[5];
-  strncpy(dest->name, src->name, 4);
-
-  dest->num = src->number;
-
-  switch(src->elem){
-    case 'C': dest->type = MOL_ATOM_ELEMENT_CARBON; break;
-    case 'H': dest->type = MOL_ATOM_ELEMENT_HYDROGEN; break;
-    case 'N': dest->type = MOL_ATOM_ELEMENT_NITROGEN; break;
-    case 'O': dest->type = MOL_ATOM_ELEMENT_OXYGEN; break;
-    case 'S': dest->type = MOL_ATOM_ELEMENT_SULFUR; break;
-    case 'P': dest->type = MOL_ATOM_ELEMENT_PHOSPHORUS; break;
-    default: dest->type = MOL_ATOM_ELEMENT_UNKNOWN; break;
-  }
-
-  dest->pos[0] = src->x;
-  dest->pos[1] = src->y;
-  dest->pos[2] = src->z;
-
-  return 0;
-}
-
-intpair::intpair(){
-    i = 0; j = 0;
-  }
-intpair::intpair(int inI, int inJ){
-    this->i = inI;
-    this->j = inJ;
-}
-intpair::~intpair(){}
-
-bool intpair::operator==(const intpair *other){
-  return (
-    ((this->i == other->i) && (this->j == other->j)) ||
-    ((this->i == other->j) && (this->j == other->i))
-  );
-}
-
-bool intpair::operator!=(const intpair *other){
-  return (
-    ((this->i != other->i) || (this->j != other->j)) &&
-    ((this->i != other->j) || (this->j != other->i))
-  );
-}
-
-bool intpair::isTheSameAs(const intpair *other){
-  return (
-    ((this->i == other->i) && (this->j == other->j)) ||
-    ((this->i == other->j) && (this->j == other->i))
-  );
-}
-
-void intpair::swap(void){
-  int inter;
-  inter = this->i;
-  this->i = this->j;
-  this->j = inter;
-}
-
-void intpair::dump(void){
-  std::cout<<i<<' '<<j<<std::endl;
-}
-
-std::string intpair::getString(void){
-  std::stringstream ret;
-  ret<<i<<' '<<j;
-  return ret.str();
-}
-
-bBond::bBond(void) : intpair(){
-  inring = 0;
-  rigid = 0;
-  ring_closing = 0; // later
-  ring_no = 0; // later
-  _isFirst = false;
-}
-
-bBond::bBond(int a, int b) : intpair(a, b){
-  inring = 0;
-  rigid = 0;
-  ring_closing = 0;
-  ring_no = 0; // later
-  _isFirst = false;
-}
-
-bBond::~bBond(void){;}
-
-bool bBond::isInRing(void){
-  if(this->inring == 1)
-    return true;
-  else
-    return false;
-}
-
-bool bBond::isRingClosing(void){
-  if(this->ring_closing == 1)
-    return true;
-  else
-    return false;
-}
-
-bool bBond::isRigid(void){
-  if(this->rigid == 1)
-    return true;
-  else
-    return false;
-}
-
-int bBond::ringNo(void){
-  return this->ring_no;
-}
-
-void bBond::setInRing(void){
-  this->inring = 1;
-}
-
-void bBond::setAsRingClosing(void){
-  this->ring_closing = 1;
-}
-
-void bBond::setAsRigid(void){
-  this->rigid = 1;
-}
-
-void bBond::setRingNo(int rn){
-  this->ring_no = rn;
-}
-
-Compound::BondIndex bBond::getBondIndex(void){
-  return bondIndex;
-}
-  
-void bBond::setBondIndex(Compound::BondIndex otherIx){
-  this->bondIndex = otherIx;
-}
-
-// Print bond variables
-void bBond::Print(void)
-{
-    std::cout << "i " << i << " j " << j << " rigid " << rigid 
-        << " inring " << inring << " ring_no " << ring_no
-        << " ring_closing " << ring_closing << std::endl;
-}
-
-// Return true if this is set as the first bond in Compound
-bool bBond::isFirst(void)
-{
-    return _isFirst;
-}
-
-// Set this bond as the first one in a Compound
-void bBond::setAsFirst(void)
-{
-    _isFirst = true;
-}
-
-
- */
-
+////////////////////
+// intriad implementation
+////////////////////
 intriad::intriad(){
   i=0; j=0; k=0;
 }
@@ -486,7 +59,7 @@ intriad::intriad(int inI, int inJ, int inK){
   this->k = inK;
 }
 intriad::~intriad(){}
-//Sorry for crowding
+
 bool intriad::operator==(const intriad *other){
   return (
     ((this->i==other->i)&&(this->j==other->j)&&(this->k==other->k))||
@@ -497,15 +70,18 @@ bool intriad::operator==(const intriad *other){
     ((this->i==other->j)&&(this->j==other->k)&&(this->k==other->i))
   );
 }
+
 bool intriad::isTheSameAs(const intriad *other){
   return (
     ((this->i==other->i)&&(this->j==other->j)&&(this->k==other->k))||
     ((this->i==other->k)&&(this->j==other->j)&&(this->k==other->i))
   );
 }
+
 void intriad::dump(void){
   std::cout<<i<<' '<<j<<' '<<k<<std::endl;
 }
+
 std::string intriad::getString(void){
   std::stringstream ret;
   ret<<i<<' '<<j<<' '<<k;
@@ -513,7 +89,9 @@ std::string intriad::getString(void){
 }
 
 
-
+////////////////////
+// bMoleculeReader implementation
+////////////////////
 bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfilename)
 {
     natoms = 0;
@@ -547,6 +125,8 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         //bAtomList[i].setName(elemStr + std::to_string(bAtomList[i].getNumber()));
 
         nameCounter++;
+        std::string string_name;
+
         a = int(nameCounter / std::pow(25, 3));
         aStr = (char)(a + 65);
         aRest = nameCounter % int(std::pow(25, 3));
@@ -562,7 +142,27 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         d = int(cRest / std::pow(25, 0));
         dStr = (char)(d + 65);
 
-        std::string string_name = aStr + bStr + cStr + dStr;
+        string_name = aStr + bStr + cStr + dStr;
+
+        /*
+        assert(nameCounter < 65536);
+        std::stringstream sstream;
+        std::string string_name;
+        if(nameCounter < 16){
+            sstream << std::hex << nameCounter;
+            string_name = "000" + sstream.str();
+        }else if(nameCounter < 256){
+            sstream << std::hex << nameCounter;
+            string_name = "00" + sstream.str();
+        }else if(nameCounter < 4096){
+            sstream << std::hex << nameCounter;
+            string_name = "0" + sstream.str();
+        }else if(nameCounter < 65536){
+            sstream << std::hex << nameCounter;
+            string_name = sstream.str();
+        }
+        */
+
         bAtomList[i].setName(string_name);
 
         bAtomList[i].setInName(str_buf);
@@ -586,13 +186,13 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         bAtomList[i].Print();
     }
 
-    /*READ BONDS*/
+    // READ BONDS
     for(int i=0; i<nbonds; i++){
         bonds[i].i = amberReader->getBondsAtomsIndex1(i);
         bonds[i].j = amberReader->getBondsAtomsIndex2(i);
     }
 
-    /*Assign atoms nbonds and freebonds*/
+    // Assign atoms nbonds and freebonds
     for(int i=0; i<natoms ; i++){
       bAtomList[i].nbonds = 0;
       for(int j=0; j<nbonds; j++){ 
@@ -604,6 +204,30 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
       }
     }
 
+    // Assign neighbors and bonds involved for each atom
+    for(int i=0; i<nbonds; i++){
+       (bAtomList[ bonds[i].i  ]).addNeighbor( &(bAtomList[ bonds[i].j  ]) );
+       (bAtomList[ bonds[i].i  ]).addBond( &(bonds[i]) );
+
+       (bAtomList[ bonds[i].j  ]).addNeighbor( &(bAtomList[ bonds[i].i  ]) );
+       (bAtomList[ bonds[i].j  ]).addBond( &(bonds[i]) );       
+    }
+
+    // Print bonds
+    std::cout << "Bonds before walk the graph" << std::endl;
+    for(int i=0; i<nbonds; i++){
+        bonds[i].Print();
+    }
+
+    // Walk graph
+    std::cout << "Walk the graph" << std::endl;
+    walkGraph( &(bAtomList[0]) );
+
+    // Print bonds
+    std::cout << "Bonds after walk the graph" << std::endl;
+    for(int i=0; i<nbonds; i++){
+        bonds[i].Print();
+    }
 
     // Every *valentAtom is derived from SingleAtom in turn derived from Compound with one atom (AtomIndex 0)
     for(int i=0; i<natoms+noDummies; i++){

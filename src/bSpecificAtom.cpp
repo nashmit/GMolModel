@@ -19,8 +19,12 @@ bSpecificAtom::bSpecificAtom(){
     visited = 0;
 }
 
-bSpecificAtom::~bSpecificAtom(){;}
+// Incomplete
+bSpecificAtom::~bSpecificAtom(){
+    neighbors.clear();
+}
 
+// Init function
 void bSpecificAtom::Zero(void){
     nbonds = 0;
     freebonds = 0;
@@ -38,13 +42,26 @@ void bSpecificAtom::Zero(void){
 
 void bSpecificAtom::Print(void)
 {
-  std::cout<<"bSpecificAtom Print: nbonds "<<nbonds<<" freebonds "<<freebonds<<" name "<<name<<" inName "<<inName
-    <<" number "<<number<<" atomIndex  "<<atomIndex<<" elem "<<elem<<" atomicNumber "<<atomicNumber<<" x "<<x<<" y "<< y<<" z "<<z
-    <<" mass "<<mass<<" vdwRadius  "<<vdwRadius<<" LJWellDepth  "<<LJWellDepth<<" fftype "<<fftype
-    <<" atomClassIndex  "<<atomClassIndex<<" biotype "<<biotype<<" bAtomType "<< bAtomType 
-    <<" charge "<<charge<<" mobile "<<mobile<<" visited "<<visited<<std::endl;
+    std::cout<<"bSpecificAtom Print: nbonds "<<nbonds<<" freebonds "<<freebonds<<" name "<<name<<" inName "<<inName
+        <<" number "<<number<<" atomIndex  "<<atomIndex<<" elem "<<elem<<" atomicNumber "<<atomicNumber<<" x "<<x<<" y "<< y<<" z "<<z
+        <<" mass "<<mass<<" vdwRadius  "<<vdwRadius<<" LJWellDepth  "<<LJWellDepth<<" fftype "<<fftype
+        <<" atomClassIndex  "<<atomClassIndex<<" biotype "<<biotype<<" bAtomType "<< bAtomType 
+        <<" charge "<<charge<<" mobile "<<mobile<<" visited "<<visited<<std::endl;
 
-    // Suggested by Eliza
+    std::cout << "Neighbors:";
+    for(std::vector<bSpecificAtom *>::iterator it = neighbors.begin();
+    it != neighbors.end(); ++it){
+        std::cout << ' ' << (*it)->number;
+    }
+    std::cout << std::endl;
+
+    std::cout << "Bonds Involved:" << std::endl;
+    for(std::vector<bBond *>::iterator it = bondsInvolved.begin();
+    it != bondsInvolved.end(); ++it){
+        (*it)->Print();
+    }
+
+    // Residue info
     //std::string residueName;
     //long int residueIndex;
     //std::string chain;
@@ -305,7 +322,17 @@ SimTK::Real bSpecificAtom::getLJWellDepth(void)
     return this->LJWellDepth;
 }
 
+// Add an atom pointer to the vector of atom neighbors
+void bSpecificAtom::addNeighbor(bSpecificAtom *someNeighbor)
+{
+    neighbors.push_back(someNeighbor);
+}
 
+// Add a bond this atom is involved in to the vector of bonds
+void bSpecificAtom::addBond(bBond *someBond)
+{
+    bondsInvolved.push_back(someBond);
+}
 
 /********************
  *     FUNCTIONS
@@ -333,4 +360,51 @@ int bAtomAssign(MolAtom *dest, const bSpecificAtom *src)
 
   return 0;
 }
+
+// Process a graph node
+void process_node(bSpecificAtom *node, int CurrentGeneration, int previousNode)
+{
+    std::cout << " switch to " << node->number << std::endl;
+
+    if (node->visited == CurrentGeneration) {
+        return;
+    }
+
+    std::cout << " update generation " << std::endl;
+    std::cout << " left bond " << previousNode << ' ' << node->number << std::endl;
+    // Mark bond
+    for(std::vector<bBond *>::iterator it = (node->bondsInvolved).begin();
+    it != (node->bondsInvolved).end(); ++it){
+        if ((*it)->isThisBond(node->number, previousNode) ){
+            (*it)->setVisited(CurrentGeneration);
+            break;
+        }
+    }
+    // ========
+    previousNode = node->number;
+
+    node->visited = CurrentGeneration;
+
+    std::cout << " start checking neighbors " << std::endl;
+    unsigned int i;
+    for(i = 0; i < (node->neighbors).size(); i++) {
+        process_node( (node->neighbors)[i], CurrentGeneration, previousNode );
+    }
+
+    std::cout << " end processing " << node->number << std::endl;
+}
+
+// Construct the molecule topology
+void walkGraph(bSpecificAtom *root)
+{
+    int CurrentGeneration = 0;
+    CurrentGeneration += 1;
+    static int previousNode = root->number;
+    process_node(root, CurrentGeneration, previousNode);
+    std::cout << std::endl;
+}
+
+
+
+
 

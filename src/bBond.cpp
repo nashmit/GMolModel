@@ -72,6 +72,7 @@ bBond::bBond(void) : intpair(){
   ring_closing = 0; // later
   ring_no = 0; // later
   _isFirst = false;
+  visited = 0;
 }
 
 bBond::bBond(int a, int b) : intpair(a, b){
@@ -80,6 +81,7 @@ bBond::bBond(int a, int b) : intpair(a, b){
   ring_closing = 0;
   ring_no = 0; // later
   _isFirst = false;
+  visited = 0;
 }
 
 bBond::~bBond(void){;}
@@ -138,7 +140,8 @@ void bBond::Print(void)
 {
     std::cout << "i " << i << " j " << j << " rigid " << rigid 
         << " inring " << inring << " ring_no " << ring_no
-        << " ring_closing " << ring_closing << std::endl;
+        << " ring_closing " << ring_closing 
+        << " visited " << visited << std::endl;
 }
 
 // Return true if this is set as the first bond in Compound
@@ -151,6 +154,27 @@ bool bBond::isFirst(void)
 void bBond::setAsFirst(void)
 {
     _isFirst = true;
+}
+
+// Check if this bond contains the arguments. If they are swapped return -1
+int bBond::isThisBond(int argFirst, int argSecond)
+{
+    if( (argFirst == this->i) && (argSecond == this->j) ){
+        return 1;
+    }
+    else if( (argSecond == this->i) && (argFirst == this->j) ){
+        return -1;
+    }
+    else{
+        return 0;
+    }
+    return 0;
+}
+
+// Set the number of times this bond was visited
+void bBond::setVisited(int argVisited)
+{
+    this->visited = argVisited;
 }
 
 

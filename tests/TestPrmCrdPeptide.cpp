@@ -15,9 +15,6 @@ int main(int argc, char **argv)
 {
     // Declare a shared memory pointer used by all the classes in the library
 
-    TARGET_TYPE *shm;
-    int SHMSZ; // size of vestigial pipe memory
-
     //  Declare variables for simulation parameters
 
     int natoms;
@@ -56,8 +53,8 @@ int main(int argc, char **argv)
 
     // Read number of atoms from mol2 file
 
-    std::string line;
-    std::string column;
+    //std::string line;
+    //std::string column;
 
     // Read Amber prmtop and inpcrd
 
@@ -67,40 +64,9 @@ int main(int argc, char **argv)
     natoms = amberReader->getNumberAtoms();
     std::cout << "natoms " << natoms << std::endl << std::flush;
 
-    // Read atom ordering from mol2
- 
-    int order[natoms+2]; // prmtop ORDER previously read from MMTK
-    TARGET_TYPE **indexMap = NULL;
-    TARGET_TYPE *PrmToAx_po = NULL;
-    TARGET_TYPE *MMTkToPrm_po = NULL;
-    indexMap = new TARGET_TYPE*[(natoms)];
-    PrmToAx_po = new TARGET_TYPE[natoms];
-    MMTkToPrm_po = new TARGET_TYPE[natoms];
-
-    for(int i=0; i<natoms; i++){
-      order[i] = i; // instead of MMTK
-    }
-    order[natoms] = 1;
-    order[natoms+1] = 1945;
-
     // Set the shared memory size (SHMSZ)
 
     int natoms3 = 3*(natoms);
-
-    SHMSZ = (
-        2*sizeof(TARGET_TYPE) +       // Counter and flag
-        natoms3*sizeof(TARGET_TYPE) + // Positions
-        natoms3*sizeof(TARGET_TYPE) + // Velocities
-        natoms3*sizeof(TARGET_TYPE) + // indexMap
-        natoms3*sizeof(TARGET_TYPE) + // Gradients
-        5*sizeof(TARGET_TYPE) +       // ac + 0 -> 4  // step, nosteps, temperature, timestep, trouble
-        1*sizeof(TARGET_TYPE) +       // ac + 5       // potential energy
-        2*sizeof(TARGET_TYPE) +       // ac + 6->7    // DAE step done; Move accepted
-        1*sizeof(TARGET_TYPE) +       // ac + 8       // KE
-        1*sizeof(TARGET_TYPE) +       // ac + 9       // steps_per_trial
-        1*sizeof(TARGET_TYPE) //+     // ac + 10      // trial
-    );
-    shm = new TARGET_TYPE[SHMSZ];
 
     // Build Gmolmodel simulation world
 
@@ -111,59 +77,10 @@ int main(int argc, char **argv)
 
     srand (time(NULL));
 
-    // Load initial shared memory values
-
-    //bool world_initialized = false;
-
-    // Assign convenient pointers for order
-
-    // Assign order in shm[][2] 
-
-    // Get coordinates in the same order as in mol2
-
-    // Get velocities
-
-    // Get order    
-
-    // Get forces   
-
-    // Get simulation parameters
-
-    // Set the client flag
-
-    // Assign convenient pointers for coordinates
-
-    // Assign convenient pointers for velocities
-
-    // Assign convenient pointers for gradients
-
-    // Rewrite indexMap to memory
-
-    // Initialize Simulation
-
     TARGET_TYPE mytimestep;
     mytimestep = 0.0015;
 
-    // Aloc necessary memory for InitSimulation - temporary
-
-    SimTK::Real **coords;
-    coords = new SimTK::Real*[p_world->mr->natoms]; // ELIZA
-    for(int j=0; j<natoms; j++){coords[j] = new SimTK::Real[3];}
-    SimTK::Real **vels;
-    vels = new SimTK::Real*[p_world->mr->natoms]; // ELIZA
-    for(int j=0; j<natoms; j++){vels[j] = new SimTK::Real[3];}
-    SimTK::Real **inivels;
-    inivels = new SimTK::Real*[p_world->mr->natoms]; // ELIZA
-    for(int j=0; j<natoms; j++){inivels[j] = new SimTK::Real[3];}
-    //SimTK::Real **indexMap;
-    indexMap = new SimTK::Real*[p_world->mr->natoms]; // ELIZA
-    for(int j=0; j<natoms; j++){indexMap[j] = new SimTK::Real[3];}
-    SimTK::Real **grads;
-    grads = new SimTK::Real*[p_world->mr->natoms]; // ELIZA
-    for(int j=0; j<natoms; j++){grads[j] = new SimTK::Real[3];}
-
-
-    p_world->InitSimulation(/*coords, vels, inivels, indexMap, grads,*/ mytimestep, true);
+    p_world->InitSimulation(mytimestep, true);
 
     // Initialize sampler
     HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);

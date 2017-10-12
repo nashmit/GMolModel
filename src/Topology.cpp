@@ -67,6 +67,7 @@ void Topology::init(
     std::string ictdF
 )
 {
+    std::cout << "Topology::init START" << std::endl;
     this->natms = natms;
     this->bAtomList = bAtomList;
     this->nbnds = nbnds;

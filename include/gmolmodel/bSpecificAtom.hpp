@@ -15,6 +15,8 @@
 #include "Simbody.h"
 #include "Molmodel.h"
 
+#include "bBond.hpp"
+//class bBond;
 
 //==============================================================================
 //                           CLASS SpecificAtom
@@ -50,7 +52,11 @@ public:
     int mobile;
     int visited;
     
-    // Suggested by Eliza
+    // Graph useful vars
+    std::vector<bSpecificAtom *> neighbors;
+    std::vector<bBond *> bondsInvolved;
+
+    // Residue and chain
     std::string residueName;
     long int residueIndex;
     std::string chain;
@@ -62,7 +68,6 @@ public:
     void Zero(void);
   
     // Interface
-  
     int getNBonds(void);
     int getFreebonds(void);
     std::string getName(void);
@@ -111,10 +116,25 @@ public:
     void setIsMobile(int);
     void setIsVisited(int);
 
+    void addNeighbor(bSpecificAtom *);
+    void addBond(bBond *);
+
 };
 
-
+// Update Molmodel MolAtom dest with Gmolmodel bSpecificAtom src values
 int bAtomAssign(MolAtom *dest, const bSpecificAtom *src);
+
+
+
+// Process a graph node
+void process_node(bSpecificAtom *node, int CurrentGeneration);
+
+// Construct the molecule topology
+void walkGraph(bSpecificAtom *root);
+
+
+
+
 
 #endif  //__BSPECIFICATOM__
 
