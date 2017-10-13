@@ -361,6 +361,7 @@ int bAtomAssign(MolAtom *dest, const bSpecificAtom *src)
   return 0;
 }
 
+/*
 // Process a graph node
 void process_node(bSpecificAtom *node, int CurrentGeneration, int previousNode)
 {
@@ -403,7 +404,7 @@ void walkGraph(bSpecificAtom *root)
     process_node(root, CurrentGeneration, previousNode);
     std::cout << std::endl;
 }
-
+*/
 
 
 

@@ -268,6 +268,7 @@ void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
 
   lig1 = new Topology();
 
+  /*
   lig1->init(
     *forceField,
     mr->natoms,
@@ -278,6 +279,17 @@ void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
     flexFN,
     ictdF
   );
+  */
+  lig1->build(
+    *forceField,
+    mr->natoms,
+    mr->bAtomList,
+    mr->nbonds,
+    mr->bonds,
+    flexFN,
+    ictdF
+  );
+
   system->adoptCompound(*lig1);
   system->modelCompounds();
   

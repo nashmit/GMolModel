@@ -114,6 +114,26 @@ public:
   bBond * getBond(int, int) const;
   int getBondOrder(int, int) const;
  
+  // Process a graph node
+  void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses);
+
+  // Construct the molecule topology
+  void walkGraph(bSpecificAtom *root);
+
+  // Build Molmodel Compound
+  void build(
+      SimTK::DuMMForceFieldSubsystem &dumm,
+      int natms,
+      bSpecificAtom *bAtomList,
+      int nbnds,
+      bBond *bonds,
+      std::string flexFN="ligand.flex",
+      std::string ictdF="IC"
+  );
+
 };
+
+
+
 
 #endif //TOPOLOGY_H_

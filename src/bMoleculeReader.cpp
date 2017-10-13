@@ -213,6 +213,8 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
        (bAtomList[ bonds[i].j  ]).addBond( &(bonds[i]) );       
     }
 
+
+    /*
     // Print bonds
     std::cout << "Bonds before walk the graph" << std::endl;
     for(int i=0; i<nbonds; i++){
@@ -228,14 +230,15 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
     for(int i=0; i<nbonds; i++){
         bonds[i].Print();
     }
+    */
 
     // Every *valentAtom is derived from SingleAtom in turn derived from Compound with one atom (AtomIndex 0)
     for(int i=0; i<natoms+noDummies; i++){
-      if(bAtomList[i].nbonds == 1){
-        if(toupper(bAtomList[i].elem) == 'H'){
-          bAtomList[i].bAtomType = new
-            UnivalentAtom(bAtomList[i].name, SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() )); // Prmtop mass
-          bAtomList[i].setAtomicNumber(1);
+        if(bAtomList[i].nbonds == 1){
+            if(toupper(bAtomList[i].elem) == 'H'){
+                bAtomList[i].bAtomType = new UnivalentAtom(bAtomList[i].name,
+                    SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() )); // Prmtop mass
+                bAtomList[i].setAtomicNumber(1);
         }
         /*
         else if((toupper(bAtomList[i].name[0]) == 'C') && (toupper(bAtomList[i].name[0]) == 'L')){
@@ -245,9 +248,9 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         }
         */
         else if(toupper(bAtomList[i].elem) == 'O'){
-          bAtomList[i].bAtomType = new
-            UnivalentAtom(bAtomList[i].name, Element(8, "Oxygen", "O", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(8);
+            bAtomList[i].bAtomType = new UnivalentAtom(bAtomList[i].name, 
+                Element(8, "Oxygen", "O", bAtomList[i].getMass()));
+            bAtomList[i].setAtomicNumber(8);
         }
         else if(toupper(bAtomList[i].elem) == 'F'){
           bAtomList[i].bAtomType = new

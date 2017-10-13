@@ -535,6 +535,127 @@ void Topology::init(
   bBond * Topology::getBond(int, int) const{assert(!"Not implemented.");}
   int Topology::getBondOrder(int, int) const{assert(!"Not implemented.");}
 
+///////////////////////
+// Other functions
+///////////////////////
 
+// Process a graph node
+void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses)
+{
+    std::cout << " switch to " << node->number << std::endl;
+
+    if (node->visited == CurrentGeneration) {
+        return;
+    }
+
+    ++nofProcesses;
+    std::cout << " update generation " << std::endl;
+    std::cout << " left bond " << previousNode->number << ' ' << node->number << std::endl;    
+
+    // Mark Gmolmodel bond and create bond in Molmodel
+    for(std::vector<bBond *>::iterator it = (node->bondsInvolved).begin();
+    it != (node->bondsInvolved).end(); ++it){
+        if ((*it)->isThisBond(node->number, previousNode->number) ){
+            (*it)->setVisited(CurrentGeneration);
+
+            // Create bond in Molmodel
+            if(nofProcesses == 2){
+                this->setBaseAtom( *(previousNode->bAtomType) );
+                this->setAtomBiotype(previousNode->name, "mainRes", previousNode->biotype);
+                this->convertInboardBondCenterToOutboard();
+
+                std::stringstream sbuff;
+                //sbuff << previousNode->name << "/bond"<< 1;
+                sbuff << previousNode->name << "/bond"<< previousNode->freebonds;
+                std::cout << "Trying to connect " << node->name << " " << node->number 
+                    << " to " << previousNode->number << " "
+                    << (sbuff.str()).c_str() << " ... " << std::flush;
+
+                this->bondAtom( *(node->bAtomType), (sbuff.str()).c_str());
+                this->setAtomBiotype(node->name, "mainRes", node->biotype);
+
+                //++previousNode->freebonds;
+                std::cout << "done." << std::endl << std::flush;
+
+            }else if(nofProcesses > 2){
+                std::stringstream sbuff;
+                sbuff << previousNode->name << "/bond" << previousNode->freebonds;
+                std::cout << "Trying to connect " << node->name << " " << node->number 
+                    << " to " << previousNode->number << " "
+                    << (sbuff.str()).c_str() << " ... " << std::flush;
+
+                this->bondAtom( *(node->bAtomType), (sbuff.str()).c_str());
+                this->setAtomBiotype(node->name, "mainRes", node->biotype);
+                if(nofProcesses == 2){
+                    //++previousNode->freebonds;
+                }else{
+                    --previousNode->freebonds;
+                }
+                std::cout << "done." << std::endl << std::flush;
+
+            }
+
+            break;
+        }
+    }
+    // ========
+    previousNode = node;
+
+    node->visited = CurrentGeneration;
+
+    std::cout << " start checking neighbors " << std::endl;
+    unsigned int i;
+    for(i = 0; i < (node->neighbors).size(); i++) {
+        process_node( (node->neighbors)[i], CurrentGeneration, previousNode, nofProcesses );
+    }
+
+    std::cout << " end processing " << node->number << std::endl;
+}
+
+// Construct the molecule topology
+void Topology::walkGraph(bSpecificAtom *root)
+{
+    static int nofProcesses = 0;
+    int CurrentGeneration = 0;
+    CurrentGeneration += 1;
+    bSpecificAtom *previousNode = root;
+    process_node(root, CurrentGeneration, previousNode, nofProcesses);
+    std::cout << std::endl;
+}
+
+void Topology::build(
+    SimTK::DuMMForceFieldSubsystem &dumm,
+    int natoms,
+    bSpecificAtom *bAtomList,
+    int nbonds,
+    bBond *bonds, 
+    std::string flexFN,
+    std::string ictdF
+)
+{
+    // Print bonds
+    std::cout << "Bonds before walk the graph" << std::endl;
+    for(int i=0; i<nbonds; i++){
+        bonds[i].Print();
+    }
+
+    // Walk graph
+    std::cout << "Walk the graph" << std::endl;
+    walkGraph( &(bAtomList[0]) );
+
+    // Print bonds
+    std::cout << "Bonds after walk the graph" << std::endl;
+    for(int i=0; i<nbonds; i++){
+        bonds[i].Print();
+    }
+}
   
+
+
+
+
+
+
+
+
 
