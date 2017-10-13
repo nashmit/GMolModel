@@ -648,6 +648,38 @@ void Topology::build(
     for(int i=0; i<nbonds; i++){
         bonds[i].Print();
     }
+
+    for(int i=0; i<nbonds; i++){
+        std::stringstream sbuff;
+        sbuff << bAtomList[bonds[i].i].name
+            << "/bond" << bAtomList[ bonds[i].i ].freebonds;
+
+        std::stringstream otsbuff;
+        otsbuff << bAtomList[ bonds[i].j  ].name
+            << "/bond" << bAtomList[ bonds[i].j  ].freebonds;
+              
+        this->addRingClosingBond(
+            (sbuff.str()).c_str(),
+            (otsbuff.str()).c_str(),
+            0.14,
+            109*Deg2Rad,
+            BondMobility::Free
+        );
+
+        this->setAtomBiotype(bAtomList[ bonds[i].i ].name, "mainRes", bAtomList[ bonds[i].i ].biotype);
+        this->setAtomBiotype(bAtomList[ bonds[i].j ].name, "mainRes", bAtomList[ bonds[i].j ].biotype);
+
+        --bAtomList[ bonds[i].i ].freebonds;
+        --bAtomList[ bonds[i].j ].freebonds;
+    }
+
+    // Print bonds
+    std::cout << "Bonds after closing the rings" << std::endl;
+    for(int i=0; i<nbonds; i++){
+        bonds[i].Print();
+    }
+
+
 }
   
 
