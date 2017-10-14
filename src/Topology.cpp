@@ -633,6 +633,15 @@ void Topology::build(
     std::string ictdF
 )
 {
+    this->natms = natoms;
+    this->bAtomList = bAtomList;
+    this->nbnds = nbonds;
+    this->bonds = bonds;
+    this->ictdF = ictdF;
+
+    assert(bAtomList != NULL);
+    this->setCompoundName("Topology");
+
     // Print bonds
     std::cout << "Bonds before walk the graph" << std::endl;
     for(int i=0; i<nbonds; i++){
@@ -650,28 +659,73 @@ void Topology::build(
     }
 
     for(int i=0; i<nbonds; i++){
-        std::stringstream sbuff;
-        sbuff << bAtomList[bonds[i].i].name
-            << "/bond" << bAtomList[ bonds[i].i ].freebonds;
-
-        std::stringstream otsbuff;
-        otsbuff << bAtomList[ bonds[i].j  ].name
-            << "/bond" << bAtomList[ bonds[i].j  ].freebonds;
-              
-        this->addRingClosingBond(
-            (sbuff.str()).c_str(),
-            (otsbuff.str()).c_str(),
-            0.14,
-            109*Deg2Rad,
-            BondMobility::Free
-        );
-
-        this->setAtomBiotype(bAtomList[ bonds[i].i ].name, "mainRes", bAtomList[ bonds[i].i ].biotype);
-        this->setAtomBiotype(bAtomList[ bonds[i].j ].name, "mainRes", bAtomList[ bonds[i].j ].biotype);
-
-        --bAtomList[ bonds[i].i ].freebonds;
-        --bAtomList[ bonds[i].j ].freebonds;
+        if(bonds[i].isVisited() == 0){
+            std::stringstream sbuff;
+            sbuff << bAtomList[bonds[i].i].name
+                << "/bond" << bAtomList[ bonds[i].i ].freebonds;
+    
+            std::stringstream otsbuff;
+            otsbuff << bAtomList[ bonds[i].j  ].name
+                << "/bond" << bAtomList[ bonds[i].j  ].freebonds;
+                  
+            this->addRingClosingBond(
+                (sbuff.str()).c_str(),
+                (otsbuff.str()).c_str(),
+                0.14,
+                109*Deg2Rad,
+                BondMobility::Free
+            );
+    
+            this->setAtomBiotype(bAtomList[ bonds[i].i ].name, "mainRes", bAtomList[ bonds[i].i ].biotype);
+            this->setAtomBiotype(bAtomList[ bonds[i].j ].name, "mainRes", bAtomList[ bonds[i].j ].biotype);
+    
+            --bAtomList[ bonds[i].i ].freebonds;
+            --bAtomList[ bonds[i].j ].freebonds;
+        }
     }
+
+    for(int k=0; k<natoms; k++){
+      std::string abuff =  "rob";
+      abuff += bAtomList[k].biotype;
+
+      DuMM::ChargedAtomTypeIndex tempChargedAtomTypeIndex = dumm.getNextUnusedChargedAtomTypeIndex();
+      std::cout << "defineChargedAtomType atomTypeIx "<<tempChargedAtomTypeIndex 
+          << " atomTypeName " << abuff.c_str() << " atomClassIx " << bAtomList[k].getAtomClassIndex()
+          << " partialChargeInE " << bAtomList[k].charge << std::endl;
+      dumm.defineChargedAtomType(
+        tempChargedAtomTypeIndex,
+        abuff.c_str(),
+        bAtomList[k].getAtomClassIndex(), // dumm.getAtomClassIndex(bAtomList[k].fftype), from MOL2
+        bAtomList[k].charge
+      );  
+
+      bAtomList[k].setChargedAtomTypeIndex(tempChargedAtomTypeIndex);
+
+      // Associate a ChargedAtomTypeIndex with a Biotype index
+      std::cout << "setBiotypeChargedAtomType bAtomList["<< k << "].getChargedAtomTypeIndex() "
+          << bAtomList[k].getChargedAtomTypeIndex()
+          << " bAtomList[" << k << "].biotype " << bAtomList[k].biotype 
+          << std::endl << std::flush;
+      dumm.setBiotypeChargedAtomType( 
+        bAtomList[k].getChargedAtomTypeIndex(),
+        Biotype::get("mainRes", bAtomList[k].biotype).getIndex()
+      );  
+
+    }   
+
+    // Assign AtomIndex values to atoms in bAtomList[] by name
+    for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
+      for(int ix = 0; ix<natoms; ix++){
+        //std::cout << "Compound atom name " << this->getAtomName(aIx) << " vs "
+        //    << "bAtomList name " << std::string(bAtomList[ix].name) << std::endl;
+        if(this->getAtomName(aIx) == std::string(bAtomList[ix].name)){ // compare SimTK::String with std::string
+          std::cout << "bAtomList[" << ix << "].atomIndex set to " << aIx << std::endl;
+          bAtomList[ix].atomIndex = aIx;
+          break;
+        }
+      }
+    }
+
 
     // Print bonds
     std::cout << "Bonds after closing the rings" << std::endl;

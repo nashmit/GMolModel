@@ -77,6 +77,7 @@ class bBond : public intpair{
 
   int isThisBond(int argFirst, int argSecond);
   void setVisited(int);
+  int isVisited(void);
 };
 
 

@@ -120,6 +120,10 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
 
     // Apply external forces
     for(int a=0; a<c.getNumAtoms(); a++){
+      
+      std::cout << "segfault loc" << "(Caller->lig1->bAtomList)[" << a << "].name" << std::endl;
+      std::cout << (Caller->lig1->bAtomList)[a].name << std::endl;
+
       SimTK::Compound::AtomIndex aIx = (Caller->lig1->bAtomList)[a].atomIndex;
       const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(c.getAtomMobilizedBodyIndex(aIx));
       SimTK::Vec3 v_check(0.0, 0.0, 0.0);

@@ -177,4 +177,11 @@ void bBond::setVisited(int argVisited)
     this->visited = argVisited;
 }
 
+// Return the number of times this bond was visited
+int bBond::isVisited(void)
+{
+    return this->visited;
+}
+
+
 
