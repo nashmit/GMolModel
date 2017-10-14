@@ -673,7 +673,7 @@ void Topology::build(
                 (otsbuff.str()).c_str(),
                 0.14,
                 109*Deg2Rad,
-                BondMobility::Free
+                BondMobility::Rigid // CHANGE
             );
     
             this->setAtomBiotype(bAtomList[ bonds[i].i ].name, "mainRes", bAtomList[ bonds[i].i ].biotype);
@@ -726,12 +726,66 @@ void Topology::build(
       }
     }
 
+    // Assign bBond::BondIndex values in bonds[] from Molmodel::BondIndex
+    int inumber, jnumber;
+    Compound::AtomIndex iIx, jIx;
+    for ( Compound::BondIndex bondIx(0); bondIx < this->getNumBonds(); ++bondIx){
+        iIx = this->getBondAtomIndex(Compound::BondIndex(bondIx), 0);
+        jIx = this->getBondAtomIndex(Compound::BondIndex(bondIx), 1);
+
+        for(int ix = 0; ix<natms; ix++){
+            std::cout << "bAtomList[ix].getCompoundAtomIndex() " << bAtomList[ix].getCompoundAtomIndex()
+                << " iIx " << iIx  << std::endl;
+            if(bAtomList[ix].getCompoundAtomIndex() == iIx){
+                inumber = bAtomList[ix].number;
+            }
+        }
+
+        for(int jx = 0; jx<natms; jx++){
+            if(bAtomList[jx].getCompoundAtomIndex() == jIx){
+                jnumber = bAtomList[jx].number;
+            }
+        }
+
+        for(int m=0; m<nbonds; m++){
+            if( ((bonds[m].i == inumber) && (bonds[m].j == jnumber)) ||
+                ((bonds[m].i == jnumber) && (bonds[m].j == inumber)) ){
+                bonds[m].setBondIndex(Compound::BondIndex(bondIx));
+            }
+        }
+    }
+
+    // Assign Compound coordinates by matching bAtomList coordinates
+    std::cout<<"Create atomTargets from passed coords array"<<std::endl;
+    std::map<AtomIndex, Vec3> atomTargets;
+    int ix = 0;
+    for(Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
+        Vec3 v(bAtomList[ix].getX(), bAtomList[ix].getY(), bAtomList[ix].getZ());
+        atomTargets.insert(pair<AtomIndex, Vec3> (bAtomList[ix].atomIndex, v));
+        ix++;
+    }
+
+    matchDefaultTopLevelTransform(atomTargets);
+    matchDefaultConfiguration(atomTargets, Match_Exact, true, 150.0); //Compound::Match_Idealized
+    //matchDefaultConfiguration(atomTargets, Match_Idealized, true, 150.0); //Compound::Match_Idealized
+    std::cout << "Configuration matched" << std::endl << std::flush;
 
     // Print bonds
     std::cout << "Bonds after closing the rings" << std::endl;
     for(int i=0; i<nbonds; i++){
         bonds[i].Print();
     }
+
+    PdbStructure  pdb(*this);
+    std::ostringstream sstream;
+    sstream<<"pdbs/sb_"<<"ini"<<".pdb";
+    std::string ofilename = sstream.str();
+    std::cout<<"Writing pdb file: "<<ofilename<<std::endl;
+    std::filebuf fb;
+    fb.open(ofilename.c_str(), std::ios::out);
+    std::ostream os(&fb);
+    pdb.write(os); // automatically multiplies by ten (nm to A)
+    fb.close();
 
 
 }
