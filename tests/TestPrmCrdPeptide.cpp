@@ -42,7 +42,7 @@ int main(int argc, char **argv)
     // RR: Rigid Rings Torsional Dynamics
     // RB: Rigid Bodies
 
-    std::string ictd = "IC";
+    std::string ictd = "TD";
 
     std::cout<<"mol2FN "<<mol2FN<<std::endl<<std::flush;
     std::cout<<"rbFN "<<rbFN<<std::endl<<std::flush;

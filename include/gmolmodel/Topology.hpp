@@ -115,7 +115,7 @@ public:
   int getBondOrder(int, int) const;
  
   // Process a graph node
-  void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses);
+  void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses, int baseAtomNumber);
 
   // Construct the molecule topology
   void walkGraph(bSpecificAtom *root);

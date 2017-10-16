@@ -540,7 +540,7 @@ void Topology::init(
 ///////////////////////
 
 // Process a graph node
-void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses)
+void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses, int baseAtomNumber)
 {
     std::cout << " switch to " << node->number << std::endl;
 
@@ -549,6 +549,7 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
     }
 
     ++nofProcesses;
+
     std::cout << " update generation " << std::endl;
     std::cout << " left bond " << previousNode->number << ' ' << node->number << std::endl;    
 
@@ -567,30 +568,35 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
                 std::stringstream sbuff;
                 //sbuff << previousNode->name << "/bond"<< 1;
                 sbuff << previousNode->name << "/bond"<< previousNode->freebonds;
-                std::cout << "Trying to connect " << node->name << " " << node->number 
-                    << " to " << previousNode->number << " "
+
+                std::cout << "Trying to connect " << node->name << "(" << node->getInName() << ") " 
+                    << node->number << " to " << previousNode->number << "(" << previousNode->getInName() << ") "
                     << (sbuff.str()).c_str() << " ... " << std::flush;
 
                 this->bondAtom( *(node->bAtomType), (sbuff.str()).c_str());
                 this->setAtomBiotype(node->name, "mainRes", node->biotype);
 
-                //++previousNode->freebonds;
+                ++previousNode->freebonds;
+
                 std::cout << "done." << std::endl << std::flush;
 
             }else if(nofProcesses > 2){
                 std::stringstream sbuff;
                 sbuff << previousNode->name << "/bond" << previousNode->freebonds;
-                std::cout << "Trying to connect " << node->name << " " << node->number 
-                    << " to " << previousNode->number << " "
+
+                std::cout << "Trying to connect " << node->name << "(" << node->getInName() << ") " 
+                    << node->number << " to " << previousNode->number << "(" << previousNode->getInName() << ") "
                     << (sbuff.str()).c_str() << " ... " << std::flush;
 
                 this->bondAtom( *(node->bAtomType), (sbuff.str()).c_str());
                 this->setAtomBiotype(node->name, "mainRes", node->biotype);
-                if(nofProcesses == 2){
-                    //++previousNode->freebonds;
+
+                if(previousNode->number == baseAtomNumber){
+                    ++previousNode->freebonds;
                 }else{
                     --previousNode->freebonds;
                 }
+
                 std::cout << "done." << std::endl << std::flush;
 
             }
@@ -606,7 +612,7 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
     std::cout << " start checking neighbors " << std::endl;
     unsigned int i;
     for(i = 0; i < (node->neighbors).size(); i++) {
-        process_node( (node->neighbors)[i], CurrentGeneration, previousNode, nofProcesses );
+        process_node( (node->neighbors)[i], CurrentGeneration, previousNode, nofProcesses, baseAtomNumber );
     }
 
     std::cout << " end processing " << node->number << std::endl;
@@ -617,9 +623,16 @@ void Topology::walkGraph(bSpecificAtom *root)
 {
     static int nofProcesses = 0;
     int CurrentGeneration = 0;
+
     CurrentGeneration += 1;
     bSpecificAtom *previousNode = root;
-    process_node(root, CurrentGeneration, previousNode, nofProcesses);
+
+    //++root->freebonds; // add Ground
+    ++root->freebonds = 1; // add Ground
+    static int baseAtomNumber = root->number;
+    
+
+    process_node(root, CurrentGeneration, previousNode, nofProcesses, baseAtomNumber);
     std::cout << std::endl;
 }
 
@@ -658,6 +671,7 @@ void Topology::build(
         bonds[i].Print();
     }
 
+    // Add ring closing bonds
     for(int i=0; i<nbonds; i++){
         if(bonds[i].isVisited() == 0){
             std::stringstream sbuff;
@@ -673,7 +687,7 @@ void Topology::build(
                 (otsbuff.str()).c_str(),
                 0.14,
                 109*Deg2Rad,
-                BondMobility::Rigid // CHANGE
+                BondMobility::Free // CHANGE
             );
     
             this->setAtomBiotype(bAtomList[ bonds[i].i ].name, "mainRes", bAtomList[ bonds[i].i ].biotype);
@@ -681,9 +695,19 @@ void Topology::build(
     
             --bAtomList[ bonds[i].i ].freebonds;
             --bAtomList[ bonds[i].j ].freebonds;
+
+            std::cout << "Close ring " 
+                << bAtomList[bonds[i].i].name << "(" << bAtomList[bonds[i].i].getInName() 
+                << ") " << bAtomList[bonds[i].i].number << " " << (sbuff.str()).c_str() << " to " 
+                << bAtomList[bonds[i].j].name << "(" << bAtomList[bonds[i].j].getInName() 
+                << ") " << bAtomList[bonds[i].j].number << " " << (otsbuff.str()).c_str() 
+                << " ... " << std::flush;
+
+            std::cout << "done." << std::endl << std::flush;
         }
     }
 
+    // Define DuMM charged atom types
     for(int k=0; k<natoms; k++){
       std::string abuff =  "rob";
       abuff += bAtomList[k].biotype;
@@ -716,8 +740,8 @@ void Topology::build(
     // Assign AtomIndex values to atoms in bAtomList[] by name
     for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
       for(int ix = 0; ix<natoms; ix++){
-        //std::cout << "Compound atom name " << this->getAtomName(aIx) << " vs "
-        //    << "bAtomList name " << std::string(bAtomList[ix].name) << std::endl;
+        std::cout << "Compound atom name " << this->getAtomName(aIx) << " vs "
+            << "bAtomList name " << std::string(bAtomList[ix].name) << std::endl;
         if(this->getAtomName(aIx) == std::string(bAtomList[ix].name)){ // compare SimTK::String with std::string
           std::cout << "bAtomList[" << ix << "].atomIndex set to " << aIx << std::endl;
           bAtomList[ix].atomIndex = aIx;
@@ -727,6 +751,7 @@ void Topology::build(
     }
 
     // Assign bBond::BondIndex values in bonds[] from Molmodel::BondIndex
+    /*
     int inumber, jnumber;
     Compound::AtomIndex iIx, jIx;
     for ( Compound::BondIndex bondIx(0); bondIx < this->getNumBonds(); ++bondIx){
@@ -754,15 +779,14 @@ void Topology::build(
             }
         }
     }
+    */
 
     // Assign Compound coordinates by matching bAtomList coordinates
     std::cout<<"Create atomTargets from passed coords array"<<std::endl;
     std::map<AtomIndex, Vec3> atomTargets;
-    int ix = 0;
-    for(Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
-        Vec3 v(bAtomList[ix].getX(), bAtomList[ix].getY(), bAtomList[ix].getZ());
-        atomTargets.insert(pair<AtomIndex, Vec3> (bAtomList[ix].atomIndex, v));
-        ix++;
+    for(int ix = 0; ix < getNumAtoms(); ++ix){
+        Vec3 vec(bAtomList[ix].getX(), bAtomList[ix].getY(), bAtomList[ix].getZ());
+        atomTargets.insert(pair<AtomIndex, Vec3> (bAtomList[ix].atomIndex, vec));
     }
 
     matchDefaultTopLevelTransform(atomTargets);
@@ -775,6 +799,19 @@ void Topology::build(
     for(int i=0; i<nbonds; i++){
         bonds[i].Print();
     }
+
+    if(ictdF=="IC"){
+        std::cout << "General regimen: " << "IC" << std::endl;
+        for (unsigned int r=0 ; r<getNumBonds(); r++){
+            setBondMobility(BondMobility::Free, Compound::BondIndex(r));
+        }
+    }else if(ictdF=="TD"){
+        std::cout << "General regimen: " << "IC" << std::endl;
+        for (unsigned int r=0 ; r<getNumBonds(); r++){
+            setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
+        }
+    }
+
 
     PdbStructure  pdb(*this);
     std::ostringstream sstream;

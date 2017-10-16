@@ -177,6 +177,9 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         bAtomList[i].setX(amberReader->getAtomsXcoord(i) / 10.0);
         bAtomList[i].setY(amberReader->getAtomsYcoord(i) / 10.0);
         bAtomList[i].setZ(amberReader->getAtomsZcoord(i) / 10.0);
+        //bAtomList[i].setX(amberReader->getAtomsXcoord(i));
+        //bAtomList[i].setY(amberReader->getAtomsYcoord(i));
+        //bAtomList[i].setZ(amberReader->getAtomsZcoord(i));
 
         bAtomList[i].setMass(amberReader->getAtomsMass(i));
 
