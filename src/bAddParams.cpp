@@ -20,7 +20,8 @@ void bAddGaffParams(
                 + std::string("_") + std::to_string(bAtomList[i].getNumber()) ).c_str(),
             bAtomList[i].getAtomicNumber(), // int atomicNumber
             bAtomList[i].getNBonds(),
-            bAtomList[i].getVdwRadius() / 10.0, // nm
+            //bAtomList[i].getVdwRadius() / 10.0, // nm
+            bAtomList[i].getVdwRadius(), // A
             bAtomList[i].getLJWellDepth() // Real vdwWellDepthInKJ 
         );
         

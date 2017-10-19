@@ -11,8 +11,10 @@ Implementation of MonteCarloSampler class. **/
 MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
                                      SimTK::SimbodyMatterSubsystem *argMatter,
                                      SimTK::Compound *argResidue,
+                                     SimTK::DuMMForceFieldSubsystem *argDumm,
+                                     SimTK::GeneralForceSubsystem *argForces,
                                      SimTK::TimeStepper *argTimeStepper)
-    : Sampler(argCompoundSystem, argMatter, argResidue, argTimeStepper)
+    : Sampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
 {
     TVector = new SimTK::Transform[matter->getNumBodies()];
 }
@@ -171,7 +173,7 @@ void MonteCarloSampler::update(SimTK::State& someState){
 // Get the potential energy from an external source as far as the sampler
 // is concerned - OPENMM has to be inserted here
 SimTK::Real MonteCarloSampler::getPEFromEvaluator(SimTK::State& someState){
-    return matter->calcKineticEnergy(someState);
+    return forces->getMultibodySystem().calcPotentialEnergy(someState);
 }
 
 // Get the desired simulation temperature. Not to be confused with 

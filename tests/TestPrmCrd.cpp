@@ -140,7 +140,7 @@ int main(int argc, char **argv)
     p_world->InitSimulation(/*coords, vels, inivels, indexMap, grads,*/ mytimestep, true);
 
     // Initialize sampler
-    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
+    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->forceField, p_world->forces, p_world->ts);
     Context *context = new Context(p_world, p_HMCsampler);
     World *world = context->getWorld();
 

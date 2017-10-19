@@ -11,8 +11,10 @@ Implementation of HamiltonianMonteCarloSampler class. **/
 HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
                                      SimTK::SimbodyMatterSubsystem *argMatter,
                                      SimTK::Compound *argResidue,
+                                     SimTK::DuMMForceFieldSubsystem *argDumm,
+                                     SimTK::GeneralForceSubsystem *argForces,
                                      SimTK::TimeStepper *argTimeStepper)
-    : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argTimeStepper)
+    : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
 {
     this->fix_n = this->fix_o = 0.0;
 }
@@ -72,7 +74,6 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     setOldKE(matter->calcKineticEnergy(someState));
 
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
-    //timeStepper->stepTo(0.0150);
 
 
 }
@@ -86,6 +87,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     SimTK::Real RT = getTemperature() * SimTK_BOLTZMANN_CONSTANT_MD;
 
     // Get old energy
+    setOldPE(getPEFromEvaluator(someState));
     SimTK::Real pe_o = getOldPE();
     
     // Get old Fixman potential

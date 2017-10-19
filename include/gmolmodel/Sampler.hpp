@@ -12,6 +12,8 @@ public:
     Sampler(SimTK::CompoundSystem *argCompoundSystem,
             SimTK::SimbodyMatterSubsystem *argMatter,
             SimTK::Compound *argResidue,
+            SimTK::DuMMForceFieldSubsystem *argDumm,
+            SimTK::GeneralForceSubsystem *forces,
             SimTK::TimeStepper *argTimeStepper);
 
 
@@ -30,6 +32,8 @@ protected:
     SimTK::CompoundSystem *compoundSystem;
     SimTK::SimbodyMatterSubsystem *matter;
     SimTK::Compound *residue;
+    SimTK::DuMMForceFieldSubsystem *dumm;
+    SimTK::GeneralForceSubsystem *forces;
     SimTK::TimeStepper *timeStepper;
 
 };

@@ -13,6 +13,8 @@ try {
     // Load the PDB file and construct the system.
     CompoundSystem system;
     SimbodyMatterSubsystem matter(system);
+    SimTK::GeneralForceSubsystem *forces = new SimTK::GeneralForceSubsystem(system);
+
     DecorationSubsystem decorations(system);
     DuMMForceFieldSubsystem forceField(system);
     forceField.loadAmber99Parameters();
@@ -44,9 +46,8 @@ try {
     TimeStepper ts(system, integ);
     ts.initialize(state);
 
-
-	// CHANGES
-	HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(&system, &matter, &system.updCompound( SimTK::CompoundSystem::CompoundIndex(0) ), &ts);
+    // CHANGES
+    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(&system, &matter, &system.updCompound( SimTK::CompoundSystem::CompoundIndex(0) ), &forceField, forces, &ts);
 
     SimTK::State& integAdvancedState = integ.updAdvancedState();
     for(int i=0; i<30; i++){

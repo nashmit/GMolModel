@@ -164,6 +164,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         */
 
         bAtomList[i].setName(string_name);
+        //bAtomList[i].setName(str_buf);
 
         bAtomList[i].setInName(str_buf);
 
@@ -384,6 +385,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
 
 
   /*Now read rigid bodies specifications*/
+  /*
   FILE *rfpo;
   rfpo = fopen(rbfilename, "r");
   if(rfpo == NULL){
@@ -480,7 +482,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
 
   fclose(rfpo);
 
-  /* Just checking *////////
+  // Just checking ////////
   std::cout<<"Checking after bMoleculeReader\n";
   for(int i=0; i<natoms;i++){
       bAtomList[i].Print();
@@ -490,7 +492,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
     fflush(stdout);
   }
   ///////////////////////////
-
+  */
 
 }
 

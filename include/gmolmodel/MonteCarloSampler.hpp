@@ -19,6 +19,8 @@ public:
     MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
                       SimTK::SimbodyMatterSubsystem *argMatter,
                       SimTK::Compound *argResidue,
+                      SimTK::DuMMForceFieldSubsystem *argDumm,
+                      SimTK::GeneralForceSubsystem *forces,
                       SimTK::TimeStepper *argTimeStepper);
 
     // Destructor

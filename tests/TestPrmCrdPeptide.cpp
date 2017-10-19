@@ -83,7 +83,7 @@ int main(int argc, char **argv)
     p_world->InitSimulation(mytimestep, true);
 
     // Initialize sampler
-    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->ts);
+    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->forceField, p_world->forces, p_world->ts);
     Context *context = new Context(p_world, p_HMCsampler);
     World *world = context->getWorld();
 
@@ -141,19 +141,19 @@ int main(int argc, char **argv)
 
         // -- UPDATE --
         std::cout << "=========================================" << std::endl;
-        std::cout << "Q before update integAdvancedState " 
-                  << integAdvancedState.getQ() << std::endl;
-        std::cout << "U before update integAdvancedState " 
-                  << integAdvancedState.getU() << std::endl;
-        std::cout << "Time before update: " << world->ts->getTime() << std::endl;
+        //std::cout << "Q before update integAdvancedState " 
+        //          << integAdvancedState.getQ() << std::endl;
+        //std::cout << "U before update integAdvancedState " 
+        //          << integAdvancedState.getU() << std::endl;
+        //std::cout << "Time before update: " << world->ts->getTime() << std::endl;
 
         //p_HMCsampler->update((world->ts->updIntegrator()).updAdvancedState());
         p_HMCsampler->update(integAdvancedState, atof(argv[3]), atoi(argv[4]));
 
-        std::cout << "Q after update integAdvancedState " 
-                  << integAdvancedState.getQ() << std::endl;
-        std::cout << "U after update integAdvancedState " 
-                  << integAdvancedState.getU() << std::endl;
+        //std::cout << "Q after update integAdvancedState " 
+        //          << integAdvancedState.getQ() << std::endl;
+        //std::cout << "U after update integAdvancedState " 
+        //          << integAdvancedState.getU() << std::endl;
         std::cout << "Time after update: " << world->ts->getTime()  
                   << "; integAdvancedState Stage after p_HMCsampler: " 
                   << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 

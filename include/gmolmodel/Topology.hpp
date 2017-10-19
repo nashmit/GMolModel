@@ -118,7 +118,7 @@ public:
   void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses, int baseAtomNumber);
 
   // Construct the molecule topology
-  void walkGraph(bSpecificAtom *root);
+  void walkGraph(bSpecificAtom *root, int baseAtomNumber);
 
   // Build Molmodel Compound
   void build(
