@@ -1,0 +1,6 @@
+source leaprc.protein.ff14SB
+source leaprc.gaff
+source leaprc.water.tip3p
+mol = loadmol2 ligand.mol2
+saveamberparm mol ligand.prmtop ligand.inpcrd
+quit

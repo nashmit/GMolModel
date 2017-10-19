@@ -1,0 +1,14 @@
+@<TRIPOS>MOLECULE
+MOL
+    2     1     1     0     0
+SMALL
+bcc
+
+
+@<TRIPOS>ATOM
+      1 O1          0.0000    0.0000    0.0000 o         1 MOL      0.000000
+      2 O2          1.4300    0.0000    0.0000 o         1 MOL      0.000000
+@<TRIPOS>BOND
+     1    1    2 1   
+@<TRIPOS>SUBSTRUCTURE
+     1 MOL         1 TEMP              0 ****  ****    0 ROOT
