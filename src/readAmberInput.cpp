@@ -497,10 +497,9 @@ int readAmberInput::getDihedralsAtomsIndex(int dihIndex, int atomIndx)
 void readAmberInput::GeneratePairStartAndLen()
 {
 	std::vector<int> currentDihedralIndices = DihedralsAtomsIndex[0];
-	
 	PairStartAndLen.push_back( std::make_pair(0,1) );
 
-	for(int idx = 1 ; idx < DihedralsAtomsIndex.size() ; idx++ )
+	for(unsigned int idx = 1 ; idx < DihedralsAtomsIndex.size() ; idx++ )
 	{
 		if( currentDihedralIndices[0] == DihedralsAtomsIndex[i][0] &&
 		    currentDihedralIndices[1] == DihedralsAtomsIndex[i][1] &&
