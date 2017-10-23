@@ -12,20 +12,23 @@ void bAddGaffParams(
     std::cout << "Read Amber parameters from prmtopi start." <<std::endl;
     SimTK::DuMM::AtomClassIndex aIx;
     for(int i=0; i<amberReader->getNumberAtoms(); i++){
+
         aIx = dumm.getNextUnusedAtomClassIndex();
         bAtomList[i].setAtomClassIndex(aIx);
-        dumm.defineAtomClass_KA(
-            aIx,
+        dumm.defineAtomClass(
+            (SimTK::DuMM::AtomClassIndex)aIx,
 	    ( std::string("prmtop") + bAtomList[i].getFftype() 
                 + std::string("_") + std::to_string(bAtomList[i].getNumber()) ).c_str(),
             bAtomList[i].getAtomicNumber(), // int atomicNumber
             bAtomList[i].getNBonds(),
-            //bAtomList[i].getVdwRadius() / 10.0, // nm
-            bAtomList[i].getVdwRadius(), // A
+            bAtomList[i].getVdwRadius() / 10.0, // nm
+            //bAtomList[i].getVdwRadius(), // A
             bAtomList[i].getLJWellDepth() // Real vdwWellDepthInKJ 
         );
         
     }
+
+    dumm.setVdwMixingRule(dumm.VdwMixingRule::LorentzBerthelot);
 
     // Suppose or try to have the same order as the reader
     for(int t=0; t<amberReader->getNumberBonds(); t++){
@@ -44,10 +47,9 @@ void bAddGaffParams(
         bAtomList[amberReader->getAnglesAtomsIndex2(t)].getAtomClassIndex(),
         bAtomList[amberReader->getAnglesAtomsIndex3(t)].getAtomClassIndex(),
         amberReader->getAnglesForceK(t),
-        amberReader->getAnglesEqval(t)
+        ANG_360_TO_180(SimTK_RADIAN_TO_DEGREE * amberReader->getAnglesEqval(t))
       );
     }
-
 
     std::vector<std::pair<int, int>> pairStartAndLens = amberReader->getPairStartAndLen(); 
 

@@ -62,6 +62,10 @@ public:
 
   void setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor);
 
+  // Scale specific DuMM force field terms by scale_factor
+
+  void setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm);
+
   // Interface
 
   // Set graph

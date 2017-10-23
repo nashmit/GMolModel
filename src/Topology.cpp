@@ -55,6 +55,34 @@ void Topology::setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::R
     dumm.setGbsaGlobalScaleFactor(scale_factor);
 }
 
+/* ==================================================
+ *    Scale DuMM force field terms by scale_factor
+ * ================================================== */
+void Topology::setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm){    
+
+    dumm.setBondStretchGlobalScaleFactor(1.0);
+
+    dumm.setBondBendGlobalScaleFactor(1.0);
+
+    dumm.setBondTorsionGlobalScaleFactor(1.0);
+
+    dumm.setAmberImproperTorsionGlobalScaleFactor(1.0);
+
+    dumm.setVdw12ScaleFactor(1.0);
+    dumm.setVdw13ScaleFactor(1.0);
+    dumm.setVdw14ScaleFactor(1.0);
+    dumm.setVdw15ScaleFactor(1.0);
+    dumm.setVdwGlobalScaleFactor(1.0);
+
+    dumm.setCoulomb12ScaleFactor(1.0);
+    dumm.setCoulomb13ScaleFactor(1.0);
+    dumm.setCoulomb14ScaleFactor(1.0);
+    dumm.setCoulomb15ScaleFactor(1.0);
+    dumm.setCoulombGlobalScaleFactor(1.0);
+
+    dumm.setGbsaGlobalScaleFactor(0.0);
+}
+
 /*Any kind of molecule*/
 void Topology::init(
     DuMMForceFieldSubsystem &dumm,

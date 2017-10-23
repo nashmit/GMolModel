@@ -171,7 +171,7 @@ std::string ictdF
   this->flexFN = flexFN;
   this->ictdF = ictdF;
   this->pyseed = new unsigned long int;
-  this->lj14sf = 0.5;
+  this->lj14sf = 1;
 
   system = new SimTK::CompoundSystem;
   matter = new SimTK::SimbodyMatterSubsystem(*system);
@@ -212,7 +212,7 @@ World::World(
   this->frcmodF = frcmodF;
   this->ictdF = ictdF;
   this->pyseed = new unsigned long int;
-  this->lj14sf = 0.5;
+  this->lj14sf = 1;
 
   system = new SimTK::CompoundSystem;
   matter = new SimTK::SimbodyMatterSubsystem(*system);
@@ -290,6 +290,8 @@ void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
     ictdF
   );
 
+  lig1->setSpecificDuMMScaleFactor(*forceField);
+
   system->adoptCompound(*lig1);
   system->modelCompounds();
   
@@ -307,6 +309,17 @@ void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
   #endif
 
   system->realizeTopology();
+
+
+  std::cout << "Number of included atoms in nonbonded interactions: " << forceField->getNumNonbondAtoms() << std::endl;
+  std::cout << "getVdwGlobalScaleFactor() " << forceField->getVdwGlobalScaleFactor() << std::endl;
+  for(int i=0; i<lig1->natms; i++){
+      std::cout << " DuMM VdW Radius " 
+          << forceField->getVdwRadius((lig1->bAtomList[i]).getAtomClassIndex()) 
+          << " DuMM VdW Well Depth"
+          << forceField->getVdwWellDepth((lig1->bAtomList[i]).getAtomClassIndex())
+          << std::endl;
+  }
 
   SimTK::State state = system->updDefaultState();
 
