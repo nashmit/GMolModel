@@ -41,6 +41,8 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
       i++;
   }
 
+  //timeStepper->initialize(someState);
+
 }
 
 

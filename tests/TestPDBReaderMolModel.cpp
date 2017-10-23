@@ -8,7 +8,7 @@
 
 using namespace SimTK;
 
-int main() {
+int main(int argc, char **argv) {
 try {
     // Load the PDB file and construct the system.
     CompoundSystem system;
@@ -19,12 +19,9 @@ try {
     DuMMForceFieldSubsystem forceField(system);
     forceField.loadAmber99Parameters();
 
-    PDBReader pdb("1AKG.pdb");
+    PDBReader pdb(argv[1]);
     pdb.createCompounds(system);
     system.modelCompounds();
-
-    //system.addEventHandler(new VelocityRescalingThermostat(
-    //    system, 293.15, 0.1));
 
     // Show me a movie
     Visualizer viz(system);
@@ -36,21 +33,53 @@ try {
     
     State state = system.getDefaultState();
     pdb.createState(system, state);
-    LocalEnergyMinimizer::minimizeEnergy(system, state, 15.0);
+    //LocalEnergyMinimizer::minimizeEnergy(system, state, 15.0);
     
     // Simulate it.
-
-    
     VerletIntegrator integ(system);
     integ.setAccuracy(1e-2);
     TimeStepper ts(system, integ);
     ts.initialize(state);
 
-    // CHANGES
+    // Create and initialize sampler
     HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(&system, &matter, &system.updCompound( SimTK::CompoundSystem::CompoundIndex(0) ), &forceField, forces, &ts);
 
-    SimTK::State& integAdvancedState = integ.updAdvancedState();
-    for(int i=0; i<30; i++){
+    std::cout << std::fixed;
+    std::cout << std::setprecision(4);
+    const SimTK::State& constRefState = ts.getIntegrator().getState();
+    SimTK::State& integAdvancedState = ts.updIntegrator().updAdvancedState();
+    p_HMCsampler->initialize(integAdvancedState, atof(argv[3]), atoi(argv[4]));
+
+    // Force field scaling
+    forceField.setBondStretchGlobalScaleFactor(0.0);
+    forceField.setBondBendGlobalScaleFactor(0.0);
+    forceField.setBondTorsionGlobalScaleFactor(0.0);
+    forceField.setAmberImproperTorsionGlobalScaleFactor(0.0);
+
+    //forceField.setVdw12ScaleFactor(0.0);
+    //forceField.setVdw13ScaleFactor(0.0);
+    //forceField.setVdw14ScaleFactor(0.0);
+    //forceField.setVdw15ScaleFactor(0.0);
+    //forceField.setVdwGlobalScaleFactor(0.0);
+
+    forceField.setCoulomb12ScaleFactor(0.0);
+    forceField.setCoulomb13ScaleFactor(0.0);
+    forceField.setCoulomb14ScaleFactor(0.0);
+    forceField.setCoulomb15ScaleFactor(0.0);
+    forceField.setCoulombGlobalScaleFactor(0.0);
+
+    forceField.setGbsaGlobalScaleFactor(0.0);
+
+    forceField.dump();
+    //=====================
+
+    std::cout << "Initial const state PE: " << std::setprecision(20)
+        << forces->getMultibodySystem().calcPotentialEnergy(constRefState)
+        << " integ advanced state PE: "
+        << forces->getMultibodySystem().calcPotentialEnergy(integAdvancedState)
+        << std::endl;
+
+    for(int i=0; i<atoi(argv[2]); i++){
         std::cout << "=========================================" << std::endl;
         std::cout << "Q before update integAdvancedState "
                   << integAdvancedState.getQ() << std::endl;
@@ -58,7 +87,7 @@ try {
                   << integAdvancedState.getU() << std::endl;
         std::cout << "Time before update: " << ts.getTime() << std::endl;
 
-        p_HMCsampler->update(integAdvancedState, 0.0015, 3);
+        p_HMCsampler->update(integAdvancedState, atof(argv[3]), atof(argv[4]));
 
         std::cout << "Q after update integAdvancedState "
                   << integAdvancedState.getQ() << std::endl;
@@ -68,7 +97,6 @@ try {
                   //<< "; integAdvancedState Stage before stepping: "
                   //<< (((SimTK::Subsystem)(matter)).getStage(integAdvancedState)).getName()
                   << std::endl;
-        //writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "MCs", i);
         writePdb(system.updCompound( SimTK::CompoundSystem::CompoundIndex(0) ), integAdvancedState, "pdbs", "sb_", 8, "HMCs", i);
 
     }
