@@ -94,9 +94,10 @@ std::string intriad::getString(void){
 ////////////////////
 bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfilename)
 {
+    std::cout << "BMOLECULEREADER" << std::endl;
+
     natoms = 0;
     bBond buffij;
-    //char elem = 'x';
     int noDummies = 0; 
     std::string line;
     char line_c[1000];
@@ -187,7 +188,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         bAtomList[i].setVdwRadius(amberReader->getAtomsRVdW(i));
         bAtomList[i].setLJWellDepth(amberReader->getAtomsEpsilon(i));
 
-        bAtomList[i].Print();
+        //bAtomList[i].Print();
     }
 
     // READ BONDS
@@ -216,25 +217,6 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
        (bAtomList[ bonds[i].j  ]).addNeighbor( &(bAtomList[ bonds[i].i  ]) );
        (bAtomList[ bonds[i].j  ]).addBond( &(bonds[i]) );       
     }
-
-
-    /*
-    // Print bonds
-    std::cout << "Bonds before walk the graph" << std::endl;
-    for(int i=0; i<nbonds; i++){
-        bonds[i].Print();
-    }
-
-    // Walk graph
-    std::cout << "Walk the graph" << std::endl;
-    walkGraph( &(bAtomList[0]) );
-
-    // Print bonds
-    std::cout << "Bonds after walk the graph" << std::endl;
-    for(int i=0; i<nbonds; i++){
-        bonds[i].Print();
-    }
-    */
 
     // Every *valentAtom is derived from SingleAtom in turn derived from Compound with one atom (AtomIndex 0)
     for(int i=0; i<natoms+noDummies; i++){
@@ -375,6 +357,17 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
 
     }
 
+    /* Just checking *////////
+    std::cout<<"Checking after bMoleculeReader\n";
+    for(int i=0; i<amberReader->getNumberAtoms();i++){
+        bAtomList[i].Print();
+    }
+    for(int i=0; i<amberReader->getNumberBonds(); i++){ // EU
+        std::cout<<"bond: "<<bonds[i].i<<" "<<bonds[i].j<<std::endl;
+        fflush(stdout);
+    }
+    ///////////////////////////
+
     if (bAtomList == NULL){
       std::cout<<"bMoleculeReader constructor exit: NULL bAtomList\n";fflush(stdout);
     }
@@ -382,118 +375,6 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
       std::cout<<"bMoleculeReader constructor: bAtomList not NULL\n";fflush(stdout);
     }
     
-
-
-  /*Now read rigid bodies specifications*/
-  /*
-  FILE *rfpo;
-  rfpo = fopen(rbfilename, "r");
-  if(rfpo == NULL){
-    printf("Usage:\n<program> -mol2 <mol2_file> -rb <rb_file> -gaff  gaff.dat -frcmod <frcmod_file>\n");
-    printf("rb_file not provided. Exiting...\n");
-    exit(1);
-  }
-
-  std::string sbuff;
-  std::vector<int> ring;
-  char curr_char;
-  //int bond_found = 0;
-  int boi;
-  int par_open = 0;
-  int ring_no = -1;
-  int ring_closing = 0;
-
-  while(fgets(line_c, MAX_LINE_LENGTH, rfpo)){
-    line = line_c; //RESTORE
-    if((sbuff = line.substr(0,5)) == "rings"){ // RESTORE
-      sbuff = "";
-      for(unsigned int i=0; i<strlen(line_c); i++){ 
-        curr_char = line_c[i]; // RESTORE
-        if(curr_char == ']'){
-          ++ring_no;
-          ring.push_back(atoi(sbuff.c_str()));
-          sbuff = "";
-          //bond_found = 0;
-          for(boi=0; boi<nbonds; boi++){ // EU
-            for(unsigned int ri=0; ri<ring.size(); ri++){
-              for(unsigned int rj=0; (rj<ring.size()) && (rj<ri); rj++){
-                if( ((ring[ri] == bonds[boi].i) && (ring[rj] == bonds[boi].j)) ||
-                  ((ring[ri] == bonds[boi].j) && (ring[rj] == bonds[boi].i))){
-                  bonds[boi].setInRing();
-                  bonds[boi].setRingNo(ring_no);
-                  if(ring_closing == 0){
-                    bonds[boi].setAsRingClosing();
-                  }
-                  ++ring_closing;
-                  //bond_found = 1;
-                  break;
-                }
-              }
-            }
-          }
-          ring.clear();
-          ring_closing = 0;
-        }
-        else if(curr_char == ','){
-          ring.push_back(atoi(sbuff.c_str()));
-          sbuff = "";
-        }
-        else if((curr_char >= '0') && (curr_char <='9')){
-          sbuff += curr_char;
-        }
-      }
-    }
-
-    else if((sbuff = line.substr(0,17)) == "non_ring_pi_bonds"){ // RESTORE
-      sbuff = "";
-      for(unsigned int i=0; i<line.size(); i++){
-        curr_char = line_c[i]; // RESTORE
-        if(curr_char == ')'){
-          par_open = 0;
-          ring.push_back(atoi(sbuff.c_str()));
-          for(boi = 0; boi<nbonds; boi++){ // EU
-            if( ((bonds[boi].i == ring[0]) && (bonds[boi].j == ring[1])) ||
-              ((bonds[boi].i == ring[1]) && (bonds[boi].j == ring[0])) ){
-              bonds[boi].setAsRigid();
-              ring.clear();
-              sbuff = "";
-              break;
-            }
-          }
-        }
-        else if((curr_char == ',') && (par_open == 1)){
-          ring.push_back(atoi(sbuff.c_str()));
-          sbuff = "";
-        }
-        else if((curr_char >= '0') && (curr_char <='9')){
-          sbuff += curr_char;
-        }
-        else if(curr_char == '('){
-          par_open = 1;
-        }
-      }
-    }
-
-    else if((sbuff = line.substr(0,17)) == "rigid_bodies"){
-      // TODO
-    }
-
-  }
-
-  fclose(rfpo);
-
-  // Just checking ////////
-  std::cout<<"Checking after bMoleculeReader\n";
-  for(int i=0; i<natoms;i++){
-      bAtomList[i].Print();
-  }
-  for(int i=0; i<nbonds; i++){ // EU
-    std::cout<<"bond: "<<bonds[i].i<<" "<<bonds[i].j<<std::endl;
-    fflush(stdout);
-  }
-  ///////////////////////////
-  */
-
 }
 
 bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,

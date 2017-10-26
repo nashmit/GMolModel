@@ -9,9 +9,27 @@ void bAddGaffParams(
 
 )
 {
-    std::cout << "Read Amber parameters from prmtopi start." <<std::endl;
+    std::cout << "BADDPARAMS" << std::endl;
     SimTK::DuMM::AtomClassIndex aIx;
     for(int i=0; i<amberReader->getNumberAtoms(); i++){
+
+       if (! SimTK::Biotype::exists("mainRes", bAtomList[i].name, SimTK::Ordinality::Any) ){
+            SimTK::BiotypeIndex biotypeIndex = SimTK::Biotype::defineBiotype(
+                  SimTK::Element(
+                      bAtomList[i].getAtomicNumber()
+                      , (std::to_string(bAtomList[i].getElem())).c_str()
+                      , (std::to_string(bAtomList[i].getElem())).c_str()
+                      , bAtomList[i].getMass())
+                , bAtomList[i].getNBonds()
+                , "mainRes"
+                , (bAtomList[i].getName()).c_str()
+                , SimTK::Ordinality::Any
+            );
+
+            bAtomList[i].setBiotypeIndex(biotypeIndex);
+        }
+
+
 
         aIx = dumm.getNextUnusedAtomClassIndex();
         bAtomList[i].setAtomClassIndex(aIx);
@@ -25,10 +43,9 @@ void bAddGaffParams(
             //bAtomList[i].getVdwRadius(), // A
             bAtomList[i].getLJWellDepth() // Real vdwWellDepthInKJ 
         );
-        
-    }
 
-    dumm.setVdwMixingRule(dumm.VdwMixingRule::LorentzBerthelot);
+
+    }
 
     // Suppose or try to have the same order as the reader
     for(int t=0; t<amberReader->getNumberBonds(); t++){
@@ -97,6 +114,8 @@ void bAddGaffParams(
             }
         }
     }
+
+    dumm.setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
 
     /* Just checking *////////
     std::cout<<"Checking after bAddParams\n";

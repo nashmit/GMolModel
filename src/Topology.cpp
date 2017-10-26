@@ -74,11 +74,11 @@ void Topology::setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm){
     dumm.setVdw15ScaleFactor(1.0);
     dumm.setVdwGlobalScaleFactor(1.0);
 
-    dumm.setCoulomb12ScaleFactor(0.0);
-    dumm.setCoulomb13ScaleFactor(0.0);
-    dumm.setCoulomb14ScaleFactor(0.0);
-    dumm.setCoulomb15ScaleFactor(0.0);
-    dumm.setCoulombGlobalScaleFactor(0.0);
+    dumm.setCoulomb12ScaleFactor(1.0);
+    dumm.setCoulomb13ScaleFactor(1.0);
+    dumm.setCoulomb14ScaleFactor(1.0);
+    dumm.setCoulomb15ScaleFactor(1.0);
+    dumm.setCoulombGlobalScaleFactor(1.0);
 
     dumm.setGbsaGlobalScaleFactor(0.0);
 }
@@ -595,7 +595,8 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
                 if( baseSetFlag == 0 ){
                     std::cout << "Set base atom" << std::endl;
                     this->setBaseAtom( *(previousNode->bAtomType) );
-                    this->setAtomBiotype(previousNode->name, "mainRes", previousNode->biotype);
+                    //this->setAtomBiotype(previousNode->name, "mainRes", previousNode->biotype);
+                    this->setAtomBiotype(previousNode->name, "mainRes", previousNode->getName());
                     this->convertInboardBondCenterToOutboard();
                     baseSetFlag = 1;
                 }
@@ -612,7 +613,8 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
                     << (sbuff.str()).c_str() << " ... " << std::flush;
 
                 this->bondAtom( *(node->bAtomType), (sbuff.str()).c_str(), 0.149, 0); // (Compound::SingleAtom&, BondCenterPathName, Length, Angle
-                this->setAtomBiotype(node->name, "mainRes", node->biotype);
+                //this->setAtomBiotype(node->name, "mainRes", node->biotype);
+                this->setAtomBiotype(node->name, "mainRes", node->getName());
 
                 --previousNode->freebonds;
                 --node->freebonds;
@@ -633,7 +635,8 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
                     << (sbuff.str()).c_str() << " ... " << std::flush;
 
                 this->bondAtom( *(node->bAtomType), (sbuff.str()).c_str(), 0.149, 0);
-                this->setAtomBiotype(node->name, "mainRes", node->biotype);
+                //this->setAtomBiotype(node->name, "mainRes", node->biotype);
+                this->setAtomBiotype(node->name, "mainRes", node->getName());
 
                 --previousNode->freebonds;
                 --node->freebonds;
@@ -689,6 +692,8 @@ void Topology::build(
     std::string ictdF
 )
 {
+    std::cout << "TOPOLOGY BUILD" << std::endl;
+
     this->natms = natoms;
     this->bAtomList = bAtomList;
     this->nbnds = nbonds;
@@ -699,10 +704,10 @@ void Topology::build(
     this->setCompoundName("mainRes");
 
     // Print bonds
-    std::cout << "Bonds before walk the graph" << std::endl;
-    for(int i=0; i<nbonds; i++){
-        bonds[i].Print();
-    }
+    //std::cout << "Bonds before walk the graph" << std::endl;
+    //for(int i=0; i<nbonds; i++){
+    //    bonds[i].Print();
+    //}
 
     // Search for appropriate atom/node to start walking the graph from
     /*
@@ -726,10 +731,10 @@ void Topology::build(
     walkGraph( &(bAtomList[0]), baseAtomNumber);
 
     // Print bonds
-    std::cout << "Bonds after walk the graph" << std::endl;
-    for(int i=0; i<nbonds; i++){
-        bonds[i].Print();
-    }
+    //std::cout << "Bonds after walk the graph" << std::endl;
+    //for(int i=0; i<nbonds; i++){
+    //    bonds[i].Print();
+    //}
 
     // Add ring closing bonds
     for(int i=0; i<nbonds; i++){
@@ -760,8 +765,10 @@ void Topology::build(
                 BondMobility::Rigid // CHANGE
             );
     
-            this->setAtomBiotype(leftNode->name, "mainRes", leftNode->biotype);
-            this->setAtomBiotype(rightNode->name, "mainRes", rightNode->biotype);
+            //this->setAtomBiotype(leftNode->name, "mainRes", leftNode->biotype);
+            //this->setAtomBiotype(rightNode->name, "mainRes", rightNode->biotype);
+            this->setAtomBiotype(leftNode->name, "mainRes", leftNode->getName());
+            this->setAtomBiotype(rightNode->name, "mainRes", rightNode->getName());
     
             --leftNode->freebonds;
             --rightNode->freebonds;
@@ -799,10 +806,13 @@ void Topology::build(
       std::cout << "setBiotypeChargedAtomType bAtomList["<< k << "].getChargedAtomTypeIndex() "
           << bAtomList[k].getChargedAtomTypeIndex()
           << " bAtomList[" << k << "].biotype " << bAtomList[k].biotype 
+          //<< " Biotype::get(\"mainRes\", bAtomList[k].biotype).getIndex() "
+          //<< Biotype::get("mainRes", bAtomList[k].biotype).getIndex()
           << std::endl << std::flush;
       dumm.setBiotypeChargedAtomType( 
         bAtomList[k].getChargedAtomTypeIndex(),
-        Biotype::get("mainRes", bAtomList[k].biotype).getIndex()
+        //Biotype::get("mainRes", bAtomList[k].biotype).getIndex()
+        bAtomList[k].getBiotypeIndex()
       );  
 
     }   
@@ -888,10 +898,22 @@ void Topology::build(
     fb.close();
 
     // Print bonds
-    std::cout << "Bonds after closing the rings" << std::endl;
-    for(int i=0; i<nbonds; i++){
-        bonds[i].Print();
+    //std::cout << "Bonds after closing the rings" << std::endl;
+    //for(int i=0; i<nbonds; i++){
+    //    bonds[i].Print();
+    //}
+
+    /* Just checking *////////
+    std::cout << "Checking after Topology" << std::endl;
+    for(int i=0; i<getNumAtoms();i++){
+        bAtomList[i].Print();
     }
+    for(int i=0; i<getNumBonds(); i++){ // EU
+        std::cout<<"bond: "<<bonds[i].i<<" "<<bonds[i].j<<std::endl;
+        fflush(stdout);
+    }
+    ///////////////////////////
+
 
     if(ictdF=="IC"){
         std::cout << "General regimen: " << "IC" << std::endl;

@@ -45,7 +45,8 @@ void bSpecificAtom::Print(void)
     std::cout<<"bSpecificAtom Print: nbonds "<<nbonds<<" freebonds "<<freebonds<<" name "<<name<<" inName "<<inName
         <<" number "<<number<<" atomIndex  "<<atomIndex<<" elem "<<elem<<" atomicNumber "<<atomicNumber<<" x "<<x<<" y "<< y<<" z "<<z
         <<" mass "<<mass<<" vdwRadius  "<<vdwRadius<<" LJWellDepth  "<<LJWellDepth<<" fftype "<<fftype
-        <<" atomClassIndex  "<<atomClassIndex<<" biotype "<<biotype<<" bAtomType "<< bAtomType 
+        <<" atomClassIndex  "<<atomClassIndex<<" biotype (useless) "<< biotype << " biotypeIndex " << biotypeIndex 
+        << " bAtomType "<< bAtomType 
         <<" charge "<<charge<<" mobile "<<mobile<<" visited "<<visited<<std::endl;
 
     std::cout << "Neighbors:";
@@ -320,6 +321,18 @@ void bSpecificAtom::setLJWellDepth(SimTK::Real inpLJWellDepth)
 SimTK::Real bSpecificAtom::getLJWellDepth(void)
 {
     return this->LJWellDepth;
+}
+
+// Get BiotypeIndex
+SimTK::BiotypeIndex bSpecificAtom::getBiotypeIndex(void)
+{
+    return biotypeIndex;
+}
+
+// Set BiotypeIndex
+void bSpecificAtom::setBiotypeIndex(SimTK::BiotypeIndex argBiotypeIndex)
+{
+    this->biotypeIndex = argBiotypeIndex;
 }
 
 // Add an atom pointer to the vector of atom neighbors

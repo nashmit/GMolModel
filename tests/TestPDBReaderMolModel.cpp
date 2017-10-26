@@ -44,8 +44,6 @@ try {
     // Create and initialize sampler
     HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(&system, &matter, &system.updCompound( SimTK::CompoundSystem::CompoundIndex(0) ), &forceField, forces, &ts);
 
-    std::cout << std::fixed;
-    std::cout << std::setprecision(4);
     const SimTK::State& constRefState = ts.getIntegrator().getState();
     SimTK::State& integAdvancedState = ts.updIntegrator().updAdvancedState();
     p_HMCsampler->initialize(integAdvancedState, atof(argv[3]), atoi(argv[4]));

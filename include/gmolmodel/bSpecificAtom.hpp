@@ -98,6 +98,9 @@ public:
     SimTK::DuMM::ChargedAtomTypeIndex getChargedAtomTypeIndex(void);
     void setChargedAtomTypeIndex(SimTK::DuMM::ChargedAtomTypeIndex);
 
+    SimTK::BiotypeIndex getBiotypeIndex(void);
+    void setBiotypeIndex(SimTK::BiotypeIndex);
+
     void setNbonds(int);
     void setFreebonds(int);
     void setName(std::string);

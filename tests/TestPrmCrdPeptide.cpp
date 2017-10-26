@@ -119,8 +119,15 @@ int main(int argc, char **argv)
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
     p_HMCsampler->initialize(integAdvancedState, atof(argv[3]), atoi(argv[4]));
 
-    world->forceField->dump();
+    //world->forceField->dump();
+    //world->forceField->dumpCForceFieldParameters(std::cout);
 
+    world->system->realize(integAdvancedState, SimTK::Stage::Dynamics);
+
+    SimTK::Real myPE = world->forces->getMultibodySystem().calcPotentialEnergy(constRefState);
+    std::cout << "Initial const state PE: " << std::setprecision(20)
+        << myPE << std::endl;
+    
     std::cout << "Initial const state PE: " << std::setprecision(20)
         << world->forces->getMultibodySystem().calcPotentialEnergy(constRefState)
         << " integ advanced state PE: "
@@ -157,6 +164,9 @@ int main(int argc, char **argv)
         //          << integAdvancedState.getU() << std::endl;
         //std::cout << "Time before update: " << world->ts->getTime() << std::endl;
 
+        SimTK::Real myPE = world->forces->getMultibodySystem().calcPotentialEnergy(integAdvancedState);
+        std::cout << "PE: " << std::setprecision(20)
+            << myPE << std::endl;
         //p_HMCsampler->update((world->ts->updIntegrator()).updAdvancedState());
         p_HMCsampler->update(integAdvancedState, atof(argv[3]), atoi(argv[4]));
 

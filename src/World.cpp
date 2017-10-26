@@ -111,6 +111,7 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
 
   #ifdef DEBUG_TIME
   boost::timer GridForce_timer;
+  printf("GridForce: calcForce START\n");
   #endif
 
   const SimTK::Compound& c = compoundSystem->getCompound(SimTK::CompoundSystem::CompoundIndex(0));
@@ -138,7 +139,8 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
 
 // This should be carefully analyzed. Intended to be taken from somewhere else.
 SimTK::Real GridForce::calcPotentialEnergy(const SimTK::State& state) const {
-  double energy = 0.0;
+  SimTK::Real energy = 0.0;
+  printf("GridForce: calcPotentialEnergy %.8lf\n", energy);
   return energy;
 }
 
