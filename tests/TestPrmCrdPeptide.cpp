@@ -86,6 +86,7 @@ int main(int argc, char **argv)
     HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->forceField, p_world->forces, p_world->ts);
     Context *context = new Context(p_world, p_HMCsampler);
     World *world = context->getWorld();
+    world->forceField->setTracing(true);
 
     // Options for mass matrix, Lennard Jones
 

@@ -119,6 +119,7 @@ set(TESTS_SRCS
         TestPrmCrd.cpp
         TestPrmCrdPeptide.cpp
 	TestPDBReaderMolModel.cpp
+        TestParallelExecutor.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})
