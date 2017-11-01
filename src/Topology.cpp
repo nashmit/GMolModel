@@ -68,17 +68,17 @@ void Topology::setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm){
 
     dumm.setAmberImproperTorsionGlobalScaleFactor(0.0);
 
-    dumm.setVdw12ScaleFactor(1.0);
-    dumm.setVdw13ScaleFactor(1.0);
-    dumm.setVdw14ScaleFactor(1.0);
-    dumm.setVdw15ScaleFactor(1.0);
-    dumm.setVdwGlobalScaleFactor(1.0);
+    dumm.setVdw12ScaleFactor(0.0);
+    dumm.setVdw13ScaleFactor(0.0);
+    dumm.setVdw14ScaleFactor(0.0);
+    dumm.setVdw15ScaleFactor(0.5);
+    //dumm.setVdwGlobalScaleFactor(0.0);
 
-    dumm.setCoulomb12ScaleFactor(1.0);
-    dumm.setCoulomb13ScaleFactor(1.0);
-    dumm.setCoulomb14ScaleFactor(1.0);
-    dumm.setCoulomb15ScaleFactor(1.0);
-    dumm.setCoulombGlobalScaleFactor(1.0);
+    dumm.setCoulomb12ScaleFactor(0.0);
+    dumm.setCoulomb13ScaleFactor(0.0);
+    dumm.setCoulomb14ScaleFactor(0.0);
+    dumm.setCoulomb15ScaleFactor(0.0);
+    dumm.setCoulombGlobalScaleFactor(0.0);
 
     dumm.setGbsaGlobalScaleFactor(0.0);
 }

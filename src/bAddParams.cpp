@@ -41,7 +41,7 @@ void bAddGaffParams(
             bAtomList[i].getNBonds(),
             bAtomList[i].getVdwRadius() / 10.0, // nm
             //bAtomList[i].getVdwRadius(), // A
-            bAtomList[i].getLJWellDepth() // Real vdwWellDepthInKJ 
+            bAtomList[i].getLJWellDepth() * 4.184// Real vdwWellDepthInKcal 
         );
 
 

@@ -12,34 +12,39 @@
 
 class NonbondedForceTask : public SimTK::Parallel2DExecutor::Task {
 public:
-    NonbondedForceTask() {
+    NonbondedForceTask(int& number) {
+	this->number = number;
     }
 
     void initialize() {
-        TRACE("NonbondedForceTask::initialize BEGIN\n");
-        TRACE("NonbondedForceTask::initialize END\n");
+        //TRACE("NonbondedForceTask::initialize BEGIN\n");
+        //TRACE("NonbondedForceTask::initialize END\n");
+	TRACE("NonbondedForceTask::initialize\n");
     }
 
     void finish() {
-        TRACE("NonbondedForceTask::finish BEGIN\n");
-        TRACE("NonbondedForceTask::finish END\n");
+        TRACE("NonbondedForceTask::finish\n");
+        //TRACE("NonbondedForceTask::finish END\n");
     }
 
     void execute(int body1, int body2) {
-        TRACE("NonbondedForceTask::execute BEGIN\n");
-        TRACE("NonbondedForceTask::execute END\n");
+        TRACE("NonbondedForceTask::execute\n");
+        //TRACE("NonbondedForceTask::execute END\n");
     }
 
 private:
-    int temp;
+	int number;
+    
 };
 
 int main (int argc, char **argv)
 {
-    int numThreadsInUse = 1;
-    int nofIncludedBodies = 10;
+    int numThreadsInUse = 3;
+    int nofIncludedBodies = 4;
 
-    NonbondedForceTask task;
+    int number = 0;
+
+    NonbondedForceTask task(number);
 
     SimTK::ParallelExecutor *executor = new SimTK::ParallelExecutor(numThreadsInUse);
 
