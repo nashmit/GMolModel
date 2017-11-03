@@ -7,8 +7,8 @@ int main(){
 
 readAmberInput MOL;
 
-string inpcrdfile = "../../2but/ligand.inpcrd";
-string prmtopfile = "../../2but/ligand.prmtop";
+string inpcrdfile = "../../tests_inputs/2but/ligand.inpcrd";
+string prmtopfile = "../../tests_inputs/2but/ligand.prmtop";
 
 
 MOL.readAmberFiles(inpcrdfile, prmtopfile);
@@ -70,6 +70,31 @@ for(int i=0; i < MOL.getNumberDihedrals(); i++)
 
 printf("\n\n");
 
+printf(">>> Check NonBondedAtomsMatrix >>> \n\n");
+
+// MOL.TestNonBondedAtomsMatrix();
+
+for(int i=0; i < MOL.getNumberAtoms(); i++)
+{
+  for(int j=0; j < MOL.getNumberAtoms(); j++)
+  {
+    printf(" %i ", MOL.getNonBondedAtomsMatrix(i, j));
+  }
+  printf("\n");
+}
+
+printf("\n\n");
+
+for(int i=0; i < MOL.getNumberAtoms(); i++)
+{
+  for(int j=0; j < MOL.getNumberAtoms(); j++)
+  {
+    if( MOL.getNonBondedAtomsMatrix(i, j) == 0)
+      printf("EXCLUDE_PAIR %5i %5i \n", i, j);
+  }
+
+}
+printf("\n\n");
 
 return 0;
 

@@ -15,7 +15,19 @@ try
 {
 
   inpcrd.open(inpcrdfile.c_str());
+  if(!inpcrd.is_open())
+  {
+          printf("Error in inpcrd file : file not opened \n");
+          exit(1);
+  }
+
   prmtop.open(prmtopfile.c_str());
+  if(!prmtop.is_open())
+  {
+          printf("Error in prmtop file : file not opened \n");
+          exit(1);
+  }
+
 
   readInpcrd();
 
@@ -76,6 +88,12 @@ try
     else if (line.find("DIHEDRALS_WITHOUT_HYDROGEN") != std::string::npos)
         readDihedrals(NumberDihedralsNONH);
 
+
+    else if (line.find("NUMBER_EXCLUDED_ATOMS") != std::string::npos)
+        readNumberExcludedAtomsList();
+    else if (line.find("EXCLUDED_ATOMS_LIST") != std::string::npos)
+        readExcludedAtomsList();
+
     else if (line.find("LENNARD_JONES_ACOEF") != std::string::npos)
         readLennardJonesACOEF();
     else if (line.find("LENNARD_JONES_BCOEF") != std::string::npos)
@@ -133,6 +151,8 @@ void readAmberInput::readPointers(){
       NumberDihedralsH = FlagPointers[6];
       NumberDihedralsNONH = FlagPointers[7];
       NumberDihedrals = NumberDihedralsH + NumberDihedralsNONH;
+
+      NumberExcludedAtoms = FlagPointers[10];
 
       NumberBondsTypes = FlagPointers[15];
       NumberAnglesTypes = FlagPointers[16];
@@ -211,16 +231,15 @@ void readAmberInput::readPointers(){
 
   void readAmberInput::readNonbondedParmIndex(){
     getline(prmtop, line);
-    for(i = 0; i < LennardJonesTypes; i++)
+    for(i = 0; i < (NumberTypes * NumberTypes); i++)
     {
          prmtop >> temp_val; LennardJonesNonbondParmIndex.push_back(temp_val);
-        //  if(temp_val < 0){
-        //     printf("ERROR: Nonobonded 10-12 interactions are not supported");
-        //     exit(1);
-        //  }
+         if(temp_val < 0){
+            printf("Error in prmtop file : Nonobonded 10-12 interactions are not supported");
+            exit(1);
+         }
     }
   }
-
 
 
   void readAmberInput::readTempBondsForceK(){
@@ -347,38 +366,148 @@ void readAmberInput::readPointers(){
 
 
 
-  void readAmberInput::readLennardJonesACOEF(){
-    getline(prmtop, line);
-    for(i = 0; i < LennardJonesTypes; i++)
-    {
-         prmtop >>  temp_val; tempLJONES_ACOEFF.push_back(temp_val);
+
+    void readAmberInput::readLennardJonesACOEF(){
+      getline(prmtop, line);
+      for(i = 0; i < LennardJonesTypes; i++)
+      {
+           prmtop >>  temp_val; tempLJONES_ACOEFF.push_back(temp_val);
+      }
     }
-  }
-  void readAmberInput::readLennardJonesBCOEF(){
-    getline(prmtop, line);
-    for(i = 0; i < LennardJonesTypes; i++)
-    {
-         prmtop >>  temp_val; tempLJONES_BCOEFF.push_back(temp_val);
+    void readAmberInput::readLennardJonesBCOEF(){
+      getline(prmtop, line);
+      for(i = 0; i < LennardJonesTypes; i++)
+      {
+           prmtop >>  temp_val; tempLJONES_BCOEFF.push_back(temp_val);
+      }
     }
-  }
 
-  void readAmberInput::readLennardJonesRVdWEpsilon(){
-    for(i = 0; i < NumberAtoms; i++)
-    {
+    void readAmberInput::readLennardJonesRVdWEpsilon(){
+    // adapted from OpenMM - amber_file_parser.py
 
-        acoef = tempLJONES_ACOEFF[LennardJonesNonbondParmIndex[((NumberTypes + 1)*(AtomsTypesIndex[i] - 1))]];
-        bcoef = tempLJONES_BCOEFF[LennardJonesNonbondParmIndex[((NumberTypes + 1)*(AtomsTypesIndex[i] - 1))]];
+    TARGET_TYPE typeRVdW[NumberTypes];
+    TARGET_TYPE typeEpsilon[NumberTypes];
 
-        if(bcoef != 0 && acoef !=0 ){
-          AtomsRVdW.push_back(pow((2.0f*acoef/bcoef), (1.0f/6.0f)) / 2.0f);
-          AtomsEpsilon.push_back(((0.25f*bcoef*bcoef)/acoef ));
+    TARGET_TYPE rmin;
+    TARGET_TYPE eps;
+
+
+      for(i = 0; i < NumberAtoms; i++)
+      {
+
+          // int index = LennardJonesNonbondParmIndex[ ((NumberTypes + 1)*(AtomsTypesIndex[i] - 1)) ] -1;
+
+          int ind = NumberTypes*(AtomsTypesIndex[i] - 1) + AtomsTypesIndex[i] - 1;
+          int index = LennardJonesNonbondParmIndex[ ind ] - 1;
+
+          if( index < 0)
+          {
+              printf("Error in prmtop file : 10-12 interactions are not supported \n");
+              exit(1);
+          }
+
+          acoef = tempLJONES_ACOEFF[ index ];
+          bcoef = tempLJONES_BCOEFF[ index ];
+
+          if(bcoef != 0 && acoef !=0 ){
+            rmin = pow((2.0f*acoef/bcoef), (1.0f/6.0f)) / 2.0f;
+            eps = (0.25f*bcoef*bcoef) /acoef ;
+          }
+          else{
+              rmin = 0.0f;
+              eps = 0.0f;
+          }
+
+          AtomsRVdW.push_back(rmin);
+          AtomsEpsilon.push_back(eps);
+
+          typeRVdW[ AtomsTypesIndex[i] - 1 ] = rmin;
+          typeEpsilon[ AtomsTypesIndex[i] - 1 ] = eps;
+
+      }
+
+      // Check if off-diagonal LJ terms
+      for(i = 0; i < NumberTypes; i++)
+      {
+        for(int j = 0; j < NumberTypes; j++)
+        {
+            int index = LennardJonesNonbondParmIndex[ NumberTypes * i + j ] - 1;
+            if (index < 0 )
+            {
+              TARGET_TYPE rij = typeRVdW[i] + typeRVdW[j];
+              TARGET_TYPE wij = sqrt( typeEpsilon[i] * typeEpsilon[j] );
+              TARGET_TYPE pairA = tempLJONES_ACOEFF[index];
+              TARGET_TYPE pairB = tempLJONES_BCOEFF[index];
+
+              // Check for 0 terms
+              if( ( pairA * pairB ==0 && ( pairA + pairB != 0 || wij * rij !=0 )))
+              {
+                printf("Error in prmtop file : Off-diagonal terms detected in LJ parameters - null \n");
+                exit(1);
+              }
+              // Check for small terms
+
+              TARGET_TYPE termA = ( pairA - (wij * pow(rij, 12) ) ) / pairA;
+              TARGET_TYPE termB = ( pairB - ( 2* wij * pow(rij, 6) ) ) / pairB;
+
+              if ( abs(termA) > pow(10, -6) || abs(termB) > pow(10, -6) )
+              {
+                printf("Error in prmtop file : Off-diagonal terms detected in LJ parameters - small \n");
+                exit(1);
+              }
+
+            }
+
+
         }
-        else{
-            AtomsRVdW.push_back(1.0f/2.0f);
-            AtomsEpsilon.push_back(0.0f);
-        }
+      }
+
     }
-  }
+
+    void readAmberInput::readNumberExcludedAtomsList(){
+      getline(prmtop, line);
+      for(i = 0; i < NumberAtoms; i++)
+      {
+           prmtop >> temp_val; NumberExcludedAtomsList.push_back(temp_val);
+      }
+    }
+
+    void readAmberInput::readExcludedAtomsList(){
+      getline(prmtop, line);
+
+
+      // create NonBondedAtomsMatrix
+      for(i = 0; i < NumberAtoms; i++)
+      {
+        std::vector<bool> row;
+        for( int j = 0; j < NumberAtoms; j++)
+        {
+          row.push_back(i!=j);
+        }
+        NonBondedAtomsMatrix.push_back(row);
+      }
+
+      i = 0;
+      while ( i < NumberAtoms )
+      {
+           // eliminates pairs involve in bonded interactions
+           int count = 1;
+           while( count <= NumberExcludedAtomsList[i])
+           {
+             prmtop >> temp_val;
+
+             if(temp_val != 0)
+             {
+                NonBondedAtomsMatrix[ i ][ temp_val - 1 ] = 0;
+                NonBondedAtomsMatrix[ temp_val - 1 ][ i ] = 0;
+             }
+
+             count++;
+           }
+           i++;
+      }
+    }
+
 
 
 
@@ -529,4 +658,8 @@ TARGET_TYPE readAmberInput::getDihedralsPhase(int dihedral){
 }
 TARGET_TYPE readAmberInput::getDihedralsPeriod(int dihedral){
   return DihedralsPeriod[dihedral];
+}
+
+bool readAmberInput::getNonBondedAtomsMatrix(int at1, int at2){
+  return NonBondedAtomsMatrix[at1][at2];
 }

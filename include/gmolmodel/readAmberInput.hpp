@@ -53,6 +53,8 @@ class readAmberInput{
       // chargemMultiplier = 18.2223;
       TARGET_TYPE getAtomsCharge(int p);
 
+      // Natmos x Natomd matrix containing 0 for excluded pairs
+      bool getNonBondedAtomsMatrix(int at1, int at2);
 
       // BONDS
       int getBondsAtomsIndex1(int bond);
@@ -75,11 +77,11 @@ class readAmberInput{
       int getDihedralsAtomsIndex2(int dih);
       int getDihedralsAtomsIndex3(int dih);
       int getDihedralsAtomsIndex4(int dih);
-      
+
       //HOREA
       int getDihedralsAtomsIndex(int dihIndex, int atomIndx);
       void GeneratePairStartAndLen();
- 
+
       std::vector < std::pair<int, int> > getPairStartAndLen();
 
       TARGET_TYPE getDihedralsForceK(int dih);  // kcal / mol^-1 rad^-2
@@ -107,7 +109,7 @@ class readAmberInput{
     int NumberBonds;
     int NumberAngles;
     int NumberDihedrals;
-
+    int NumberExcludedAtoms;
 
     // ATOMS
     // 4 characters std::strings left aligned - "CA  "
@@ -202,6 +204,10 @@ class readAmberInput{
     std::vector<TARGET_TYPE> tempLJONES_BCOEFF;
 
 
+    std::vector<int> NumberExcludedAtomsList;
+    std::vector <std::vector <bool> > NonBondedAtomsMatrix;
+
+
     // readAmberFiles internal field readers
     void readInpcrd();
     void readPointers();
@@ -233,6 +239,8 @@ class readAmberInput{
 
     void readLennardJonesRVdWEpsilon();
 
+    void readNumberExcludedAtomsList();
+    void readExcludedAtomsList();
 
 
 
