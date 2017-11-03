@@ -17,6 +17,7 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
     : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
 {
     this->fix_n = this->fix_o = 0.0;
+    trackStep = 0;
 }
 
 // Destructor
@@ -77,6 +78,9 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
 
+    // DEBUG point
+    //writePdb(*residue, someState, "pdbs", "sb_", 8, "HMCprop", trackStep);
+    ++trackStep;
 
 }
 

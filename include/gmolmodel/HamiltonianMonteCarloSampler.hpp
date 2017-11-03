@@ -5,6 +5,8 @@
 
 class Topology;
 class IState;
+void writePdb(      SimTK::Compound& c, SimTK::State& advanced,
+         const char *dirname, const char *prefix, int midlength, const char *sufix, double aTime);
 
 class HamiltonianMonteCarloSampler : public MonteCarloSampler
 {
@@ -35,7 +37,8 @@ public:
     void setOldKE(SimTK::Real);
 
 protected:
-       SimTK::Real ke_o; // The kinetic energy retained for acc-rej step
+    SimTK::Real ke_o; // The kinetic energy retained for acc-rej step
+    int trackStep;
 
 };
 
