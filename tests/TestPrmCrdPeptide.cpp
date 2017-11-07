@@ -118,12 +118,13 @@ int main(int argc, char **argv)
     std::cout << std::setprecision(4);
     const SimTK::State& constRefState = world->integ->getState();
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
-    p_HMCsampler->initialize(integAdvancedState, atof(argv[3]), atoi(argv[4]));
+    std::cout << "p_HMCsampler->initialize" << std::endl;
+    p_HMCsampler->initialize( integAdvancedState, atof(argv[3]), atoi(argv[4]), SimTK::Real(atof(argv[5])) );
 
     //world->forceField->dump();
     //world->forceField->dumpCForceFieldParameters(std::cout);
 
-    world->system->realize(integAdvancedState, SimTK::Stage::Dynamics);
+    //world->system->realize(integAdvancedState, SimTK::Stage::Dynamics);
 
     SimTK::Real myPE = world->forces->getMultibodySystem().calcPotentialEnergy(constRefState);
     std::cout << "Initial const state PE: " << std::setprecision(20)

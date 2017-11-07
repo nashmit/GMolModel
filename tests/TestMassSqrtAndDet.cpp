@@ -46,6 +46,7 @@ try {
     for (int i=0; i < nu; ++i){
        V[i] = i;
     }
+
     system.realize(state, SimTK::Stage::Position);
     matter.multiplyBySqrtMInv(state, V, SqrtMInvV);
     std::cout << "V= " << V << std::endl;
@@ -62,8 +63,11 @@ try {
     // Get detM
     SimTK::Real detM = 1.0;
     SimTK::Vector DetV(nu);
-    SimTK::Matrix D0(6, 6);
-    matter.calcDetM(state, V, DetV, D0);
+    //SimTK::Matrix D0(6, 6);
+    Real* newDetM = new Real(1.0);
+
+    matter.calcDetM(state, V, DetV, newDetM);
+    std::cout << "newDetM: " << *newDetM << std::endl;
     //==========
 
     // ---- Verify with Eigen ----------
@@ -80,20 +84,20 @@ try {
     std::cout << "EiDetM= " << EiDetM << std::endl;
 
     // Eigen D0 determinant
-    for(int i=0; i<6; i++){
-        for(int j=0; j<6; j++){
-            EiD0(i, j) = D0(i, j);
-        }
-    }
-    SimTK::Real EiDetD0 = EiD0.determinant();
+    //for(int i=0; i<6; i++){
+    //    for(int j=0; j<6; j++){
+    //        EiD0(i, j) = D0(i, j);
+    //    }
+    //}
+    //SimTK::Real EiDetD0 = EiD0.determinant();
 
     // Jain determinant
-    JainDetM = EiDetD0;
-    for(int i=6; i<nu; i++){
+    //JainDetM = EiDetD0;
+    //for(int i=6; i<nu; i++){
         //std::cout << "DetV[" <<  i << "]= " << DetV[i] << " ";
-        JainDetM *= DetV[i];
-    }
-    std::cout << "JainDetM= " << JainDetM  << std::endl;
+    //    JainDetM *= DetV[i];
+    //}
+    //std::cout << "JainDetM= " << JainDetM  << std::endl;
     //====================================
 
 

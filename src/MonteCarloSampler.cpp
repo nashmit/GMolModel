@@ -26,24 +26,39 @@ MonteCarloSampler::~MonteCarloSampler()
 }
 
 // Compute Fixman potential
-SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState)
-{
+SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
     int nu = someState.getNU();
     SimTK::Vector V(nu);
+
+    //for (int i=0; i < nu; ++i){
+    //   V[i] = i;
+    //}
+    system->realize(someState, SimTK::Stage::Position);
+
+    // Get M
+    //SimTK::Matrix M(nu, nu);
+    //matter->calcM(someState, M);
+
+    // Get detM
+    SimTK::Real detM = 1.0;
     SimTK::Vector DetV(nu);
-    SimTK::Matrix D0(6, 6);
-    Eigen::MatrixXd EiD0(6, 6);
+    SimTK::Real* D0 = new SimTK::Real(1.0);
+
+    //std::cout<<"Stage: "<<matter->getStage(someState)<<std::endl;
     matter->calcDetM(someState, V, DetV, D0);
-    for(int i=0; i<6; i++){
-        for(int j=0; j<6; j++){
-            EiD0(i, j) = D0(i, j);
-        }
-    }
-    SimTK::Real EiDetD0 = EiD0.determinant();
-    for(int i=6; i<nu; i++){
-        EiDetD0 *= DetV[i];
-    }
-    return EiDetD0;
+
+    // ---- Verify with Eigen ----------
+    // Eigen M determinant
+    //Eigen::MatrixXd EiM(nu, nu);
+    //for(int i=0; i<nu; i++){
+    //    for(int j=0; j<nu; j++){
+    //        EiM(i, j) = M(i, j);
+    //    }
+    //}
+    //SimTK::Real EiDetM = EiM.determinant();
+    //std::cout << "EiDetM= " << EiDetM << std::endl;
+
+    return RT * std::log(*D0);
 }
 
 // Get the stored potential energy
@@ -187,6 +202,7 @@ SimTK::Real MonteCarloSampler::getTemperature(void){
 void MonteCarloSampler::setTemperature(SimTK::Real argTemperature)
 {
     this->temperature = argTemperature;
+    RT = this->temperature * SimTK_BOLTZMANN_CONSTANT_MD;
 }
 
 // Send configuration to an external evaluator

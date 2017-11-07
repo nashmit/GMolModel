@@ -60,13 +60,13 @@ void Topology::setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::R
  * ================================================== */
 void Topology::setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm){    
 
-    dumm.setBondStretchGlobalScaleFactor(0.0);
+    //dumm.setBondStretchGlobalScaleFactor(0.0);
 
-    dumm.setBondBendGlobalScaleFactor(0.0);
+    //dumm.setBondBendGlobalScaleFactor(0.0);
 
-    dumm.setBondTorsionGlobalScaleFactor(0.0);
+    //dumm.setBondTorsionGlobalScaleFactor(0.0);
 
-    dumm.setAmberImproperTorsionGlobalScaleFactor(0.0);
+    //dumm.setAmberImproperTorsionGlobalScaleFactor(0.0);
 
     dumm.setVdw12ScaleFactor(0.0);
     dumm.setVdw13ScaleFactor(0.0);
@@ -76,11 +76,11 @@ void Topology::setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm){
 
     dumm.setCoulomb12ScaleFactor(0.0);
     dumm.setCoulomb13ScaleFactor(0.0);
-    dumm.setCoulomb14ScaleFactor(0.0); // dumm.setCoulomb14ScaleFactor(0.8333333333);
-    dumm.setCoulomb15ScaleFactor(0.0); //dumm.setCoulomb15ScaleFactor(1.0);
-    dumm.setCoulombGlobalScaleFactor(0.0);
+    dumm.setCoulomb14ScaleFactor(0.8333333333);
+    dumm.setCoulomb15ScaleFactor(1.0);
+    //dumm.setCoulombGlobalScaleFactor(0.0);
 
-    dumm.setGbsaGlobalScaleFactor(0.0);
+    //dumm.setGbsaGlobalScaleFactor(0.0);
 }
 
 /*Any kind of molecule*/

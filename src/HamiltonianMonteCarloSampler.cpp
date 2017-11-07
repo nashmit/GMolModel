@@ -32,7 +32,7 @@ void HamiltonianMonteCarloSampler::setOldKE(SimTK::Real inpKE)
 }
 
 // Initialize variables (identical to setTVector)
-void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps)
+void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature)
 {
   int i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
@@ -41,6 +41,10 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
       TVector[i] = mobod.getMobilizerTransform(someState);
       i++;
   }
+
+  fix_o = fix_n = calcFixman(someState);
+  setTemperature(argTemperature);
+  randomEngine.seed( std::time(0) );
 
   //timeStepper->initialize(someState);
 
@@ -57,16 +61,16 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 
     // Assign velocities according to Maxwell-Boltzmann distribution
     int nu = someState.getNU();
-    double kTb = SimTK_BOLTZMANN_CONSTANT_MD * 300.0;
-    double sqrtkTb = std::sqrt(kTb);
+    double sqrtRT = std::sqrt(RT);
     SimTK::Vector V(nu);
+
     SimTK::Vector SqrtMInvV(nu);
     for (int i=0; i < nu; ++i){
         V[i] = gaurand(randomEngine);
     }
     system->realize(someState, SimTK::Stage::Position);
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
-    SqrtMInvV *= sqrtkTb; // Set stddev according to temperature
+    SqrtMInvV *= sqrtRT; // Set stddev according to temperature
     someState.updU() = SqrtMInvV;
 
     // After an event handler has made a discontinuous change to the 
@@ -75,6 +79,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     system->realize(someState, SimTK::Stage::Acceleration);
     //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
     setOldKE(matter->calcKineticEnergy(someState));
+    fix_o = calcFixman(someState);
 
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
 
@@ -90,21 +95,23 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real timestep, int nosteps)
 {
     SimTK::Real rand_no = uniformRealDistribution(randomEngine);
-    SimTK::Real RT = getTemperature() * SimTK_BOLTZMANN_CONSTANT_MD;
+    //SimTK::Real RT = getTemperature() * SimTK_BOLTZMANN_CONSTANT_MD;
 
     // Get old energy
     setOldPE(getPEFromEvaluator(someState));
     SimTK::Real pe_o = getOldPE();
     
     // Get old Fixman potential
-    system->realize(someState, SimTK::Stage::Acceleration);
-    fix_o = calcFixman(someState);
+    //system->realize(someState, SimTK::Stage::Dynamics);
+    //fix_o = calcFixman(someState);
 
     // Assign random configuration
+
 
     propose(someState, timestep, nosteps);
 
     //system->realize(someState, SimTK::Stage::Acceleration);
+    //system->realize(someState, SimTK::Stage::Dynamics);
     fix_n = calcFixman(someState);
 
     // Send configuration to evaluator  
@@ -124,6 +131,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     assert(!isnan(pe_n));
     SimTK::Real etot_n = pe_n + ke_n + fix_n;
     SimTK::Real etot_o = pe_o + ke_o + fix_o;
+    std::cout<<std::setprecision(20)<<std::fixed;
     std::cout << "pe_o " << pe_o << " ke_o " << ke_o << " fix_o " << fix_o << std::endl;
     std::cout << "pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n << std::endl;
     std::cout << "rand_no " << rand_no << std::endl;

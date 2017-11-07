@@ -24,7 +24,7 @@ public:
     virtual ~HamiltonianMonteCarloSampler();
 
     // Initialize variables (like TVector)
-    void initialize(SimTK::State& advanced, SimTK::Real timestep, int nosteps); 
+    void initialize(SimTK::State& advanced, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature); 
 
     // Assign a random conformation. Time measured in picoseconds
     void propose(SimTK::State& someState, SimTK::Real timestep, int nosteps);

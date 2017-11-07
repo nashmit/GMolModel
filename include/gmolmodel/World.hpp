@@ -71,10 +71,10 @@
 #endif
 */
 /*
-*/
 #ifndef DEBUG_TIME
 #define DEBUG_TIME
 #endif
+*/
 
 #ifndef TRY_TO_USE_OPENMM
 #define TRY_TO_USE_OPENMM

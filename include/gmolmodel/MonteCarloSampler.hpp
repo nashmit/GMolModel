@@ -64,6 +64,7 @@ protected:
     SimTK::Transform *TVector; // Transform matrices
     SimTK::Real pe_o;
     SimTK::Real temperature;
+    SimTK::Real RT;
     
     SimTK::Real fix_o, fix_n;
  

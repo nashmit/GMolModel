@@ -39,20 +39,9 @@ SimTK::Real Sampler::calcMassDeterminant(SimTK::State& state)
     int nu = state.getNU();
     SimTK::Vector V(nu);
     SimTK::Vector DetV(nu);
-    SimTK::Matrix D0(6, 6);
-    Eigen::MatrixXd EiD0(6, 6);
+    SimTK::Real *D0 = new SimTK::Real(1.0);
     matter->calcDetM(state, V, DetV, D0);
-
-    for(int i=0; i<6; i++){
-        for(int j=0; j<6; j++){
-            EiD0(i, j) = D0(i, j);
-        }
-    }
-    SimTK::Real EiDetD0 = EiD0.determinant();
-    for(int i=6; i<nu; i++){
-        EiDetD0 *= DetV[i];
-    }
-    return EiDetD0;
+    return *D0;
 }
 
 // Compute mass matrix determinant
@@ -62,20 +51,9 @@ SimTK::Real Sampler::calcMassDeterminant(const SimTK::State& state)
     int nu = state.getNU();
     SimTK::Vector V(nu);
     SimTK::Vector DetV(nu);
-    SimTK::Matrix D0(6, 6);
-    Eigen::MatrixXd EiD0(6, 6);
+    SimTK::Real *D0 = new SimTK::Real(1.0);
     matter->calcDetM(state, V, DetV, D0);
-
-    for(int i=0; i<6; i++){
-        for(int j=0; j<6; j++){
-            EiD0(i, j) = D0(i, j);
-        }
-    }
-    SimTK::Real EiDetD0 = EiD0.determinant();
-    for(int i=6; i<nu; i++){
-        EiDetD0 *= DetV[i];
-    }
-    return EiDetD0;
+    return *D0;
 }
 
 // Update - to be implemented by every specific sampler
