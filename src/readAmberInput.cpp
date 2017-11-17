@@ -414,7 +414,7 @@ void readAmberInput::readPointers(){
             eps = (0.25f*bcoef*bcoef) /acoef ;
           }
           else{
-              rmin = 0.0f;
+              rmin = 0.05f;
               eps = 0.0f;
           }
 
