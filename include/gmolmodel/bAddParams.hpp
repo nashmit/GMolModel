@@ -35,18 +35,52 @@ bool Type2atomType(string Type, char *atomType, int ATOMTYPE_MAX_LEN);
  * Add Parameters Function. It adds the parameters read from prmtop
  * file to the DuMM force field.
  **/
-void bAddGaffParams(
+void bAddAllParams(
+    std::string resName,
     readAmberInput *amberReader,
     SimTK::DuMMForceFieldSubsystem& dumm,
     bSpecificAtom *bAtomList,
     bBond *bonds
-
+);
+void bAddBiotypes(
+    std::string resName,
+    readAmberInput *amberReader,
+    SimTK::DuMMForceFieldSubsystem& dumm,
+    bSpecificAtom *bAtomList,
+    bBond *bonds
+);
+void bAddAtomClasses(
+    std::string resName,
+    readAmberInput *amberReader,
+    SimTK::DuMMForceFieldSubsystem& dumm,
+    bSpecificAtom *bAtomList,
+    bBond *bonds
+);
+void bAddBondParams(
+    std::string resName,
+    readAmberInput *amberReader,
+    SimTK::DuMMForceFieldSubsystem& dumm,
+    bSpecificAtom *bAtomList,
+    bBond *bonds
+);
+void bAddAngleParams(
+    std::string resName,
+    readAmberInput *amberReader,
+    SimTK::DuMMForceFieldSubsystem& dumm,
+    bSpecificAtom *bAtomList,
+    bBond *bonds
+);
+void bAddTorsionParams(
+    std::string resName,
+    readAmberInput *amberReader,
+    SimTK::DuMMForceFieldSubsystem& dumm,
+    bSpecificAtom *bAtomList,
+    bBond *bonds
 );
 
 /**
  * Add gaff Parameters Function. It adds the parameters read from an Amber parameters
  * file to the DuMM force field.
- **/
 void bAddGaffParams(
   SimTK::DuMMForceFieldSubsystem& dumm,
   const char *filename,
@@ -57,6 +91,7 @@ void bAddGaffParams(
   bBond *bonds, // EU
   string frcmodfn
 );
+ **/
 
 #endif  //__BADDPARAMS__
 

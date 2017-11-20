@@ -11,3 +11,5 @@
 #include <string>
 #include <iostream>
 #include <cctype>
+
+#include <boost/math/distributions/normal.hpp>

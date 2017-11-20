@@ -23,6 +23,11 @@ public:
     // Destructor
     virtual ~HamiltonianMonteCarloSampler();
 
+    // Calculate O(n2) the square root of the mass matrix inverse
+    void calcSqrtMInvL(SimTK::State& someState, SimTK::Matrix& SqrtMInv);
+    void calcSqrtMInvU(SimTK::State& someState, SimTK::Matrix& SqrtMInv);
+    // Calculate sqrt(M) using Eigen
+    void calcNumSqrtMUpper(SimTK::State& someState, SimTK::Matrix& SqrtMUpper);
     // Initialize variables (like TVector)
     void initialize(SimTK::State& advanced, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature); 
 
@@ -33,6 +38,9 @@ public:
     // to the appropriate conformation
     void update(SimTK::State& someState, SimTK::Real timestep, int nosteps);
 
+    // Get old kinetic energy
+    SimTK::Real getOldKE(void) { return this->ke_o; }
+    
     // Set kinetic energies    
     void setOldKE(SimTK::Real);
 

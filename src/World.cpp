@@ -115,7 +115,6 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
   #endif
 
   const SimTK::Compound& c = compoundSystem->getCompound(SimTK::CompoundSystem::CompoundIndex(0));
-  int arrays_cut = 2 + 4*3*(c.getNumAtoms());
 
   if((*fassno>0)){ // Get forces from MMTK
 
@@ -177,76 +176,90 @@ std::string ictdF
   system = new SimTK::CompoundSystem;
   matter = new SimTK::SimbodyMatterSubsystem(*system);
   forces = new SimTK::GeneralForceSubsystem(*system);
+
   decorations = new SimTK::DecorationSubsystem(*system);
   SimTK::Visualizer viz(*system);
   system->addEventReporter( new SimTK::Visualizer::Reporter(viz, 0.0015));
+
   forceField = new SimTK::DuMMForceFieldSubsystem(*system);
-  forceField->loadAmber99Parameters();
+  //forceField->loadAmber99Parameters();
   integ = new SimTK::VerletIntegrator(*system);
   ts = new SimTK::TimeStepper(*system, *integ);
 
-  mr = new bMoleculeReader(amberReader, rbF.c_str());
+  mr1 = new bMoleculeReader(amberReader, rbF.c_str());
+  //mr2 = new bMoleculeReader(amberReader, rbF.c_str());
 
-  bAddGaffParams(
+  std::cout << "Add parameters for lig1" << std::endl;
+  bAddAllParams(
+    "lig1",
     amberReader,
     *forceField,
-    mr->bAtomList,
-    mr->bonds
+    mr1->bAtomList,
+    mr1->bonds
   );
+
+  /*
+  std::cout << "Add parameters for lig2" << std::endl;
+  for(int i = 0; i < mr2->natoms; i++){
+    (mr2->bAtomList[i]).setX((mr2->bAtomList[i]).getX() + 1.0); // nm
+  }
+
+  bAddAllParams(
+    "lig2",
+    amberReader,
+    *forceField,
+    mr2->bAtomList,
+    mr2->bonds
+  );
+  
+  //bAddBiotypes(
+  //  "lig2",
+  //  amberReader,
+  //  *forceField,
+  //  mr->bAtomList,
+  //  mr->bonds
+  //);
+  //bAddAtomClasses(
+  //  "lig2",
+  //  amberReader,
+  //  *forceField,
+  //  mr->bAtomList,
+  //  mr->bonds
+  //);
+  */
+
+  forceField->setVdw12ScaleFactor(0.0);
+  forceField->setVdw13ScaleFactor(0.0);
+  forceField->setVdw14ScaleFactor(0.5);
+  forceField->setVdw15ScaleFactor(1.0);
+  forceField->setCoulomb12ScaleFactor(0.0);
+  forceField->setCoulomb13ScaleFactor(0.0);
+  forceField->setCoulomb14ScaleFactor(0.8333333333);
+  forceField->setCoulomb15ScaleFactor(1.0);
+  forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
+
+  //lig1->setSpecificDuMMScaleFactor(*forceField);
+  //forceField->setBondStretchGlobalScaleFactor(0.0);
+  //forceField->setBondBendGlobalScaleFactor(0.0);
+  //forceField->setBondTorsionGlobalScaleFactor(0.0);
+  //forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
+
+  //forceField->setVdw12ScaleFactor(0.0);
+  //forceField->setVdw13ScaleFactor(0.0);
+  //forceField->setVdw14ScaleFactor(0.0);
+  //forceField->setVdw15ScaleFactor(0.0);
+  //forceField->setVdwGlobalScaleFactor(0.0);
+
+  //forceField->setCoulomb12ScaleFactor(0.0);
+  //forceField->setCoulomb13ScaleFactor(0.0);
+  //forceField->setCoulomb14ScaleFactor(0.0);
+  //forceField->setCoulomb15ScaleFactor(0.0);
+  //forceField->setCoulombGlobalScaleFactor(0.0);
+
+  forceField->setGbsaGlobalScaleFactor(0.0);
+  //
 
 }
-
-World::World(
-  string mol2F, string rbF, string gaffF, string frcmodF,
-  string ictdF 
-){
-  passno = new int;
-  vassno = new int;
-  fassno = new int;
-  sassno = new int;
-  sysTimestep = new TARGET_TYPE;
-  *sysTimestep = 0.0015; // Default
-  //
-  this->mol2F = mol2F;
-  this->rbF = rbF;
-  this->gaffF = gaffF;
-  this->frcmodF = frcmodF;
-  this->ictdF = ictdF;
-  this->pyseed = new unsigned long int;
-  this->lj14sf = 1;
-
-  system = new SimTK::CompoundSystem;
-  matter = new SimTK::SimbodyMatterSubsystem(*system);
-  forces = new SimTK::GeneralForceSubsystem(*system);
-  decorations = new SimTK::DecorationSubsystem(*system);
-  SimTK::Visualizer viz(*system);
-  system->addEventReporter( new SimTK::Visualizer::Reporter(viz, 0.0015));
-  forceField = new SimTK::DuMMForceFieldSubsystem(*system);
-  forceField->loadAmber99Parameters();
-  integ = new SimTK::VerletIntegrator(*system); // NEW
-  ts = new SimTK::TimeStepper(*system, *integ); // NEW
-
-  mr = new bMoleculeReader(
-    *forceField,
-    mol2F.c_str(),
-    "mol2",
-    rbF.c_str()
-  );
-  if (mr->bAtomList == NULL){
-    std::cout<<"After bMoleculeReader: NULL bAtomList"<<std::endl;
-    exit(1);
-  }
-  bAddGaffParams(
-    *forceField,
-    gaffF.c_str(),
-    mr->natoms,
-    mr->bAtomList,
-    mr->nbonds,
-    mr->bonds,
-    frcmodF.c_str()
-  );
-
-}//end of constructor
 
 // Initialize simulation
 void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
@@ -265,35 +278,35 @@ void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
     forceField->setUseOpenMMAcceleration(true);
   #endif
   forceField->setTracing(true); // log OpenMM info to console
-  forceField->setNumThreadsRequested(1); // default
+  forceField->setNumThreadsRequested(1); // don't use this unless
 
-  lig1 = new Topology();
+  lig1 = new Topology("lig1");
+  //lig2 = new Topology("lig2");
 
-  /*
-  lig1->init(
-    *forceField,
-    mr->natoms,
-    mr->bAtomList,
-    mr->nbonds,
-    mr->bonds,
-    first_time,
-    flexFN,
-    ictdF
-  );
-  */
   lig1->build(
     *forceField,
-    mr->natoms,
-    mr->bAtomList,
-    mr->nbonds,
-    mr->bonds,
+    mr1->natoms,
+    mr1->bAtomList,
+    mr1->nbonds,
+    mr1->bonds,
     flexFN,
     ictdF
   );
+  /*
+  lig2->build(
+    *forceField,
+    mr2->natoms,
+    mr2->bAtomList,
+    mr2->nbonds,
+    mr2->bonds,
+    flexFN,
+    "TD"
+  );
+  */
 
-  lig1->setSpecificDuMMScaleFactor(*forceField);
 
   system->adoptCompound(*lig1);
+  //system->adoptCompound(*lig2, SimTK::Transform(SimTK::Vec3(-0.5, 0, 0)) * SimTK::Transform(SimTK::Rotation(0.1, SimTK::YAxis)));
   system->modelCompounds();
   
   TVector = new SimTK::Transform[matter->getNumBodies()];
@@ -311,13 +324,13 @@ void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
 
   system->realizeTopology();
 
-
   std::cout << "Number of included atoms in nonbonded interactions: " << forceField->getNumNonbondAtoms() << std::endl;
+
   std::cout << "getVdwGlobalScaleFactor() " << forceField->getVdwGlobalScaleFactor() << std::endl;
   for(int i=0; i<lig1->natms; i++){
       std::cout << " DuMM VdW Radius " 
           << forceField->getVdwRadius((lig1->bAtomList[i]).getAtomClassIndex()) 
-          << " DuMM VdW Well Depth"
+          << " DuMM VdW Well Depth "
           << forceField->getVdwWellDepth((lig1->bAtomList[i]).getAtomClassIndex())
           << std::endl;
   }
