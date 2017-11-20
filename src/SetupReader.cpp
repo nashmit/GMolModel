@@ -1,5 +1,7 @@
+#include "SetupReader.hpp"
+
 // Constructor
-void SetupReader::SetupReader(std::ifstream& setupFile)
+SetupReader::SetupReader(std::ifstream& setupFile)
 {
     assert(!"Not implemented");
 }
