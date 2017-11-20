@@ -123,6 +123,7 @@ set(LIBGMOLMODEL_SRC
 	World.cpp
         readAmberInput.cpp
 	bgeneral.cpp
+        SetupReader.cpp
 	)
 
 include_directories(../include/gmolmodel)
