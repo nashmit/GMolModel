@@ -1,0 +1,28 @@
+
+source leaprc.protein.ff14SB
+set default PBRadii mbondi2
+
+system = loadpdb /home/eliza/panitumumab/pani_4ch/chA.pdb
+saveAmberParm system  /home/eliza/panitumumab/pani_4ch/chA.prmtop /home/eliza/panitumumab/pani_4ch/chA.inpcrd
+saveMol2 system /home/eliza/panitumumab/pani_4ch/chA.mol2 1
+
+system = loadpdb /home/eliza/panitumumab/pani_4ch/chB.pdb
+saveAmberParm system  /home/eliza/panitumumab/pani_4ch/chB.prmtop /home/eliza/panitumumab/pani_4ch/chB.inpcrd
+saveMol2 system /home/eliza/panitumumab/pani_4ch/chB.mol2 1
+
+
+system = loadpdb /home/eliza/panitumumab/pani_4ch/chC.pdb
+saveAmberParm system  /home/eliza/panitumumab/pani_4ch/chC.prmtop /home/eliza/panitumumab/pani_4ch/chC.inpcrd
+saveMol2 system /home/eliza/panitumumab/pani_4ch/chC.mol2 1
+
+
+system = loadpdb /home/eliza/panitumumab/pani_4ch/chD.pdb
+saveAmberParm system  /home/eliza/panitumumab/pani_4ch/chD.prmtop /home/eliza/panitumumab/pani_4ch/chD.inpcrd
+saveMol2 system /home/eliza/panitumumab/pani_4ch/chD.mol2 1
+
+
+
+
+
+quit
+
