@@ -25,6 +25,153 @@ HamiltonianMonteCarloSampler::~HamiltonianMonteCarloSampler()
 {
 }
 
+// Compute O(n2) the square root of the mass matrix using using Eige - doesn't work !!n
+void HamiltonianMonteCarloSampler::calcNumSqrtMUpper(SimTK::State& someState, SimTK::Matrix& SqrtMUpper)
+{
+    int nu = someState.getNU();
+    assert((SqrtMUpper.nrow() == nu) && (SqrtMUpper.ncol() == nu) && "calcSqrtMUpper: passed matrix doesn't have nu x nu size.");
+
+    // Calc sqrt(MInv) and put it in SqrtM
+    SimTK::Matrix SqrtMInvU(nu, nu);
+    this->calcSqrtMInvU(someState, SqrtMInvU);
+
+    // Put sqrt(MInv) in Eigen
+    Eigen::MatrixXd EiSqrtMInvU(nu, nu);
+    for(int i=0; i<nu; i++){
+        for(int j=0; j<nu; j++){
+            EiSqrtMInvU(i, j) = SqrtMInvU(i, j);
+        }
+    }
+    std::cout << "SqrtMInvU: " << std::endl << SqrtMInvU << std::endl;
+    std::cout << "EiSqrtMInvU: " << std::endl << EiSqrtMInvU << std::endl;
+
+    // Compute the inverse of sqrt(M) = inv(sqrt(MInv)) with Eigen
+    Eigen::MatrixXd EiSqrtMUpper(nu, nu);
+    EiSqrtMUpper = EiSqrtMInvU.inverse();
+
+    // Put sqrt(M) back in Simbody style matrix SqrtM
+    for(int i=0; i<nu; i++){
+        for(int j=0; j<nu; j++){
+            SqrtMUpper(i, j) = EiSqrtMUpper(i, j);
+        }
+    }
+    std::cout << "EiSqrtMUpper: " << std::endl << EiSqrtMUpper << std::endl;
+    std::cout << "SqrtMUpper: " << std::endl << SqrtMUpper << std::endl;
+
+    // ---- Verify with Eigen ----------
+    // Get M
+    SimTK::Matrix M(nu, nu);
+    matter->calcM(someState, M);
+    //std::cout << "M: " << M << std::endl;
+    SimTK::Matrix MInv(nu, nu);
+    matter->calcMInv(someState, MInv);
+    std::cout << "MInv: " << MInv << std::endl;
+
+    // Transfer into Eigen
+    Eigen::MatrixXd EiVer(nu, nu);
+    for(int i=0; i<nu; i++){
+        for(int j=0; j<nu; j++){
+            EiVer(i, j) = SqrtMUpper(i, j);
+        }
+    }
+    std::cout << "EiMInv: " << EiSqrtMInvU.transpose() * EiSqrtMInvU << std::endl;
+    //std::cout << "EiM: " << EiVer.transpose() * EiVer << std::endl;
+    
+}
+
+// Calculate O(n2) the square root of the mass matrix inverse
+void HamiltonianMonteCarloSampler::calcSqrtMInvU(SimTK::State& someState, SimTK::Matrix& SqrtMInv)
+{
+    int nu = someState.getNU();
+    assert((SqrtMInv.nrow() == nu) && (SqrtMInv.ncol() == nu) && "calcSqrtMInvU: passed matrix doesn't have nu x nu size.");
+
+    SimTK::Vector V(nu);
+    SimTK::Vector SqrtMInvV(nu);
+
+    // Zero the matrix and the temporary vector
+    for (int i=0; i < nu; ++i){
+        V[i] = 0;
+        for (int j=0; j < nu; ++j){
+            SqrtMInv(i, j) = 0;
+        }
+    }
+
+    // Calculate the values inside the matrix
+    for (int i=0; i < nu; ++i){
+        V[i] = 1;
+        matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
+        for (int j=0; j < nu; ++j){
+            SqrtMInv(i, j) = SqrtMInvV[j];
+        }
+        V[i] = 0;
+    }
+
+    // ---- Verify with Eigen ----------
+    // Get M
+    //SimTK::Matrix MInv(nu, nu);
+    //matter->calcMInv(someState, MInv);
+    //std::cout << "MInv: " << MInv << std::endl;
+
+    // Transfer into Eigen
+    //Eigen::MatrixXd EiMInv(nu, nu);
+    //Eigen::MatrixXd EiSqrtMInv(nu, nu);
+    //for(int i=0; i<nu; i++){
+    //    for(int j=0; j<nu; j++){
+    //        EiSqrtMInv(i, j) = SqrtMInv(i, j);
+    //    }
+    //}
+    //std::cout << "Eigen MInv calc: " << EiSqrtMInv.transpose() * EiSqrtMInv << std::endl;
+
+    // Diagonalization
+    ////Eigen::EigenSolver<Eigen::MatrixXd> EiSoM(EiM);
+    ////Eigen::MatrixXcd EiD = EiSoM.eigenvalues().asDiagonal();
+    ////Eigen::MatrixXcd EiV = EiSoM.eigenvectors();
+
+}
+
+void HamiltonianMonteCarloSampler::calcSqrtMInvL(SimTK::State& someState, SimTK::Matrix& SqrtMInv)
+{
+    int nu = someState.getNU();
+    assert((SqrtMInv.nrow() == nu) && (SqrtMInv.ncol() == nu) && "calcSqrtMInvL: passed matrix doesn't have nu x nu size.");
+
+    SimTK::Vector V(nu);
+    SimTK::Vector SqrtMInvV(nu);
+
+    // Zero the matrix and the temporary vector
+    for (int i=0; i < nu; ++i){
+        V[i] = 0;
+        for (int j=0; j < nu; ++j){
+            SqrtMInv(i, j) = 0;
+        }
+    }
+
+    // Calculate the values inside the matrix
+    for (int i=0; i < nu; ++i){
+        V[i] = 1;
+        matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
+        for (int j=0; j < nu; ++j){
+            SqrtMInv(j, i) = SqrtMInvV[j];
+        }
+        V[i] = 0;
+    }
+
+    // ---- Verify with Eigen ----------
+    // Get M
+    //SimTK::Matrix MInv(nu, nu);
+    //matter->calcMInv(someState, MInv);
+    //std::cout << "MInv: " << MInv << std::endl;
+
+    // Transfer into Eigen
+    //Eigen::MatrixXd EiMInv(nu, nu);
+    //Eigen::MatrixXd EiSqrtMInv(nu, nu);
+    //for(int i=0; i<nu; i++){
+    //    for(int j=0; j<nu; j++){
+    //        EiSqrtMInv(i, j) = SqrtMInv(i, j);
+    //    }
+    //}
+    //std::cout << "Eigen MInv calc: " << EiSqrtMInv * EiSqrtMInv.transpose() << std::endl;
+
+}
 // Set old kinetic energy
 void HamiltonianMonteCarloSampler::setOldKE(SimTK::Real inpKE)
 {
@@ -42,11 +189,20 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
       i++;
   }
 
-  fix_o = fix_n = calcFixman(someState);
-  setTemperature(argTemperature);
+  system->realize(someState, SimTK::Stage::Position);
+  setTemperature(argTemperature); // Needed for Fixman
+  setOldPE(getPEFromEvaluator(someState));
+
+  setOldFixman(calcFixman(someState));
+  setOldKE(0.0);
+
   randomEngine.seed( std::time(0) );
 
   //timeStepper->initialize(someState);
+  // After an event handler has made a discontinuous change to the 
+  // Integrator's "advanced state", this method must be called to 
+  // reinitialize the Integrator.
+  //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
 
 }
 
@@ -60,6 +216,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //randomEngine.seed(4294653137UL); // for reproductibility
 
     // Assign velocities according to Maxwell-Boltzmann distribution
+    // and set Old kinetic energy
     int nu = someState.getNU();
     double sqrtRT = std::sqrt(RT);
     SimTK::Vector V(nu);
@@ -67,63 +224,91 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     SimTK::Vector SqrtMInvV(nu);
     for (int i=0; i < nu; ++i){
         V[i] = gaurand(randomEngine);
+        //double z = 0;
+        //V[i] = boost::math::pdf(gaurand, z);
     }
+
     system->realize(someState, SimTK::Stage::Position);
+    std::cout << "Before stepTo Q: " << someState.getQ() << std::endl;
+    std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
+    //std::cout << "HamiltonianMonteCarloSampler::propose SqrtMInvV: " << SqrtMInvV << std::endl;
     SqrtMInvV *= sqrtRT; // Set stddev according to temperature
     someState.updU() = SqrtMInvV;
+    std::cout << "Before stepTo U: " << someState.getU() << std::endl;
 
-    // After an event handler has made a discontinuous change to the 
-    // Integrator's "advanced state", this method must be called to 
-    // reinitialize the Integrator.
+    // Set old kinetic energy
     system->realize(someState, SimTK::Stage::Acceleration);
-    //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
     setOldKE(matter->calcKineticEnergy(someState));
-    fix_o = calcFixman(someState);
 
+    // Check priinciple of equipartition of energy
+    //SimTK::Vector U(nu);
+    //U = SqrtMInvV;
+    //SimTK::Vector P(nu);
+    //SimTK::Vector elementWisePU(nu);
+
+    //matter->multiplyByM(someState, U, P);
+    //for(int i=0; i<nu; i++){
+    //    elementWisePU(i) = U(i) * P(i);
+    //}
+    //std::cout << "HamiltonianMonteCarloSampler::propose p*u: ";
+    //for(int i=0; i<nu; i++){
+    //    std::cout << " " << elementWisePU(i);
+    //}
+    //std::cout << std::endl;
+
+    // Get M
+    //SimTK::Matrix M(nu, nu);
+    //matter->calcM(someState, M);
+    //std::cout << "Before stepTo:" << std::setprecision(3) << std::endl;
+    //for(int i=0; i<nu; i++){
+    //    std::cout << "M: ";
+    //    for(int j=0; j<nu; j++){
+    //        std::cout << M(i, j) << " ";
+    //    }
+    //    std::cout << std::endl;
+    //}
+
+    // Propagate through phase space (integrate)
+    std::cout << "Before stepTo time: " << someState.getTime() << std::endl;
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
-
-    // DEBUG point
+    std::cout << "After  stepTo time: " << someState.getTime() << std::endl;
     //writePdb(*residue, someState, "pdbs", "sb_", 8, "HMCprop", trackStep);
     ++trackStep;
+
+    std::cout << "After  stepTo Q: " << someState.getQ() << std::endl;
+    std::cout << "After  stepTo U: " << someState.getU() << std::endl;
+    std::cout << "After  stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
+
+    // Get M
+    //matter->calcM(someState, M);
+    //std::cout << "After stepTo:" << std::setprecision(3) << std::endl;
+    //for(int i=0; i<nu; i++){
+    //    std::cout << "M: ";
+    //    for(int j=0; j<nu; j++){
+    //        std::cout << M(i, j) << " ";
+    //    }
+    //    std::cout << std::endl;
+    //}
 
 }
 
 // The update step in Monte Carlo methods consists in:
 // Acception - rejection step
-
 void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real timestep, int nosteps)
 {
     SimTK::Real rand_no = uniformRealDistribution(randomEngine);
-    //SimTK::Real RT = getTemperature() * SimTK_BOLTZMANN_CONSTANT_MD;
 
-    // Get old energy
-    setOldPE(getPEFromEvaluator(someState));
-    SimTK::Real pe_o = getOldPE();
-    
-    // Get old Fixman potential
     //system->realize(someState, SimTK::Stage::Dynamics);
-    //fix_o = calcFixman(someState);
-
-    // Assign random configuration
-
 
     propose(someState, timestep, nosteps);
 
-    //system->realize(someState, SimTK::Stage::Acceleration);
-    //system->realize(someState, SimTK::Stage::Dynamics);
+    SimTK::Real pe_o  = getOldPE();
+    SimTK::Real fix_o = getOldFixman();
+    SimTK::Real ke_o  = getOldKE();
+
     fix_n = calcFixman(someState);
-
-    // Send configuration to evaluator  
-
-    sendConfToEvaluator(); // OPENMM
-
-    // Get current potential energy from evaluator
-
     SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
-
-    // Get current kinetic energy from Simbody
-
     SimTK::Real ke_n = matter->calcKineticEnergy(someState);
 
     // Apply Metropolis criterion
@@ -131,19 +316,34 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     assert(!isnan(pe_n));
     SimTK::Real etot_n = pe_n + ke_n + fix_n;
     SimTK::Real etot_o = pe_o + ke_o + fix_o;
-    std::cout<<std::setprecision(20)<<std::fixed;
-    std::cout << "pe_o " << pe_o << " ke_o " << ke_o << " fix_o " << fix_o << std::endl;
-    std::cout << "pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n << std::endl;
-    std::cout << "rand_no " << rand_no << std::endl;
-    if ((etot_n < etot_o) or (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
-        std::cout << "Move accepted" << std::endl;
+
+    std::cout<<std::setprecision(10)<<std::fixed;
+    std::cout << "pe_o " << pe_o << " ke_o " << ke_o << " fix_o " << fix_o
+        << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
+        << " rand_no " << rand_no
+        << " etot_n " << etot_n << " etot_o " << etot_o;
+
+
+    if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
+        std::cout << " 1 " ;
         setTVector(someState);
+        //sendConfToEvaluator(); // OPENMM
         setOldPE(pe_n);
-        setOldFixman(someState);
+        setOldFixman(fix_n);
+        someState.updU() = 0.0;
+        setOldKE(0.0);
+        
     }else{ // Reject
-        std::cout << "Move not accepted" << std::endl;
+        std::cout << " 0 " ;
         assignConfFromTVector(someState);
+        someState.updU() = 0.0;
+        setOldKE(0.0);
     }
+
+    std::cout << " : pe_o " << getOldPE() << " ke_o " << getOldKE() << " fix_o " << getOldFixman()
+        << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n << std:: endl;
+    std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
+
 }
 
 

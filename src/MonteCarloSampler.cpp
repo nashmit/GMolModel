@@ -44,9 +44,11 @@ SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
     SimTK::Vector DetV(nu);
     SimTK::Real* D0 = new SimTK::Real(1.0);
 
-    //std::cout<<"Stage: "<<matter->getStage(someState)<<std::endl;
+    //std::cout << "MonteCarloSampler::calcFixman Stage: "<< matter->getStage(someState) << std::endl;
     matter->calcDetM(someState, V, DetV, D0);
 
+    //std::cout << "MonteCarloSampler::calcFixman D0: " << *D0 << std::endl;
+    //std::cout << "MonteCarloSampler::calcFixman RT: " << RT << std::endl;
     // ---- Verify with Eigen ----------
     // Eigen M determinant
     //Eigen::MatrixXd EiM(nu, nu);
@@ -57,7 +59,7 @@ SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
     //}
     //SimTK::Real EiDetM = EiM.determinant();
     //std::cout << "EiDetM= " << EiDetM << std::endl;
-
+    assert(RT > SimTK::TinyReal);
     return RT * std::log(*D0);
 }
 
@@ -74,13 +76,13 @@ void MonteCarloSampler::setOldPE(SimTK::Real argPE)
 }
 
 // Set Fixman potential
-void MonteCarloSampler::setOldFixman(SimTK::State& someState)
+void MonteCarloSampler::setOldFixman(SimTK::Real argFixman)
 {
-    this->fix_o = calcFixman(someState);
+    this->fix_o = argFixman;
 }
 
 // Get Fixman potential
-SimTK::Real MonteCarloSampler::getOldFixman(SimTK::State& someState)
+SimTK::Real MonteCarloSampler::getOldFixman(void)
 {
     return this->fix_o;
 }
@@ -207,7 +209,9 @@ void MonteCarloSampler::setTemperature(SimTK::Real argTemperature)
 
 // Send configuration to an external evaluator
 
-void MonteCarloSampler::sendConfToEvaluator(void){}
+void MonteCarloSampler::sendConfToEvaluator(void){
+    assert(!"Not implemented");
+}
 
 
 

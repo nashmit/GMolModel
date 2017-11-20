@@ -44,8 +44,8 @@ public:
     void setOldPE(SimTK::Real argPE);
 
     // Set/get Fixman potential
-    void setOldFixman(SimTK::State& someState);
-    SimTK::Real getOldFixman(SimTK::State& someState);
+    void setOldFixman(SimTK::Real);
+    SimTK::Real getOldFixman(void);
 
     // Evaluate the potential energy at current state
     SimTK::Real getPEFromEvaluator(SimTK::State& someState); 
@@ -86,6 +86,7 @@ protected:
         boost::random::uniform_real_distribution<double>((-1)*SimTK::One, SimTK::One);
 
     boost::normal_distribution<> gaurand = boost::normal_distribution<>(0.0, 1.0);
+    //boost::math::normal gaurand;
 
 };
 

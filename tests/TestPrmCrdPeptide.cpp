@@ -36,13 +36,13 @@ int main(int argc, char **argv)
     std::string frcmodFN = std::string(argv[1]) + std::string("/ligand.frcmod");
     std::string flexFN = std::string(argv[1]) + std::string("/ligand.flex");
 
-    // Simulation type:
+    // Simulation type: argv[6]
     // IC: Internal Coordinates Dynamics
     // TD: Torsional Dynamics
     // RR: Rigid Rings Torsional Dynamics
     // RB: Rigid Bodies
 
-    std::string ictd = "IC";
+    std::string ictd = std::string(argv[6]);
 
     std::cout<<"mol2FN "<<mol2FN<<std::endl<<std::flush;
     std::cout<<"rbFN "<<rbFN<<std::endl<<std::flush;
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
     double **retConfsPois = new double* [ntrials];
     for(int r=0; r<ntrials; r++){
-        retConfsPois[r] = new double[3 * world->mr->natoms]; // WATCHOUT
+        retConfsPois[r] = new double[3 * world->mr1->natoms]; // WATCHOUT
     }
     double *retPotEsPoi = new double[ntrials];
     double *accs = new double;
@@ -118,7 +118,6 @@ int main(int argc, char **argv)
     std::cout << std::setprecision(4);
     const SimTK::State& constRefState = world->integ->getState();
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
-    std::cout << "p_HMCsampler->initialize" << std::endl;
     p_HMCsampler->initialize( integAdvancedState, atof(argv[3]), atoi(argv[4]), SimTK::Real(atof(argv[5])) );
 
     //world->forceField->dump();
@@ -126,17 +125,22 @@ int main(int argc, char **argv)
 
     //world->system->realize(integAdvancedState, SimTK::Stage::Dynamics);
 
-    SimTK::Real myPE = world->forces->getMultibodySystem().calcPotentialEnergy(constRefState);
-    std::cout << "Initial const state PE: " << std::setprecision(20)
-        << myPE << std::endl;
-    
     std::cout << "Initial const state PE: " << std::setprecision(20)
         << world->forces->getMultibodySystem().calcPotentialEnergy(constRefState)
         << " integ advanced state PE: "
         << world->forces->getMultibodySystem().calcPotentialEnergy(integAdvancedState) 
+        << " sampler temperature: "
+        << p_HMCsampler->getTemperature()
         << std::endl;
 
     for(int i = 0; i<atoi(argv[2]); i++){
+        //if( i == 10 ){
+        //        world->lig1->setRegimen(std::string("TD"));
+        //        std::cout << "BUG 0" << std::endl << std::flush;
+        //        world->system->modelCompounds();
+        //        world->system->realizeTopology();
+            //world->system->realize(integAdvancedState, SimTK::Stage::Model);
+        //}
         // -- STEPTO -- 
 
         //std::cout << "Time before stepping: " << world->ts->getTime()
@@ -159,16 +163,13 @@ int main(int argc, char **argv)
 
 
         // -- UPDATE --
-        std::cout << "=========================================" << std::endl;
+        //std::cout << "=========================================" << std::endl;
         //std::cout << "Q before update integAdvancedState " 
         //          << integAdvancedState.getQ() << std::endl;
         //std::cout << "U before update integAdvancedState " 
         //          << integAdvancedState.getU() << std::endl;
         //std::cout << "Time before update: " << world->ts->getTime() << std::endl;
 
-        SimTK::Real myPE = world->forces->getMultibodySystem().calcPotentialEnergy(integAdvancedState);
-        std::cout << "PE: " << std::setprecision(20)
-            << myPE << std::endl;
         //p_HMCsampler->update((world->ts->updIntegrator()).updAdvancedState());
         p_HMCsampler->update(integAdvancedState, atof(argv[3]), atoi(argv[4]));
 
@@ -176,15 +177,15 @@ int main(int argc, char **argv)
         //          << integAdvancedState.getQ() << std::endl;
         //std::cout << "U after update integAdvancedState " 
         //          << integAdvancedState.getU() << std::endl;
-        std::cout << "Time after update: " << world->ts->getTime()  
-                  << "; integAdvancedState Stage after p_HMCsampler: " 
-                  << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
-                  << "; integAdvancedState Stage before stepping: " 
-                  << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
-                  << std::endl;
-        writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "HMCs", i);
+        //std::cout << "Time after update: " << world->ts->getTime()  
+        //          << "; integAdvancedState Stage after p_HMCsampler: " 
+        //          << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+        //          << "; integAdvancedState Stage before stepping: " 
+        //          << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+        //          << std::endl;
+        writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "HMC1s", i);
+        //writePdb(*((SimTK::Compound *)(world->lig2)), integAdvancedState, "pdbs", "sb_", 8, "HMC2s", i);
     }
-
 
 }
 

@@ -38,10 +38,12 @@ public:
 
   // Constructor
   Topology();
+  Topology(std::string argName);
   // Destructor
   virtual ~Topology();
 
   // In case we already know the graph and order
+  /*
   void init(
     SimTK::DuMMForceFieldSubsystem &dumm,
     int natms,
@@ -52,7 +54,7 @@ public:
     std::string flexFN="ligand.flex",
     std::string ictdF="IC"
   );
-
+  */
 
   // Set a MolModel and a MolStructure - to be removed
 
@@ -74,7 +76,7 @@ public:
   void insertBond(int atom_no1, int atom_no2, int bondOrder);
 
   // Parameters
-
+  /*
   void setDuMMAtomParam(int, SimTK::Real vdw, SimTK::Real well);
   void setDuMMBondParam(int, int, SimTK::Real k, SimTK::Real equil);
   void setDuMMAngleParam(int, int, int, SimTK::Real k, SimTK::Real equil);
@@ -104,7 +106,7 @@ public:
       int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
       int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
   );
-
+  */
   // Get
 
   int getNAtoms(void) const;
@@ -119,10 +121,12 @@ public:
   int getBondOrder(int, int) const;
  
   // Process a graph node
-  void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses, int baseAtomNumber);
+  //void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses, int baseAtomNumber);
+  void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode);
 
   // Construct the molecule topology
-  void walkGraph(bSpecificAtom *root, int baseAtomNumber);
+  //void walkGraph(bSpecificAtom *root, int baseAtomNumber);
+  void walkGraph(bSpecificAtom *root);
 
   // Build Molmodel Compound
   void build(
@@ -135,6 +139,17 @@ public:
       std::string ictdF="IC"
   );
 
+  void setRegimen(std::string argRegimen);
+
+  std::string getname(void){return this->name;}
+  void setName(std::string argName){this->name = argName;}
+
+private:
+  std::string regimen;
+  std::string name;
+  int nofProcesses;
+  int baseSetFlag;
+  int baseAtomNumber;
 };
 
 

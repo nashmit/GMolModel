@@ -149,8 +149,10 @@ class World{
   SimTK::Force::Custom *ExtForce;
   SimTK::DecorationSubsystem *decorations;
   SimTK::DuMMForceFieldSubsystem *forceField;
-  bMoleculeReader *mr;  // local
+  bMoleculeReader *mr1;  // local
+  //bMoleculeReader *mr2;  // local
   Topology *lig1;  // local
+  //Topology *lig2;  // local
   SimTK::Visualizer *viz;
   #ifdef NOSETHERMOS
   SimTK::NoseHooverThermostat *thermo;
@@ -188,11 +190,12 @@ class World{
   World(readAmberInput *amberReader, std::string rbF, std::string flexFN,
         std::string ictdF
         );
-  
+  /* 
   World(
     string mol2F, string rbF, string gaffF, string frcmodF,
     string ictdF 
   );
+  */
 
   void InitSimulation(
     TARGET_TYPE extTimestep,
