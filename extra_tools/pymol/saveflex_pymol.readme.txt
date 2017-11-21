@@ -1,0 +1,13 @@
+
+
+
+1)	go to mol2 file folder
+2)	open mol2 file in pymol
+3)	select flexible residues 
+4)	type in pymol console:
+
+		run PATH/saveflex_pymol.py
+		saveflex_from_mol2("chA", "sele")
+
+		argv 1: molecule name ( it will open chA.mol2 and create chA.flex  )
+		argv 2: selection name from pymol
