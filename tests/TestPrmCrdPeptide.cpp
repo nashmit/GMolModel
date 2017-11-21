@@ -10,6 +10,7 @@
 
 #include "HamiltonianMonteCarloSampler.hpp"
 #include "readAmberInput.hpp"
+#include "SetupReader.hpp"
 
 int main(int argc, char **argv)
 {
@@ -27,6 +28,21 @@ int main(int argc, char **argv)
     ntrials = 10; // RESTORE DEL
     std::cout<<"main ntrials: "<<ntrials<<std::endl;
     std::cout<<"main nosteps: "<<nosteps<<std::endl;
+
+    // Use setup reader
+    
+    SetupReader setupReader(argv[7]);
+
+    setupReader.dump();
+
+    std::vector<std::string> argValues;
+    std::vector<std::string>::iterator argValuesIt;
+
+    argValues = setupReader.getValues("MOLS");
+    for(argValuesIt = argValues.begin(); argValuesIt != argValues.end(); ++argValuesIt){
+        std::cout << " " << *argValuesIt;
+    }
+    std::cout << std::endl;
 
     // Set input filenames
  

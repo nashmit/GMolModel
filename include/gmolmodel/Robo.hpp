@@ -9,7 +9,9 @@
 
 #include <algorithm>
 #include <string>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <cctype>
 
 #include <boost/math/distributions/normal.hpp>
