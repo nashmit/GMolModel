@@ -153,25 +153,20 @@ bool GridForce::dependsOnlyOnPositions() const {
 ////////////////////////////
 ////// SYMBODY SYSTEM //////
 ////////////////////////////
-World::World(readAmberInput *amberReader, std::string rbF, std::string flexFN,
-std::string ictdF
-)
+World::World(readAmberInput *amberReader, std::string rbF, std::string flexFN, std::string ictdF)
 {
-  passno = new int;
-  vassno = new int;
   fassno = new int;
-  sassno = new int;
   sysTimestep = new TARGET_TYPE;
   *sysTimestep = 0.0015;
   //
-  this->mol2F = mol2F;
+  //this->mol2F = mol2F;
   this->rbF = rbF;
   this->gaffF = gaffF;
   this->frcmodF = frcmodF;
   this->flexFN = flexFN;
   this->ictdF = ictdF;
-  this->pyseed = new unsigned long int;
-  this->lj14sf = 1;
+  //this->pyseed = new unsigned long int;
+  //this->lj14sf = 1;
 
   system = new SimTK::CompoundSystem;
   matter = new SimTK::SimbodyMatterSubsystem(*system);
@@ -185,9 +180,12 @@ std::string ictdF
   //forceField->loadAmber99Parameters();
   integ = new SimTK::VerletIntegrator(*system);
   ts = new SimTK::TimeStepper(*system, *integ);
+}
 
+void World::AddMolecule(readAmberInput *amberReader, std::string rbF, std::string flexFN, std::string ictdF)
+{
   mr1 = new bMoleculeReader(amberReader, rbF.c_str());
-  //mr2 = new bMoleculeReader(amberReader, rbF.c_str());
+  mr2 = new bMoleculeReader(amberReader, rbF.c_str());
 
   std::cout << "Add parameters for lig1" << std::endl;
   bAddAllParams(
@@ -198,10 +196,9 @@ std::string ictdF
     mr1->bonds
   );
 
-  /*
   std::cout << "Add parameters for lig2" << std::endl;
   for(int i = 0; i < mr2->natoms; i++){
-    (mr2->bAtomList[i]).setX((mr2->bAtomList[i]).getX() + 1.0); // nm
+    (mr2->bAtomList[i]).setX((mr2->bAtomList[i]).getX() + 5.0); // nm
   }
 
   bAddAllParams(
@@ -212,6 +209,7 @@ std::string ictdF
     mr2->bonds
   );
   
+  /*
   //bAddBiotypes(
   //  "lig2",
   //  amberReader,
@@ -259,16 +257,7 @@ std::string ictdF
   forceField->setGbsaGlobalScaleFactor(0.0);
   //
 
-}
-
-// Initialize simulation
-void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
-{
-  *passno = 0;
-  *vassno = 0;
   *fassno = 0;
-  *sassno = 0;
-
   ExtForce = new SimTK::Force::Custom(*forces, new GridForce(system, *matter 
     , fassno
     , this
@@ -280,8 +269,14 @@ void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
   forceField->setTracing(true); // log OpenMM info to console
   forceField->setNumThreadsRequested(1); // don't use this unless
 
+}
+
+// Initialize simulation
+void World::InitSimulation(readAmberInput *amberReader, std::string rbF, std::string flexFN,
+std::string ictdF)
+{
   lig1 = new Topology("lig1");
-  //lig2 = new Topology("lig2");
+  lig2 = new Topology("lig2");
 
   lig1->build(
     *forceField,
@@ -292,7 +287,6 @@ void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
     flexFN,
     ictdF
   );
-  /*
   lig2->build(
     *forceField,
     mr2->natoms,
@@ -300,32 +294,18 @@ void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
     mr2->nbonds,
     mr2->bonds,
     flexFN,
-    "TD"
+    ictdF
   );
+  /*
   */
 
-
   system->adoptCompound(*lig1);
-  //system->adoptCompound(*lig2, SimTK::Transform(SimTK::Vec3(-0.5, 0, 0)) * SimTK::Transform(SimTK::Rotation(0.1, SimTK::YAxis)));
+  system->adoptCompound(*lig2, SimTK::Transform(SimTK::Vec3(-0.5, 0, 0)) * SimTK::Transform(SimTK::Rotation(0.1, SimTK::YAxis)));
   system->modelCompounds();
   
-  TVector = new SimTK::Transform[matter->getNumBodies()];
-
-  arrays_cut = 2 + 4*3*(lig1->natms);
-  *sysTimestep = 0.0015; // CHECK
-  startT = 300.0; // CHECK
-
-  #ifdef NOSETHERMOS
-  thermo = new NoseHooverThermostat(*forces, *matter, startT, (*sysTimestep)*(50)); // every (x*10000)th step
-  #endif
-  #ifdef VELSTHERMOS
-  system->updDefaultSubsystem().addEventHandler(vthermo = new VelocityRescalingThermostat(*system, startT, (*sysTimestep)*100000)); // every (100)th step
-  #endif
 
   system->realizeTopology();
-
   std::cout << "Number of included atoms in nonbonded interactions: " << forceField->getNumNonbondAtoms() << std::endl;
-
   std::cout << "getVdwGlobalScaleFactor() " << forceField->getVdwGlobalScaleFactor() << std::endl;
   for(int i=0; i<lig1->natms; i++){
       std::cout << " DuMM VdW Radius " 
@@ -335,24 +315,28 @@ void World::InitSimulation(TARGET_TYPE extTimestep, bool first_time)
           << std::endl;
   }
 
-  SimTK::State state = system->updDefaultState();
+  //SimTK::State state = system->updDefaultState();
+  //ts->initialize(system->getDefaultState());
 
-  ts->initialize(system->getDefaultState());
 }//end of InitSimulation
 
 
 // Interface
 Topology * World::getTopology(void) const{
+    assert(!"Not implemented");
     return lig1;
 }
 
 Topology * World::updTopology(void){
+    assert(!"Not implemented");
     return lig1;
 }
 
 // Advance
 void World::Advance(int nosteps){
 
+  *sysTimestep = 0.0015; // CHECK
+  startT = 300.0; // CHECK
   TARGET_TYPE myrealtime=0;
   myrealtime = (TARGET_TYPE)nosteps * (*sysTimestep);
   std::cout<<"myrealtime: "<<myrealtime<<std::endl;

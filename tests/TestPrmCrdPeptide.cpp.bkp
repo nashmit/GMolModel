@@ -29,41 +29,60 @@ int main(int argc, char **argv)
     std::cout<<"main ntrials: "<<ntrials<<std::endl;
     std::cout<<"main nosteps: "<<nosteps<<std::endl;
 
-    // Initialize setup reader
-    SetupReader setupReader(argv[1]);
+    // Use setup reader
+    
+    SetupReader setupReader(argv[7]);
+
     setupReader.dump();
 
-    // Get input filenames
     std::vector<std::string> argValues;
     std::vector<std::string>::iterator argValuesIt;
-    argValues = setupReader.getValues("MOLECULES");
-    //for(argValuesIt = argValues.begin(); argValuesIt != argValues.end(); ++argValuesIt){
-        std::string prmtopFN = argValues[0] + std::string("/ligand.prmtop");
-    //    std::string frcmodFN = argValuesIt + std::string("/ligand.frcmod");
-        std::string inpcrdFN = argValues[0] + std::string("/ligand.inpcrd");
-        std::string rbFN = argValues[0] + std::string("/ligand.rb");
-        std::string flexFN = argValues[0] + std::string("/ligand.flex");
-    //    std::cout << "prmtopFN " << prmtopFN << std::endl<<std::flush;
-    //    std::cout << "frcmodFN " << frcmodFN << std::endl<<std::flush;
-    //    std::cout << "inpcrdFN " << inpcrdFN << std::endl<<std::flush;
-    //    std::cout << "rbFN "     << rbFN     << std::endl << std::flush;
-    //    std::cout << "flexFN "   << flexFN   << std::endl << std::flush;
-    //}
 
-    // Get simulation type:
+    argValues = setupReader.getValues("MOLS");
+    for(argValuesIt = argValues.begin(); argValuesIt != argValues.end(); ++argValuesIt){
+        std::cout << " " << *argValuesIt;
+    }
+    std::cout << std::endl;
+
+    // Set input filenames
+ 
+    std::string mol2FN = std::string(argv[1]) + std::string("/ligand.mol2");
+    std::string rbFN = std::string(argv[1]) + std::string("/ligand.rb");
+    std::string gaffFN = "gaff.dat";
+    std::string frcmodFN = std::string(argv[1]) + std::string("/ligand.frcmod");
+    std::string flexFN = std::string(argv[1]) + std::string("/ligand.flex");
+
+    // Simulation type: argv[6]
     // IC: Internal Coordinates Dynamics
     // TD: Torsional Dynamics
     // RR: Rigid Rings Torsional Dynamics
     // RB: Rigid Bodies
-    std::string ictd = setupReader.getValues("REGIMEN")[0];
+
+    std::string ictd = std::string(argv[6]);
+
+    std::cout<<"mol2FN "<<mol2FN<<std::endl<<std::flush;
+    std::cout<<"rbFN "<<rbFN<<std::endl<<std::flush;
+    std::cout<<"gaffFN "<<gaffFN<<std::endl<<std::flush;
+    std::cout<<"frcmodFN "<<frcmodFN<<std::endl<<std::flush;
+    std::cout<<"flexFN "<<flexFN<<std::endl<<std::flush;
     std::cout<<"ictd "<<ictd<<std::endl<<std::flush;
 
-    // Read Amber prmtop and inpcrd
-    readAmberInput *amberReader = new readAmberInput();
-    amberReader->readAmberFiles(inpcrdFN, prmtopFN);
+    // Read number of atoms from mol2 file
 
+    //std::string line;
+    //std::string column;
+
+    // Read Amber prmtop and inpcrd
+
+    readAmberInput *amberReader = new readAmberInput();
+    amberReader->readAmberFiles(std::string(argv[1]) + std::string("/ligand.inpcrd"), 
+        std::string(argv[1]) + std::string("/ligand.prmtop"));
     natoms = amberReader->getNumberAtoms();
     std::cout << "natoms " << natoms << std::endl << std::flush;
+
+    // Set the shared memory size (SHMSZ)
+
+    int natoms3 = 3*(natoms);
 
     // Build Gmolmodel simulation world
 
@@ -74,8 +93,10 @@ int main(int argc, char **argv)
 
     srand (time(NULL));
 
-    p_world->AddMolecule(amberReader, rbFN, flexFN, ictd);
-    p_world->InitSimulation(amberReader, rbFN, flexFN, ictd);
+    TARGET_TYPE mytimestep;
+    mytimestep = 0.0015;
+
+    p_world->InitSimulation(mytimestep, true);
 
     // Initialize sampler
     HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->forceField, p_world->forces, p_world->ts);
@@ -83,20 +104,43 @@ int main(int argc, char **argv)
     World *world = context->getWorld();
     world->forceField->setTracing(true);
 
-    
+    // Options for mass matrix, Lennard Jones
+
+    int pyseed = 0;
+    int _massMatNumOpt = 1; // EU
+    int _metroFixmanOpt = 1; // EU
+    double _lj14sf = 1; //--
+
+    // Alloc memory for saving configurations WATCHOUT TOO BIG
+
+    double **retConfsPois = new double* [ntrials];
+    for(int r=0; r<ntrials; r++){
+        retConfsPois[r] = new double[3 * world->mr1->natoms]; // WATCHOUT
+    }
+    double *retPotEsPoi = new double[ntrials];
+    double *accs = new double;
+
+    *world->pyseed = pyseed;
+    world->massMatNumOpt = _massMatNumOpt;
+    world->metroFixmanOpt = _metroFixmanOpt;
+    world->lj14sf = _lj14sf; //--
+    world->sysRetConfsPois = retConfsPois;
+    world->sysRetPotEsPoi = retPotEsPoi;
+    world->sysAccs = accs;
 
    // Simulate
+
     std::cout << std::fixed;
     std::cout << std::setprecision(4);
     const SimTK::State& constRefState = world->integ->getState();
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
-    p_HMCsampler->initialize( integAdvancedState, 
-                              std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
-                              std::stoi(setupReader.getValues("STEPS")[0]),
-                              SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
+    p_HMCsampler->initialize( integAdvancedState, atof(argv[3]), atoi(argv[4]), SimTK::Real(atof(argv[5])) );
+
     //world->forceField->dump();
     //world->forceField->dumpCForceFieldParameters(std::cout);
+
     //world->system->realize(integAdvancedState, SimTK::Stage::Dynamics);
+
     std::cout << "Initial const state PE: " << std::setprecision(20)
         << world->forces->getMultibodySystem().calcPotentialEnergy(constRefState)
         << " integ advanced state PE: "
@@ -105,8 +149,35 @@ int main(int argc, char **argv)
         << p_HMCsampler->getTemperature()
         << std::endl;
 
-    
-    for(int i = 0; i < std::stoi(setupReader.getValues("STEPS")[0]); i++){
+    for(int i = 0; i<atoi(argv[2]); i++){
+        //if( i == 10 ){
+        //        world->lig1->setRegimen(std::string("TD"));
+        //        std::cout << "BUG 0" << std::endl << std::flush;
+        //        world->system->modelCompounds();
+        //        world->system->realizeTopology();
+            //world->system->realize(integAdvancedState, SimTK::Stage::Model);
+        //}
+        // -- STEPTO -- 
+
+        //std::cout << "Time before stepping: " << world->ts->getTime()
+                  //<< "; integAdvancedState Stage before stepping: " 
+                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+                  //<< "; integAdvancedState Stage before stepping: " 
+                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+                  //<< std::endl;
+
+        //world->ts->initialize(integAdvancedState);
+        //world->ts->stepTo(timeToReach);
+        //world->integ->reinitialize(SimTK::Stage::Instance, true);
+
+        //std::cout << "Time after  stepping: " << world->ts->getTime()
+                  //<< "; integAdvancedState Stage after stepping: " 
+                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+                  //<< "; integAdvancedState Stage before stepping: " 
+                  //<< (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
+                  //<< std::endl;
+
+
         // -- UPDATE --
         //std::cout << "=========================================" << std::endl;
         //std::cout << "Q before update integAdvancedState " 
@@ -116,9 +187,7 @@ int main(int argc, char **argv)
         //std::cout << "Time before update: " << world->ts->getTime() << std::endl;
 
         //p_HMCsampler->update((world->ts->updIntegrator()).updAdvancedState());
-        p_HMCsampler->update(integAdvancedState, 
-            std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
-            std::stoi(setupReader.getValues("FREE_MDSTEPS")[0]) );
+        p_HMCsampler->update(integAdvancedState, atof(argv[3]), atoi(argv[4]));
 
         //std::cout << "Q after update integAdvancedState " 
         //          << integAdvancedState.getQ() << std::endl;

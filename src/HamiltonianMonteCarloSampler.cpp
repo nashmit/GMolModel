@@ -181,28 +181,32 @@ void HamiltonianMonteCarloSampler::setOldKE(SimTK::Real inpKE)
 // Initialize variables (identical to setTVector)
 void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature)
 {
-  int i = 0;
-  for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-      const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-      const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
-      TVector[i] = mobod.getMobilizerTransform(someState);
-      i++;
-  }
+    //SimTK::State state = compoundSystem->updDefaultState();
+    timeStepper->initialize(compoundSystem->getDefaultState());
 
-  system->realize(someState, SimTK::Stage::Position);
-  setTemperature(argTemperature); // Needed for Fixman
-  setOldPE(getPEFromEvaluator(someState));
-
-  setOldFixman(calcFixman(someState));
-  setOldKE(0.0);
-
-  randomEngine.seed( std::time(0) );
-
-  //timeStepper->initialize(someState);
-  // After an event handler has made a discontinuous change to the 
-  // Integrator's "advanced state", this method must be called to 
-  // reinitialize the Integrator.
-  //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
+    int i = 0;
+    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+        const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
+        TVector[i] = mobod.getMobilizerTransform(someState);
+        i++;
+    }
+  
+  
+    system->realize(someState, SimTK::Stage::Position);
+    setTemperature(argTemperature); // Needed for Fixman
+    setOldPE(getPEFromEvaluator(someState));
+  
+    setOldFixman(calcFixman(someState));
+    setOldKE(0.0);
+  
+    randomEngine.seed( std::time(0) );
+  
+    //timeStepper->initialize(someState);
+    // After an event handler has made a discontinuous change to the 
+    // Integrator's "advanced state", this method must be called to 
+    // reinitialize the Integrator.
+    //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
 
 }
 

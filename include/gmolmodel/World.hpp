@@ -149,10 +149,15 @@ class World{
   SimTK::Force::Custom *ExtForce;
   SimTK::DecorationSubsystem *decorations;
   SimTK::DuMMForceFieldSubsystem *forceField;
+
+  std::vector< std::vector<bMoleculeReader> > moleculeReaders;
+  std::vector< std::vector<Topology> > topologies;
+
   bMoleculeReader *mr1;  // local
-  //bMoleculeReader *mr2;  // local
+  bMoleculeReader *mr2;  // local
   Topology *lig1;  // local
-  //Topology *lig2;  // local
+  Topology *lig2;  // local
+
   SimTK::Visualizer *viz;
   #ifdef NOSETHERMOS
   SimTK::NoseHooverThermostat *thermo;
@@ -178,18 +183,19 @@ class World{
   int **mbxTreeMat;    // tree representing the bonding
   SimTK::Real *branchMassVec; // branch masses self body included
 
-  double **sysRetConfsPois;
-  double *sysRetPotEsPoi;
-  double *sysAccs;
+  //double **sysRetConfsPois;
+  //double *sysRetPotEsPoi;
+  //double *sysAccs;
 
-  long unsigned int *pyseed;
-  int massMatNumOpt;
-  int metroFixmanOpt;
-  double lj14sf; //-- MMTK default
+  //long unsigned int *pyseed;
+  //int massMatNumOpt;
+  //int metroFixmanOpt;
+  //double lj14sf; //-- MMTK default
 
-  World(readAmberInput *amberReader, std::string rbF, std::string flexFN,
-        std::string ictdF
-        );
+  World(readAmberInput *amberReader, std::string rbF, std::string flexFN, std::string ictdF);
+
+  void AddMolecule(readAmberInput *amberReader, std::string rbF, std::string flexFN, std::string ictdF);
+
   /* 
   World(
     string mol2F, string rbF, string gaffF, string frcmodF,
@@ -197,9 +203,8 @@ class World{
   );
   */
 
-  void InitSimulation(
-    TARGET_TYPE extTimestep,
-    bool first_time
+  void InitSimulation(readAmberInput *amberReader, std::string rbF, std::string flexFN,
+      std::string ictdF
   );
 
   
