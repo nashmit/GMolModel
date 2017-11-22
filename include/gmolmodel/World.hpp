@@ -165,12 +165,11 @@ class World{
   #ifdef VELSTHERMOS
   SimTK::VelocityRescalingThermostat *vthermo;
   #endif
-  SimTK::Real startT;
   //RungeKuttaMersonIntegrator *integ;
   SimTK::VerletIntegrator *integ;
   //MidVVIntegrator *integ;
   SimTK::TimeStepper *ts;
-  string mol2F, rbF, gaffF, frcmodF, flexFN, ictdF;
+  string mol2F, rbFN, frcmodF, flexFN, ictdF;
 
   int arrays_cut;
 
@@ -178,40 +177,21 @@ class World{
   int *vassno;
   int *fassno;
   int *sassno;
-  TARGET_TYPE *sysTimestep;
   SimTK::Transform *TVector;
   int **mbxTreeMat;    // tree representing the bonding
   SimTK::Real *branchMassVec; // branch masses self body included
 
-  //double **sysRetConfsPois;
-  //double *sysRetPotEsPoi;
-  //double *sysAccs;
+  World(SimTK::Real visualizerFrequency = 0.0015);
 
-  //long unsigned int *pyseed;
-  //int massMatNumOpt;
-  //int metroFixmanOpt;
-  //double lj14sf; //-- MMTK default
+  void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF);
 
-  World(readAmberInput *amberReader, std::string rbF, std::string flexFN, std::string ictdF);
-
-  void AddMolecule(readAmberInput *amberReader, std::string rbF, std::string flexFN, std::string ictdF);
-
-  /* 
-  World(
-    string mol2F, string rbF, string gaffF, string frcmodF,
-    string ictdF 
-  );
-  */
-
-  void InitSimulation(readAmberInput *amberReader, std::string rbF, std::string flexFN,
+  void InitSimulation(readAmberInput *amberReader, std::string rbFN, std::string flexFN,
       std::string ictdF
   );
-
   
   // Interface
   Topology * getTopology(void) const;
   Topology * updTopology(void);
-
 
   // Manages the TimeStepper actions
   void Advance(int nosteps);

@@ -67,8 +67,7 @@ int main(int argc, char **argv)
 
     // Build Gmolmodel simulation world
 
-    World *p_world = new World(amberReader, rbFN, flexFN, ictd //, PrmToAx_po, MMTkToPrm_po, shm
-        ); 
+    World *p_world = new World(std::stod(setupReader.getValues("FREE_TIMESTEP")[0])); 
 
     // Seed the random number generator 
 

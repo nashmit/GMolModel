@@ -181,6 +181,7 @@ void HamiltonianMonteCarloSampler::setOldKE(SimTK::Real inpKE)
 // Initialize variables (identical to setTVector)
 void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature)
 {
+    compoundSystem->realizeTopology();
     //SimTK::State state = compoundSystem->updDefaultState();
     timeStepper->initialize(compoundSystem->getDefaultState());
 
