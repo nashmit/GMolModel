@@ -26,11 +26,11 @@ void bAddBiotypes(
             );
 
             bAtomList[i].setBiotypeIndex(biotypeIndex);
-            std::cout << " bAddGaffParams: Defined Biotype: " 
+            std::cout << " bAddParams: Defined Biotype: " 
                 << resName << bAtomList[i].name << " " << SimTK::Ordinality::Any << "|" 
                 << " with BiotypeIndex " << bAtomList[i].getBiotypeIndex() << std::endl;
         }else{
-            std::cout << " bAddGaffParams: Biotype already set: " 
+            std::cout << " bAddParams: Biotype already set: " 
                 << resName << bAtomList[i].name << " " << SimTK::Ordinality::Any << "|" 
                 << " with BiotypeIndex " << bAtomList[i].getBiotypeIndex() << std::endl;
         }
@@ -63,9 +63,9 @@ void bAddAtomClasses(
                 //bAtomList[i].getVdwRadius(), // A
                 bAtomList[i].getLJWellDepth() * 4.184 // kcal to kJ
             );
-            std::cout << "bAddGaffParams: Defined AtomClass: " << bAtomList[i].getAtomClassIndex() << std::endl;
+            std::cout << "bAddParams: Defined AtomClass: " << bAtomList[i].getAtomClassIndex() << std::endl;
         //}else{
-        //    std::cout << "bAddGaffParams: AtomClass already set: " << bAtomList[i].getAtomClassIndex() << std::endl;
+        //    std::cout << "bAddParams: AtomClass already set: " << bAtomList[i].getAtomClassIndex() << std::endl;
         //}
 
 
@@ -77,9 +77,10 @@ void bAddAtomClasses(
       abuff += bAtomList[k].biotype;
 
       SimTK::DuMM::ChargedAtomTypeIndex tempChargedAtomTypeIndex = dumm.getNextUnusedChargedAtomTypeIndex();
-      std::cout << "defineChargedAtomType atomTypeIx "<<tempChargedAtomTypeIndex
+      bAtomList[k].setChargedAtomTypeIndex(tempChargedAtomTypeIndex);
+      std::cout << "bAddParams: defineChargedAtomType atomTypeIx "<<tempChargedAtomTypeIndex
           << " atomTypeName " << abuff.c_str() << " atomClassIx " << bAtomList[k].getAtomClassIndex()
-          << " partialChargeInE " << bAtomList[k].charge << std::endl;
+          << " partialChargeInE " << bAtomList[k].charge << " chargedAtomTypeIndex " << bAtomList[k].getChargedAtomTypeIndex() << std::endl;
       dumm.defineChargedAtomType(
         tempChargedAtomTypeIndex,
         abuff.c_str(),
@@ -87,10 +88,9 @@ void bAddAtomClasses(
         bAtomList[k].charge
       );
 
-      bAtomList[k].setChargedAtomTypeIndex(tempChargedAtomTypeIndex);
 
       // Associate a ChargedAtomTypeIndex with a Biotype index
-      std::cout << "setBiotypeChargedAtomType bAtomList["<< k << "].getChargedAtomTypeIndex() "
+      std::cout << "bAddParams: setBiotypeChargedAtomType bAtomList["<< k << "].getChargedAtomTypeIndex() "
           << bAtomList[k].getChargedAtomTypeIndex()
           << " bAtomList[" << k << "].biotype " << bAtomList[k].biotype
           //<< " Biotype::get(\"(this->name).c_str()\", bAtomList[k].biotype).getIndex() "

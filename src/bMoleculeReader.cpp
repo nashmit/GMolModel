@@ -377,6 +377,10 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
     
 }
 
+// Default destructor
+bMoleculeReader::~bMoleculeReader(){;}
+
+/*
 bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
         const char *filename,
         const char *filetype,
@@ -387,7 +391,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
 
   FILE *fpo;
   fpo = fopen(filename, "r");
-  /*rewind(fpo);*/ /*Doesn't work for Windows files*/
+  // rewind(fpo); // Doesn't work for Windows files
   MAX_LINE_LENGTH = 1000;
   char *buff = new char[80];
   //bZeroCharArray(buff, 80);
@@ -404,12 +408,12 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
   //unsigned int lno = 0;
   int noDummies = 0;
 
-  /*+++++++++ External readers ++++++++++*/
+  //+++++++++ External readers ++++++++++
   if(strstr(filetype, "external")){
     ;
   }
 
-  /*+++++++++ MOL2 type ++++++++++*/
+  //+++++++++ MOL2 type ++++++++++*
   else if(strstr(filetype, "mol2")){
     bZeroCharArray(buff, 80); // EU
     natoms = 0;
@@ -417,7 +421,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     char elem = 'x';
     int lno = 0;
  
-    /*Read number of atoms*/
+    // Read number of atoms
     bZeroCharArray(line_c, MAX_LINE_LENGTH); // EU
     while(fgets(line_c, MAX_LINE_LENGTH, fpo)){
       ++lno;
@@ -437,9 +441,9 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     }
     bZeroCharArray(line_c, MAX_LINE_LENGTH);
 
-    bAtomList = new bSpecificAtom[natoms + noDummies]; /*Alloc - 1 for dummy*/
+    bAtomList = new bSpecificAtom[natoms + noDummies]; //Alloc - 1 for dummy
 
-    /*Jump to the atom section*/
+    //Jump to the atom section
     while(fgets(line_c, MAX_LINE_LENGTH, fpo)){
       if(line_c[0] == '@'){
         break;
@@ -448,7 +452,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     }
     bZeroCharArray(line_c, MAX_LINE_LENGTH);
 
-    /*Read position, element, fftype and charge*/
+    //Read position, element, fftype and charge
     lno = 0;
     while(fgets(line_c, MAX_LINE_LENGTH, fpo) && (lno < natoms)){ 
       ++lno;
@@ -495,7 +499,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     #ifdef DEBUG_LEVEL02
     //std::cout<<std::endl<<"bMoleculeReader::bMoleculeReader 2 Read Bonds down"<<std::endl<<std::flush;
     #endif
-    /*READ BONDS*/
+    // READ BONDS
     //fgets(line_c, MAX_LINE_LENGTH, fpo); // RESTORE
     lno = 0;
     //do{ // RESTORE
@@ -522,7 +526,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     //while(fgets(line_c, MAX_LINE_LENGTH, fpo) && (line_c[0] != '@')); // RESTORE
 
     
-    /*Assign atoms nbonds and freebonds*/
+    // Assign atoms nbonds and freebonds
     for(i=0; i<natoms;i++){
       bAtomList[i].nbonds = 0;
       //for(j=0; j<bonds.size(); j++){ // RESTORE
@@ -540,7 +544,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     #endif
 
 
-    /*TODO Develop TrivalentAtomTetra for adding custom angles*/
+    //TODO Develop TrivalentAtomTetra for adding custom angles
     // Every *valentAtom is derived from SingleAtom in turn derived from Compound with one atom (AtomIndex 0)
     for(i=0; i<natoms+noDummies; i++){
       #ifdef DEBUG_LEVEL02
@@ -697,7 +701,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
     
   }
 
-  /* Just checking *////////
+  // Just checking ///////
   #ifdef DEBUG_LEVEL02
   std::cout<<"Just checking\n";
   for(i=0; i<natoms;i++){
@@ -723,7 +727,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
   //////////////////////////////////////////
 
 
-  /*Now read rigid bodies specifications*/
+  // Now read rigid bodies specifications
   FILE *rfpo;
   rfpo = fopen(rbfilename, "r");
   if(rfpo == NULL){
@@ -856,8 +860,7 @@ bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,
 
   fclose(rfpo);
 }
-
-bMoleculeReader::~bMoleculeReader(){;}
+i*/
 
 
 

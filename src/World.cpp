@@ -120,7 +120,7 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
 
     // Apply external forces
     for(int a=0; a<c.getNumAtoms(); a++){
-      SimTK::Compound::AtomIndex aIx = (Caller->lig1->bAtomList)[a].atomIndex;
+      SimTK::Compound::AtomIndex aIx = ( (Caller->getTopology(0, 0)).bAtomList )[a].atomIndex;
       const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(c.getAtomMobilizedBodyIndex(aIx));
       SimTK::Vec3 v_check(0.0, 0.0, 0.0);
       mobod.applyForceToBodyPoint(state, c.getAtomLocationInMobilizedBodyFrame(aIx), v_check, bodyForces);
@@ -153,38 +153,48 @@ bool GridForce::dependsOnlyOnPositions() const {
 ////////////////////////////
 ////// SYMBODY SYSTEM //////
 ////////////////////////////
-World::World(SimTK::Real visualizerFrequency)
+World::World(bool visual, SimTK::Real visualizerFrequency)
 {
     fassno = new int; // External forces
   
     system = new SimTK::CompoundSystem;
     matter = new SimTK::SimbodyMatterSubsystem(*system);
     forces = new SimTK::GeneralForceSubsystem(*system);
-  
-    decorations = new SimTK::DecorationSubsystem(*system);
-    SimTK::Visualizer viz(*system);
-    system->addEventReporter( new SimTK::Visualizer::Reporter(viz, visualizerFrequency));
+
+    if(visual){
+        decorations = new SimTK::DecorationSubsystem(*system);
+        SimTK::Visualizer viz(*system);
+        system->addEventReporter( new SimTK::Visualizer::Reporter(viz, visualizerFrequency));
+    }
   
     forceField = new SimTK::DuMMForceFieldSubsystem(*system);
     //forceField->loadAmber99Parameters();
     integ = new SimTK::VerletIntegrator(*system);
     ts = new SimTK::TimeStepper(*system, *integ);
+
+    moleculeCount = -1;
 }
 
 void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF)
 {
+    moleculeCount++; // Used for unique names of molecules
+
     this->rbFN = rbFN;
     this->frcmodF = frcmodF;
     this->flexFN = flexFN;
     this->ictdF = ictdF;
-  
-    mr1 = new bMoleculeReader(amberReader, rbFN.c_str());
+ 
+    std::vector<bMoleculeReader> moleculeCopies; // One copy per regimen
+    std::vector<Topology> topologyCopies; // One copy per regimen
+ 
+    //mr1 = new bMoleculeReader(amberReader, rbFN.c_str());
+    moleculeCopies.push_back(bMoleculeReader(amberReader, rbFN.c_str()));
     //mr2 = new bMoleculeReader(amberReader, rbFN.c_str());
-    //moleculeReaders.push_back(bMoleculeReader(amberReader, rbFN.c_str()));
+    moleculeReaders.push_back(moleculeCopies);
 
-    std::cout << "Add parameters for lig1" << std::endl;
-    bAddAllParams("lig1", amberReader, *forceField, mr1->bAtomList, mr1->bonds);
+    std::cout << "World::AddMolecule add parameters" << std::endl;
     //bAddAllParams("lig1", amberReader, *forceField, mr1->bAtomList, mr1->bonds);
+    bAddAllParams(std::string("lig") + std::to_string(moleculeCount), amberReader, *forceField, (moleculeReaders.back().back()).bAtomList, (moleculeReaders.back().back()).bonds);
   
     //std::cout << "Add parameters for lig2" << std::endl;
     //for(int i = 0; i < mr2->natoms; i++){
@@ -192,90 +202,111 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
     //}
     //bAddAllParams("lig2", amberReader, *forceField, mr2->bAtomList, mr2->bonds);
     
-    lig1 = new Topology("lig1");
+    std::cout << "World::AddMolecule add Compound" << std::endl;
+    //lig1 = new Topology("lig1");
+    topologyCopies.push_back(Topology(std::string("lig") + std::to_string(moleculeCount)));
     //lig2 = new Topology("lig2");
+    topologies.push_back(topologyCopies);
   
-    lig1->build(*forceField, mr1->natoms, mr1->bAtomList, mr1->nbonds, mr1->bonds, flexFN, ictdF);
+    std::cout << "World::AddMolecule build Compound" << std::endl;
+    //lig1->build(*forceField, mr1->natoms, mr1->bAtomList, mr1->nbonds, mr1->bonds, flexFN, ictdF);
+    (topologies.back().back()).build(*forceField, (moleculeReaders.back().back()).natoms, (moleculeReaders.back().back()).bAtomList, (moleculeReaders.back().back()).nbonds, (moleculeReaders.back().back()).bonds, flexFN, ictdF);
     //lig2->build(*forceField, mr2->natoms, mr2->bAtomList, mr2->nbonds, mr2->bonds, flexFN, ictdF);
   
-    system->adoptCompound(*lig1);
+    std::cout << "World::AddMolecule adopt Compound" << std::endl;
+    system->adoptCompound(topologies.back().back());
     //system->adoptCompound(*lig2, SimTK::Transform(SimTK::Vec3(-0.5, 0, 0)) * SimTK::Transform(SimTK::Rotation(0.1, SimTK::YAxis)));
-    system->modelCompounds();
+    std::cout << "World::AddMolecule realizeTopology" << std::endl;
     system->realizeTopology();
-  
+
     std::cout << "Number of included atoms in nonbonded interactions: " << forceField->getNumNonbondAtoms() << std::endl;
     std::cout << "getVdwGlobalScaleFactor() " << forceField->getVdwGlobalScaleFactor() << std::endl;
-    for(int i=0; i<lig1->natms; i++){
+    for(int i=0; i<(topologies.back().back()).natms; i++){
         std::cout << " DuMM VdW Radius " 
-            << forceField->getVdwRadius((lig1->bAtomList[i]).getAtomClassIndex()) 
+            << forceField->getVdwRadius(((topologies.back().back()).bAtomList[i]).getAtomClassIndex()) 
             << " DuMM VdW Well Depth "
-            << forceField->getVdwWellDepth((lig1->bAtomList[i]).getAtomClassIndex())
+            << forceField->getVdwWellDepth(((topologies.back().back()).bAtomList[i]).getAtomClassIndex())
             << std::endl;
     }
   
 }
 
 // Initialize simulation
-void World::InitSimulation(readAmberInput *amberReader, std::string rbFN, std::string flexFN,
-std::string ictdF)
+void World::Init(void)
 {
-  //SimTK::State state = system->updDefaultState();
-  //ts->initialize(system->getDefaultState());
+    // Only model after loading all the compounds
+    std::cout << "World::Init model Compound" << std::endl;
+    system->modelCompounds();
+   
+    // Generate a nonbonded list
+    forceField->clearIncludedNonbondAtomList();
+    for(SimTK::DuMM::AtomIndex dummAIx(0); dummAIx < forceField->getNumAtoms(); ++dummAIx){
+        SimTK::MobilizedBodyIndex mobodIx = forceField->getAtomBody(dummAIx);
+        SimTK::Vec3 getAtomStationOnBody(dummAIx);
 
-  forceField->setVdw12ScaleFactor(0.0);
-  forceField->setVdw13ScaleFactor(0.0);
-  forceField->setVdw14ScaleFactor(0.5);
-  forceField->setVdw15ScaleFactor(1.0);
-  forceField->setCoulomb12ScaleFactor(0.0);
-  forceField->setCoulomb13ScaleFactor(0.0);
-  forceField->setCoulomb14ScaleFactor(0.8333333333);
-  forceField->setCoulomb15ScaleFactor(1.0);
-  forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
 
-  //lig1->setSpecificDuMMScaleFactor(*forceField);
-  //forceField->setBondStretchGlobalScaleFactor(0.0);
-  //forceField->setBondBendGlobalScaleFactor(0.0);
-  //forceField->setBondTorsionGlobalScaleFactor(0.0);
-  //forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
+        //Real SimTK::MobilizedBody::calcStationToStationDistance	(const State& state, const Vec3& locationOnBodyB, const MobilizedBody& bodyA, const Vec3& locationOnBodyA);
 
-  //forceField->setVdw12ScaleFactor(0.0);
-  //forceField->setVdw13ScaleFactor(0.0);
-  //forceField->setVdw14ScaleFactor(0.0);
-  //forceField->setVdw15ScaleFactor(0.0);
-  //forceField->setVdwGlobalScaleFactor(0.0);
-
-  //forceField->setCoulomb12ScaleFactor(0.0);
-  //forceField->setCoulomb13ScaleFactor(0.0);
-  //forceField->setCoulomb14ScaleFactor(0.0);
-  //forceField->setCoulomb15ScaleFactor(0.0);
-  //forceField->setCoulombGlobalScaleFactor(0.0);
-
-  forceField->setGbsaGlobalScaleFactor(0.0);
-  //
-
-  *fassno = 0;
-  ExtForce = new SimTK::Force::Custom(*forces, new GridForce(system, *matter, fassno, this));
-
-  #ifdef TRY_TO_USE_OPENMM
-    forceField->setUseOpenMMAcceleration(true);
-  #endif
-  forceField->setTracing(true); // log OpenMM info to console
-  forceField->setNumThreadsRequested(1); // don't use this unless
-
-  system->realizeTopology();
+        if(true){
+            forceField->includeNonbondAtom(dummAIx);
+        }
+    }
+   
+    //SimTK::State state = system->updDefaultState();
+    //ts->initialize(system->getDefaultState());
+  
+    forceField->setVdw12ScaleFactor(0.0);
+    forceField->setVdw13ScaleFactor(0.0);
+    forceField->setVdw14ScaleFactor(0.5);
+    forceField->setVdw15ScaleFactor(1.0);
+    forceField->setCoulomb12ScaleFactor(0.0);
+    forceField->setCoulomb13ScaleFactor(0.0);
+    forceField->setCoulomb14ScaleFactor(0.8333333333);
+    forceField->setCoulomb15ScaleFactor(1.0);
+    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
+  
+    //lig1->setSpecificDuMMScaleFactor(*forceField);
+    //forceField->setBondStretchGlobalScaleFactor(0.0);
+    //forceField->setBondBendGlobalScaleFactor(0.0);
+    //forceField->setBondTorsionGlobalScaleFactor(0.0);
+    //forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
+  
+    //forceField->setVdw12ScaleFactor(0.0);
+    //forceField->setVdw13ScaleFactor(0.0);
+    //forceField->setVdw14ScaleFactor(0.0);
+    //forceField->setVdw15ScaleFactor(0.0);
+    //forceField->setVdwGlobalScaleFactor(0.0);
+  
+    //forceField->setCoulomb12ScaleFactor(0.0);
+    //forceField->setCoulomb13ScaleFactor(0.0);
+    //forceField->setCoulomb14ScaleFactor(0.0);
+    //forceField->setCoulomb15ScaleFactor(0.0);
+    //forceField->setCoulombGlobalScaleFactor(0.0);
+  
+    forceField->setGbsaGlobalScaleFactor(0.0);
+    //
+  
+    *fassno = 0;
+    ExtForce = new SimTK::Force::Custom(*forces, new GridForce(system, *matter, fassno, this));
+  
+    #ifdef TRY_TO_USE_OPENMM
+        forceField->setUseOpenMMAcceleration(true);
+    #endif
+    forceField->setTracing(true); // log OpenMM info to console
+    forceField->setNumThreadsRequested(1); // don't use this unless
+  
+    system->realizeTopology();
 
 }//end of InitSimulation
 
 
 // Interface
-Topology * World::getTopology(void) const{
-    assert(!"Not implemented");
-    return lig1;
+const Topology& World::getTopology(int moleculeNumber, int moleculeCopy) const{
+    return topologies[moleculeNumber][moleculeCopy];
 }
 
-Topology * World::updTopology(void){
+Topology& World::updTopology(void){
     assert(!"Not implemented");
-    return lig1;
 }
 
 // Advance

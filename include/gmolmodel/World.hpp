@@ -173,25 +173,23 @@ class World{
 
   int arrays_cut;
 
-  int *passno;
-  int *vassno;
+  int moleculeCount;
+
   int *fassno;
-  int *sassno;
   SimTK::Transform *TVector;
   int **mbxTreeMat;    // tree representing the bonding
   SimTK::Real *branchMassVec; // branch masses self body included
 
-  World(SimTK::Real visualizerFrequency = 0.0015);
+  World(bool visual=true, SimTK::Real visualizerFrequency = 0.0015);
 
   void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF);
 
-  void InitSimulation(readAmberInput *amberReader, std::string rbFN, std::string flexFN,
-      std::string ictdF
-  );
+  void Init(void);
   
   // Interface
-  Topology * getTopology(void) const;
-  Topology * updTopology(void);
+  const Topology& getTopology(int moleculeNumber, int moleculeCopy) const;
+
+  Topology& updTopology(void);
 
   // Manages the TimeStepper actions
   void Advance(int nosteps);

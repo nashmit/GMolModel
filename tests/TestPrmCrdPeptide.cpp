@@ -14,79 +14,53 @@
 
 int main(int argc, char **argv)
 {
-    // Declare a shared memory pointer used by all the classes in the library
-
-    //  Declare variables for simulation parameters
-
-    int natoms;
-    int nosteps;
-    int ntrials;
-
-    // Set simulation parameters
-
-    nosteps = 10; // RESTORE DEL
-    ntrials = 10; // RESTORE DEL
-    std::cout<<"main ntrials: "<<ntrials<<std::endl;
-    std::cout<<"main nosteps: "<<nosteps<<std::endl;
-
     // Initialize setup reader
     SetupReader setupReader(argv[1]);
-    setupReader.dump();
+
+    // Build Gmolmodel simulation world
+    World *p_world;
+    if(setupReader.getValues("VISUAL")[0] == "TRUE"){
+        p_world = new World(true, std::stod(setupReader.getValues("FREE_TIMESTEP")[0]));
+    }else{
+        p_world = new World(false, std::stod(setupReader.getValues("FREE_TIMESTEP")[0]));
+    }
 
     // Get input filenames
     std::vector<std::string> argValues;
     std::vector<std::string>::iterator argValuesIt;
     argValues = setupReader.getValues("MOLECULES");
-    //for(argValuesIt = argValues.begin(); argValuesIt != argValues.end(); ++argValuesIt){
-        std::string prmtopFN = argValues[0] + std::string("/ligand.prmtop");
-    //    std::string frcmodFN = argValuesIt + std::string("/ligand.frcmod");
-        std::string inpcrdFN = argValues[0] + std::string("/ligand.inpcrd");
-        std::string rbFN = argValues[0] + std::string("/ligand.rb");
-        std::string flexFN = argValues[0] + std::string("/ligand.flex");
-    //    std::cout << "prmtopFN " << prmtopFN << std::endl<<std::flush;
-    //    std::cout << "frcmodFN " << frcmodFN << std::endl<<std::flush;
-    //    std::cout << "inpcrdFN " << inpcrdFN << std::endl<<std::flush;
-    //    std::cout << "rbFN "     << rbFN     << std::endl << std::flush;
-    //    std::cout << "flexFN "   << flexFN   << std::endl << std::flush;
-    //}
+    for(argValuesIt = argValues.begin(); argValuesIt != argValues.end(); ++argValuesIt){
+        // Get molecule files
+        std::string prmtopFN = *argValuesIt + std::string("/ligand.prmtop");
+        std::string inpcrdFN = *argValuesIt + std::string("/ligand.inpcrd");
+        std::string rbFN = *argValuesIt + std::string("/ligand.rb");
+        std::string flexFN = *argValuesIt + std::string("/ligand.flex");
 
-    // Get simulation type:
-    // IC: Internal Coordinates Dynamics
-    // TD: Torsional Dynamics
-    // RR: Rigid Rings Torsional Dynamics
-    // RB: Rigid Bodies
-    std::string ictd = setupReader.getValues("REGIMEN")[0];
-    std::cout<<"ictd "<<ictd<<std::endl<<std::flush;
+        // Get regimen
+        std::string ictd = setupReader.getValues("REGIMEN")[0];
 
-    // Read Amber prmtop and inpcrd
-    readAmberInput *amberReader = new readAmberInput();
-    amberReader->readAmberFiles(inpcrdFN, prmtopFN);
+        // Read Amber prmtop and inpcrd
+        readAmberInput *amberReader = new readAmberInput();
+        amberReader->readAmberFiles(inpcrdFN, prmtopFN);
 
-    natoms = amberReader->getNumberAtoms();
-    std::cout << "natoms " << natoms << std::endl << std::flush;
+        // Add molecules
+        p_world->AddMolecule(amberReader, rbFN, flexFN, ictd);
 
-    // Build Gmolmodel simulation world
+        delete amberReader;
+    }
 
-    World *p_world = new World(std::stod(setupReader.getValues("FREE_TIMESTEP")[0])); 
+    p_world->Init();
 
-    // Seed the random number generator 
-
-    srand (time(NULL));
-
-    p_world->AddMolecule(amberReader, rbFN, flexFN, ictd);
-    p_world->InitSimulation(amberReader, rbFN, flexFN, ictd);
 
     // Initialize sampler
+    srand (time(NULL));
     HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->forceField, p_world->forces, p_world->ts);
     Context *context = new Context(p_world, p_HMCsampler);
     World *world = context->getWorld();
     world->forceField->setTracing(true);
 
-    
-
    // Simulate
-    std::cout << std::fixed;
-    std::cout << std::setprecision(4);
+    std::cout << std::fixed << std::setprecision(4);
     const SimTK::State& constRefState = world->integ->getState();
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
     p_HMCsampler->initialize( integAdvancedState, 
@@ -103,34 +77,17 @@ int main(int argc, char **argv)
         << " sampler temperature: "
         << p_HMCsampler->getTemperature()
         << std::endl;
-
     
     for(int i = 0; i < std::stoi(setupReader.getValues("STEPS")[0]); i++){
-        // -- UPDATE --
-        //std::cout << "=========================================" << std::endl;
-        //std::cout << "Q before update integAdvancedState " 
-        //          << integAdvancedState.getQ() << std::endl;
-        //std::cout << "U before update integAdvancedState " 
-        //          << integAdvancedState.getU() << std::endl;
-        //std::cout << "Time before update: " << world->ts->getTime() << std::endl;
 
-        //p_HMCsampler->update((world->ts->updIntegrator()).updAdvancedState());
         p_HMCsampler->update(integAdvancedState, 
             std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
             std::stoi(setupReader.getValues("FREE_MDSTEPS")[0]) );
 
-        //std::cout << "Q after update integAdvancedState " 
-        //          << integAdvancedState.getQ() << std::endl;
-        //std::cout << "U after update integAdvancedState " 
-        //          << integAdvancedState.getU() << std::endl;
-        //std::cout << "Time after update: " << world->ts->getTime()  
-        //          << "; integAdvancedState Stage after p_HMCsampler: " 
-        //          << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
-        //          << "; integAdvancedState Stage before stepping: " 
-        //          << (((SimTK::Subsystem *)(world->matter))->getStage(integAdvancedState)).getName() 
-        //          << std::endl;
-        writePdb(*((SimTK::Compound *)(world->lig1)), integAdvancedState, "pdbs", "sb_", 8, "HMC1s", i);
-        //writePdb(*((SimTK::Compound *)(world->lig2)), integAdvancedState, "pdbs", "sb_", 8, "HMC2s", i);
+        writePdb( ((SimTK::Compound)(world->getTopology(0, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC0s", i);
+        writePdb( ((SimTK::Compound)(world->getTopology(1, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC1s", i);
+        //writePdb( ((SimTK::Compound)(world->getTopology(2, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC2s", i);
+        //writePdb( ((SimTK::Compound)(world->getTopology(3, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC3s", i);
     }
 
 }
