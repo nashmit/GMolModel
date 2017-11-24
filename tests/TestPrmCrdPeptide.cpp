@@ -86,8 +86,8 @@ int main(int argc, char **argv)
 
         writePdb( ((SimTK::Compound)(world->getTopology(0, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC0s", i);
         writePdb( ((SimTK::Compound)(world->getTopology(1, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC1s", i);
-        //writePdb( ((SimTK::Compound)(world->getTopology(2, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC2s", i);
-        //writePdb( ((SimTK::Compound)(world->getTopology(3, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC3s", i);
+        writePdb( ((SimTK::Compound)(world->getTopology(2, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC2s", i);
+        writePdb( ((SimTK::Compound)(world->getTopology(3, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC3s", i);
     }
 
 }

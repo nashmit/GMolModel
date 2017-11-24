@@ -237,20 +237,29 @@ void World::Init(void)
     // Only model after loading all the compounds
     std::cout << "World::Init model Compound" << std::endl;
     system->modelCompounds();
-   
+
     // Generate a nonbonded list
+    /*
     forceField->clearIncludedNonbondAtomList();
-    for(SimTK::DuMM::AtomIndex dummAIx(0); dummAIx < forceField->getNumAtoms(); ++dummAIx){
-        SimTK::MobilizedBodyIndex mobodIx = forceField->getAtomBody(dummAIx);
-        SimTK::Vec3 getAtomStationOnBody(dummAIx);
+    system->realizeTopology();
+    for(SimTK::DuMM::AtomIndex dummAIxA(0); dummAIxA < forceField->getNumAtoms(); ++dummAIxA){
+        SimTK::MobilizedBodyIndex mobodIxA = forceField->getAtomBody(dummAIxA);
+        SimTK::Vec3 stationA = forceField->getAtomStationOnBody(dummAIxA);
+        SimTK::MobilizedBody mobodA = matter->getMobilizedBody(mobodIxA);
+ 
+        for(SimTK::DuMM::AtomIndex dummAIxB(0); dummAIxB < forceField->getNumAtoms(); ++dummAIxB){
+            SimTK::MobilizedBodyIndex mobodIxB = forceField->getAtomBody(dummAIxB);
+            SimTK::Vec3 stationB = forceField->getAtomStationOnBody(dummAIxB);
+            SimTK::MobilizedBody mobodB = matter->getMobilizedBody(mobodIxB);
 
+            SimTK::Real distance = mobodA.calcStationToStationDistance(system->getDefaultState(), stationA, mobodB, stationB);
 
-        //Real SimTK::MobilizedBody::calcStationToStationDistance	(const State& state, const Vec3& locationOnBodyB, const MobilizedBody& bodyA, const Vec3& locationOnBodyA);
-
-        if(true){
-            forceField->includeNonbondAtom(dummAIx);
+            if(distance < 8.0){
+                forceField->includeNonbondAtom(dummAIxA);
+            }
         }
     }
+    */
    
     //SimTK::State state = system->updDefaultState();
     //ts->initialize(system->getDefaultState());

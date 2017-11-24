@@ -234,13 +234,13 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     }
 
     system->realize(someState, SimTK::Stage::Position);
-    std::cout << "Before stepTo Q: " << someState.getQ() << std::endl;
-    std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
+    //std::cout << "Before stepTo Q: " << someState.getQ() << std::endl;
+    //std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
     //std::cout << "HamiltonianMonteCarloSampler::propose SqrtMInvV: " << SqrtMInvV << std::endl;
     SqrtMInvV *= sqrtRT; // Set stddev according to temperature
     someState.updU() = SqrtMInvV;
-    std::cout << "Before stepTo U: " << someState.getU() << std::endl;
+    //std::cout << "Before stepTo U: " << someState.getU() << std::endl;
 
     // Set old kinetic energy
     system->realize(someState, SimTK::Stage::Acceleration);
@@ -275,15 +275,15 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //}
 
     // Propagate through phase space (integrate)
-    std::cout << "Before stepTo time: " << someState.getTime() << std::endl;
+    //std::cout << "Before stepTo time: " << someState.getTime() << std::endl;
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
-    std::cout << "After  stepTo time: " << someState.getTime() << std::endl;
+    //std::cout << "After  stepTo time: " << someState.getTime() << std::endl;
     //writePdb(*residue, someState, "pdbs", "sb_", 8, "HMCprop", trackStep);
     ++trackStep;
 
-    std::cout << "After  stepTo Q: " << someState.getQ() << std::endl;
-    std::cout << "After  stepTo U: " << someState.getU() << std::endl;
-    std::cout << "After  stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
+    //std::cout << "After  stepTo Q: " << someState.getQ() << std::endl;
+    //std::cout << "After  stepTo U: " << someState.getU() << std::endl;
+    //std::cout << "After  stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
 
     // Get M
     //matter->calcM(someState, M);
@@ -347,7 +347,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
 
     std::cout << " : pe_o " << getOldPE() << " ke_o " << getOldKE() << " fix_o " << getOldFixman()
         << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n << std:: endl;
-    std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
+    //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
 
 }
 
