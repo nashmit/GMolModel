@@ -1,0 +1,9 @@
+MOLECULES paniA paniB paniC paniD	# Molecules to load
+REGIMEN TD 				# Regimen (IC, TD, MIX, RB, RBMIX)
+STEPS 300 				# MC steps (Acception-rejection steps)
+FREE_TIMESTEP 0.0015 			# Timestep to be used with all dofs dynamics
+CONS_TIMESTEP 0.0015 			# Timestep to be used with constrained dynamics
+FREE_MDSTEPS  3 			# Number of MD trial steps with all dofs dynamics
+CONS_MDSTEPS  3 			# Number of MD trial steps with constrained dynamics
+TEMPERATURE   300 			# Temperature for constant temperature simulations
+VISUAL FALSE 				# Use the visualizer
