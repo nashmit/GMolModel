@@ -84,10 +84,16 @@ int main(int argc, char **argv)
             std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
             std::stoi(setupReader.getValues("FREE_MDSTEPS")[0]) );
 
-        writePdb( ((SimTK::Compound)(world->getTopology(0, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC0s", i);
-        writePdb( ((SimTK::Compound)(world->getTopology(1, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC1s", i);
-        writePdb( ((SimTK::Compound)(world->getTopology(2, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC2s", i);
-        writePdb( ((SimTK::Compound)(world->getTopology(3, 0))), integAdvancedState, "pdbs", "sb_", 8, "HMC3s", i);
+        if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
+            for(int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+                writePdb( ((SimTK::Compound)(world->getTopology(mol_i, 0))),
+                    integAdvancedState, 
+                    "pdbs", "sb_",
+                    8, 
+                    (std::string("HMC") + std::to_string(mol_i)).c_str(), i);
+            }
+        }
+
     }
 
 }
