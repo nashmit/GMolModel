@@ -47,8 +47,8 @@ SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
     //std::cout << "MonteCarloSampler::calcFixman Stage: "<< matter->getStage(someState) << std::endl;
     matter->calcDetM(someState, V, DetV, D0);
 
-    std::cout << "MonteCarloSampler::calcFixman D0: " << *D0 << std::endl;
-    std::cout << "MonteCarloSampler::calcFixman RT: " << RT << std::endl;
+    //std::cout << "MonteCarloSampler::calcFixman D0: " << *D0 << std::endl;
+    //std::cout << "MonteCarloSampler::calcFixman RT: " << RT << std::endl;
     // ---- Verify with Eigen ----------
     // Eigen M determinant
     //Eigen::MatrixXd EiM(nu, nu);

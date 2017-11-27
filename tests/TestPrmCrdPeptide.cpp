@@ -63,10 +63,19 @@ int main(int argc, char **argv)
     std::cout << std::fixed << std::setprecision(4);
     const SimTK::State& constRefState = world->integ->getState();
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
-    p_HMCsampler->initialize( integAdvancedState, 
-                              std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
-                              std::stoi(setupReader.getValues("STEPS")[0]),
-                              SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
+    if( setupReader.getValues("REGIMEN")[0] == "IC" ){
+        p_HMCsampler->initialize( integAdvancedState, 
+           std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
+           std::stoi(setupReader.getValues("STEPS")[0]),
+           SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
+           false );
+    }else{
+        p_HMCsampler->initialize( integAdvancedState, 
+           std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
+           std::stoi(setupReader.getValues("STEPS")[0]),
+           SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
+           true );
+    }
     //world->forceField->dump();
     //world->forceField->dumpCForceFieldParameters(std::cout);
     //world->system->realize(integAdvancedState, SimTK::Stage::Dynamics);

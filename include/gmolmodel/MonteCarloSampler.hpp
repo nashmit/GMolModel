@@ -65,7 +65,8 @@ protected:
     SimTK::Real pe_o;
     SimTK::Real temperature;
     SimTK::Real RT;
-    
+
+    bool useFixman;    
     SimTK::Real fix_o, fix_n;
  
     // Random number generators - not sure if I need two

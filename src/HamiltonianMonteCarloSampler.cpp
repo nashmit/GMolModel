@@ -16,6 +16,7 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
                                      SimTK::TimeStepper *argTimeStepper)
     : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
 {
+    this->useFixman = true;  
     this->fix_n = this->fix_o = 0.0;
     trackStep = 0;
 }
@@ -179,7 +180,7 @@ void HamiltonianMonteCarloSampler::setOldKE(SimTK::Real inpKE)
 }
 
 // Initialize variables (identical to setTVector)
-void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature)
+void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman)
 {
     compoundSystem->realizeTopology();
     //SimTK::State state = compoundSystem->updDefaultState();
@@ -197,8 +198,14 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
     system->realize(someState, SimTK::Stage::Position);
     setTemperature(argTemperature); // Needed for Fixman
     setOldPE(getPEFromEvaluator(someState));
-  
-    setOldFixman(calcFixman(someState));
+
+    this->useFixman = argUseFixman;  
+
+    if(useFixman){
+        setOldFixman(calcFixman(someState));
+    }else{
+        setOldFixman(1);
+    }
     setOldKE(0.0);
   
     randomEngine.seed( std::time(0) );
@@ -234,13 +241,13 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     }
 
     system->realize(someState, SimTK::Stage::Position);
-    std::cout << "Before stepTo Q: " << someState.getQ() << std::endl;
-    std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
+    //std::cout << "Before stepTo Q: " << someState.getQ() << std::endl;
+    //std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
     //std::cout << "HamiltonianMonteCarloSampler::propose SqrtMInvV: " << SqrtMInvV << std::endl;
     SqrtMInvV *= sqrtRT; // Set stddev according to temperature
     someState.updU() = SqrtMInvV;
-    std::cout << "Before stepTo U: " << someState.getU() << std::endl;
+    //std::cout << "Before stepTo U: " << someState.getU() << std::endl;
 
     // Set old kinetic energy
     system->realize(someState, SimTK::Stage::Acceleration);
@@ -263,26 +270,26 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //std::cout << std::endl;
 
     // Get M
-    SimTK::Matrix M(nu, nu);
-    matter->calcM(someState, M);
-    std::cout << "Before stepTo M:" << std::setprecision(3) << std::endl;
-    bool worry_flag = false;
-    for(int i=0; i<nu; i++){
-        //std::cout << "M: ";
-        for(int j=0; j<nu; j++){
-            //std::cout << M(i, j) << " ";
-            if( std::isinf(M(i, j)) ){
-                std::cout << "M(" << i << ", " << j << ") is inf" << std::endl;
-                worry_flag = true;
-                return;
-            }else if( std::isnan(M(i, j)) ){
-                std::cout << "M(" << i << ", " << j << ") is nan" << std::endl;
-                worry_flag = true;
-                return;
-            }
-        }
-        //std::cout << std::endl;
-    }
+    //SimTK::Matrix M(nu, nu);
+    //matter->calcM(someState, M);
+    //std::cout << "Before stepTo M:" << std::setprecision(3) << std::endl;
+    //bool worry_flag = false;
+    //for(int i=0; i<nu; i++){
+    //    //std::cout << "M: ";
+    //    for(int j=0; j<nu; j++){
+    //        //std::cout << M(i, j) << " ";
+    //        if( std::isinf(M(i, j)) ){
+    //            std::cout << "M(" << i << ", " << j << ") is inf" << std::endl;
+    //            worry_flag = true;
+    //            return;
+    //        }else if( std::isnan(M(i, j)) ){
+    //            std::cout << "M(" << i << ", " << j << ") is nan" << std::endl;
+    //            worry_flag = true;
+    //            return;
+    //        }
+    //    }
+    //    //std::cout << std::endl;
+    //}
 
     // Propagate through phase space (integrate)
     //std::cout << "Before stepTo time: " << someState.getTime() << std::endl;
@@ -291,9 +298,9 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //writePdb(*residue, someState, "pdbs", "sb_", 8, "HMCprop", trackStep);
     ++trackStep;
 
-    std::cout << "After  stepTo Q: " << someState.getQ() << std::endl;
-    std::cout << "After  stepTo U: " << someState.getU() << std::endl;
-    std::cout << "After  stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
+    //std::cout << "After  stepTo Q: " << someState.getQ() << std::endl;
+    //std::cout << "After  stepTo U: " << someState.getU() << std::endl;
+    //std::cout << "After  stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
 
     // Get M
     //matter->calcM(someState, M);
@@ -319,18 +326,29 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     propose(someState, timestep, nosteps);
 
     SimTK::Real pe_o  = getOldPE();
-    SimTK::Real fix_o = getOldFixman();
+    if(useFixman){
+        SimTK::Real fix_o = getOldFixman();
+    }
     SimTK::Real ke_o  = getOldKE();
 
-    fix_n = calcFixman(someState);
+    if(useFixman){
+        fix_n = calcFixman(someState);
+    }else{
+        fix_n = 1;
+    }
     SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
     SimTK::Real ke_n = matter->calcKineticEnergy(someState);
 
     // Apply Metropolis criterion
-
+    SimTK::Real etot_o, etot_n;
     assert(!isnan(pe_n));
-    SimTK::Real etot_n = pe_n + ke_n + fix_n;
-    SimTK::Real etot_o = pe_o + ke_o + fix_o;
+    if(useFixman){
+        etot_n = pe_n + ke_n + fix_n;
+        etot_o = pe_o + ke_o + fix_o;
+    }else{
+        etot_n = pe_n + ke_n;
+        etot_o = pe_o + ke_o;
+    }
 
     std::cout<<std::setprecision(10)<<std::fixed;
     std::cout << "pe_o " << pe_o << " ke_o " << ke_o << " fix_o " << fix_o
