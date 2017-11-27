@@ -474,7 +474,8 @@ void Topology::build(
     }
     ///////////////////////////
 
-
+    setRegimen(ictdF, flexFN);
+    /*
     if(ictdF=="IC"){
         std::cout << "General regimen: " << "IC" << std::endl;
         for (unsigned int r=0 ; r<getNumBonds(); r++){
@@ -486,12 +487,12 @@ void Topology::build(
             setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
         }
     }
-
+    */
 
 }
   
 // Set regimen
-void Topology::setRegimen(std::string argRegimen){
+void Topology::setRegimen(std::string argRegimen, std::string flexFN){
     
     if(argRegimen == "IC"){
         for (unsigned int r=0 ; r<getNumBonds(); r++){
@@ -503,6 +504,36 @@ void Topology::setRegimen(std::string argRegimen){
             setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
         }
         std::cout << "Changed regimen to: " << "TD" << std::endl;
+    }else if(argRegimen == "RB"){
+        std::string line;
+        std::ifstream F(flexFN);
+        std::vector<std::string> V;
+        std::vector<std::string>::iterator VIt;
+        int line_i = -1;
+        while(F.good()){
+            line_i++;
+            std::getline(F, line);
+            std::istringstream iss(line);
+            std::string word;
+          
+            if(line_i == 1){ 
+                int word_i = -1;
+                while(iss >> word){
+                    if(word[0] == '#'){
+                        break;
+                    }
+                    word_i++;
+                    V.push_back(std::move(word));
+                }
+            }
+        }
+
+        std::cout << "Topology::setRegimen: ";
+        for ( std::vector<std::string>::iterator VIt = V.begin(); VIt != V.end(); ++VIt){
+            std::cout << *VIt << " " << std::endl;
+        }
+        std::cout << std::endl;
+
     }
     this->regimen = argRegimen;
 }

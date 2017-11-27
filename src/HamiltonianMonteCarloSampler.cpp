@@ -234,13 +234,13 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     }
 
     system->realize(someState, SimTK::Stage::Position);
-    //std::cout << "Before stepTo Q: " << someState.getQ() << std::endl;
-    //std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
+    std::cout << "Before stepTo Q: " << someState.getQ() << std::endl;
+    std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
     //std::cout << "HamiltonianMonteCarloSampler::propose SqrtMInvV: " << SqrtMInvV << std::endl;
     SqrtMInvV *= sqrtRT; // Set stddev according to temperature
     someState.updU() = SqrtMInvV;
-    //std::cout << "Before stepTo U: " << someState.getU() << std::endl;
+    std::cout << "Before stepTo U: " << someState.getU() << std::endl;
 
     // Set old kinetic energy
     system->realize(someState, SimTK::Stage::Acceleration);
@@ -263,16 +263,26 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //std::cout << std::endl;
 
     // Get M
-    //SimTK::Matrix M(nu, nu);
-    //matter->calcM(someState, M);
-    //std::cout << "Before stepTo:" << std::setprecision(3) << std::endl;
-    //for(int i=0; i<nu; i++){
-    //    std::cout << "M: ";
-    //    for(int j=0; j<nu; j++){
-    //        std::cout << M(i, j) << " ";
-    //    }
-    //    std::cout << std::endl;
-    //}
+    SimTK::Matrix M(nu, nu);
+    matter->calcM(someState, M);
+    std::cout << "Before stepTo M:" << std::setprecision(3) << std::endl;
+    bool worry_flag = false;
+    for(int i=0; i<nu; i++){
+        //std::cout << "M: ";
+        for(int j=0; j<nu; j++){
+            //std::cout << M(i, j) << " ";
+            if( std::isinf(M(i, j)) ){
+                std::cout << "M(" << i << ", " << j << ") is inf" << std::endl;
+                worry_flag = true;
+                return;
+            }else if( std::isnan(M(i, j)) ){
+                std::cout << "M(" << i << ", " << j << ") is nan" << std::endl;
+                worry_flag = true;
+                return;
+            }
+        }
+        std::cout << std::endl;
+    }
 
     // Propagate through phase space (integrate)
     //std::cout << "Before stepTo time: " << someState.getTime() << std::endl;
@@ -281,9 +291,9 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //writePdb(*residue, someState, "pdbs", "sb_", 8, "HMCprop", trackStep);
     ++trackStep;
 
-    //std::cout << "After  stepTo Q: " << someState.getQ() << std::endl;
-    //std::cout << "After  stepTo U: " << someState.getU() << std::endl;
-    //std::cout << "After  stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
+    std::cout << "After  stepTo Q: " << someState.getQ() << std::endl;
+    std::cout << "After  stepTo U: " << someState.getU() << std::endl;
+    std::cout << "After  stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
 
     // Get M
     //matter->calcM(someState, M);

@@ -139,7 +139,7 @@ public:
       std::string ictdF="IC"
   );
 
-  void setRegimen(std::string argRegimen);
+  void setRegimen(std::string argRegimen, std::string flexFN);
 
   std::string getname(void){return this->name;}
   void setName(std::string argName){this->name = argName;}

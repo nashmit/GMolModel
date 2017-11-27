@@ -73,6 +73,7 @@ bBond::bBond(void) : intpair(){
   ring_no = 0; // later
   _isFirst = false;
   visited = 0;
+  bondIndex = SimTK::Compound::BondIndex(99999999);
 }
 
 bBond::bBond(int a, int b) : intpair(a, b){
@@ -82,6 +83,7 @@ bBond::bBond(int a, int b) : intpair(a, b){
   ring_no = 0; // later
   _isFirst = false;
   visited = 0;
+  bondIndex = SimTK::Compound::BondIndex(99999999);
 }
 
 bBond::~bBond(void){;}
