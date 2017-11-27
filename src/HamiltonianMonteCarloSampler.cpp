@@ -281,7 +281,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
                 return;
             }
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
     }
 
     // Propagate through phase space (integrate)
