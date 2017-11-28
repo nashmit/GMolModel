@@ -195,12 +195,6 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
                 //this->setAtomBiotype(node->name, (this->name), node->biotype);
                 this->setAtomBiotype(node->name, (this->name).c_str(), node->getName());
 
-std::cout << "Topology: Compound Bonds AtomIndeces: "; ///////////////////////////////////
-for (unsigned int debi = 0 ; debi < getNumBonds(); debi++){
-    std::cout << "(" << getBondAtomIndex(Compound::BondIndex(debi), 0) << ", " << getBondAtomIndex(Compound::BondIndex(debi), 1) << ") ";
-}
-std::cout << std::endl; //////////////////////////////////////////////////////////////////
-
                 // Set bSpecificAtom atomIndex to the last atom added to bond
                 node->atomIndex = getBondAtomIndex(Compound::BondIndex(getNumBonds() - 1), 1) ; // Set bSpecificAtom atomIndex to the last atom added to bond
                 previousNode->atomIndex = getBondAtomIndex(Compound::BondIndex(getNumBonds() - 1), 0) ; // The only time we have to set atomIndex to the previous node
@@ -226,12 +220,6 @@ std::cout << std::endl; ////////////////////////////////////////////////////////
                 this->bondAtom( *(node->bAtomType), (sbuff.str()).c_str(), 0.149, 0);
                 //this->setAtomBiotype(node->name, (this->name), node->biotype);
                 this->setAtomBiotype(node->name, (this->name), node->getName());
-
-std::cout << "Topology: Compound Bonds AtomIndeces: "; ///////////////////////////////////
-for (unsigned int debi = 0 ; debi < getNumBonds(); debi++){
-    std::cout << "(" << getBondAtomIndex(Compound::BondIndex(debi), 0) << ", " << getBondAtomIndex(Compound::BondIndex(debi), 1) << ") ";
-}
-std::cout << std::endl; //////////////////////////////////////////////////////////////////
 
                 // Set bSpecificAtom atomIndex to the last atom added to bond
                 node->atomIndex = getBondAtomIndex(Compound::BondIndex(getNumBonds() - 1), 1) ; // Set bSpecificAtom atomIndex to the last atom added to bond
@@ -390,12 +378,6 @@ void Topology::build(
                 << rightNode->name << "(" << rightNode->getInName() 
                 << ") " << rightNode->number << " " << (otsbuff.str()).c_str() 
                 << " ... " << std::flush;
-
-std::cout << "Topology: Compound Bonds AtomIndeces: "; ///////////////////////////////////
-for (unsigned int debi = 0 ; debi < getNumBonds(); debi++){
-    std::cout << "(" << getBondAtomIndex(Compound::BondIndex(debi), 0) << ", " << getBondAtomIndex(Compound::BondIndex(debi), 1) << ") ";
-}
-std::cout << std::endl; //////////////////////////////////////////////////////////////////
 
             std::cout << "done." << std::endl << std::flush;
         }
