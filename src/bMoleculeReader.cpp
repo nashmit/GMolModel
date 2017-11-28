@@ -118,6 +118,8 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         bAtomList[i].Zero();
 
         bAtomList[i].setNumber(i);
+        //bAtomList[i].setNumber(amberReader->getAtomIndex); // not implemented
+
         str_buf = amberReader->getAtomsName(i);
         boost::trim(str_buf);
         bAtomList[i].setElem(str_buf.at(0));
