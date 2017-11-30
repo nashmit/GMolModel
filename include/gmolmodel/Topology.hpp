@@ -39,76 +39,24 @@ public:
   // Constructor
   Topology();
   Topology(std::string argName);
+
   // Destructor
   virtual ~Topology();
 
-  // In case we already know the graph and order
-  /*
-  void init(
-    SimTK::DuMMForceFieldSubsystem &dumm,
-    int natms,
-    bSpecificAtom *bAtomList,
-    int nbnds,
-    bBond *bonds, // EU
-    bool first_time=true,
-    std::string flexFN="ligand.flex",
-    std::string ictdF="IC"
-  );
-  */
-
   // Set a MolModel and a MolStructure - to be removed
-
   void setMolModel(void);
 
   // Scale all DuMM force field terms by scale_factor
-
   void setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor);
 
   // Scale specific DuMM force field terms by scale_factor
-
   void setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm);
 
-  // Interface
-
   // Set graph
-
   void insertAtom(bSpecificAtom *atom);
   void insertBond(int atom_no1, int atom_no2, int bondOrder);
 
-  // Parameters
-  /*
-  void setDuMMAtomParam(int, SimTK::Real vdw, SimTK::Real well);
-  void setDuMMBondParam(int, int, SimTK::Real k, SimTK::Real equil);
-  void setDuMMAngleParam(int, int, int, SimTK::Real k, SimTK::Real equil);
-
-  void setDuMMDihedralParam(int, int, int, int,
-      int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
-  );
-  void setDuMMDihedralParam(int, int, int, int, 
-      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
-      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
-  );
-  void setDuMMDihedralParam(int, int, int, int, 
-      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
-      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
-      int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
-  );
-
-  void setDuMMImproperParam(int, int, int, int,
-      int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
-  );
-  void setDuMMImproperParam(int, int, int, int, 
-      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
-      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
-  );
-  void setDuMMImproperParam(int, int, int, int, 
-      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
-      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
-      int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
-  );
-  */
-  // Get
-
+  // Interface
   int getNAtoms(void) const;
   int getNBonds(void) const;
 
@@ -125,7 +73,6 @@ public:
   void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode);
 
   // Construct the molecule topology
-  //void walkGraph(bSpecificAtom *root, int baseAtomNumber);
   void walkGraph(bSpecificAtom *root);
 
   // Build Molmodel Compound
@@ -143,6 +90,13 @@ public:
 
   std::string getname(void){return this->name;}
   void setName(std::string argName){this->name = argName;}
+
+  void PrintStaticVars(void){
+      std::cout << "Topology static vars:" 
+          << " regimen " << regimen << " name " << name
+          << " nofProcesses " << nofProcesses << " baseSetFlag " << baseSetFlag << " baseAtomNumber " << baseAtomNumber
+          << std::endl;
+  };
 
 private:
   std::string regimen;

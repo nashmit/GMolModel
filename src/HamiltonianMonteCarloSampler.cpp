@@ -275,9 +275,9 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //std::cout << "Before stepTo M:" << std::setprecision(3) << std::endl;
     //bool worry_flag = false;
     //for(int i=0; i<nu; i++){
-    //    //std::cout << "M: ";
+    //    std::cout << "M: ";
     //    for(int j=0; j<nu; j++){
-    //        //std::cout << M(i, j) << " ";
+    //        std::cout << M(i, j) << " ";
     //        if( std::isinf(M(i, j)) ){
     //            std::cout << "M(" << i << ", " << j << ") is inf" << std::endl;
     //            worry_flag = true;
@@ -288,7 +288,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //            return;
     //        }
     //    }
-    //    //std::cout << std::endl;
+    //    std::cout << std::endl;
     //}
 
     // Propagate through phase space (integrate)

@@ -153,30 +153,35 @@ bool GridForce::dependsOnlyOnPositions() const {
 ////////////////////////////
 ////// SYMBODY SYSTEM //////
 ////////////////////////////
-World::World(bool visual, SimTK::Real visualizerFrequency)
+World::World(int worldIndex, bool visual, SimTK::Real visualizerFrequency)
 {
+    ownWorldIndex = worldIndex;
+    std::cout << "World::World BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl;
     fassno = new int; // External forces
   
-    system = new SimTK::CompoundSystem;
-    matter = new SimTK::SimbodyMatterSubsystem(*system);
-    forces = new SimTK::GeneralForceSubsystem(*system);
+    compoundSystem = new SimTK::CompoundSystem;
+    matter = new SimTK::SimbodyMatterSubsystem(*compoundSystem);
+    forces = new SimTK::GeneralForceSubsystem(*compoundSystem);
 
     if(visual){
-        decorations = new SimTK::DecorationSubsystem(*system);
-        SimTK::Visualizer viz(*system);
-        system->addEventReporter( new SimTK::Visualizer::Reporter(viz, visualizerFrequency));
+        decorations = new SimTK::DecorationSubsystem(*compoundSystem);
+        SimTK::Visualizer viz(*compoundSystem);
+        vizReporter = new SimTK::Visualizer::Reporter(viz, visualizerFrequency);
+        compoundSystem->addEventReporter( vizReporter );
     }
   
-    forceField = new SimTK::DuMMForceFieldSubsystem(*system);
+    forceField = new SimTK::DuMMForceFieldSubsystem(*compoundSystem);
     //forceField->loadAmber99Parameters();
-    integ = new SimTK::VerletIntegrator(*system);
-    ts = new SimTK::TimeStepper(*system, *integ);
+    integ = new SimTK::VerletIntegrator(*compoundSystem);
+    ts = new SimTK::TimeStepper(*compoundSystem, *integ);
 
     moleculeCount = -1;
+    std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
 }
 
 void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF)
 {
+    std::cout << "World::AddMolecule BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl;
     moleculeCount++; // Used for unique names of molecules
 
     this->rbFN = rbFN;
@@ -187,37 +192,23 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
     std::vector<bMoleculeReader> moleculeCopies; // One copy per regimen
     std::vector<Topology> topologyCopies; // One copy per regimen
  
-    //mr1 = new bMoleculeReader(amberReader, rbFN.c_str());
     moleculeCopies.push_back(bMoleculeReader(amberReader, rbFN.c_str()));
-    //mr2 = new bMoleculeReader(amberReader, rbFN.c_str());
     moleculeReaders.push_back(moleculeCopies);
 
     std::cout << "World::AddMolecule add parameters" << std::endl;
-    //bAddAllParams("lig1", amberReader, *forceField, mr1->bAtomList, mr1->bonds);
     bAddAllParams(std::string("lig") + std::to_string(moleculeCount), amberReader, *forceField, (moleculeReaders.back().back()).bAtomList, (moleculeReaders.back().back()).bonds);
   
-    //std::cout << "Add parameters for lig2" << std::endl;
-    //for(int i = 0; i < mr2->natoms; i++){
-    //  (mr2->bAtomList[i]).setX((mr2->bAtomList[i]).getX() + 5.0); // nm
-    //}
-    //bAddAllParams("lig2", amberReader, *forceField, mr2->bAtomList, mr2->bonds);
-    
     std::cout << "World::AddMolecule add Compound" << std::endl;
-    //lig1 = new Topology("lig1");
     topologyCopies.push_back(Topology(std::string("lig") + std::to_string(moleculeCount)));
-    //lig2 = new Topology("lig2");
     topologies.push_back(topologyCopies);
   
     std::cout << "World::AddMolecule build Compound" << std::endl;
-    //lig1->build(*forceField, mr1->natoms, mr1->bAtomList, mr1->nbonds, mr1->bonds, flexFN, ictdF);
     (topologies.back().back()).build(*forceField, (moleculeReaders.back().back()).natoms, (moleculeReaders.back().back()).bAtomList, (moleculeReaders.back().back()).nbonds, (moleculeReaders.back().back()).bonds, flexFN, ictdF);
-    //lig2->build(*forceField, mr2->natoms, mr2->bAtomList, mr2->nbonds, mr2->bonds, flexFN, ictdF);
   
-    std::cout << "World::AddMolecule adopt Compound" << std::endl;
-    system->adoptCompound(topologies.back().back());
-    //system->adoptCompound(*lig2, SimTK::Transform(SimTK::Vec3(-0.5, 0, 0)) * SimTK::Transform(SimTK::Rotation(0.1, SimTK::YAxis)));
+    std::cout << "World::AddMolecule adopt Compound " << &(topologies.back().back()) << std::endl;
+    compoundSystem->adoptCompound(topologies.back().back());
     std::cout << "World::AddMolecule realizeTopology" << std::endl;
-    system->realizeTopology();
+    compoundSystem->realizeTopology();
 
     std::cout << "Number of included atoms in nonbonded interactions: " << forceField->getNumNonbondAtoms() << std::endl;
     std::cout << "getVdwGlobalScaleFactor() " << forceField->getVdwGlobalScaleFactor() << std::endl;
@@ -229,19 +220,21 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
             << std::endl;
     }
   
+    std::cout << "World::AddMolecule END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
 }
 
 // Initialize simulation
 void World::Init(void)
 {
     // Only model after loading all the compounds
+    std::cout << "World::Init BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl;
     std::cout << "World::Init model Compound" << std::endl;
-    system->modelCompounds();
+    compoundSystem->modelCompounds();
 
     // Generate a nonbonded list
     /*
     forceField->clearIncludedNonbondAtomList();
-    system->realizeTopology();
+    compoundSystem->realizeTopology();
     for(SimTK::DuMM::AtomIndex dummAIxA(0); dummAIxA < forceField->getNumAtoms(); ++dummAIxA){
         SimTK::MobilizedBodyIndex mobodIxA = forceField->getAtomBody(dummAIxA);
         SimTK::Vec3 stationA = forceField->getAtomStationOnBody(dummAIxA);
@@ -261,8 +254,8 @@ void World::Init(void)
     }
     */
    
-    //SimTK::State state = system->updDefaultState();
-    //ts->initialize(system->getDefaultState());
+    //SimTK::State state = compoundSystem->updDefaultState();
+    //ts->initialize(compoundSystem->getDefaultState());
   
     forceField->setVdw12ScaleFactor(0.0);
     forceField->setVdw13ScaleFactor(0.0);
@@ -274,7 +267,7 @@ void World::Init(void)
     forceField->setCoulomb15ScaleFactor(1.0);
     forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
   
-    //lig1->setSpecificDuMMScaleFactor(*forceField);
+    //->setSpecificDuMMScaleFactor(*forceField);
     //forceField->setBondStretchGlobalScaleFactor(0.0);
     //forceField->setBondBendGlobalScaleFactor(0.0);
     //forceField->setBondTorsionGlobalScaleFactor(0.0);
@@ -296,16 +289,32 @@ void World::Init(void)
     //
   
     *fassno = 0;
-    ExtForce = new SimTK::Force::Custom(*forces, new GridForce(system, *matter, fassno, this));
+    ExtForce = new SimTK::Force::Custom(*forces, new GridForce(compoundSystem, *matter, fassno, this));
   
     #ifdef TRY_TO_USE_OPENMM
-        forceField->setUseOpenMMAcceleration(true);
+        //forceField->setUseOpenMMAcceleration(true);
     #endif
-    forceField->setTracing(true); // log OpenMM info to console
+    //forceField->setTracing(true); // log OpenMM info to console
     forceField->setNumThreadsRequested(1); // don't use this unless
   
-    system->realizeTopology();
+    std::cout << "World::Init POINTERS: ownWorldIndex: " << this->ownWorldIndex << ":" << std::endl
+        << " System " << &(matter->getSystem()) << std::endl
+        << " System::Guts " << &((matter->getSystem()).getSystemGuts()) << std::endl
+        << " CompoundSystem " << compoundSystem << std::endl
+        << " SimbodyMatterSubsystem " << matter << std::endl
+        << " GeneralForceSubsystem " << forces << std::endl
+        << " MultibodySubsystem " << &(forces->getMultibodySystem()) << std::endl
+        << " DecorationSubsystem " << decorations << std::endl
+        << " Visualizer " << &viz << std::endl
+        << " vizReporter " << vizReporter << std::endl
+        << " DuMMForceFieldSubsystem " << forceField << std::endl
+        << " VerletIntegrator " << integ << std::endl
+        << " TimeStepper " << ts << std::endl
+        << std::endl;
 
+    compoundSystem->realizeTopology();
+
+    std::cout << "World::Init END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
 }//end of InitSimulation
 
 
@@ -317,6 +326,28 @@ const Topology& World::getTopology(int moleculeNumber, int moleculeCopy) const{
 Topology& World::updTopology(void){
     assert(!"Not implemented");
 }
+
+
+std::vector<SimTK::Vec3> World::getAtomsLocationsInGround(void)
+{
+    assert(!"Not implemented");
+}
+
+void World::setAtomsLocations(std::vector<SimTK::Vec3>)
+{
+    assert(!"Not implemented");
+}
+
+
+
+
+
+
+
+
+
+
+
 
 // Advance
 void World::Advance(int nosteps){

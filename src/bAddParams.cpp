@@ -12,7 +12,7 @@ void bAddBiotypes(
     // Add Biotypes
     for(int i=0; i<amberReader->getNumberAtoms(); i++){
 
-       if (! SimTK::Biotype::exists(resName.c_str(), bAtomList[i].name, SimTK::Ordinality::Any) ){
+       //if (! SimTK::Biotype::exists(resName.c_str(), bAtomList[i].name, SimTK::Ordinality::Any) ){
             SimTK::BiotypeIndex biotypeIndex = SimTK::Biotype::defineBiotype(
                   SimTK::Element(
                       bAtomList[i].getAtomicNumber()
@@ -29,11 +29,11 @@ void bAddBiotypes(
             std::cout << " bAddParams: Defined Biotype: " 
                 << resName << bAtomList[i].name << " " << SimTK::Ordinality::Any << "|" 
                 << " with BiotypeIndex " << bAtomList[i].getBiotypeIndex() << std::endl;
-        }else{
-            std::cout << " bAddParams: Biotype already set: " 
-                << resName << bAtomList[i].name << " " << SimTK::Ordinality::Any << "|" 
-                << " with BiotypeIndex " << bAtomList[i].getBiotypeIndex() << std::endl;
-        }
+        //}else{
+        //    std::cout << " bAddParams: Biotype already set: " 
+        //        << resName << bAtomList[i].name << " " << SimTK::Ordinality::Any << "|" 
+        //        << " with BiotypeIndex " << bAtomList[i].getBiotypeIndex() << std::endl;
+        //}
 
     }
 }
