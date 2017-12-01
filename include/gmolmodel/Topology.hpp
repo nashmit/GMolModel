@@ -98,12 +98,27 @@ public:
           << std::endl;
   };
 
+  void loadMaps(void);
+
+  std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > getMbx2aIx(void){
+      return mbx2aIx;
+  }
+
+  std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > getAIx2mbx(void){
+      return aIx2mbx;
+  }
+
 private:
   std::string regimen;
   std::string name;
   int nofProcesses;
   int baseSetFlag;
   int baseAtomNumber;
+
+  // Map mbx2aIx contains only atoms at the origin of mobods
+  std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > mbx2aIx;
+  std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > aIx2mbx;
+
 };
 
 

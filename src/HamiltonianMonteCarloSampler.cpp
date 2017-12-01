@@ -242,7 +242,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 
     system->realize(someState, SimTK::Stage::Position);
     //std::cout << "Before stepTo Q: " << someState.getQ() << std::endl;
-    //std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
+    std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
     //std::cout << "HamiltonianMonteCarloSampler::propose SqrtMInvV: " << SqrtMInvV << std::endl;
     SqrtMInvV *= sqrtRT; // Set stddev according to temperature
@@ -356,7 +356,6 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_o) " << exp(-(etot_n - etot_o) / RT)
         << " etot_n " << etot_n << " etot_o " << etot_o;
 
-
     if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
         std::cout << " 1 " ;
         setTVector(someState);
@@ -365,7 +364,6 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         setOldFixman(fix_n);
         someState.updU() = 0.0;
         setOldKE(0.0);
-        
     }else{ // Reject
         std::cout << " 0 " ;
         assignConfFromTVector(someState);

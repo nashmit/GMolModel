@@ -493,7 +493,19 @@ void Topology::setRegimen(std::string argRegimen, std::string flexFN){
     this->regimen = argRegimen;
 }
 
-
+// Load MobilizedBody vs Compound::AtomIndex maps
+void Topology::loadMaps(void){
+    // Load MobilizedBodyIndex vs CompoundAtomIndex maps. 
+    // These contain only atoms at the origin of mobods
+    for (SimTK::Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
+        SimTK::MobilizedBodyIndex mbx = getAtomMobilizedBodyIndex(aIx);
+        if(getAtomLocationInMobilizedBodyFrame(aIx) == 0){
+            std::pair<SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > pairToBeInserted(mbx, aIx);
+            mbx2aIx.insert(pairToBeInserted);
+        }
+        aIx2mbx.insert(std::pair< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex >(aIx, mbx));
+    }
+}
 
 
 

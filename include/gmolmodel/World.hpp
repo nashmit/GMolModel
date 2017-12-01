@@ -151,8 +151,8 @@ class World{
   SimTK::Visualizer::Reporter *vizReporter;
   SimTK::DuMMForceFieldSubsystem *forceField;
 
-  std::vector< std::vector<bMoleculeReader> > moleculeReaders;
-  std::vector< std::vector<Topology> > topologies;
+  std::vector<bMoleculeReader> moleculeReaders;
+  std::vector<Topology> topologies;
 
   SimTK::Visualizer *viz;
   #ifdef NOSETHERMOS
@@ -179,11 +179,11 @@ class World{
 
   void Init(void);
 
-  std::vector<SimTK::Vec3> getAtomsLocationsInGround(void);
-  void setAtomsLocations(std::vector<SimTK::Vec3>);
+  std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > >  getAtomsLocationsInGround(const SimTK::State & state);
+  SimTK::State& setAtomsLocationsInGround(std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations);
   
   // Interface
-  const Topology& getTopology(int moleculeNumber, int moleculeCopy) const;
+  const Topology& getTopology(int moleculeNumber) const;
   Topology& updTopology(void);
 
   // Manages the TimeStepper actions

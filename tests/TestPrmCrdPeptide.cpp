@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
     // Initialize sampler
     srand (time(NULL));
-    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->compoundSystem, p_world->matter, (SimTK::Compound *)(&(p_world->getTopology(0, 0))), p_world->forceField, p_world->forces, p_world->ts);
+    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->compoundSystem, p_world->matter, (SimTK::Compound *)(&(p_world->getTopology(0))), p_world->forceField, p_world->forces, p_world->ts);
 
     Context *context = new Context();
     context->AddWorld(p_world, p_HMCsampler);
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 
         if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
             for(int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                writePdb( ((SimTK::Compound)(world->getTopology(mol_i, 0))),
+                writePdb( ((SimTK::Compound)(world->getTopology(mol_i))),
                     integAdvancedState, 
                     "pdbs", "sb_",
                     8, 
