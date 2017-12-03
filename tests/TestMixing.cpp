@@ -160,6 +160,15 @@ int main(int argc, char **argv)
     for(int i = 0; i < total_mcsteps; i += round_mcsteps){
         j += 2;
         //std::cout << "WORLD 0 +++++++++++++++++++" << std::endl;
+
+        if(i > 0){
+            integAdvancedState0 = world0->setAtomsLocationsInGround(integAdvancedState0, world1->getAtomsLocationsInGround(integAdvancedState1));
+            //// Automatically accept and assign old values
+            p_HMCsampler0->reinitialize( integAdvancedState0, 
+                free_timestep, total_mcsteps,
+                SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
+        }
+
         for(int k = 0; k < free_mix_mcsteps; k++){
             p_HMCsampler0->update(integAdvancedState0, free_timestep, free_mdsteps);
             if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
@@ -180,8 +189,7 @@ int main(int argc, char **argv)
 
         //// Automatically accept and assign old values
         p_HMCsampler1->reinitialize( integAdvancedState1, 
-            std::stod(setupReader.getValues("CONS_TIMESTEP")[0]),
-            std::stoi(setupReader.getValues("STEPS")[0]),
+            cons_timestep, total_mcsteps,
             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
         //std::cout << "integAdvancedState0.getQ() after: " << integAdvancedState0.getQ() << std::endl;
         //std::cout << "integAdvancedState1.getQ() after" << integAdvancedState1.getQ() << std::endl;
