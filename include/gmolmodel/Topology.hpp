@@ -108,6 +108,8 @@ public:
       return aIx2mbx;
   }
 
+  void writePdb(std::string dirname, std::string prefix, std::string sufix, int maxNofDigits, int index) const;
+
 private:
   std::string regimen;
   std::string name;
@@ -118,7 +120,7 @@ private:
   // Map mbx2aIx contains only atoms at the origin of mobods
   std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > mbx2aIx;
   std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > aIx2mbx;
-  std::map< SimTK::Compound::AtomIndex, int > aIx2number;
+  //std::map< SimTK::Compound::AtomIndex, int > aIx2number;
 
 };
 

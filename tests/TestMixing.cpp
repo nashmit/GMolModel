@@ -172,10 +172,12 @@ int main(int argc, char **argv)
         for(int k = 0; k < free_mix_mcsteps; k++){
             p_HMCsampler0->update(integAdvancedState0, free_timestep, free_mdsteps);
             if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
+                world0->updateAtomLists(integAdvancedState0);
                 for(int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                    writePdb( ((SimTK::Compound)(world0->getTopology(mol_i))), 
-                    integAdvancedState0, "pdbs", "sb_", 10, 
-                    (std::string("HMC") + std::to_string(mol_i)).c_str(), j-1);
+                    (world0->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, j-1);
+                    //writePdb( ((SimTK::Compound)(world0->getTopology(mol_i))), 
+                    //    integAdvancedState0, "pdbs", "sb_", 10, 
+                    //    (std::string("HMC") + std::to_string(mol_i)).c_str(), j-1);
                 }
             }
         }
@@ -198,10 +200,12 @@ int main(int argc, char **argv)
         for(int k = 0; k < cons_mix_mcsteps; k++){
             p_HMCsampler1->update(integAdvancedState1, cons_timestep, cons_mdsteps);
             if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
+                world1->updateAtomLists(integAdvancedState1);
                 for(int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                    writePdb( ((SimTK::Compound)(world1->getTopology(mol_i))),
-                        integAdvancedState1, "pdbs", "sb_", 10, 
-                        (std::string("HMC") + std::to_string(mol_i)).c_str(), j);
+                    (world1->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, j);
+                    //writePdb( ((SimTK::Compound)(world1->getTopology(mol_i))),
+                    //    integAdvancedState1, "pdbs", "sb_", 10, 
+                    //    (std::string("HMC") + std::to_string(mol_i)).c_str(), j);
                 }
             }
         }

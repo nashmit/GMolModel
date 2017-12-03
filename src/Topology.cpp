@@ -504,16 +504,48 @@ void Topology::loadMaps(void){
             mbx2aIx.insert(pairToBeInserted);
         }
         aIx2mbx.insert(std::pair< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex >(aIx, mbx));
-        for(int i = 0; i< getNumAtoms(); i++){
-            if(bAtomList.atomIndex == aIx){
-                aIx2number.insert(std::pair< SimTK::Compound::AtomIndex, int >(aIx, bAtomList[i].number));
-                break;
-            }
-        }
+        //for(int i = 0; i< getNumAtoms(); i++){
+        //    if((bAtomList[i]).atomIndex == aIx){
+        //        aIx2number.insert(std::pair< SimTK::Compound::AtomIndex, int >(aIx, (bAtomList[i]).number));
+        //        break;
+        //    }
+        //}
     }
 }
 
+void Topology::writePdb(std::string dirname, std::string prefix, std::string sufix, int maxNofDigits, int index) const
+{
+    int nofDigits = (int) floor(log10(index));
+    std::string zeros("");
+    if(maxNofDigits > nofDigits){
+        for(int i = 0; i < (maxNofDigits - nofDigits); i++){
+            zeros += std::string("0");
+        }
+    }
+    std::stringstream sstream;
+    sstream << dirname << "/" << prefix << zeros << std::to_string(index) << sufix;
+    string ofilename = sstream.str();
 
+    FILE *oF = fopen (ofilename.c_str(),"w");
+    // Pdb lines
+    for(int i = 0; i < getNumAtoms(); i++){
+        fprintf(oF, "%-6s%5d %4s %3s %c%4d    %8.3f%8.3f%8.3f  %4.2f%6.2f          %2s\n"
+            , "ATOM"                 // record
+            , i                      // index
+            , bAtomList[i].inName  // name
+            , "UNK"                  // residue name
+            , 'A'                    // chain
+            , 1                      // residue index
+            , bAtomList[i].getX()    // x
+            , bAtomList[i].getY()    // y
+            , bAtomList[i].getZ()    // z
+            , 1.0                    // occupancy
+            , 0.0                    // beta factor
+            , "  ");                 // element
+    }
+
+    fclose(oF);
+}
 
 
 

@@ -180,7 +180,10 @@ class World{
   void Init(void);
 
   std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > >  getAtomsLocationsInGround(const SimTK::State&);
+
   SimTK::State& setAtomsLocationsInGround(SimTK::State&, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations);
+
+  void updateAtomLists(const SimTK::State&);
  
   void PrintSimbodyStateCache(SimTK::State&);
  
