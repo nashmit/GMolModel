@@ -28,8 +28,12 @@ public:
     void calcSqrtMInvU(SimTK::State& someState, SimTK::Matrix& SqrtMInv);
     // Calculate sqrt(M) using Eigen
     void calcNumSqrtMUpper(SimTK::State& someState, SimTK::Matrix& SqrtMUpper);
+
     // Initialize variables (like TVector)
     void initialize(SimTK::State& advanced, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman = true); 
+
+    // Initialize variables (like TVector)
+    void reinitialize(SimTK::State& advanced, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature); 
 
     // Assign a random conformation. Time measured in picoseconds
     void propose(SimTK::State& someState, SimTK::Real timestep, int nosteps);

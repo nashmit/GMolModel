@@ -227,7 +227,7 @@ void World::Init(void)
     compoundSystem->modelCompounds();
 
     // Load MobilizedBodyIndex vs Compound::AtomIndex maps 
-    for ( int i = 0; i < this->topologies.size(); i++){
+    for ( unsigned int i = 0; i < this->topologies.size(); i++){
         ((this->topologies)[i]).loadMaps();
     }
 
@@ -336,7 +336,7 @@ std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > World::get
     std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > returnVector;
 
     // Iterate through topologies
-    for ( int i = 0; i < this->topologies.size(); i++){
+    for ( unsigned int i = 0; i < this->topologies.size(); i++){
         std::vector<std::pair<bSpecificAtom *, SimTK::Vec3>> currentTopologyInfo;
         // Iterate through atoms
         for(int j = 0; j < topologies[i].getNumAtoms(); j++){
@@ -351,16 +351,19 @@ std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > World::get
 }
 
 // 
-SimTK::State& World::setAtomsLocationsInGround(std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations)
+SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations)
 {
     //(matter->getSystem()).invalidateSystemTopologyCache();
 
+    //std::cout << "World::setAtomsLocationsInGround BEGIN" << std::endl;
+    //PrintSimbodyStateCache(someState);
+    
     // Iterate through molecules/topologies
-    for(int i = 0; i < otherWorldsAtomsLocations.size(); i++){
+    for(unsigned int i = 0; i < otherWorldsAtomsLocations.size(); i++){
 
         std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
         std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
-        for(int j = 0; j < currentTopology.size(); j++){
+        for(unsigned int j = 0; j < currentTopology.size(); j++){
 
             SimTK::Compound::AtomIndex atomIndex = ((currentTopology[j]).first)->atomIndex;
             SimTK::Vec3 location = ((currentTopology[j]).second);
@@ -428,9 +431,7 @@ SimTK::State& World::setAtomsLocationsInGround(std::vector< std::vector< std::pa
         // Set stations and AtomPLacements for atoms in DuMM
         for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i].getNumAtoms(); ++aIx){
             SimTK::MobilizedBodyIndex mbx = topologies[i].getAtomMobilizedBodyIndex(aIx);
-            //SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
                 SimTK::DuMM::AtomIndex dAIx = topologies[i].getDuMMAtomIndex(aIx);
-                //SimTK::Transform topologies[i] BAt_X_atom = topologies[i].getFrameInMobilizedBodyFrame(aIx);
                 forceField->bsetAtomStationOnBody( dAIx, locs[int(aIx)] );
                 forceField->updIncludedAtomStation(dAIx) = (locs[int(aIx)]);
                 forceField->bsetAtomPlacementStation(dAIx, mbx, locs[int(aIx)] );
@@ -451,13 +452,23 @@ SimTK::State& World::setAtomsLocationsInGround(std::vector< std::vector< std::pa
     } // END iterating through molecules/topologies
 
     this->compoundSystem->realizeTopology();
-    SimTK::State& astate = compoundSystem->updDefaultState();
-    compoundSystem->realize(astate, SimTK::Stage::Position);
-    return astate;
+    someState = compoundSystem->updDefaultState();
 
+    //std::cout << "World::setAtomsLocationsInGround State Cache at the END:" << std::endl;
+    //PrintSimbodyStateCache(someState);
+    //std::cout << "World::setAtomsLocationsInGround END" << std::endl;
+
+    return someState;
 }
 
-
+void World::PrintSimbodyStateCache(SimTK::State& someState){
+    std::cout << " System Stage: " << someState.getSystemStage() << std::endl;
+    for(int i = 0; i < someState.getNumSubsystems(); i++){
+        std::cout << " Subsystem " << i << " Name: " << someState.getSubsystemName(SimTK::SubsystemIndex(i))
+            << " Stage: " << someState.getSubsystemStage(SimTK::SubsystemIndex(i))
+            << " Version: " << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
+    }
+}
 
 
 

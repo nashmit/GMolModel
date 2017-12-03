@@ -194,7 +194,6 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
         i++;
     }
   
-  
     system->realize(someState, SimTK::Stage::Position);
     setTemperature(argTemperature); // Needed for Fixman
     setOldPE(getPEFromEvaluator(someState));
@@ -216,6 +215,47 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
     // reinitialize the Integrator.
     //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
 
+}
+
+// Initialize variables (identical to setTVector)
+void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature)
+{
+    //compoundSystem->realizeTopology();
+    //system->realize(someState, SimTK::Stage::Instance);
+
+    //someState.advanceSystemToStage(SimTK::Stage::Instance);
+    //someState.invalidateAllCacheAtOrAbove(SimTK::Stage::Instance);
+
+    int nu = someState.getNU();
+    SimTK::Vector V(nu);
+    SimTK::Vector SqrtMInvV(nu);
+    system->realize(someState, SimTK::Stage::Position);
+    matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
+    system->realize(someState, SimTK::Stage::Acceleration);
+    setOldFixman(calcFixman(someState));
+
+    int i = 0;
+    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+        const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
+        TVector[i] = mobod.getMobilizerTransform(someState);
+        i++;
+    }
+
+    setTemperature(argTemperature); // Needed for Fixman
+
+    //system->realize(someState, SimTK::Stage::Dynamics);
+
+    setOldPE(getPEFromEvaluator(someState));
+
+    //setOldFixman(calcFixman(someState));
+
+    setOldKE(0.0);
+  
+    // After an event handler has made a discontinuous change to the 
+    // Integrator's "advanced state", this method must be called to 
+    // reinitialize the Integrator.
+    //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
 }
 
 

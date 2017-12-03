@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 
     // Initialize samplers 
     p_HMCsampler1->initialize( integAdvancedState1, 
-       std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
+       std::stod(setupReader.getValues("CONS_TIMESTEP")[0]),
        std::stoi(setupReader.getValues("STEPS")[0]),
        SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
        true );
@@ -139,77 +139,65 @@ int main(int argc, char **argv)
     World *world0 = context->getWorld(0);
     World *world1 = context->getWorld(1);
 
-    //world0->/forceField->dump();
-    //world0->forceField->dumpCForceFieldParameters(std::cout);
-    //world0->system->realize(integAdvancedState, SimTK::Stage::Dynamics);
     std::cout << "World 0 Initial const state PE: " << std::setprecision(20)
         << world0->forces->getMultibodySystem().calcPotentialEnergy(constRefState0)<< std::endl;
     std::cout << "World 1 Initial const state PE: " << std::setprecision(20)
         << world1->forces->getMultibodySystem().calcPotentialEnergy(constRefState1)<< std::endl;
 
-    // Simulate
+    // Simulate - STEPS = MIXING STEPS
+    int free_mix_mcsteps = std::stoi(setupReader.getValues("FREE_MIXMCSTEPS")[0]);
+    int cons_mix_mcsteps = std::stoi(setupReader.getValues("CONS_MIXMCSTEPS")[0]);
+    int total_mcsteps = std::stoi(setupReader.getValues("STEPS")[0]);
+    assert( (!(total_mcsteps % free_mix_mcsteps)) &&
+            (!(total_mcsteps % cons_mix_mcsteps)) && 
+            "Total number of steps must be divisible with free and cons MC steps within a round." );
+    int round_mcsteps = free_mix_mcsteps + cons_mix_mcsteps;
+    SimTK::Real free_timestep = std::stod(setupReader.getValues("FREE_TIMESTEP")[0]);
+    int free_mdsteps = std::stoi(setupReader.getValues("FREE_MDSTEPS")[0]);
+    SimTK::Real cons_timestep = std::stod(setupReader.getValues("CONS_TIMESTEP")[0]);
+    int cons_mdsteps = std::stoi(setupReader.getValues("CONS_MDSTEPS")[0]);
     int j = -1;
-    for(int i = 0; i < std::stoi(setupReader.getValues("STEPS")[0]); i++){
+    for(int i = 0; i < total_mcsteps; i += round_mcsteps){
         j += 2;
-
-        std::cout << "WORLD 0" << std::endl;
-        p_HMCsampler0->update(integAdvancedState0, std::stod(setupReader.getValues("FREE_TIMESTEP")[0]), std::stoi(setupReader.getValues("FREE_MDSTEPS")[0]) );
-        if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
-            for(int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                //std::cout << "world0 coords at step " << j << ":"<< std::endl;
-                //std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > worldAtomsLocations 
-                //    = world0->getAtomsLocationsInGround(integAdvancedState0);
-                //std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > atomsLocations = worldAtomsLocations[0];
-                //std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> >::iterator atomsLocationsIt;
-                //for(atomsLocationsIt = atomsLocations.begin(); atomsLocationsIt != atomsLocations.end(); ++atomsLocationsIt){
-                //    std::cout << ((*atomsLocationsIt).first)->name << " " << (*atomsLocationsIt).second << std::endl;
-                //} 
-                writePdb( ((SimTK::Compound)(world0->getTopology(mol_i))), integAdvancedState0, "pdbs", "sb_", 8, (std::string("HMC") + std::to_string(mol_i)).c_str(), j-1);
+        //std::cout << "WORLD 0 +++++++++++++++++++" << std::endl;
+        for(int k = 0; k < free_mix_mcsteps; k++){
+            p_HMCsampler0->update(integAdvancedState0, free_timestep, free_mdsteps);
+            if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
+                for(int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+                    writePdb( ((SimTK::Compound)(world0->getTopology(mol_i))), 
+                    integAdvancedState0, "pdbs", "sb_", 10, 
+                    (std::string("HMC") + std::to_string(mol_i)).c_str(), j-1);
+                }
             }
         }
 
-        std::cout << "WORLD 1" << std::endl;
-        p_HMCsampler1->update(integAdvancedState1, std::stod(setupReader.getValues("CONS_TIMESTEP")[0]), std::stoi(setupReader.getValues("FREE_MDSTEPS")[0]) );
-        if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
-            for(int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                //std::cout << "world1 coords at step " << j << " before change:"<< std::endl;
-                //std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > worldAtomsLocations 
-                //    = world1->getAtomsLocationsInGround(integAdvancedState1);
-                //std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > atomsLocations = worldAtomsLocations[0];
-                //std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> >::iterator atomsLocationsIt;
-                //for(atomsLocationsIt = atomsLocations.begin(); atomsLocationsIt != atomsLocations.end(); ++atomsLocationsIt){
-                //    std::cout << ((*atomsLocationsIt).first)->name << " " << (*atomsLocationsIt).second << std::endl;
-                //} 
-                writePdb( ((SimTK::Compound)(world1->getTopology(mol_i))), integAdvancedState1, "pdbs", "sb_", 8, (std::string("HMC") + std::to_string(mol_i)).c_str(), j);
-            }
+        //std::cout << "WORLD 1" << std::endl;
+        //std::cout << "integAdvancedState0.getQ() before: " << integAdvancedState0.getQ() << std::endl;
+        //std::cout << "integAdvancedState1.getQ() before" << integAdvancedState1.getQ() << std::endl;
+        //std::cout << "MOD (WORLD1) PE before: " << world1->forces->getMultibodySystem().calcPotentialEnergy(integAdvancedState1) << std::endl;
 
-            //std::cout << "MOD PE before: " << world1->forces->getMultibodySystem().calcPotentialEnergy(integAdvancedState1) << std::endl;
-            std::cout << "MOD Q before: " << integAdvancedState1.getQ() << std::endl;
-            integAdvancedState1 = world1->setAtomsLocationsInGround(world0->getAtomsLocationsInGround(integAdvancedState0));
-            (world1->matter->getSystem()).realize(integAdvancedState1, SimTK::Stage::Dynamics);
+        integAdvancedState1 = world1->setAtomsLocationsInGround(integAdvancedState1, world0->getAtomsLocationsInGround(integAdvancedState0));
 
-            // Automatically accept and assign old values
-            p_HMCsampler1->setTVector(integAdvancedState1);
-            p_HMCsampler1->setOldPE(world1->forces->getMultibodySystem().calcPotentialEnergy(integAdvancedState1));
-            //p_HMCsampler1->setOldFixman(p_HMCsampler1->calcFixman(integAdvancedState1));
-            //integAdvancedState1.updU() = 0.0;
-            p_HMCsampler1->setOldKE(0.0);
+        //// Automatically accept and assign old values
+        p_HMCsampler1->reinitialize( integAdvancedState1, 
+            std::stod(setupReader.getValues("CONS_TIMESTEP")[0]),
+            std::stoi(setupReader.getValues("STEPS")[0]),
+            SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
+        //std::cout << "integAdvancedState0.getQ() after: " << integAdvancedState0.getQ() << std::endl;
+        //std::cout << "integAdvancedState1.getQ() after" << integAdvancedState1.getQ() << std::endl;
+        //std::cout << "MOD (WORLD1) PE after: " << world1->forces->getMultibodySystem().calcPotentialEnergy(integAdvancedState1) << std::endl;
 
-            //std::cout << "MOD PE after: " << world1->forces->getMultibodySystem().calcPotentialEnergy(integAdvancedState1) << std::endl;
-            std::cout << "MOD Q after: " << integAdvancedState1.getQ() << std::endl;
-
-            for(int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                //std::cout << "world1 coords at step " << j << " after change:"<< std::endl;
-                //std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > worldAtomsLocations 
-                //    = world1->getAtomsLocationsInGround(world1->integ->updAdvancedState());
-                //std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > atomsLocations = worldAtomsLocations[0];
-                //std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> >::iterator atomsLocationsIt;
-                //for(atomsLocationsIt = atomsLocations.begin(); atomsLocationsIt != atomsLocations.end(); ++atomsLocationsIt){
-                //    std::cout << ((*atomsLocationsIt).first)->name << " " << (*atomsLocationsIt).second << std::endl;
-                //} 
-                writePdb( ((SimTK::Compound)(world1->getTopology(mol_i))), integAdvancedState1, "pdbs", "sb_", 8, (std::string("HMCmod") + std::to_string(mol_i)).c_str(), j);
+        for(int k = 0; k < cons_mix_mcsteps; k++){
+            p_HMCsampler1->update(integAdvancedState1, cons_timestep, cons_mdsteps);
+            if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
+                for(int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+                    writePdb( ((SimTK::Compound)(world1->getTopology(mol_i))),
+                        integAdvancedState1, "pdbs", "sb_", 10, 
+                        (std::string("HMC") + std::to_string(mol_i)).c_str(), j);
+                }
             }
         }
+        //std::cout << "END ============================" << std::endl;
 
     } // for i in MC steps
 
