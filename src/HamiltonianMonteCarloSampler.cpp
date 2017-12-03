@@ -282,7 +282,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 
     system->realize(someState, SimTK::Stage::Position);
     //std::cout << "Before stepTo Q: " << someState.getQ() << std::endl;
-    std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
+    //std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
     //std::cout << "HamiltonianMonteCarloSampler::propose SqrtMInvV: " << SqrtMInvV << std::endl;
     SqrtMInvV *= sqrtRT; // Set stddev according to temperature
@@ -390,11 +390,11 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         etot_o = pe_o + ke_o;
     }
 
-    std::cout<<std::setprecision(10)<<std::fixed;
-    std::cout << "pe_o " << pe_o << " ke_o " << ke_o << " fix_o " << fix_o
-        << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
-        //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_o) " << exp(-(etot_n - etot_o) / RT)
-        << " etot_n " << etot_n << " etot_o " << etot_o;
+    //std::cout<<std::setprecision(10)<<std::fixed;
+    //std::cout << "pe_o " << pe_o << " ke_o " << ke_o << " fix_o " << fix_o
+    //    << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
+    //    //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_o) " << exp(-(etot_n - etot_o) / RT)
+    //    << " etot_n " << etot_n << " etot_o " << etot_o;
 
     if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
         std::cout << " 1 " ;
@@ -411,8 +411,8 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         setOldKE(0.0);
     }
 
-    std::cout << " : pe_o " << getOldPE() << " ke_o " << getOldKE() << " fix_o " << getOldFixman()
-        << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n << std:: endl;
+    //std::cout << " : pe_o " << getOldPE() << " ke_o " << getOldKE() << " fix_o " << getOldFixman()
+    //    << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n << std:: endl;
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
 
 }

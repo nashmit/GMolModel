@@ -504,6 +504,12 @@ void Topology::loadMaps(void){
             mbx2aIx.insert(pairToBeInserted);
         }
         aIx2mbx.insert(std::pair< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex >(aIx, mbx));
+        for(int i = 0; i< getNumAtoms(); i++){
+            if(bAtomList.atomIndex == aIx){
+                aIx2number.insert(std::pair< SimTK::Compound::AtomIndex, int >(aIx, bAtomList[i].number));
+                break;
+            }
+        }
     }
 }
 

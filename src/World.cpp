@@ -343,6 +343,7 @@ std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > World::get
             SimTK::Compound::AtomIndex compoundAtomIndex = topologies[i].bAtomList[j].getCompoundAtomIndex();
             SimTK::Vec3 location = topologies[i].calcAtomLocationInGroundFrame(state, compoundAtomIndex);
             currentTopologyInfo.push_back(std::pair<bSpecificAtom *, SimTK::Vec3>(&(topologies[i].bAtomList[j]), location));
+            //topologies[i].bAtomList[j].setX(location[0]);.......
         }
         returnVector.push_back(currentTopologyInfo);
     }
