@@ -536,9 +536,9 @@ void Topology::writePdb(std::string dirname, std::string prefix, std::string suf
             , "UNK"                  // residue name
             , 'A'                    // chain
             , 1                      // residue index
-            , bAtomList[i].getX()    // x
-            , bAtomList[i].getY()    // y
-            , bAtomList[i].getZ()    // z
+            , 10.0*bAtomList[i].getX()    // x in A
+            , 10.0*bAtomList[i].getY()    // y in A
+            , 10.0*bAtomList[i].getZ()    // z in A
             , 1.0                    // occupancy
             , 0.0                    // beta factor
             , "  ");                 // element
