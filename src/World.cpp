@@ -156,7 +156,7 @@ bool GridForce::dependsOnlyOnPositions() const {
 World::World(int worldIndex, bool visual, SimTK::Real visualizerFrequency)
 {
     ownWorldIndex = worldIndex;
-    std::cout << "World::World BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl;
+    std::cout << "World::World BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
     fassno = new int; // External forces
   
     compoundSystem = new SimTK::CompoundSystem;
@@ -176,12 +176,12 @@ World::World(int worldIndex, bool visual, SimTK::Real visualizerFrequency)
     ts = new SimTK::TimeStepper(*compoundSystem, *integ);
 
     moleculeCount = -1;
-    std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
+    std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
 void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF)
 {
-    std::cout << "World::AddMolecule BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl;
+    std::cout << "World::AddMolecule BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
     moleculeCount++; // Used for unique names of molecules
 
     this->rbFN = rbFN;
@@ -191,39 +191,39 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
  
     moleculeReaders.push_back(bMoleculeReader(amberReader, rbFN.c_str()));
 
-    std::cout << "World::AddMolecule add parameters" << std::endl;
+    std::cout << "World::AddMolecule add parameters" << std::endl << std::flush;
     bAddAllParams(std::string("lig") + std::to_string(moleculeCount), amberReader, *forceField, (moleculeReaders.back()).bAtomList, (moleculeReaders.back()).bonds);
   
-    std::cout << "World::AddMolecule add Compound" << std::endl;
+    std::cout << "World::AddMolecule add Compound" << std::endl << std::flush;
     topologies.push_back(Topology(std::string("lig") + std::to_string(moleculeCount)));
   
-    std::cout << "World::AddMolecule build Compound" << std::endl;
+    std::cout << "World::AddMolecule build Compound" << std::endl << std::flush;
     (topologies.back()).build(*forceField, (moleculeReaders.back()).natoms, (moleculeReaders.back()).bAtomList, (moleculeReaders.back()).nbonds, (moleculeReaders.back()).bonds, flexFN, ictdF);
   
-    std::cout << "World::AddMolecule adopt Compound " << &(topologies.back()) << std::endl;
+    std::cout << "World::AddMolecule adopt Compound " << &(topologies.back()) << std::endl << std::flush;
     compoundSystem->adoptCompound(topologies.back());
-    std::cout << "World::AddMolecule realizeTopology" << std::endl;
+    std::cout << "World::AddMolecule realizeTopology" << std::endl << std::flush;
     compoundSystem->realizeTopology();
 
-    std::cout << "Number of included atoms in nonbonded interactions: " << forceField->getNumNonbondAtoms() << std::endl;
-    std::cout << "getVdwGlobalScaleFactor() " << forceField->getVdwGlobalScaleFactor() << std::endl;
+    std::cout << "Number of included atoms in nonbonded interactions: " << forceField->getNumNonbondAtoms() << std::endl << std::flush;
+    std::cout << "getVdwGlobalScaleFactor() " << forceField->getVdwGlobalScaleFactor() << std::endl << std::flush;
     for(int i=0; i<(topologies.back()).natms; i++){
         std::cout << " DuMM VdW Radius " 
             << forceField->getVdwRadius(((topologies.back()).bAtomList[i]).getAtomClassIndex()) 
             << " DuMM VdW Well Depth "
             << forceField->getVdwWellDepth(((topologies.back()).bAtomList[i]).getAtomClassIndex())
-            << std::endl;
+            << std::endl << std::flush;
     }
   
-    std::cout << "World::AddMolecule END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
+    std::cout << "World::AddMolecule END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
 // Initialize simulation
 void World::Init(void)
 {
     // Only model after loading all the compounds
-    std::cout << "World::Init BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl;
-    std::cout << "World::Init model Compound" << std::endl;
+    std::cout << "World::Init BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
+    std::cout << "World::Init model Compound" << std::endl << std::flush;
     compoundSystem->modelCompounds();
 
     // Load MobilizedBodyIndex vs Compound::AtomIndex maps 
@@ -297,21 +297,6 @@ void World::Init(void)
     //forceField->setTracing(true); // log OpenMM info to console
     forceField->setNumThreadsRequested(1); // don't use this unless
   
-    std::cout << "World::Init POINTERS: ownWorldIndex: " << this->ownWorldIndex << ":" << std::endl
-        << " System " << &(matter->getSystem()) << std::endl
-        << " System::Guts " << &((matter->getSystem()).getSystemGuts()) << std::endl
-        << " CompoundSystem " << compoundSystem << std::endl
-        << " SimbodyMatterSubsystem " << matter << std::endl
-        << " GeneralForceSubsystem " << forces << std::endl
-        << " MultibodySubsystem " << &(forces->getMultibodySystem()) << std::endl
-        << " DecorationSubsystem " << decorations << std::endl
-        << " Visualizer " << &viz << std::endl
-        << " vizReporter " << vizReporter << std::endl
-        << " DuMMForceFieldSubsystem " << forceField << std::endl
-        << " VerletIntegrator " << integ << std::endl
-        << " TimeStepper " << ts << std::endl
-        << std::endl;
-
     compoundSystem->realizeTopology();
 
     std::cout << "World::Init END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
@@ -510,7 +495,18 @@ void World::Advance(int nosteps){
 }
 
 // Destructor
-World::~World(){}
+World::~World(){
+    delete fassno;
+
+    delete ts;
+    delete integ;
+    delete forceField;
+    delete matter;
+    delete forces;
+    delete compoundSystem;
+
+    //forceField->loadAmber99Parameters();
+}
 
 
 

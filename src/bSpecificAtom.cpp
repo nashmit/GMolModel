@@ -17,6 +17,7 @@ bSpecificAtom::bSpecificAtom(){
     y = -999;
     z = -999;
     visited = 0;
+    charge = 0.0;
 }
 
 // Incomplete

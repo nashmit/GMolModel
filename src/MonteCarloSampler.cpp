@@ -60,7 +60,9 @@ SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
     //SimTK::Real EiDetM = EiM.determinant();
     //std::cout << "EiDetM= " << EiDetM << std::endl;
     assert(RT > SimTK::TinyReal);
-    return RT * std::log(*D0);
+    SimTK::Real result = RT * std::log(*D0);
+    delete D0;
+    return result;
 }
 
 // Get the stored potential energy

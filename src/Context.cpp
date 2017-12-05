@@ -26,6 +26,8 @@ World * Context::AddWorld(World *inp_p_world, Sampler * inp_p_sampler){
 Context::~Context(){
     worlds.clear();
     samplers.clear();
+    //delete p_world;
+    delete p_sampler;
 }
 
 // Get world
