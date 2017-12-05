@@ -31,7 +31,7 @@ def saveflex_from_mol2 ( Filename, userSelection ):
 			
 		elif bondsection:
 			for k in range ( len(index_list) ):
-				if index_list[k] == int( currentLine[1] ) or index_list[k] == int( currentLine[2] ):
+				if index_list[k] == int( currentLine[1] ):
 					# prints in file.flex 
 					print >> flex, int(currentLine[1]) - 1, int(currentLine[2]) - 1
 					# prints in pymol console
