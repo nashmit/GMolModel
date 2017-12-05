@@ -193,6 +193,11 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
 
                 this->bondAtom( *(node->bAtomType), (sbuff.str()).c_str(), 0.149, 0); // (Compound::SingleAtom&, BondCenterPathName, Length, Angle
                 //this->setAtomBiotype(node->name, (this->name), node->biotype);
+
+                std::cout << "Topology::process_node: setAtomBiotype: " 
+                    << " node->name " << node->name << " (this->name).c_str() " << (this->name).c_str() << " node->getName() " << node->getName() 
+                    << std::endl;
+
                 this->setAtomBiotype(node->name, (this->name).c_str(), node->getName());
 
                 // Set bSpecificAtom atomIndex to the last atom added to bond
@@ -219,6 +224,10 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
 
                 this->bondAtom( *(node->bAtomType), (sbuff.str()).c_str(), 0.149, 0);
                 //this->setAtomBiotype(node->name, (this->name), node->biotype);
+                std::cout << "Topology::process_node: setAtomBiotype: " 
+                    << " node->name " << node->name << " (this->name).c_str() " << (this->name).c_str() << " node->getName() " << node->getName() 
+                    << std::endl;
+
                 this->setAtomBiotype(node->name, (this->name), node->getName());
 
                 // Set bSpecificAtom atomIndex to the last atom added to bond
@@ -263,10 +272,8 @@ void Topology::walkGraph(bSpecificAtom *root)
     CurrentGeneration += 1;
     bSpecificAtom *previousNode = root;
 
-    //++root->freebonds; // add Ground
-    //root->freebonds = 1; // only the Ground
-    
-    //process_node(root, CurrentGeneration, previousNode, nofProcesses, baseAtomNumber);
+    baseSetFlag = 0;
+    PrintStaticVars();
     process_node(root, CurrentGeneration, previousNode);
     std::cout << std::endl;
 }
@@ -298,39 +305,11 @@ void Topology::build(
         bonds[i].setVisited(0);
     }
 
-    // Print bonds
-    //std::cout << "Bonds before walk the graph" << std::endl;
-    //for(int i=0; i<nbonds; i++){
-    //    bonds[i].Print();
-    //}
-
-    // Search for appropriate atom/node to start walking the graph from
-    /*
-    for(int i=0; i<natoms; i++){
-        //if(bAtomList[i].freebonds == 2){
-        if(bAtomList[i].getInName() == std::string("OH")){
-            // Walk graph
-            std::cout << "Walk the graph" << std::endl;
-            bSpecificAtom *root = &(bAtomList[i]);
-            static int baseAtomNumber = root->number;
-            walkGraph( root, baseAtomNumber);
-            break;
-        }
-    }
-    */
-
     // Walk graph
     std::cout << "Walk the graph" << std::endl;
     bSpecificAtom *root = &(bAtomList[0]);
     baseAtomNumber = root->number;
-    //walkGraph( &(bAtomList[0]), baseAtomNumber);
     walkGraph( &(bAtomList[0]));
-
-    // Print bonds
-    //std::cout << "Bonds after walk the graph" << std::endl;
-    //for(int i=0; i<nbonds; i++){
-    //    bonds[i].Print();
-    //}
 
     // Add ring closing bonds
     for(int i=0; i<nbonds; i++){
@@ -383,54 +362,6 @@ void Topology::build(
         }
     }
 
-    // Define DuMM charged atom types
-    //for(int k=0; k<natoms; k++){
-    //  std::string abuff =  (this->name);
-    //  abuff += bAtomList[k].biotype;
-    //
-    //DuMM::ChargedAtomTypeIndex tempChargedAtomTypeIndex = dumm.getNextUnusedChargedAtomTypeIndex();
-    //  std::cout << "defineChargedAtomType atomTypeIx "<<tempChargedAtomTypeIndex 
-    //    << " atomTypeName " << abuff.c_str() << " atomClassIx " << bAtomList[k].getAtomClassIndex()
-    //      << " partialChargeInE " << bAtomList[k].charge << std::endl;
-    //  dumm.defineChargedAtomType(
-    //    tempChargedAtomTypeIndex,
-    //    abuff.c_str(),
-    //    bAtomList[k].getAtomClassIndex(), // dumm.getAtomClassIndex(bAtomList[k].fftype), from MOL2
-     //   bAtomList[k].charge
-      //);
-     //
-      //bAtomList[k].setChargedAtomTypeIndex(tempChargedAtomTypeIndex);
-     //
-      // Associate a ChargedAtomTypeIndex with a Biotype index
-      //std::cout << "setBiotypeChargedAtomType bAtomList["<< k << "].getChargedAtomTypeIndex() "
-      //    << bAtomList[k].getChargedAtomTypeIndex()
-      //    << " bAtomList[" << k << "].biotype " << bAtomList[k].biotype 
-      //    //<< " Biotype::get(\"(this->name).c_str()\", bAtomList[k].biotype).getIndex() "
-      //    //<< Biotype::get((this->name).c_str(), bAtomList[k].biotype).getIndex()
-      //    << std::endl << std::flush;
-      //dumm.setBiotypeChargedAtomType( 
-      //  bAtomList[k].getChargedAtomTypeIndex(),
-      //  //Biotype::get((this->name), bAtomList[k].biotype).getIndex()
-      //  bAtomList[k].getBiotypeIndex()
-      //);  
-      //
-    //}   
-    // #
-
-    // Assign AtomIndex values to atoms in bAtomList[] by name
-    //for (Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
-    //  for(int ix = 0; ix<natoms; ix++){
-    //    //std::cout << "Compound atom name " << this->getAtomName(aIx) << " vs "
-    //    //    << "bAtomList name " << std::string(bAtomList[ix].name) << std::endl;
-    //    if(this->getAtomName(aIx) == std::string(bAtomList[ix].name)){ // compare SimTK::String with std::string
-    //      std::cout << "bAtomList[" << ix << "].atomIndex set to " << aIx << " "
-    //          << std::string(bAtomList[ix].name) << " " << std::string(bAtomList[ix].inName) << std::endl;
-    //      bAtomList[ix].atomIndex = aIx;
-    //      break;
-    //    }
-    //  }
-    //}
-
     std::cout << "Topology: name inName atomIndexi:" << std::endl;
     for(int ix = 0; ix < getNumAtoms(); ++ix){
         std::cout << bAtomList[ix].name << " " << bAtomList[ix].inName << " " << bAtomList[ix].atomIndex << std::endl;
@@ -449,18 +380,9 @@ void Topology::build(
         atomTargets.insert(pair<AtomIndex, Vec3> (bAtomList[ix].atomIndex, vec));
     }
 
-    //std::cout << "Trying matchDefaultTopLevelTransform ... " << std::flush;
-    //matchDefaultTopLevelTransform(atomTargets);
-    //std::cout << "done. " << std::endl << std::flush;
-
     std::cout << "Trying matchDefaultConfiguration Match_Exact ... " << std::flush;
     matchDefaultConfiguration(atomTargets, Match_Exact, true, 150.0); //Compound::Match_Idealized
     std::cout << "done. " << std::endl << std::flush;
-
-
-    //std::cout << "Trying matchDefaultConfigurationi Match_Idealized ... " << std::flush;
-    //matchDefaultConfiguration(atomTargets, Match_Idealized, true, 150.0); //Compound::Match_Idealized
-    //std::cout << "done. " << std::endl << std::flush;
 
     PdbStructure  pdb(*this);
     std::ostringstream sstream;
@@ -472,12 +394,6 @@ void Topology::build(
     std::ostream os(&fb);
     pdb.write(os); // automatically multiplies by ten (nm to A)
     fb.close();
-
-    // Print bonds
-    //std::cout << "Bonds after closing the rings" << std::endl;
-    //for(int i=0; i<nbonds; i++){
-    //    bonds[i].Print();
-    //}
 
     /* Just checking *////////
     std::cout << "Checking after Topology" << std::endl;
@@ -491,19 +407,6 @@ void Topology::build(
     ///////////////////////////
 
     setRegimen(ictdF, flexFN);
-    /*
-    if(ictdF=="IC"){
-        std::cout << "General regimen: " << "IC" << std::endl;
-        for (unsigned int r=0 ; r<getNumBonds(); r++){
-            setBondMobility(BondMobility::Free, Compound::BondIndex(r));
-        }
-    }else if(ictdF=="TD"){
-        std::cout << "General regimen: " << "TD" << std::endl;
-        for (unsigned int r=0 ; r<getNumBonds(); r++){
-            setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
-        }
-    }
-    */
 
 }
   
@@ -590,9 +493,59 @@ void Topology::setRegimen(std::string argRegimen, std::string flexFN){
     this->regimen = argRegimen;
 }
 
+// Load MobilizedBody vs Compound::AtomIndex maps
+void Topology::loadMaps(void){
+    // Load MobilizedBodyIndex vs CompoundAtomIndex maps. 
+    // These contain only atoms at the origin of mobods
+    for (SimTK::Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
+        SimTK::MobilizedBodyIndex mbx = getAtomMobilizedBodyIndex(aIx);
+        if(getAtomLocationInMobilizedBodyFrame(aIx) == 0){
+            std::pair<SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > pairToBeInserted(mbx, aIx);
+            mbx2aIx.insert(pairToBeInserted);
+        }
+        aIx2mbx.insert(std::pair< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex >(aIx, mbx));
+        //for(int i = 0; i< getNumAtoms(); i++){
+        //    if((bAtomList[i]).atomIndex == aIx){
+        //        aIx2number.insert(std::pair< SimTK::Compound::AtomIndex, int >(aIx, (bAtomList[i]).number));
+        //        break;
+        //    }
+        //}
+    }
+}
 
+void Topology::writePdb(std::string dirname, std::string prefix, std::string sufix, int maxNofDigits, int index) const
+{
+    int nofDigits = (int) floor(log10(index));
+    std::string zeros("");
+    if(maxNofDigits > nofDigits){
+        for(int i = 0; i < (maxNofDigits - nofDigits); i++){
+            zeros += std::string("0");
+        }
+    }
+    std::stringstream sstream;
+    sstream << dirname << "/" << prefix << zeros << std::to_string(index) << sufix;
+    string ofilename = sstream.str();
 
+    FILE *oF = fopen (ofilename.c_str(),"w");
+    // Pdb lines
+    for(int i = 0; i < getNumAtoms(); i++){
+        fprintf(oF, "%-6s%5d %4s %3s %c%4d    %8.3f%8.3f%8.3f  %4.2f%6.2f          %2s\n"
+            , "ATOM"                 // record
+            , i                      // index
+            , bAtomList[i].inName  // name
+            , "UNK"                  // residue name
+            , 'A'                    // chain
+            , 1                      // residue index
+            , 10.0*bAtomList[i].getX()    // x in A
+            , 10.0*bAtomList[i].getY()    // y in A
+            , 10.0*bAtomList[i].getZ()    // z in A
+            , 1.0                    // occupancy
+            , 0.0                    // beta factor
+            , "  ");                 // element
+    }
 
+    fclose(oF);
+}
 
 
 

@@ -60,3 +60,12 @@ SimTK::Real Sampler::calcMassDeterminant(const SimTK::State& state)
 
 void Sampler::update(SimTK::State& somState){}
 
+void Sampler::PrintSimbodyStateCache(SimTK::State& someState){
+    std::cout << " System Stage: " << someState.getSystemStage() << std::endl;
+    for(int i = 0; i < someState.getNumSubsystems(); i++){
+        std::cout << " Subsystem Name: " << someState.getSubsystemName(SimTK::SubsystemIndex(i))
+            << " Stage: " << someState.getSubsystemStage(SimTK::SubsystemIndex(i))
+            << " Version: " << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
+    }
+}
+

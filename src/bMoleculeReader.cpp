@@ -190,6 +190,11 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         bAtomList[i].setVdwRadius(amberReader->getAtomsRVdW(i));
         bAtomList[i].setLJWellDepth(amberReader->getAtomsEpsilon(i));
 
+        //bAtomList[i].setResidueName(amberReader->getResidueName(i));
+        //bAtomList[i].setResidueIndex(amberReader->getResidueIndex(i));
+        bAtomList[i].residueName = std::string("UNK");
+        bAtomList[i].residueIndex = 1;
+
         //bAtomList[i].Print();
     }
 

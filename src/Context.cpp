@@ -5,34 +5,55 @@
 #include "World.hpp"
 #include "Sampler.hpp"
 
-// Constructor
-
-Context::Context(World *inp_p_world, Sampler * inp_p_sampler){
-    p_world = inp_p_world;
-    p_sampler = inp_p_sampler;
+// Default constructor
+Context::Context(void){
 }
 
+// Constructor
+Context::Context(World *inp_p_world, Sampler * inp_p_sampler){
+    worlds.push_back(inp_p_world);
+    samplers.push_back(inp_p_sampler);
+}
+
+// Add another world and a sampler to the context
+World * Context::AddWorld(World *inp_p_world, Sampler * inp_p_sampler){
+    worlds.push_back(inp_p_world);
+    samplers.push_back(inp_p_sampler);
+    return worlds.back();
+}
 
 // Destructor
-
 Context::~Context(){
-    //
+    worlds.clear();
+    samplers.clear();
 }
 
 // Get world
-
 World * Context::getWorld(void) const{
-    return p_world;
+    return worlds.back();
 }
 
-// Get mutable world
+// Get a specific world
+World * Context::getWorld(int which) const{
+    return worlds[which];
+}
 
+// Get the last mutable world
 World * Context::updWorld(void){
-    return p_world;
+    return worlds.back();
 }
 
-// Get sampler
+// Get a mutable specific world
+World * Context::updWorld(int which){
+    return worlds[which];
+}
 
-Sampler * Context::getSampler(void){
-    return p_sampler;
+// Get the last sampler
+Sampler * Context::getSampler(void) const{
+    return samplers.back();
+}
+
+// Get a specific sampler
+Sampler * Context::getSampler(int which) const{
+    return samplers[which];
 }

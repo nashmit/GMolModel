@@ -20,9 +20,9 @@ int main(int argc, char **argv)
     // Build Gmolmodel simulation world
     World *p_world;
     if(setupReader.getValues("VISUAL")[0] == "TRUE"){
-        p_world = new World(true, std::stod(setupReader.getValues("FREE_TIMESTEP")[0]));
+        p_world = new World(0, true, std::stod(setupReader.getValues("FREE_TIMESTEP")[0]));
     }else{
-        p_world = new World(false, std::stod(setupReader.getValues("FREE_TIMESTEP")[0]));
+        p_world = new World(0, false, std::stod(setupReader.getValues("FREE_TIMESTEP")[0]));
     }
 
     // Get input filenames
@@ -54,8 +54,10 @@ int main(int argc, char **argv)
 
     // Initialize sampler
     srand (time(NULL));
-    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->system, p_world->matter, p_world->lig1, p_world->forceField, p_world->forces, p_world->ts);
-    Context *context = new Context(p_world, p_HMCsampler);
+    HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->compoundSystem, p_world->matter, (SimTK::Compound *)(&(p_world->getTopology(0))), p_world->forceField, p_world->forces, p_world->ts);
+
+    Context *context = new Context();
+    context->AddWorld(p_world, p_HMCsampler);
     World *world = context->getWorld();
     world->forceField->setTracing(true);
 
@@ -95,7 +97,7 @@ int main(int argc, char **argv)
 
         if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
             for(int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                writePdb( ((SimTK::Compound)(world->getTopology(mol_i, 0))),
+                writePdb( ((SimTK::Compound)(world->getTopology(mol_i))),
                     integAdvancedState, 
                     "pdbs", "sb_",
                     8, 

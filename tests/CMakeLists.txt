@@ -119,6 +119,7 @@ set(TESTS_SRCS
 	TestPDBReaderMolModel.cpp
         TestParallelExecutor.cpp
 	TestAmberInput.cpp
+        TestMixing.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})

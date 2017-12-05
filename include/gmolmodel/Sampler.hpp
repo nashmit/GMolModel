@@ -27,6 +27,8 @@ public:
     // Update
     virtual void update(SimTK::State&);
 
+    void PrintSimbodyStateCache(SimTK::State& someState);
+
 protected:
     const SimTK::System *system;
     SimTK::CompoundSystem *compoundSystem;

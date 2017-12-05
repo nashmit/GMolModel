@@ -143,20 +143,16 @@ class GridForce : public SimTK::Force::Custom::Implementation {
  **/
 class World{
  public:
-  SimTK::CompoundSystem *system;
+  SimTK::CompoundSystem *compoundSystem;
   SimTK::SimbodyMatterSubsystem *matter;
   SimTK::GeneralForceSubsystem *forces;
   SimTK::Force::Custom *ExtForce;
   SimTK::DecorationSubsystem *decorations;
+  SimTK::Visualizer::Reporter *vizReporter;
   SimTK::DuMMForceFieldSubsystem *forceField;
 
-  std::vector< std::vector<bMoleculeReader> > moleculeReaders;
-  std::vector< std::vector<Topology> > topologies;
-
-  bMoleculeReader *mr1;  // local
-  bMoleculeReader *mr2;  // local
-  Topology *lig1;  // local
-  Topology *lig2;  // local
+  std::vector<bMoleculeReader> moleculeReaders;
+  std::vector<Topology> topologies;
 
   SimTK::Visualizer *viz;
   #ifdef NOSETHERMOS
@@ -165,30 +161,34 @@ class World{
   #ifdef VELSTHERMOS
   SimTK::VelocityRescalingThermostat *vthermo;
   #endif
-  //RungeKuttaMersonIntegrator *integ;
   SimTK::VerletIntegrator *integ;
-  //MidVVIntegrator *integ;
   SimTK::TimeStepper *ts;
-  string mol2F, rbFN, frcmodF, flexFN, ictdF;
-
-  int arrays_cut;
+  std::string mol2F, rbFN, frcmodF, flexFN, ictdF;
 
   int moleculeCount;
+  int ownWorldIndex;
 
   int *fassno;
   SimTK::Transform *TVector;
   int **mbxTreeMat;    // tree representing the bonding
   SimTK::Real *branchMassVec; // branch masses self body included
 
-  World(bool visual=true, SimTK::Real visualizerFrequency = 0.0015);
+  World(int worldIndex, bool visual=true, SimTK::Real visualizerFrequency = 0.0015);
 
   void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF);
 
   void Init(void);
-  
-  // Interface
-  const Topology& getTopology(int moleculeNumber, int moleculeCopy) const;
 
+  std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > >  getAtomsLocationsInGround(const SimTK::State&);
+
+  SimTK::State& setAtomsLocationsInGround(SimTK::State&, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations);
+
+  void updateAtomLists(const SimTK::State&);
+ 
+  void PrintSimbodyStateCache(SimTK::State&);
+ 
+  // Interface
+  const Topology& getTopology(int moleculeNumber) const;
   Topology& updTopology(void);
 
   // Manages the TimeStepper actions

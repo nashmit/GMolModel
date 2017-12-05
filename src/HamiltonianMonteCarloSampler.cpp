@@ -194,7 +194,6 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
         i++;
     }
   
-  
     system->realize(someState, SimTK::Stage::Position);
     setTemperature(argTemperature); // Needed for Fixman
     setOldPE(getPEFromEvaluator(someState));
@@ -216,6 +215,47 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
     // reinitialize the Integrator.
     //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
 
+}
+
+// Initialize variables (identical to setTVector)
+void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature)
+{
+    //compoundSystem->realizeTopology();
+    //system->realize(someState, SimTK::Stage::Instance);
+
+    //someState.advanceSystemToStage(SimTK::Stage::Instance);
+    //someState.invalidateAllCacheAtOrAbove(SimTK::Stage::Instance);
+
+    int nu = someState.getNU();
+    SimTK::Vector V(nu);
+    SimTK::Vector SqrtMInvV(nu);
+    system->realize(someState, SimTK::Stage::Position);
+    matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
+    system->realize(someState, SimTK::Stage::Acceleration);
+    setOldFixman(calcFixman(someState));
+
+    int i = 0;
+    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+        const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
+        TVector[i] = mobod.getMobilizerTransform(someState);
+        i++;
+    }
+
+    setTemperature(argTemperature); // Needed for Fixman
+
+    //system->realize(someState, SimTK::Stage::Dynamics);
+
+    setOldPE(getPEFromEvaluator(someState));
+
+    //setOldFixman(calcFixman(someState));
+
+    setOldKE(0.0);
+  
+    // After an event handler has made a discontinuous change to the 
+    // Integrator's "advanced state", this method must be called to 
+    // reinitialize the Integrator.
+    //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
 }
 
 
@@ -275,9 +315,9 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //std::cout << "Before stepTo M:" << std::setprecision(3) << std::endl;
     //bool worry_flag = false;
     //for(int i=0; i<nu; i++){
-    //    //std::cout << "M: ";
+    //    std::cout << "M: ";
     //    for(int j=0; j<nu; j++){
-    //        //std::cout << M(i, j) << " ";
+    //        std::cout << M(i, j) << " ";
     //        if( std::isinf(M(i, j)) ){
     //            std::cout << "M(" << i << ", " << j << ") is inf" << std::endl;
     //            worry_flag = true;
@@ -288,7 +328,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //            return;
     //        }
     //    }
-    //    //std::cout << std::endl;
+    //    std::cout << std::endl;
     //}
 
     // Propagate through phase space (integrate)
@@ -350,12 +390,11 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         etot_o = pe_o + ke_o;
     }
 
-    std::cout<<std::setprecision(10)<<std::fixed;
+    //std::cout<<std::setprecision(10)<<std::fixed;
     std::cout << "pe_o " << pe_o << " ke_o " << ke_o << " fix_o " << fix_o
         << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_o) " << exp(-(etot_n - etot_o) / RT)
         << " etot_n " << etot_n << " etot_o " << etot_o;
-
 
     if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
         std::cout << " 1 " ;
@@ -365,7 +404,6 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         setOldFixman(fix_n);
         someState.updU() = 0.0;
         setOldKE(0.0);
-        
     }else{ // Reject
         std::cout << " 0 " ;
         assignConfFromTVector(someState);
