@@ -285,7 +285,11 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
     //std::cout << "HamiltonianMonteCarloSampler::propose SqrtMInvV: " << SqrtMInvV << std::endl;
-    SqrtMInvV *= sqrtRT; // Set stddev according to temperature
+
+    SimTK::Real temperatureBoost = 2.58; // sqrt(2000/300) : brings temperature from 300 to 1000
+    SqrtMInvV *= sqrtRT * temperatureBoost; // Set stddev according to temperature
+    //SqrtMInvV *= sqrtRT; // Set stddev according to temperature
+
     someState.updU() = SqrtMInvV;
     //std::cout << "Before stepTo U: " << someState.getU() << std::endl;
 
