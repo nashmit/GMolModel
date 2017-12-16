@@ -295,7 +295,7 @@ void World::Init(void)
         //forceField->setUseOpenMMAcceleration(true);
     #endif
     //forceField->setTracing(true); // log OpenMM info to console
-    forceField->setNumThreadsRequested(1); // don't use this unless
+    //forceField->setNumThreadsRequested(1); // don't use this unless
   
     compoundSystem->realizeTopology();
 

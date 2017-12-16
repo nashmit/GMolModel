@@ -44,6 +44,7 @@ SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
     SimTK::Vector DetV(nu);
     SimTK::Real* D0 = new SimTK::Real(1.0);
 
+    // TODO: remove the request for Dynamics stage cache in SImbody files
     //std::cout << "MonteCarloSampler::calcFixman Stage: "<< matter->getStage(someState) << std::endl;
     matter->calcDetM(someState, V, DetV, D0);
 
@@ -62,6 +63,26 @@ SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
     assert(RT > SimTK::TinyReal);
     SimTK::Real result = RT * std::log(*D0);
     delete D0;
+    return result;
+}
+
+// Compute Fixman potential numerically
+SimTK::Real MonteCarloSampler::calcNumFixman(SimTK::State& someState){
+    // Get M
+    int nu = someState.getNU();
+    SimTK::Matrix M(nu, nu);
+    matter->calcM(someState, M);
+
+    // Eigen M determinant
+    Eigen::MatrixXd EiM(nu, nu);
+    for(int i=0; i<nu; i++){
+        for(int j=0; j<nu; j++){
+            EiM(i, j) = M(i, j);
+        }
+    }
+    SimTK::Real EiDetM = EiM.determinant();
+    assert(RT > SimTK::TinyReal);
+    SimTK::Real result = RT * std::log(EiDetM);
     return result;
 }
 

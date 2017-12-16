@@ -53,6 +53,9 @@ public:
     // Compute Fixman potential
     SimTK::Real calcFixman(SimTK::State& someState);
 
+    // Compute Fixman potential numerically
+    SimTK::Real calcNumFixman(SimTK::State& someState);
+
     // Send configuration to an external evaluator
     void sendConfToEvaluator(void);
 

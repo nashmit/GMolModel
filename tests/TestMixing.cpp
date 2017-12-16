@@ -64,12 +64,16 @@ int main(int argc, char **argv)
             (SimTK::Compound *)(&((p_worlds[worldIx])->getTopology(0))),
             p_worlds[worldIx]->forceField, (p_worlds[worldIx])->forces, (p_worlds[worldIx])->ts ) );
     
-        // Initialize samplers 
+        // Initialize samplers
+        bool useFixman = true;
+        if(setupReader.getValues("REGIMENS")[worldIx] == "IC"){
+            useFixman = false;
+        }
         (p_samplers[worldIx])->initialize( (p_worlds[worldIx])->integ->updAdvancedState(), 
-           std::stod(setupReader.getValues("TIMESTEPS")[worldIx]),
-           std::stoi(setupReader.getValues("STEPS")[0]),
-           SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
-           true );
+             std::stod(setupReader.getValues("TIMESTEPS")[worldIx]),
+             std::stoi(setupReader.getValues("STEPS")[0]),
+             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
+             useFixman );
     
     }
     ////////////////////////////////////////////////////////// END creating Worlds
@@ -115,6 +119,7 @@ int main(int argc, char **argv)
         }else{
             remainders[0] = i % round_mcsteps;
         }
+
         for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
             remainders[worldIx] = i % round_mcsteps;
             if(worldIx > 0){
@@ -138,6 +143,10 @@ int main(int argc, char **argv)
                 currentAdvancedState,
                 timesteps[currentWorldIx], mdsteps[currentWorldIx]);
         }
+
+        // Debug
+        //(p_worlds[currentWorldIx])->PrintSimbodyStateCache(currentAdvancedState);
+
         if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
             (p_worlds[currentWorldIx])->updateAtomLists(currentAdvancedState);
             for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
@@ -157,7 +166,7 @@ int main(int argc, char **argv)
             p_samplers[worldIndexes[0]]->reinitialize( nextAdvancedState, 
                 timesteps[worldIndexes[0]], total_mcsteps,
                 SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
-            }
+        }
 
     } // for i in MC steps
 

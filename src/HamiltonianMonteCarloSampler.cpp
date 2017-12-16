@@ -182,7 +182,7 @@ void HamiltonianMonteCarloSampler::setOldKE(SimTK::Real inpKE)
 // Initialize variables (identical to setTVector)
 void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman)
 {
-    compoundSystem->realizeTopology();
+    //compoundSystem->realizeTopology(); // ELIMINATE REALIZE TOPOLOGY
     //SimTK::State state = compoundSystem->updDefaultState();
     timeStepper->initialize(compoundSystem->getDefaultState());
 
@@ -193,8 +193,10 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
         TVector[i] = mobod.getMobilizerTransform(someState);
         i++;
     }
-  
+ 
+    // Make sure matter and forces subsystems realize thier q and f(q) s
     system->realize(someState, SimTK::Stage::Position);
+
     setTemperature(argTemperature); // Needed for Fixman
     setOldPE(getPEFromEvaluator(someState));
 
@@ -220,19 +222,21 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
 // Initialize variables (identical to setTVector)
 void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature)
 {
-    //compoundSystem->realizeTopology();
-    //system->realize(someState, SimTK::Stage::Instance);
+    //compoundSystem->realizeTopology(); // no need since a sampler doesn't change topological state cars
 
     //someState.advanceSystemToStage(SimTK::Stage::Instance);
-    //someState.invalidateAllCacheAtOrAbove(SimTK::Stage::Instance);
 
     int nu = someState.getNU();
     SimTK::Vector V(nu);
     SimTK::Vector SqrtMInvV(nu);
+
+    // Make sure matter and forces subsystems realize thier q and f(q) s
     system->realize(someState, SimTK::Stage::Position);
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
-    system->realize(someState, SimTK::Stage::Acceleration);
-    setOldFixman(calcFixman(someState));
+
+    // Position should be sufficient be needed !!!!!
+    //system->realize(someState, SimTK::Stage::Acceleration);
+    //setOldFixman(calcFixman(someState));
 
     int i = 0;
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
@@ -244,11 +248,9 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::
 
     setTemperature(argTemperature); // Needed for Fixman
 
-    //system->realize(someState, SimTK::Stage::Dynamics);
-
     setOldPE(getPEFromEvaluator(someState));
 
-    //setOldFixman(calcFixman(someState));
+    setOldFixman(calcFixman(someState));
 
     setOldKE(0.0);
   
@@ -276,6 +278,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     SimTK::Vector SqrtMInvV(nu);
     for (int i=0; i < nu; ++i){
         V[i] = gaurand(randomEngine);
+        //V[i] = 0.2;
         //double z = 0;
         //V[i] = boost::math::pdf(gaurand, z);
     }
@@ -286,9 +289,9 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
     //std::cout << "HamiltonianMonteCarloSampler::propose SqrtMInvV: " << SqrtMInvV << std::endl;
 
-    SimTK::Real temperatureBoost = 2.58; // sqrt(2000/300) : brings temperature from 300 to 1000
-    SqrtMInvV *= sqrtRT * temperatureBoost; // Set stddev according to temperature
-    //SqrtMInvV *= sqrtRT; // Set stddev according to temperature
+    //SimTK::Real temperatureBoost = 2.58; // sqrt(2000/300) : brings temperature from 300 to 1000
+    //SqrtMInvV *= sqrtRT * temperatureBoost; // Set stddev according to temperature
+    SqrtMInvV *= sqrtRT; // Set stddev according to temperature
 
     someState.updU() = SqrtMInvV;
     //std::cout << "Before stepTo U: " << someState.getU() << std::endl;
@@ -400,8 +403,9 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_o) " << exp(-(etot_n - etot_o) / RT)
         << " etot_n " << etot_n << " etot_o " << etot_o;
 
+    //if ((pe_n < pe_o) || (rand_no < exp(-( (pe_n + fix_n) - (pe_o + fix_o) ) / RT))){ // Accept
     if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
-        std::cout << " 1 " ;
+        std::cout << " acc 1 " ;
         setTVector(someState);
         //sendConfToEvaluator(); // OPENMM
         setOldPE(pe_n);
@@ -409,14 +413,15 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         someState.updU() = 0.0;
         setOldKE(0.0);
     }else{ // Reject
-        std::cout << " 0 " ;
+        std::cout << " acc 0 " ;
         assignConfFromTVector(someState);
         someState.updU() = 0.0;
         setOldKE(0.0);
     }
 
-    std::cout << " : pe_o " << getOldPE() << " ke_o " << getOldKE() << " fix_o " << getOldFixman()
-        << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n << std:: endl;
+    std::cout << " pe_os " << getOldPE() << " ke_os " << getOldKE() << " fix_os " << getOldFixman()
+        //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
+        << std:: endl;
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
 
 }
