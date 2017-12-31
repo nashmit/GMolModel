@@ -4,9 +4,9 @@
 #include "Robo.hpp"
 #include "Sampler.hpp"
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
-#include <boost/random/normal_distribution.hpp>
+//#include <boost/random/mersenne_twister.hpp>
+//#include <boost/random/uniform_real_distribution.hpp>
+//#include <boost/random/normal_distribution.hpp>
 
 class Topology;
 class IState;
@@ -30,18 +30,33 @@ public:
     SimTK::Real getTemperature(void);
     void setTemperature(SimTK::Real);
 
+    // Store/restore the configuration from the set nternal transforms vector
+    // TVector
+    void setSetTVector(const SimTK::State& advanced);
+    SimTK::Transform * getSetTVector(void);
+    void assignConfFromSetTVector(SimTK::State& advanced);
+
     // Store/restore the configuration from the internal transforms vector
     // TVector
     void setTVector(const SimTK::State& advanced);
+    void setTVector(SimTK::Transform *);
     SimTK::Transform * getTVector(void);
     void assignConfFromTVector(SimTK::State& advanced);
 
     // Assign a random conformation
     void propose(SimTK::State& advanced);
 
-    // Store/restore potential energy
+    // Get/set set potential energy
+    SimTK::Real getSetPE(void);
+    void setSetPE(SimTK::Real argPE);
+
+    // Get/set current potential energy
     SimTK::Real getOldPE(void);
     void setOldPE(SimTK::Real argPE);
+
+    // Set/get Fixman potential
+    void setSetFixman(SimTK::Real);
+    SimTK::Real getSetFixman(void);
 
     // Set/get Fixman potential
     void setOldFixman(SimTK::Real);
@@ -64,13 +79,14 @@ public:
     void update(SimTK::State&);
 
 protected:
+    SimTK::Transform *SetTVector; // Transform matrices
     SimTK::Transform *TVector; // Transform matrices
-    SimTK::Real pe_o;
+    SimTK::Real pe_set, pe_o;
     SimTK::Real temperature;
     SimTK::Real RT;
 
     bool useFixman;    
-    SimTK::Real fix_o, fix_n;
+    SimTK::Real fix_set, fix_o, fix_n;
  
     // Random number generators - not sure if I need two
     // Needs testing

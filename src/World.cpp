@@ -354,8 +354,6 @@ void World::updateAtomLists(const SimTK::State & state)
 // 
 SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations)
 {
-    //(matter->getSystem()).invalidateSystemTopologyCache();
-
     //std::cout << "World::setAtomsLocationsInGround BEGIN" << std::endl;
     //PrintSimbodyStateCache(someState);
     

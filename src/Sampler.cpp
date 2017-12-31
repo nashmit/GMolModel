@@ -24,6 +24,32 @@ Sampler::Sampler(SimTK::CompoundSystem *argCompoundSystem,
     this->forces = argForces;
     this->timeStepper = argTimeStepper;
     this->system = &(matter->getSystem());
+
+    // Harmonic oscillator constants
+    for(int i = 0; i < HO_D; i++){HO_x[i] = 1;}
+    for(int i = 0; i < HO_D; i++){HO_x0[i] = 0;}
+    for(int i = 0; i < HO_D; i++){HO_xini[i] = 1;}
+    for(int i = 0; i < HO_D; i++){HO_xprop[i] = 1;}
+    for(int i = 0; i < HO_D; i++){HO_v[i] = 0;}
+    for(int i = 0; i < HO_D; i++){HO_f[i] = 0;}
+    for(int i = 0; i < HO_D; i++){HO_m[i] = 1;}
+    for(int i = 0; i < HO_D; i++){HO_a[i] = 0;}
+    for(int i = 0; i < HO_D; i++){HO_k[i] = 1;}
+
+    pertAmp = 15.0; // Perturbation amplitude
+
+    HO_PE_x = 0.0; // PE at the begining of the proposal
+    HO_PE_xprop = 0.0; // PE after the proposal
+    HO_PE_set = 0.0; // PE set at the end of the acc-rej step
+
+    HO_KE_x = 0.0;
+    HO_KE_xprop = 0.0;
+    HO_KE_set = 0.0;
+
+    HO_etot_x = 0.0;
+    HO_etot_xprop = 0.0;
+    HO_etot_set = 0.0;
+
 }
 
 // Destructor
@@ -67,5 +93,84 @@ void Sampler::PrintSimbodyStateCache(SimTK::State& someState){
             << " Stage: " << someState.getSubsystemStage(SimTK::SubsystemIndex(i))
             << " Version: " << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
     }
+}
+
+
+
+//////////////////////////////////// 
+// Harmonic oscillator functions
+////////////////////////////////////
+
+// Potential energy function - modifies HO_f
+double Sampler::HarmonicOscillatorPE(double *someX)
+{
+    double pe = 0.0;
+    for (int i = 0; i < HO_D; i++){
+        HO_f[i] =  -1.0 * HO_k[i] *   (someX[i] - HO_x0[i]); // f = -kx
+        pe  += (0.5  * HO_k[i] * ( (someX[i] - HO_x0[i]) * (someX[i] - HO_x0[i]) ) ); // PE = 1/2 k x^2
+    }
+    return pe;
+}
+
+// Kinetic energy function
+double Sampler::HarmonicOscillatorKE(double *someV)
+{
+    double ke = 0.0;
+    for (int i = 0; i < HO_D; i++){
+        ke += ( 0.5 * HO_m[i] * someV[i] * someV[i] );
+    }
+    return ke;
+}
+
+// Initialize velocities according to T
+void Sampler::HO_InitializeVelocity(double *someV, double T)
+{
+    double HO_RT = T * SimTK_BOLTZMANN_CONSTANT_MD;
+    // Diagonal mass matrix case
+    for (int i = 0; i < HO_D; i++){
+        someV[i]  = HO_gaurand(HO_randomEngine);
+        someV[i] *= std::sqrt(HO_RT/HO_m[i]);
+    }
+}
+
+// Integrate x using Velocity Verlet - modifies xprop
+void Sampler::HO_VelocityVerlet(double dt, int nofSteps)
+{
+    for(int step = 0; step < nofSteps; step++){
+        // Compute forces fo = fo(xo) and put it in f
+        HarmonicOscillatorPE(HO_xprop);
+        // Compute accelerations ao = ao(fo) and put  it in a
+        for (int i = 0; i < HO_D; i++){
+            HO_a[i] = HO_f[i] / HO_m[i];
+        }
+
+        // Compute vhalf  = vhalf(vo, ao) and put in v
+        for (int i = 0; i < HO_D; i++){
+            HO_v[i] = HO_v[i] + (0.5 * HO_a[i] * dt);
+        }
+
+        // Compute xn = xn(xo, vhalf) and put it in x
+        for (int i = 0; i < HO_D; i++){
+            HO_xprop[i] = HO_xprop[i] + (HO_v[i] * dt);
+        }
+        // Compute new forces fn = fn(xn) and replace in f
+        HarmonicOscillatorPE(HO_xprop);
+        // Compute new accelerations an = an(fn) and replace in a
+        for (int i = 0; i < HO_D; i++){
+            HO_a[i] = HO_f[i] / HO_m[i];
+        }
+        // Compute new velocities vn = vn(vhalf, an) and replace v
+        for (int i = 0; i < HO_D; i++){
+            HO_v[i] = HO_v[i] + (0.5 * HO_a[i] * dt);
+        }
+
+        //std::cout << "HO_xprop ";
+        //for (int i = 0; i < HO_D; i++){
+        //    std::cout << HO_xprop[i] << " ";
+        //}
+        //std::cout << std::endl;
+
+    }
+
 }
 

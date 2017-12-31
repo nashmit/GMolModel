@@ -173,6 +173,13 @@ void HamiltonianMonteCarloSampler::calcSqrtMInvL(SimTK::State& someState, SimTK:
     //std::cout << "Eigen MInv calc: " << EiSqrtMInv * EiSqrtMInv.transpose() << std::endl;
 
 }
+
+// Set set kinetic energy
+void HamiltonianMonteCarloSampler::setSetKE(SimTK::Real inpKE)
+{
+    this->ke_set = inpKE;
+}
+
 // Set old kinetic energy
 void HamiltonianMonteCarloSampler::setOldKE(SimTK::Real inpKE)
 {
@@ -182,34 +189,47 @@ void HamiltonianMonteCarloSampler::setOldKE(SimTK::Real inpKE)
 // Initialize variables (identical to setTVector)
 void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman)
 {
+    randomEngine.seed( std::time(0) );
     //compoundSystem->realizeTopology(); // ELIMINATE REALIZE TOPOLOGY
     //SimTK::State state = compoundSystem->updDefaultState();
     timeStepper->initialize(compoundSystem->getDefaultState());
+    setTemperature(argTemperature); // Needed for Fixman
 
+    // Initialize x
+    system->realize(someState, SimTK::Stage::Position);
     int i = 0;
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
-        TVector[i] = mobod.getMobilizerTransform(someState);
+        SetTvector[i] = TVector[i] = mobod.getMobilizerTransform(someState);
         i++;
     }
- 
-    // Make sure matter and forces subsystems realize thier q and f(q) s
-    system->realize(someState, SimTK::Stage::Position);
-
-    setTemperature(argTemperature); // Needed for Fixman
     setOldPE(getPEFromEvaluator(someState));
+    setSetPE(getOldPE());
 
     this->useFixman = argUseFixman;  
-
     if(useFixman){
         setOldFixman(calcFixman(someState));
+        setSetFixman(getOldFixman());
     }else{
-        setOldFixman(1);
+        setOldFixman(0.0);
+        setSetFixman(getOldFixman());
     }
-    setOldKE(0.0);
-  
-    randomEngine.seed( std::time(0) );
+
+    // Initialize velocities to temperature
+    int nu = someState.getNU();
+    double sqrtRT = std::sqrt(RT);
+    SimTK::Vector V(nu);
+    SimTK::Vector SqrtMInvV(nu);
+    for (int j=0; j < nu; ++j){
+        V[j] = gaurand(randomEngine);
+    }
+    matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
+    SqrtMInvV *= sqrtRT; // Set stddev according to temperature
+    someState.updU() = SqrtMInvV;
+    system->realize(someState, SimTK::Stage::Velocity);
+    setOldKE(matter->calcKineticEnergy(someState));
+    setSetKE(getOldKE());
   
     //timeStepper->initialize(someState);
     // After an event handler has made a discontinuous change to the 
@@ -217,27 +237,27 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
     // reinitialize the Integrator.
     //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
 
+    /////////////////////////
+    // Harmonic oscillator
+    /////////////////////////
+    HO_randomEngine.seed( std::time(0) );
+    // Initialize x
+    for(int i = 0; i < HO_D; i++){HO_x[i] = HO_xini[i] = 1.0;}
+    HO_PE_set = HO_PE_xprop = HO_PE_x = HarmonicOscillatorPE(HO_x);
+    // Initialize v
+    HO_InitializeVelocity(HO_v, getTemperature());
+    HO_KE_set = HO_KE_xprop = HO_KE_x = HarmonicOscillatorKE(HO_v);
+    HO_etot_x = HO_PE_x + HO_KE_x;
+    HO_etot_set = HO_etot_xprop = HO_etot_x;
 }
 
 // Initialize variables (identical to setTVector)
 void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature)
 {
-    //compoundSystem->realizeTopology(); // no need since a sampler doesn't change topological state cars
+    setTemperature(argTemperature); // Needed for Fixman
 
-    //someState.advanceSystemToStage(SimTK::Stage::Instance);
-
-    int nu = someState.getNU();
-    SimTK::Vector V(nu);
-    SimTK::Vector SqrtMInvV(nu);
-
-    // Make sure matter and forces subsystems realize thier q and f(q) s
+    // Initialize x
     system->realize(someState, SimTK::Stage::Position);
-    matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
-
-    // Position should be sufficient be needed !!!!!
-    //system->realize(someState, SimTK::Stage::Acceleration);
-    //setOldFixman(calcFixman(someState));
-
     int i = 0;
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
@@ -246,18 +266,43 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::
         i++;
     }
 
-    setTemperature(argTemperature); // Needed for Fixman
-
     setOldPE(getPEFromEvaluator(someState));
 
-    setOldFixman(calcFixman(someState));
+    if(useFixman){
+        setOldFixman(calcFixman(someState));
+    }else{
+        setOldFixman(0.0);
+    }
 
-    setOldKE(0.0);
+    // Initialize velocities to temperature
+    int nu = someState.getNU();
+    double sqrtRT = std::sqrt(RT);
+    SimTK::Vector V(nu);
+    SimTK::Vector SqrtMInvV(nu);
+    for (int j=0; j < nu; ++j){
+        V[j] = gaurand(randomEngine);
+    }
+    matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
+    SqrtMInvV *= sqrtRT; // Set stddev according to temperature
+    someState.updU() = SqrtMInvV;
+    system->realize(someState, SimTK::Stage::Velocity);
+    setOldKE(matter->calcKineticEnergy(someState));
   
     // After an event handler has made a discontinuous change to the 
     // Integrator's "advanced state", this method must be called to 
     // reinitialize the Integrator.
     //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
+    /////////////////////////
+    // Harmonic oscillator
+    /////////////////////////
+    // Initialize x
+    for(int i = 0; i < HO_D; i++){HO_x[i] = HO_xini[i] = 1.0;}
+    HO_PE_set = HO_PE_xprop = HO_PE_x = HarmonicOscillatorPE(HO_x);
+    // Initialize v
+    HO_InitializeVelocity(HO_v, getTemperature());
+    HO_KE_set = HO_KE_xprop = HO_KE_x = HarmonicOscillatorKE(HO_v);
+    HO_etot_x = HO_PE_x + HO_KE_x;
+    HO_etot_set = HO_etot_xprop = HO_etot_x;
 }
 
 
@@ -274,17 +319,13 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     int nu = someState.getNU();
     double sqrtRT = std::sqrt(RT);
     SimTK::Vector V(nu);
-
     SimTK::Vector SqrtMInvV(nu);
     for (int i=0; i < nu; ++i){
         V[i] = gaurand(randomEngine);
-        //V[i] = 0.2;
-        //double z = 0;
-        //V[i] = boost::math::pdf(gaurand, z);
     }
 
     system->realize(someState, SimTK::Stage::Position);
-    //std::cout << "Before stepTo Q: " << someState.getQ() << std::endl;
+    //std::cout << "Q: " << someState.getQ() << std::endl;
     //std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
     //std::cout << "HamiltonianMonteCarloSampler::propose SqrtMInvV: " << SqrtMInvV << std::endl;
@@ -297,7 +338,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //std::cout << "Before stepTo U: " << someState.getU() << std::endl;
 
     // Set old kinetic energy
-    system->realize(someState, SimTK::Stage::Acceleration);
+    system->realize(someState, SimTK::Stage::Velocity);
     setOldKE(matter->calcKineticEnergy(someState));
 
     // Check priinciple of equipartition of energy
@@ -360,6 +401,22 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //    std::cout << std::endl;
     //}
 
+    /////////////////////////
+    // Harmonic oscillator
+    /////////////////////////
+
+    for(int i = 0; i < HO_D; i++){HO_x[i] = HO_xini[i];}
+    HO_PE_x = HO_PE_set;
+    HO_InitializeVelocity(HO_v, getTemperature());
+    HO_KE_x = HarmonicOscillatorKE(HO_v);
+    HO_etot_x = HO_PE_x + HO_KE_x;
+
+    HO_VelocityVerlet(timestep, 100);
+    HO_PE_xprop = HarmonicOscillatorPE(HO_xprop);
+    HO_KE_xprop = HarmonicOscillatorKE(HO_v);
+    HO_etot_xprop = HO_PE_xprop + HO_KE_xprop;
+    //////////////////////////
+
 }
 
 // The update step in Monte Carlo methods consists in:
@@ -367,8 +424,6 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real timestep, int nosteps)
 {
     SimTK::Real rand_no = uniformRealDistribution(randomEngine);
-
-    //system->realize(someState, SimTK::Stage::Dynamics);
 
     propose(someState, timestep, nosteps);
 
@@ -381,7 +436,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     if(useFixman){
         fix_n = calcFixman(someState);
     }else{
-        fix_n = 1;
+        fix_n = 0.0;
     }
     SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
     SimTK::Real ke_n = matter->calcKineticEnergy(someState);
@@ -403,8 +458,9 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_o) " << exp(-(etot_n - etot_o) / RT)
         << " etot_n " << etot_n << " etot_o " << etot_o;
 
-    //if ((pe_n < pe_o) || (rand_no < exp(-( (pe_n + fix_n) - (pe_o + fix_o) ) / RT))){ // Accept
-    if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
+    //if (( (pe_n + fix_n) < (pe_o + fix_o) ) || (rand_no < exp(-( (pe_n + fix_n) - (pe_o + fix_o) ) / RT))){ // Accept
+    if (( (pe_n) < (pe_o) ) || (rand_no < exp(-( (pe_n) - (pe_o) ) / RT))){ // Accept
+    //if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
         std::cout << " acc 1 " ;
         setTVector(someState);
         //sendConfToEvaluator(); // OPENMM
@@ -423,6 +479,23 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
         << std:: endl;
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
+
+
+    /////////////////////////
+    // Harmonic oscillator
+    /////////////////////////
+    //if (( (pe_n) < (pe_o) ) || (rand_no < exp(-( (pe_n) - (pe_o) ) / RT))){ // Accept
+    if ((HO_etot_xprop < HO_etot_x) || (rand_no < exp(-(HO_etot_xprop - HO_etot_x)/RT))){ // Accept
+        for(int i = 0; i < HO_D; i++){HO_xini[i] = HO_xprop[i];}
+        HO_PE_set = HO_PE_xprop;
+        HO_KE_set = HO_KE_xprop;
+        HO_etot_set = HO_PE_xprop + HO_KE_xprop;
+        HO_etot_set = HO_etot_x;
+    }else{ // Reject
+        for(int i = 0; i < HO_D; i++){HO_x[i] = HO_xini[i];}
+    }
+
+    std::cout << "HO 1 pe_os " << HO_PE_set << " ke_os " << HO_KE_set << " etot_os " << HO_etot_set << std::endl;
 
 }
 

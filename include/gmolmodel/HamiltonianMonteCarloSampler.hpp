@@ -42,13 +42,20 @@ public:
     // to the appropriate conformation
     void update(SimTK::State& someState, SimTK::Real timestep, int nosteps);
 
-    // Get old kinetic energy
+    // Get set kinetic energy
     SimTK::Real getOldKE(void) { return this->ke_o; }
     
-    // Set kinetic energies    
+    // Get old kinetic energy
+    SimTK::Real getSetKE(void) { return this->ke_set; }
+    
+    // Set old kinetic energy
     void setOldKE(SimTK::Real);
 
+    // Set set kinetic energies    
+    void setSetKE(SimTK::Real);
+
 protected:
+    SimTK::Real ke_set; // The kinetic energy retained for acc-rej step
     SimTK::Real ke_o; // The kinetic energy retained for acc-rej step
     int trackStep;
 

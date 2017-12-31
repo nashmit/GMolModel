@@ -61,7 +61,7 @@ SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
     //SimTK::Real EiDetM = EiM.determinant();
     //std::cout << "EiDetM= " << EiDetM << std::endl;
     assert(RT > SimTK::TinyReal);
-    SimTK::Real result = RT * std::log(*D0);
+    SimTK::Real result = 0.5 * RT * std::log(*D0);
     delete D0;
     return result;
 }
@@ -82,8 +82,14 @@ SimTK::Real MonteCarloSampler::calcNumFixman(SimTK::State& someState){
     }
     SimTK::Real EiDetM = EiM.determinant();
     assert(RT > SimTK::TinyReal);
-    SimTK::Real result = RT * std::log(EiDetM);
+    SimTK::Real result = 0.5 * RT * std::log(EiDetM);
     return result;
+}
+
+// Get the set potential energy
+SimTK::Real MonteCarloSampler::getSetPE(void)
+{
+    return this->pe_set;
 }
 
 // Get the stored potential energy
@@ -92,16 +98,34 @@ SimTK::Real MonteCarloSampler::getOldPE(void)
     return this->pe_o;
 }
 
+// Set set potential energy
+void MonteCarloSampler::setSetPE(SimTK::Real argPE)
+{
+    this->pe_set = argPE;
+}
+
 // Set stored potential energy
 void MonteCarloSampler::setOldPE(SimTK::Real argPE)
 {
     this->pe_o = argPE;
 }
 
-// Set Fixman potential
+// Set set Fixman potential
+void MonteCarloSampler::setSetFixman(SimTK::Real argFixman)
+{
+    this->fix_set = argFixman;
+}
+
+// Set old Fixman potential
 void MonteCarloSampler::setOldFixman(SimTK::Real argFixman)
 {
     this->fix_o = argFixman;
+}
+
+// Get set Fixman potential
+SimTK::Real MonteCarloSampler::getSetFixman(void)
+{
+    return this->fix_set;
 }
 
 // Get Fixman potential
@@ -121,10 +145,50 @@ void MonteCarloSampler::setTVector(const SimTK::State& someState)
   }
 }
 
+// Stores the configuration into an internal vector of transforms TVector
+void MonteCarloSampler::setTVector(SimTK::Transform *inpTVector)
+{
+  int i = 0;
+  for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+    TVector[i] = inpTVector[i];
+    i++;
+  }
+}
+
+// Stores the set configuration into an internal vector of transforms TVector
+void MonteCarloSampler::setSetTVector(const SimTK::State& someState)
+{
+  int i = 0;
+  for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+    SetTVector[i] = mobod.getMobilizerTransform(someState);
+    i++;
+  }
+}
+
+// Stores the configuration into an internal vector of transforms TVector
 // Get the stored configuration
 SimTK::Transform * MonteCarloSampler::getTVector(void)
 {
     return this->TVector;
+}
+
+// Stores the configuration into an internal vector of transforms TVector
+// Get the stored configuration
+SimTK::Transform * MonteCarloSampler::getSetTVector(void)
+{
+    return this->SetTVector;
+}
+
+// Restores configuration from the internal set vector of transforms TVector
+void MonteCarloSampler::assignConfFromSetTVector(SimTK::State& someState)
+{
+  int i = 0;
+  for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+    mobod.setQToFitTransform(someState, SetTVector[i]);
+    i++;
+  }
 }
 
 // Restores configuration from the internal vector of transforms TVector
@@ -138,6 +202,7 @@ void MonteCarloSampler::assignConfFromTVector(SimTK::State& someState)
   }
 }
 
+// Assign random conformation
 // Assign random conformation
 // In torsional dynamics the first body has 7 Q variables for 6 dofs - one
 // quaternion (q) and 3 Cartesian coordinates (x). updQ will return: 
@@ -165,7 +230,8 @@ void MonteCarloSampler::propose(SimTK::State& someState)
         i++;
     }
 
-    system->realize(someState, SimTK::Stage::Acceleration); // NECESSARY
+    //system->realize(someState, SimTK::Stage::Acceleration); // NECESSARY
+    system->realize(someState, SimTK::Stage::Position); // NECESSARY
 
     /*
     std::cout << "State info AFTER  updQ. Time = " << someState.getTime() << std::endl;
