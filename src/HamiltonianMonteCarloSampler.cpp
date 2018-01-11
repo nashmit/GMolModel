@@ -201,7 +201,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
-        SetTvector[i] = TVector[i] = mobod.getMobilizerTransform(someState);
+        SetTVector[i] = TVector[i] = mobod.getMobilizerTransform(someState);
         i++;
     }
     setOldPE(getPEFromEvaluator(someState));
@@ -230,6 +230,8 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
     system->realize(someState, SimTK::Stage::Velocity);
     setOldKE(matter->calcKineticEnergy(someState));
     setSetKE(getOldKE());
+    this->etot_o = getOldPE() + getOldKE() + getOldFixman();
+    this->etot_set = this->etot_o;
   
     //timeStepper->initialize(someState);
     // After an event handler has made a discontinuous change to the 
@@ -256,22 +258,26 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::
 {
     setTemperature(argTemperature); // Needed for Fixman
 
+    //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Topology, false);
+
     // Initialize x
     system->realize(someState, SimTK::Stage::Position);
     int i = 0;
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
-        TVector[i] = mobod.getMobilizerTransform(someState);
+        SetTVector[i] = TVector[i] = mobod.getMobilizerTransform(someState);
         i++;
     }
-
     setOldPE(getPEFromEvaluator(someState));
+    setSetPE(getOldPE());
 
     if(useFixman){
         setOldFixman(calcFixman(someState));
+        setSetFixman(getOldFixman());
     }else{
         setOldFixman(0.0);
+        setSetFixman(getOldFixman());
     }
 
     // Initialize velocities to temperature
@@ -287,7 +293,13 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::
     someState.updU() = SqrtMInvV;
     system->realize(someState, SimTK::Stage::Velocity);
     setOldKE(matter->calcKineticEnergy(someState));
+    setSetKE(getOldKE());
+    this->etot_o = getOldPE() + getOldKE() + getOldFixman();
+    this->etot_set = this->etot_o;
   
+    //std::cout <<  "Sampler after reinitialize State Cache Info: " << std::endl;
+    //PrintSimbodyStateCache(someState);
+
     // After an event handler has made a discontinuous change to the 
     // Integrator's "advanced state", this method must be called to 
     // reinitialize the Integrator.
@@ -314,6 +326,16 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 {
     //randomEngine.seed(4294653137UL); // for reproductibility
 
+    system->realize(someState, SimTK::Stage::Position);
+    // Initialize x - not necessary
+    int t = 0;
+    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+        TVector[t] = SetTVector[t];
+        t++;
+    }
+    setOldPE(getSetPE());
+    setOldFixman(getSetFixman());
+
     // Assign velocities according to Maxwell-Boltzmann distribution
     // and set Old kinetic energy
     int nu = someState.getNU();
@@ -323,8 +345,6 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     for (int i=0; i < nu; ++i){
         V[i] = gaurand(randomEngine);
     }
-
-    system->realize(someState, SimTK::Stage::Position);
     //std::cout << "Q: " << someState.getQ() << std::endl;
     //std::cout << "Before stepTo PE: " << forces->getMultibodySystem().calcPotentialEnergy(someState) << std::endl;
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
@@ -340,6 +360,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     // Set old kinetic energy
     system->realize(someState, SimTK::Stage::Velocity);
     setOldKE(matter->calcKineticEnergy(someState));
+    this->etot_o = getOldPE() + getOldKE() + getOldFixman();
 
     // Check priinciple of equipartition of energy
     //SimTK::Vector U(nu);
@@ -382,6 +403,8 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     // Propagate through phase space (integrate)
     //std::cout << "Before stepTo time: " << someState.getTime() << std::endl;
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
+    //std::cout <<  "Sampler after stepTo State Cache Info: " << std::endl;
+    //PrintSimbodyStateCache(someState);
     //std::cout << "After  stepTo time: " << someState.getTime() << std::endl;
     //writePdb(*residue, someState, "pdbs", "sb_", 8, "HMCprop", trackStep);
     ++trackStep;
@@ -439,6 +462,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         fix_n = 0.0;
     }
     SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
+    system->realize(someState, SimTK::Stage::Velocity);
     SimTK::Real ke_n = matter->calcKineticEnergy(someState);
 
     // Apply Metropolis criterion
@@ -452,6 +476,9 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         etot_o = pe_o + ke_o;
     }
 
+    //std::cout <<  "Sampler after energies calculations State Cache Info: " << std::endl;
+    //PrintSimbodyStateCache(someState);
+
     //std::cout<<std::setprecision(10)<<std::fixed;
     std::cout << "pe_o " << pe_o << " ke_o " << ke_o << " fix_o " << fix_o
         << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
@@ -459,27 +486,33 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         << " etot_n " << etot_n << " etot_o " << etot_o;
 
     //if (( (pe_n + fix_n) < (pe_o + fix_o) ) || (rand_no < exp(-( (pe_n + fix_n) - (pe_o + fix_o) ) / RT))){ // Accept
-    if (( (pe_n) < (pe_o) ) || (rand_no < exp(-( (pe_n) - (pe_o) ) / RT))){ // Accept
+    //if (( (pe_n) < (pe_o) ) || (rand_no < exp(-( (pe_n) - (pe_o) ) / RT))){ // Accept
+    //if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
+
+    if(1){ // Always accept
     //if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
         std::cout << " acc 1 " ;
-        setTVector(someState);
+        setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
-        setOldPE(pe_n);
-        setOldFixman(fix_n);
-        someState.updU() = 0.0;
-        setOldKE(0.0);
+        setSetPE(pe_n);
+        setSetFixman(fix_n);
+        setSetKE(ke_n);
+        this->etot_set = getSetPE() + getSetFixman() + getSetKE();
+        //someState.updU() = 0.0;
+        //setOldKE(0.0);
+
     }else{ // Reject
         std::cout << " acc 0 " ;
-        assignConfFromTVector(someState);
-        someState.updU() = 0.0;
-        setOldKE(0.0);
+        assignConfFromSetTVector(someState);
+        //someState.updU() = 0.0;
+        //setOldKE(0.0);
+
     }
 
     std::cout << " pe_os " << getOldPE() << " ke_os " << getOldKE() << " fix_os " << getOldFixman()
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
         << std:: endl;
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
-
 
     /////////////////////////
     // Harmonic oscillator

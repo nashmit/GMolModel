@@ -87,6 +87,7 @@ public:
   );
 
   void setRegimen(std::string argRegimen, std::string flexFN);
+  std::string getRegimen(void);
 
   std::string getname(void){return this->name;}
   void setName(std::string argName){this->name = argName;}

@@ -49,7 +49,7 @@ public:
     void HO_VelocityVerlet(double dt, int nofSteps);
     ///////////////////////////////////
 
-protected:
+public:
     const SimTK::System *system;
     SimTK::CompoundSystem *compoundSystem;
     SimTK::SimbodyMatterSubsystem *matter;

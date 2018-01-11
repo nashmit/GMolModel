@@ -56,7 +56,7 @@ int main(int argc, char **argv)
         }
     
         // Initialize worlds
-        (p_worlds[worldIx])->Init();
+        (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]) );
     
         // Initialize sampler
         p_samplers.push_back( new HamiltonianMonteCarloSampler(
@@ -87,8 +87,9 @@ int main(int argc, char **argv)
     //World *world0 = context->getWorld(0);
     //World *world1 = context->getWorld(1);
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
-        std::cout << "World 0 Initial const state PE: " << std::setprecision(20)
+        std::cout << "World " << worldIx << " initial const state PE: " << std::setprecision(20)
             << (p_worlds[worldIx])->forces->getMultibodySystem().calcPotentialEnergy((p_worlds[worldIx])->integ->updAdvancedState()) 
+            << " useFixman = " << p_samplers[worldIx]->isUsingFixman()
             << std::endl;
     }
 
@@ -111,61 +112,80 @@ int main(int argc, char **argv)
     }
 
     // Simulate the two worlds
-    for(int i = 0; i < total_mcsteps; i += round_mcsteps){
-        
-        // Get remainders
-        if(i == 0){
-            remainders[0] = 0;
-        }else{
-            remainders[0] = i % round_mcsteps;
+    int mc_step = -1;
+    // Update one round for the first regimen
+    currentWorldIx = worldIndexes.front();
+    SimTK::State& advancedState = (p_worlds[currentWorldIx])->integ->updAdvancedState();
+    //SimTK::State& defaultState = (p_worlds[currentWorldIx])->integ->updDefaultState();
+    std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
+    for(int k = 0; k < mix_mcsteps[currentWorldIx]; k++){
+        ++mc_step; // Increment mc_step
+        p_samplers[currentWorldIx]->update(advancedState,
+            timesteps[currentWorldIx], mdsteps[currentWorldIx]);
+    }
+    if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
+        (p_worlds[currentWorldIx])->updateAtomLists(advancedState);
+        for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+            ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
         }
+    }
 
-        for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
-            remainders[worldIx] = i % round_mcsteps;
-            if(worldIx > 0){
-                remainders[worldIx] = remainders[worldIx - 1] % mix_mcsteps[worldIx];
-            }
-         }
+    while(mc_step < total_mcsteps){
 
-        // Choose world based on remainders
-        for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
-            if(remainders[worldIx] == 0){
-                currentWorldIx = worldIx;
-                break;
-            }
-        }
-         
-        // Update
-        //std::cout << "main: Current World index " << currentWorldIx << std::endl << std::flush;
+        // Get coordinates from last world and accept them automatically
+        std::rotate(worldIndexes.begin(), worldIndexes.begin() + 1, worldIndexes.end());
+        currentWorldIx = worldIndexes.front();
+
+        // Transfer coordinates from last world to current
+        std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
+            << " at MC step " << mc_step << std::endl;
+        const SimTK::State& lastConstState = (p_worlds[worldIndexes.back()])->integ->getState();
+        const SimTK::State& currentConstState = (p_worlds[currentWorldIx])->integ->getState();
+        SimTK::State& lastAdvancedState = (p_worlds[worldIndexes.back()])->integ->updAdvancedState();
         SimTK::State& currentAdvancedState = (p_worlds[currentWorldIx])->integ->updAdvancedState();
-        for(int k = 0; k < mix_mcsteps[currentWorldIx]; k++){
-            p_samplers[currentWorldIx]->update(
-                currentAdvancedState,
-                timesteps[currentWorldIx], mdsteps[currentWorldIx]);
+
+        // CHECK COORD ASS Write source pdb
+        for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+            (p_worlds[worldIndexes.back()])->updateAtomLists(lastAdvancedState);
+            ((p_worlds[worldIndexes.back()])->getTopology(mol_i)).writePdb("pdbs", "sb_src", ".pdb", 10, mc_step);
+            std::cout << "world " << worldIndexes.back() << " ";
+            (p_worlds[worldIndexes.back()])->printPoss((p_worlds[worldIndexes.back()])->getTopology(mol_i), lastAdvancedState);
+        }
+        currentAdvancedState = (p_worlds[currentWorldIx])->setAtomsLocationsInGround(
+            currentAdvancedState, (p_worlds[worldIndexes.back()])->getAtomsLocationsInGround( lastAdvancedState ));
+        // CHECK COORD ASS Write dest pdb
+        for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+            ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb_dest", ".pdb", 10, mc_step);
+            std::cout << "world " << currentWorldIx << " ";
+            (p_worlds[currentWorldIx])->printPoss((p_worlds[currentWorldIx])->getTopology(mol_i), currentAdvancedState);
         }
 
-        // Debug
+        //std::cout << "Advanced states info: "<< lastAdvancedState << " " << currentAdvancedState << std::endl;
+        // Reinitialize current sampler
+        //std::cout << "World " << worldIndexes.back() << " State Cache Info: " << std::endl;
+        //(p_worlds[worldIndexes.back()])->PrintSimbodyStateCache(lastAdvancedState);
+        //std::cout << "Test World " << currentWorldIx << " before reinitialize State Cache Info before reinitialize: " << std::endl;
         //(p_worlds[currentWorldIx])->PrintSimbodyStateCache(currentAdvancedState);
+        //std::cout << "integrator addresses: "
+        //    << &(p_samplers[currentWorldIx]->timeStepper->updIntegrator()) << " " << &(p_worlds[currentWorldIx]->integ) << " "
+        //    << &(p_samplers[worldIndexes.back()]->timeStepper->updIntegrator()) << " " << &(p_worlds[worldIndexes.back()]->integ) << std::endl;
+        p_samplers[currentWorldIx]->reinitialize( currentAdvancedState, 
+            timesteps[currentWorldIx], total_mcsteps,
+            SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
 
+        // Set residual energy for current sampler
+        (p_samplers[currentWorldIx])->setREP( (p_samplers[worldIndexes.back()])->getSetPE() - (p_samplers[currentWorldIx])->getSetPE() );
+
+        std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
+        for(int k = 0; k < mix_mcsteps[currentWorldIx]; k++){
+            ++mc_step; // Increment mc_step
+            p_samplers[currentWorldIx]->update(currentAdvancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
+        }
         if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
             (p_worlds[currentWorldIx])->updateAtomLists(currentAdvancedState);
             for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, i);
+                ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
             }
-        }
-
-        if(nofRegimens > 1){
-            // Get coordinates from last world and accept them automatically
-            std::rotate(worldIndexes.begin(), worldIndexes.begin() + 1, worldIndexes.end());
-            //std::cout << "main: Sending configuration to World " << worldIndexes[0] << std::endl;
-            SimTK::State& nextAdvancedState = (p_worlds[worldIndexes[0]])->integ->updAdvancedState();
-
-            currentAdvancedState = (p_worlds[currentWorldIx])->setAtomsLocationsInGround(
-                currentAdvancedState, (p_worlds[worldIndexes[0]])->getAtomsLocationsInGround( nextAdvancedState ));
-
-            p_samplers[worldIndexes[0]]->reinitialize( nextAdvancedState, 
-                timesteps[worldIndexes[0]], total_mcsteps,
-                SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
         }
 
     } // for i in MC steps

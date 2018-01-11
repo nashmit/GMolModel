@@ -49,7 +49,7 @@ int main(int argc, char **argv)
         delete amberReader;
     }
 
-    p_world->Init();
+    p_world->Init(0.0015);
 
 
     // Initialize sampler

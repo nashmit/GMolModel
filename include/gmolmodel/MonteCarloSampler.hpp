@@ -59,11 +59,18 @@ public:
     SimTK::Real getSetFixman(void);
 
     // Set/get Fixman potential
+    void setREP(SimTK::Real);
+    SimTK::Real getREP(void);
+
+    // Set/get Fixman potential
     void setOldFixman(SimTK::Real);
     SimTK::Real getOldFixman(void);
 
     // Evaluate the potential energy at current state
     SimTK::Real getPEFromEvaluator(SimTK::State& someState); 
+
+    // Return true if use Fixman potential
+    bool isUsingFixman(void);
 
     // Compute Fixman potential
     SimTK::Real calcFixman(SimTK::State& someState);
@@ -87,6 +94,7 @@ protected:
 
     bool useFixman;    
     SimTK::Real fix_set, fix_o, fix_n;
+    SimTK::Real residualEmbeddedPotential; // inside rigid bodies if weren't rigid
  
     // Random number generators - not sure if I need two
     // Needs testing

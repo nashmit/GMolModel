@@ -177,7 +177,7 @@ class World{
 
   void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF);
 
-  void Init(void);
+  void Init(SimTK::Real integTimestep);
 
   std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > >  getAtomsLocationsInGround(const SimTK::State&);
 
@@ -186,6 +186,8 @@ class World{
   void updateAtomLists(const SimTK::State&);
  
   void PrintSimbodyStateCache(SimTK::State&);
+
+  void printPoss(const SimTK::Compound& c, SimTK::State& someState);
  
   // Interface
   const Topology& getTopology(int moleculeNumber) const;

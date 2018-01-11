@@ -17,12 +17,19 @@ MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
     : Sampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
 {
     TVector = new SimTK::Transform[matter->getNumBodies()];
+    SetTVector = new SimTK::Transform[matter->getNumBodies()];
 }
 
 // Destructor
 MonteCarloSampler::~MonteCarloSampler()
 {
     delete [] TVector;
+}
+
+// Return true if use Fixman potential
+bool MonteCarloSampler::isUsingFixman(void)
+{
+    return useFixman;
 }
 
 // Compute Fixman potential
@@ -34,6 +41,7 @@ SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
     //   V[i] = i;
     //}
     system->realize(someState, SimTK::Stage::Position);
+    matter->realizeArticulatedBodyInertias(someState); // Move in calcDetM ?
 
     // Get M
     //SimTK::Matrix M(nu, nu);
@@ -134,6 +142,17 @@ SimTK::Real MonteCarloSampler::getOldFixman(void)
     return this->fix_o;
 }
 
+// Set/get Residual Embedded Potential
+void MonteCarloSampler::setREP(SimTK::Real inp)
+{
+    this->residualEmbeddedPotential = inp;
+}
+
+SimTK::Real MonteCarloSampler::getREP(void)
+{
+    return this->residualEmbeddedPotential;
+}
+
 // Stores the configuration into an internal vector of transforms TVector
 void MonteCarloSampler::setTVector(const SimTK::State& someState)
 {
@@ -183,23 +202,45 @@ SimTK::Transform * MonteCarloSampler::getSetTVector(void)
 // Restores configuration from the internal set vector of transforms TVector
 void MonteCarloSampler::assignConfFromSetTVector(SimTK::State& someState)
 {
+  //someState.invalidateAll(SimTK::Stage::Instance);
+  //matter->invalidateArticulatedBodyInertias(someState);
+  //system->realize(someState, SimTK::Stage::Position);
   int i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+    system->realize(someState, SimTK::Stage::Position);
     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
     mobod.setQToFitTransform(someState, SetTVector[i]);
+
+    system->realize(someState, SimTK::Stage::Position);
+    //matter->realizeArticulatedBodyInertias(someState);
+
+    //std::cout <<  "Sampler after setQ State Cache Info: " << std::endl;
+    //PrintSimbodyStateCache(someState);
+
     i++;
   }
+  system->realize(someState, SimTK::Stage::Position);
+  //matter->realizeArticulatedBodyInertias(someState);
 }
 
 // Restores configuration from the internal vector of transforms TVector
 void MonteCarloSampler::assignConfFromTVector(SimTK::State& someState)
 {
+  //someState.invalidateAll(SimTK::Stage::Instance);
+  //matter->invalidateArticulatedBodyInertias(someState);
+  //system->realize(someState, SimTK::Stage::Position);
   int i = 0;
   for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+    system->realize(someState, SimTK::Stage::Position);
     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
     mobod.setQToFitTransform(someState, TVector[i]);
+
+    system->realize(someState, SimTK::Stage::Position);
+    //matter->realizeArticulatedBodyInertias(someState);
     i++;
   }
+  system->realize(someState, SimTK::Stage::Position);
+  //matter->realizeArticulatedBodyInertias(someState);
 }
 
 // Assign random conformation
