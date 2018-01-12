@@ -100,6 +100,7 @@ public:
   };
 
   void loadMaps(void);
+  void printMaps(void);
 
   std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > getMbx2aIx(void){
       return mbx2aIx;

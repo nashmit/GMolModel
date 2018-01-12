@@ -518,6 +518,23 @@ void Topology::loadMaps(void){
     }
 }
 
+void Topology::printMaps(void)
+{
+    std::cout << "Topology printMaps" << std::endl;
+    std::cout << "mbx2aIx:" << std::endl;
+    for(map<SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex>::const_iterator it = mbx2aIx.begin();
+       it != mbx2aIx.end(); ++it)
+    {
+        std::cout << "mbx " << it->first << " atomIndex " << it->second << std::endl;
+    }
+    std::cout << "aIx2mbx:" << std::endl;
+    for(map<SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex>::const_iterator it = aIx2mbx.begin();
+       it != aIx2mbx.end(); ++it)
+    {
+        std::cout << "atomIndex " << it->first << " mbx " << it->second << std::endl;
+    }
+}
+
 void Topology::writePdb(std::string dirname, std::string prefix, std::string sufix, int maxNofDigits, int index) const
 {
     int nofDigits = (int) floor(log10(index));
