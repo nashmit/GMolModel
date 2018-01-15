@@ -547,12 +547,12 @@ void Topology::writePdb(std::string dirname, std::string prefix, std::string suf
     std::stringstream sstream;
     sstream << dirname << "/" << prefix << zeros << std::to_string(index) << sufix;
     string ofilename = sstream.str();
-    std::cout << "Topology writePdb to " << ofilename << std::endl;
+    //std::cout << "Topology writePdb to " << ofilename << std::endl;
 
     FILE *oF = fopen (ofilename.c_str(),"w");
     // Pdb lines
     for(int i = 0; i < getNumAtoms(); i++){
-        std::cout << "Topology writePdb atom " << i << " " << bAtomList[i].getX() << std::endl;
+        //std::cout << "Topology writePdb atom " << i << " " << bAtomList[i].getX() << std::endl;
         fprintf(oF, "%-6s%5d %4s %3s %c%4d    %8.3f%8.3f%8.3f  %4.2f%6.2f          %2s\n"
             , "ATOM"                 // record
             , i                      // index

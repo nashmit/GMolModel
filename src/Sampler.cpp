@@ -38,6 +38,7 @@ Sampler::Sampler(SimTK::CompoundSystem *argCompoundSystem,
 
     pertAmp = 15.0; // Perturbation amplitude
 
+    #ifdef HARMONICOSCILLATOR
     HO_PE_x = 0.0; // PE at the begining of the proposal
     HO_PE_xprop = 0.0; // PE after the proposal
     HO_PE_set = 0.0; // PE set at the end of the acc-rej step
@@ -49,6 +50,7 @@ Sampler::Sampler(SimTK::CompoundSystem *argCompoundSystem,
     HO_etot_x = 0.0;
     HO_etot_xprop = 0.0;
     HO_etot_set = 0.0;
+    #endif
 
 }
 

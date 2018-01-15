@@ -18,6 +18,7 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
 {
     this->useFixman = true;  
     this->fix_n = this->fix_o = 0.0;
+    this->residualEmbeddedPotential = 0.0;
     trackStep = 0;
 }
 
@@ -239,6 +240,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
     // reinitialize the Integrator.
     //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
 
+    #ifdef HARMONICOSCILLATOR
     /////////////////////////
     // Harmonic oscillator
     /////////////////////////
@@ -251,6 +253,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
     HO_KE_set = HO_KE_xprop = HO_KE_x = HarmonicOscillatorKE(HO_v);
     HO_etot_x = HO_PE_x + HO_KE_x;
     HO_etot_set = HO_etot_xprop = HO_etot_x;
+    #endif
 }
 
 // Initialize variables (identical to setTVector)
@@ -304,6 +307,8 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::
     // Integrator's "advanced state", this method must be called to 
     // reinitialize the Integrator.
     //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Velocity, false);
+
+    #ifdef HARMONICOSCILLATOR
     /////////////////////////
     // Harmonic oscillator
     /////////////////////////
@@ -315,6 +320,7 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::
     HO_KE_set = HO_KE_xprop = HO_KE_x = HarmonicOscillatorKE(HO_v);
     HO_etot_x = HO_PE_x + HO_KE_x;
     HO_etot_set = HO_etot_xprop = HO_etot_x;
+    #endif
 }
 
 
@@ -424,6 +430,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //    std::cout << std::endl;
     //}
 
+    #ifdef HARMONICOSCILLATOR
     /////////////////////////
     // Harmonic oscillator
     /////////////////////////
@@ -439,6 +446,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     HO_KE_xprop = HarmonicOscillatorKE(HO_v);
     HO_etot_xprop = HO_PE_xprop + HO_KE_xprop;
     //////////////////////////
+    #endif
 
 }
 
@@ -476,21 +484,25 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         etot_o = pe_o + ke_o;
     }
 
+    etot_o;
+    etot_n;
+
     //std::cout <<  "Sampler after energies calculations State Cache Info: " << std::endl;
     //PrintSimbodyStateCache(someState);
 
-    //std::cout<<std::setprecision(10)<<std::fixed;
-    std::cout << "pe_o " << pe_o << " ke_o " << ke_o << " fix_o " << fix_o
-        << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
+    std::cout<<std::setprecision(5)<<std::fixed;
+    std::cout << "pe_o " << pe_o + getREP() << " ke_o " << ke_o << " fix_o " << fix_o << " rep " << getREP()
+        << " pe_n " << pe_n  + getREP() << " ke_n " << ke_n << " fix_n " << fix_n
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_o) " << exp(-(etot_n - etot_o) / RT)
-        << " etot_n " << etot_n << " etot_o " << etot_o;
+        //<< " etot_n " << etot_n  + getREP() << " etot_o " << etot_o + getREP()
+        ;
 
     //if (( (pe_n + fix_n) < (pe_o + fix_o) ) || (rand_no < exp(-( (pe_n + fix_n) - (pe_o + fix_o) ) / RT))){ // Accept
     //if (( (pe_n) < (pe_o) ) || (rand_no < exp(-( (pe_n) - (pe_o) ) / RT))){ // Accept
     //if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
 
-    if(1){ // Always accept
-    //if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
+    //if(1){ // Always accept
+    if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
         std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
@@ -509,11 +521,12 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
 
     }
 
-    std::cout << " pe_os " << getOldPE() << " ke_os " << getOldKE() << " fix_os " << getOldFixman()
+    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getSetKE() << " fix_os " << getSetFixman()
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
         << std:: endl;
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
 
+    #ifdef HARMONICOSCILLATOR
     /////////////////////////
     // Harmonic oscillator
     /////////////////////////
@@ -527,8 +540,8 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     }else{ // Reject
         for(int i = 0; i < HO_D; i++){HO_x[i] = HO_xini[i];}
     }
-
     std::cout << "HO 1 pe_os " << HO_PE_set << " ke_os " << HO_KE_set << " etot_os " << HO_etot_set << std::endl;
+    #endif
 
 }
 

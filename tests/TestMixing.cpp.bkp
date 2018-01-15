@@ -113,16 +113,24 @@ int main(int argc, char **argv)
 
     // Simulate the two worlds
     int mc_step = -1;
-
     // Update one round for the first regimen
     currentWorldIx = worldIndexes.front();
     SimTK::State& advancedState = (p_worlds[currentWorldIx])->integ->updAdvancedState();
+    //SimTK::State& defaultState = (p_worlds[currentWorldIx])->integ->updDefaultState();
 
     // Update
-    //std::cout << "Sampler " << currentWorldIx << " updating initially" << std::endl;
+    std::cout << "Sampler " << currentWorldIx << " updating initially" << std::endl;
     for(int k = 0; k < mix_mcsteps[currentWorldIx]; k++){
         ++mc_step; // Increment mc_step
-        p_samplers[currentWorldIx]->update(advancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
+        p_samplers[currentWorldIx]->update(advancedState,
+            timesteps[currentWorldIx], mdsteps[currentWorldIx]);
+    }
+
+    // Set residual energy for the rest of the samplers
+    if(setupReader.getValues("REGIMENS")[currentWorldIx] == "IC"){
+        for(int wIx = 1; wIx < nofRegimens; wIx++){
+            (p_samplers[wIx])->setREP( (p_samplers[currentWorldIx])->getSetPE() - (p_samplers[wIx])->getSetPE() );
+        }
     }
 
     // Write pdb
@@ -140,32 +148,47 @@ int main(int argc, char **argv)
         currentWorldIx = worldIndexes.front();
 
         // Transfer coordinates from last world to current
-        //std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
-        //    << " at MC step " << mc_step << std::endl;
+        std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
+            << " at MC step " << mc_step << std::endl;
+        //const SimTK::State& lastConstState = (p_worlds[worldIndexes.back()])->integ->getState();
+        //const SimTK::State& currentConstState = (p_worlds[currentWorldIx])->integ->getState();
         SimTK::State& lastAdvancedState = (p_worlds[worldIndexes.back()])->integ->updAdvancedState();
         SimTK::State& currentAdvancedState = (p_worlds[currentWorldIx])->integ->updAdvancedState();
 
+        // CHECK COORD ASS Write source pdb
+        //for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+        //    (p_worlds[worldIndexes.back()])->updateAtomLists(lastAdvancedState);
+        //    ((p_worlds[worldIndexes.back()])->getTopology(mol_i)).writePdb("pdbs", "sb_src", ".pdb", 10, mc_step);
+        //    //std::cout << "world " << worldIndexes.back() << " ";
+        //    //(p_worlds[worldIndexes.back()])->printPoss((p_worlds[worldIndexes.back()])->getTopology(mol_i), lastAdvancedState);
+        //}
         currentAdvancedState = (p_worlds[currentWorldIx])->setAtomsLocationsInGround(
             currentAdvancedState, (p_worlds[worldIndexes.back()])->getAtomsLocationsInGround( lastAdvancedState ));
+        // CHECK COORD ASS Write dest pdb
+        //for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+        //    ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb_dest", ".pdb", 10, mc_step);
+        //    //std::cout << "world " << currentWorldIx << " ";
+        //    //(p_worlds[currentWorldIx])->printPoss((p_worlds[currentWorldIx])->getTopology(mol_i), currentAdvancedState);
+        //}
+
+        // Set residual energy for the rest of the samplers
+        if(setupReader.getValues("REGIMENS")[currentWorldIx] == "IC"){
+            for(int wIx = 1; wIx < nofRegimens; wIx++){
+                (p_samplers[wIx])->setREP( (p_samplers[currentWorldIx])->getSetPE() - (p_samplers[wIx])->getSetPE() );
+            }
+        }
 
         // Reinitialize current sampler
+        //std::cout << "Test World " << currentWorldIx << " before reinitialize State Cache Info before reinitialize: " << std::endl;
+        //(p_worlds[currentWorldIx])->PrintSimbodyStateCache(currentAdvancedState);
+        //std::cout << "integrator addresses: "
+        //    << &(p_samplers[currentWorldIx]->timeStepper->updIntegrator()) << " " << &(p_worlds[currentWorldIx]->integ) << std::endl;
         p_samplers[currentWorldIx]->reinitialize( currentAdvancedState, 
             timesteps[currentWorldIx], total_mcsteps,
             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
 
-        // Set residual energy for the rest of the samplers
-        if(setupReader.getValues("REGIMENS")[worldIndexes.back()] == "IC"){
-            for(int i = 0; i < nofRegimens - 1; i++){
-                int restIx = worldIndexes[i];
-                int backIx = worldIndexes.back();
-                SimTK::Real diffPE = (p_samplers[backIx])->getSetPE() - (p_samplers[restIx])->getSetPE();
-                //std::cout << "Setting sampler " << restIx << " REP to " << (p_samplers[backIx])->getSetPE() << " - " << (p_samplers[restIx])->getSetPE() << " = " << diffPE << std::endl;
-                (p_samplers[restIx])->setREP( diffPE );
-            }
-        }
-
         // Update
-        //std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
+        std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
         for(int k = 0; k < mix_mcsteps[currentWorldIx]; k++){
             ++mc_step; // Increment mc_step
             p_samplers[currentWorldIx]->update(currentAdvancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);

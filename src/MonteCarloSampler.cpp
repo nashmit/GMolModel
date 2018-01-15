@@ -18,6 +18,7 @@ MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
 {
     TVector = new SimTK::Transform[matter->getNumBodies()];
     SetTVector = new SimTK::Transform[matter->getNumBodies()];
+    this->residualEmbeddedPotential = 0.0;
 }
 
 // Destructor

@@ -6,6 +6,10 @@
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/normal_distribution.hpp>
 
+//#ifndef HARMONICOSCILLATOR
+//#define HARMONICOSCILLATOR // for testing purposes
+//#endif
+
 class Topology;
 
 class Sampler
@@ -57,7 +61,7 @@ public:
     SimTK::DuMMForceFieldSubsystem *dumm;
     SimTK::GeneralForceSubsystem *forces;
     SimTK::TimeStepper *timeStepper;
-   
+  
     // Harmonic oscillator constants
     static const int HO_D = 20; // Dimensionality
     double HO_x[HO_D]; // Equilibrium position
@@ -86,7 +90,6 @@ public:
 
     boost::random::mt19937 HO_randomEngine = boost::random::mt19937();
     boost::normal_distribution<> HO_gaurand = boost::normal_distribution<>(0.0, 1.0);
-
 
 };
 
