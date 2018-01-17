@@ -68,7 +68,9 @@ void bArgParser::Print(void){
 }
 
 
-bArgParser::~bArgParser(){} // destructor
+bArgParser::~bArgParser(){
+    delete [] option;
+} // destructor
 
 ////////////////////////////
 ////// END ARGPARSER ///////

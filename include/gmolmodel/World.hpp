@@ -149,10 +149,11 @@ class World{
   SimTK::Force::Custom *ExtForce;
   SimTK::DecorationSubsystem *decorations;
   SimTK::Visualizer::Reporter *vizReporter;
+  bool visual;
   SimTK::DuMMForceFieldSubsystem *forceField;
 
-  std::vector<bMoleculeReader> moleculeReaders;
-  std::vector<Topology> topologies;
+  std::vector<bMoleculeReader *> moleculeReaders;
+  std::vector<Topology *> topologies;
 
   SimTK::Visualizer *viz;
   #ifdef NOSETHERMOS
@@ -173,7 +174,7 @@ class World{
   int **mbxTreeMat;    // tree representing the bonding
   SimTK::Real *branchMassVec; // branch masses self body included
 
-  World(int worldIndex, bool visual=true, SimTK::Real visualizerFrequency = 0.0015);
+  World(int worldIndex, bool isVisual=true, SimTK::Real visualizerFrequency = 0.0015);
 
   void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF);
 

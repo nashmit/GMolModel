@@ -87,10 +87,9 @@ class intriad{
 class bMoleculeReader{
  public:
   bSpecificAtom *bAtomList;
-  //std::vector<bBond> bonds; // RESTORE
   bBond *bonds;
   int natoms;
-  int nbonds; // EU
+  int nbonds; 
   unsigned int MAX_LINE_LENGTH;
 
   bMoleculeReader(readAmberInput *amberReader, const char *);

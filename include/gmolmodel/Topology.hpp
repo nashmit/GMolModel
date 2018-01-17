@@ -43,8 +43,9 @@ public:
   // Destructor
   virtual ~Topology();
 
-  // Set a MolModel and a MolStructure - to be removed
+  // Set/delete a MolModel and a MolStructure - to be removed
   void setMolModel(void);
+  void clearMolModel(void);
 
   // Scale all DuMM force field terms by scale_factor
   void setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor);

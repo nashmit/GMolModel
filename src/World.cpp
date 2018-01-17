@@ -125,7 +125,6 @@ GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatter
                     ) : matter(matter){
   this->compoundSystem = compoundSystem;
   this->fassno = fassno;
-  flag = new int;
   this->Caller = Caller;
 }
 
@@ -176,7 +175,7 @@ bool GridForce::dependsOnlyOnPositions() const {
 ////////////////////////////
 ////// SYMBODY SYSTEM //////
 ////////////////////////////
-World::World(int worldIndex, bool visual, SimTK::Real visualizerFrequency)
+World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
 {
     ownWorldIndex = worldIndex;
     std::cout << "World::World BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
@@ -186,6 +185,7 @@ World::World(int worldIndex, bool visual, SimTK::Real visualizerFrequency)
     matter = new SimTK::SimbodyMatterSubsystem(*compoundSystem);
     forces = new SimTK::GeneralForceSubsystem(*compoundSystem);
 
+    this->visual = isVisual;
     if(visual){
         decorations = new SimTK::DecorationSubsystem(*compoundSystem);
         SimTK::Visualizer viz(*compoundSystem);
@@ -212,29 +212,32 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
     this->flexFN = flexFN;
     this->ictdF = ictdF;
  
-    moleculeReaders.push_back(bMoleculeReader(amberReader, rbFN.c_str()));
+    std::cout << "World::AddMolecule moleculeReaders.push_back" << std::endl << std::flush;
+    bMoleculeReader * molRead = new bMoleculeReader(amberReader, rbFN.c_str());
+    moleculeReaders.push_back(molRead);
 
     std::cout << "World::AddMolecule add parameters" << std::endl << std::flush;
-    bAddAllParams(std::string("lig") + std::to_string(moleculeCount), amberReader, *forceField, (moleculeReaders.back()).bAtomList, (moleculeReaders.back()).bonds);
+    bAddAllParams(std::string("lig") + std::to_string(moleculeCount), amberReader, *forceField, (moleculeReaders.back())->bAtomList, (moleculeReaders.back())->bonds);
   
     std::cout << "World::AddMolecule add Compound" << std::endl << std::flush;
-    topologies.push_back(Topology(std::string("lig") + std::to_string(moleculeCount)));
+    Topology * top = new Topology(std::string("lig") + std::to_string(moleculeCount));
+    topologies.push_back(top);
   
     std::cout << "World::AddMolecule build Compound" << std::endl << std::flush;
-    (topologies.back()).build(*forceField, (moleculeReaders.back()).natoms, (moleculeReaders.back()).bAtomList, (moleculeReaders.back()).nbonds, (moleculeReaders.back()).bonds, flexFN, ictdF);
+    (topologies.back())->build(*forceField, (moleculeReaders.back())->natoms, (moleculeReaders.back())->bAtomList, (moleculeReaders.back())->nbonds, (moleculeReaders.back())->bonds, flexFN, ictdF);
   
-    std::cout << "World::AddMolecule adopt Compound " << &(topologies.back()) << std::endl << std::flush;
-    compoundSystem->adoptCompound(topologies.back());
+    std::cout << "World::AddMolecule adopt Compound " << topologies.back() << std::endl << std::flush;
+    compoundSystem->adoptCompound( *(topologies.back()) );
     std::cout << "World::AddMolecule realizeTopology" << std::endl << std::flush;
     compoundSystem->realizeTopology();
 
     std::cout << "Number of included atoms in nonbonded interactions: " << forceField->getNumNonbondAtoms() << std::endl << std::flush;
     std::cout << "getVdwGlobalScaleFactor() " << forceField->getVdwGlobalScaleFactor() << std::endl << std::flush;
-    for(int i=0; i<(topologies.back()).natms; i++){
+    for(int i=0; i<(topologies.back())->natms; i++){
         std::cout << " DuMM VdW Radius " 
-            << forceField->getVdwRadius(((topologies.back()).bAtomList[i]).getAtomClassIndex()) 
+            << forceField->getVdwRadius(((topologies.back())->bAtomList[i]).getAtomClassIndex()) 
             << " DuMM VdW Well Depth "
-            << forceField->getVdwWellDepth(((topologies.back()).bAtomList[i]).getAtomClassIndex())
+            << forceField->getVdwWellDepth(((topologies.back())->bAtomList[i]).getAtomClassIndex())
             << std::endl << std::flush;
     }
   
@@ -253,9 +256,9 @@ void World::Init(SimTK::Real timestep)
 
     // Load MobilizedBodyIndex vs Compound::AtomIndex maps 
     for ( unsigned int i = 0; i < this->topologies.size(); i++){
-        ((this->topologies)[i]).loadMaps();
+        ((this->topologies)[i])->loadMaps();
         std::cout << "Print maps topology " << i << std::endl;
-        ((this->topologies)[i]).printMaps();
+        ((this->topologies)[i])->printMaps();
     }
 
     // Generate a nonbonded list
@@ -332,11 +335,11 @@ void World::Init(SimTK::Real timestep)
 
 // Interface
 const Topology& World::getTopology(int moleculeNumber) const{
-    return topologies[moleculeNumber];
+    return *(topologies[moleculeNumber]);
 }
 
 Topology& World::updTopology(void){
-    return topologies.back();
+    return *(topologies.back());
 }
 
 // Returns: the inner vector represents the locations as a pair of bSpecificAtom
@@ -351,10 +354,10 @@ std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > World::get
     for ( unsigned int i = 0; i < this->topologies.size(); i++){
         std::vector<std::pair<bSpecificAtom *, SimTK::Vec3>> currentTopologyInfo;
         // Iterate through atoms
-        for(int j = 0; j < topologies[i].getNumAtoms(); j++){
-            SimTK::Compound::AtomIndex compoundAtomIndex = topologies[i].bAtomList[j].getCompoundAtomIndex();
-            SimTK::Vec3 location = topologies[i].calcAtomLocationInGroundFrame(state, compoundAtomIndex);
-            currentTopologyInfo.push_back(std::pair<bSpecificAtom *, SimTK::Vec3>(&(topologies[i].bAtomList[j]), location));
+        for(int j = 0; j < (topologies[i])->getNumAtoms(); j++){
+            SimTK::Compound::AtomIndex compoundAtomIndex = topologies[i]->bAtomList[j].getCompoundAtomIndex();
+            SimTK::Vec3 location = (topologies[i])->calcAtomLocationInGroundFrame(state, compoundAtomIndex);
+            currentTopologyInfo.push_back(std::pair<bSpecificAtom *, SimTK::Vec3>(&((topologies[i])->bAtomList[j]), location));
         }
         returnVector.push_back(currentTopologyInfo);
     }
@@ -368,13 +371,13 @@ void World::updateAtomLists(const SimTK::State & state)
     // Iterate through topologies
     for ( unsigned int i = 0; i < this->topologies.size(); i++){
         // Iterate through atoms
-        for(int j = 0; j < topologies[i].getNumAtoms(); j++){
-            SimTK::Compound::AtomIndex compoundAtomIndex = topologies[i].bAtomList[j].getCompoundAtomIndex();
-            SimTK::Vec3 location = topologies[i].calcAtomLocationInGroundFrame(state, compoundAtomIndex);
-            topologies[i].bAtomList[j].setX(location[0]);
-            topologies[i].bAtomList[j].setY(location[1]);
-            topologies[i].bAtomList[j].setZ(location[2]);
-            //std::cout << "updateAtomList atom " << j << " " << topologies[i].bAtomList[j].getX() << std::endl;
+        for(int j = 0; j < topologies[i]->getNumAtoms(); j++){
+            SimTK::Compound::AtomIndex compoundAtomIndex = topologies[i]->bAtomList[j].getCompoundAtomIndex();
+            SimTK::Vec3 location = topologies[i]->calcAtomLocationInGroundFrame(state, compoundAtomIndex);
+            topologies[i]->bAtomList[j].setX(location[0]);
+            topologies[i]->bAtomList[j].setY(location[1]);
+            topologies[i]->bAtomList[j].setZ(location[2]);
+            //std::cout << "updateAtomList atom " << j << " " << topologies[i]->bAtomList[j].getX() << std::endl;
         }
     }
 }
@@ -388,7 +391,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
     
     // Iterate through molecules/topologies
     for(unsigned int i = 0; i < otherWorldsAtomsLocations.size(); i++){
-        if(topologies[i].getRegimen() == "IC"){
+        if(topologies[i]->getRegimen() == "IC"){
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
             std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
@@ -402,22 +405,22 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             }
 
             // Match
-            topologies[i].matchDefaultAtomChirality(atomTargets, 0.01, false);
-            topologies[i].matchDefaultBondLengths(atomTargets);
-            topologies[i].matchDefaultBondAngles(atomTargets);
-            topologies[i].matchDefaultDihedralAngles(atomTargets, SimTK::Compound::DistortPlanarBonds);
-            topologies[i].matchDefaultTopLevelTransform(atomTargets);
-            topologies[i].matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
+            topologies[i]->matchDefaultAtomChirality(atomTargets, 0.01, false);
+            topologies[i]->matchDefaultBondLengths(atomTargets);
+            topologies[i]->matchDefaultBondAngles(atomTargets);
+            topologies[i]->matchDefaultDihedralAngles(atomTargets, SimTK::Compound::DistortPlanarBonds);
+            topologies[i]->matchDefaultTopLevelTransform(atomTargets);
+            topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
-            SimTK::Transform G_X_T = topologies[i].getTopLevelTransform();
+            SimTK::Transform G_X_T = topologies[i]->getTopLevelTransform();
             //SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
             SimTK::Transform P_X_M[matter->getNumBodies()]; // related to X_PFs
             SimTK::Transform T_X_BAt[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
             //SimTK::Angle inboardBondDihedralAngles[matter->getNumBodies()]; // related to X_FMs
-            //SimTK::Vec3 locs[topologies[i].getNumAtoms()];
-            P_X_M[1] = G_X_T * topologies[i].calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
-            T_X_BAt[1] = topologies[i].calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            //SimTK::Vec3 locs[topologies[i]->getNumAtoms()];
+            P_X_M[1] = G_X_T * topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            T_X_BAt[1] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
             //std::cout << "TopLevelTransform G_X_T:" ;
             //std::cout << G_X_T << std::endl;
             //std::cout << "DefaultAtomFrameInCompoundFrame: T_X_BAt of atom 0:";
@@ -427,28 +430,28 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             //std::cout << "DEBUG: " << " aIx " << aIx << " mbx " << mbx << " parentMbx " << parentMbx << std::endl;
         
             // Iterate through atoms - get P_X_M for all the bodies
-            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i].getNumAtoms(); ++aIx){
-                if(topologies[i].getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
+            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
+                if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
                     // Get body, parentBody, parentAtom
-                    SimTK::MobilizedBodyIndex mbx = topologies[i].getAtomMobilizedBodyIndex(aIx);
+                    SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
                     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
                     //const SimTK::MobilizedBody& parentMobod =  mobod.getParentMobilizedBody();
                     //SimTK::MobilizedBodyIndex parentMbx = parentMobod.getMobilizedBodyIndex();
                     //std::cout << "aIx " << aIx << " mbx " << mbx << " mobod.getQ " << ((SimTK::MobilizedBody::Free&)mobod).getQ(someState) << std::endl;
-                    //SimTK::Compound::AtomIndex parentAIx = (topologies[i].getMbx2aIx()).at(parentMbx);
+                    //SimTK::Compound::AtomIndex parentAIx = (topologies[i]->getMbx2aIx()).at(parentMbx);
         
                     // Get inboard dihedral angle and put in BAt_X_M0
-                    //inboardBondDihedralAngles[int(mbx)] = topologies[i].bgetDefaultInboardDihedralAngle(aIx);
+                    //inboardBondDihedralAngles[int(mbx)] = topologies[i]->bgetDefaultInboardDihedralAngle(aIx);
                     //std::cout << " inboardBondDihedralAngles " << inboardBondDihedralAngles[int(mbx)] << std::endl;
                     //SimTK::Transform BAt_X_M0 = SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis);
         
                     // Get P_X_M
-                    T_X_BAt[int(mbx)] = topologies[i].calcDefaultAtomFrameInCompoundFrame(aIx);
+                    T_X_BAt[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
                     //std::cout << "T_X_BAt: "<< std::endl << T_X_BAt[int(mbx)];
-                    //std::cout << "Location in mobod: " << topologies[i].getAtomLocationInMobilizedBodyFrame(aIx);
+                    //std::cout << "Location in mobod: " << topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx);
 
                     //SimTK::Transform T_X_M0 = T_X_BAt[int(mbx)] * BAt_X_M0;
-                    //const SimTK::Transform& T_X_PAt = topologies[i].calcDefaultAtomFrameInCompoundFrame(parentAIx);
+                    //const SimTK::Transform& T_X_PAt = topologies[i]->calcDefaultAtomFrameInCompoundFrame(parentAIx);
                     //SimTK::Transform PAt_X_T = ~T_X_PAt;
                     //SimTK::Transform PAt_X_M0 = PAt_X_T * T_X_M0;
                     P_X_M[int(mbx)] = G_X_T * T_X_BAt[int(mbx)]; // MODIFIED
@@ -472,41 +475,41 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             }
     
             // Match Default Configuration ( => default state)
-            topologies[i].matchDefaultAtomChirality(atomTargets, 0.01, false);
-            topologies[i].matchDefaultBondLengths(atomTargets);
-            topologies[i].matchDefaultBondAngles(atomTargets);
-            topologies[i].matchDefaultDihedralAngles(atomTargets, SimTK::Compound::DistortPlanarBonds);
-            topologies[i].matchDefaultTopLevelTransform(atomTargets);
-            topologies[i].matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
+            topologies[i]->matchDefaultAtomChirality(atomTargets, 0.01, false);
+            topologies[i]->matchDefaultBondLengths(atomTargets);
+            topologies[i]->matchDefaultBondAngles(atomTargets);
+            topologies[i]->matchDefaultDihedralAngles(atomTargets, SimTK::Compound::DistortPlanarBonds);
+            topologies[i]->matchDefaultTopLevelTransform(atomTargets);
+            topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
     
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
-            SimTK::Transform G_X_T = topologies[i].getTopLevelTransform();
+            SimTK::Transform G_X_T = topologies[i]->getTopLevelTransform();
             SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
             SimTK::Transform P_X_M[matter->getNumBodies()]; // related to X_PFs
             SimTK::Transform T_X_BAt[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
             SimTK::Angle inboardBondDihedralAngles[matter->getNumBodies()]; // related to X_FMs
-            SimTK::Vec3 locs[topologies[i].getNumAtoms()];
-            P_X_M[1] = G_X_T * topologies[i].calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
-            T_X_BAt[1] = topologies[i].calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            SimTK::Vec3 locs[topologies[i]->getNumAtoms()];
+            P_X_M[1] = G_X_T * topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            T_X_BAt[1] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
         
             // Iterate through atoms - get P_X_M for all the bodies
-            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i].getNumAtoms(); ++aIx){
-                if(topologies[i].getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
+            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
+                if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
                     // Get body, parentBody, parentAtom
-                    SimTK::MobilizedBodyIndex mbx = topologies[i].getAtomMobilizedBodyIndex(aIx);
+                    SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
                     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
                     const SimTK::MobilizedBody& parentMobod =  mobod.getParentMobilizedBody();
                     SimTK::MobilizedBodyIndex parentMbx = parentMobod.getMobilizedBodyIndex();
-                    SimTK::Compound::AtomIndex parentAIx = (topologies[i].getMbx2aIx()).at(parentMbx);
+                    SimTK::Compound::AtomIndex parentAIx = (topologies[i]->getMbx2aIx()).at(parentMbx);
         
                     // Get inboard dihedral angle and put in BAt_X_M0
-                    inboardBondDihedralAngles[int(mbx)] = topologies[i].bgetDefaultInboardDihedralAngle(aIx);
+                    inboardBondDihedralAngles[int(mbx)] = topologies[i]->bgetDefaultInboardDihedralAngle(aIx);
                     SimTK::Transform BAt_X_M0 = SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis);
         
                     // Get P_X_M
-                    T_X_BAt[int(mbx)] = topologies[i].calcDefaultAtomFrameInCompoundFrame(aIx);
+                    T_X_BAt[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
                     SimTK::Transform T_X_M0 = T_X_BAt[int(mbx)] * BAt_X_M0;
-                    const SimTK::Transform& T_X_PAt = topologies[i].calcDefaultAtomFrameInCompoundFrame(parentAIx);
+                    const SimTK::Transform& T_X_PAt = topologies[i]->calcDefaultAtomFrameInCompoundFrame(parentAIx);
                     SimTK::Transform PAt_X_T = ~T_X_PAt;
                     SimTK::Transform PAt_X_M0 = PAt_X_T * T_X_M0;
                     P_X_M[int(mbx)] = PAt_X_M0;
@@ -514,13 +517,13 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             }
         
             // Iterate through atoms - Set locations inside the bodies = BAt_X_atom.p
-            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i].getNumAtoms(); ++aIx){
-                SimTK::MobilizedBodyIndex mbx = topologies[i].getAtomMobilizedBodyIndex(aIx);
-                if(topologies[i].getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is not at body's origin
+            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
+                SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
+                if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is not at body's origin
                     SimTK::Transform BAt_X_T = ~(T_X_BAt[int(mbx)]);
-                    SimTK::Transform T_X_atom =  topologies[i].calcDefaultAtomFrameInCompoundFrame(aIx);
+                    SimTK::Transform T_X_atom =  topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
                     SimTK::Transform BAt_X_atom = BAt_X_T * T_X_atom;
-                    topologies[i].bsetFrameInMobilizedBodyFrame(aIx, BAt_X_atom);
+                    topologies[i]->bsetFrameInMobilizedBodyFrame(aIx, BAt_X_atom);
                     locs[int(aIx)] = BAt_X_atom.p();
                 }
                 else{
@@ -529,9 +532,9 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             }
         
             // Set stations and AtomPLacements for atoms in DuMM
-            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i].getNumAtoms(); ++aIx){
-                SimTK::MobilizedBodyIndex mbx = topologies[i].getAtomMobilizedBodyIndex(aIx);
-                    SimTK::DuMM::AtomIndex dAIx = topologies[i].getDuMMAtomIndex(aIx);
+            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
+                SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
+                    SimTK::DuMM::AtomIndex dAIx = topologies[i]->getDuMMAtomIndex(aIx);
                     forceField->bsetAtomStationOnBody( dAIx, locs[int(aIx)] );
                     forceField->updIncludedAtomStation(dAIx) = (locs[int(aIx)]);
                     forceField->bsetAtomPlacementStation(dAIx, mbx, locs[int(aIx)] );
@@ -597,14 +600,24 @@ void World::Advance(int nosteps){
 
 // Destructor
 World::~World(){
+    if(this->visual == true){
+        delete decorations;
+        //delete vizReporter;
+    }
     delete fassno;
-
     delete ts;
     delete integ;
     delete forceField;
+    delete ExtForce;
     delete matter;
     delete forces;
     delete compoundSystem;
+    for(unsigned int i = 0; i < moleculeReaders.size(); i++){
+        delete moleculeReaders[i];
+    }
+    for(unsigned int i = 0; i < topologies.size(); i++){
+        delete topologies[i];
+    }
 
     //forceField->loadAmber99Parameters();
 }

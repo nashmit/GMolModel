@@ -25,6 +25,7 @@ MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
 MonteCarloSampler::~MonteCarloSampler()
 {
     delete [] TVector;
+    delete [] SetTVector;
 }
 
 // Return true if use Fixman potential

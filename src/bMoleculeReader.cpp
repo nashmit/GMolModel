@@ -385,7 +385,19 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
 }
 
 // Default destructor
-bMoleculeReader::~bMoleculeReader(){;}
+bMoleculeReader::~bMoleculeReader()
+{
+    std::cout << "bMoleculeReader destructor called." << std::endl;
+    int noDummies = 0; 
+    for(int i=0; i< natoms+noDummies; i++){
+          delete bAtomList[i].bAtomType;
+    }
+    //for(int i=0; i < nbonds; i++){
+    //      delete bonds[i]...;
+    //}
+    delete [] bAtomList;
+    delete [] bonds;
+}
 
 /*
 bMoleculeReader::bMoleculeReader(DuMMForceFieldSubsystem& dumm,

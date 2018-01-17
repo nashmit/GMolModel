@@ -35,6 +35,11 @@ void Topology::setMolModel(void){
     struc[0].chain_names[0] = &bMolAtomList[0].chain_id;
 }
 
+void Topology::clearMolModel(void){
+    delete [] bMolAtomList;
+    // TODO opposite of mol_MolModelCreate and  mol_StructureAtomAdd
+}
+
 /* ==================================================
  *    Scale all DuMM force field terms by scale_factor
  * ================================================== */
