@@ -1,0 +1,9 @@
+MOLECULES 2but	 # Molecules to load
+REGIMENS IC TD  			# Regimen (IC, TD, MIX, RB, RBMIX)
+STEPS 64 				# MC steps (Acception-rejection steps)
+TIMESTEPS 0.0020 0.0060		# Timesteps to be used with regimens
+MDSTEPS  5 10		# Number of MD trial steps with all dofs dynamics
+MIXMCSTEPS 2 2                # Number of MC trials within a mixing round
+TEMPERATURE   300 			# Temperature for constant temperature simulations
+VISUAL TRUE 				# Use the visualizer
+WRITEPDBS FALSE				# Write pdbs

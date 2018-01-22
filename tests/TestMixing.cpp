@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include "simmain.hpp"
+#include "Robo.hpp"
 
 #include "HamiltonianMonteCarloSampler.hpp"
 #include "readAmberInput.hpp"
@@ -16,6 +17,7 @@ int main(int argc, char **argv)
 {
     // Initialize setup reader
     SetupReader setupReader(argv[1]);
+    TRACE("NEW ALLOC\n");
     Context *context = new Context();
     srand (time(NULL));
 
@@ -27,8 +29,10 @@ int main(int argc, char **argv)
     
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
         if(setupReader.getValues("VISUAL")[0] == "TRUE"){
+            TRACE("NEW ALLOC\n");
             p_worlds.push_back( new World(worldIx, true, std::stod(setupReader.getValues("TIMESTEPS")[worldIx])) );
         }else{
+            TRACE("NEW ALLOC\n");
             p_worlds.push_back( new World(worldIx, false, std::stod(setupReader.getValues("TIMESTEPS")[worldIx])) );
         }
 
@@ -48,6 +52,7 @@ int main(int argc, char **argv)
     
             std::string ictd = setupReader.getValues("REGIMENS")[worldIx];
     
+            TRACE("NEW ALLOC\n");
             readAmberInput *amberReader = new readAmberInput();
             amberReader->readAmberFiles(inpcrdFN, prmtopFN);
             (p_worlds[worldIx])->AddMolecule(amberReader, rbFN, flexFN, ictd);
@@ -59,6 +64,7 @@ int main(int argc, char **argv)
         (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]) );
     
         // Initialize sampler
+        TRACE("NEW ALLOC\n");
         p_samplers.push_back( new HamiltonianMonteCarloSampler(
             (p_worlds[worldIx])->compoundSystem, (p_worlds[worldIx])->matter, 
             (SimTK::Compound *)(&((p_worlds[worldIx])->getTopology(0))),

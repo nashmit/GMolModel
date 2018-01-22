@@ -16,7 +16,9 @@ MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
                                      SimTK::TimeStepper *argTimeStepper)
     : Sampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
 {
+    TRACE("NEW ALLOC\n");
     TVector = new SimTK::Transform[matter->getNumBodies()];
+    TRACE("NEW ALLOC\n");
     SetTVector = new SimTK::Transform[matter->getNumBodies()];
     this->residualEmbeddedPotential = 0.0;
 }
@@ -52,6 +54,7 @@ SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
     // Get detM
     SimTK::Real detM = 1.0;
     SimTK::Vector DetV(nu);
+    TRACE("NEW ALLOC\n");
     SimTK::Real* D0 = new SimTK::Real(1.0);
 
     // TODO: remove the request for Dynamics stage cache in SImbody files

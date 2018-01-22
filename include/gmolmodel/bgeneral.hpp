@@ -32,12 +32,6 @@
 //#define DEBUG 1
 //#endif
 
-#ifdef DEBUG
-#define TRACE(STR) printf("%s", STR);
-#else
-#define TRACE(STR)
-#endif
-
 
 #ifndef TARGET_TYPE
 #define TARGET_TYPE double

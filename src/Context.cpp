@@ -27,7 +27,7 @@ Context::~Context(){
     worlds.clear();
     samplers.clear();
     //delete p_world;
-    delete p_sampler;
+    //delete p_sampler;
 }
 
 // Get world
