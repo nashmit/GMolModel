@@ -132,7 +132,7 @@ foreach(TEST_SRC ${TESTS_SRCS})
                 ${Boost_LIBRARIES}
                 ${BOOST_LIBS_BYHAND}
                 #${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense...
-                libGMOLMODEL_dynamic.so
+		GMOLMODEL_dynamic
                 m )
 endforeach()
 
