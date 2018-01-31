@@ -26,4 +26,4 @@ cd ../../build-debug/
 
 
 cmake ..
-
+make -j4
