@@ -337,6 +337,15 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     int t = 0;
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         TVector[t] = SetTVector[t];
+
+        // A bit of study. TO BE DELETED
+        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+        //std::cout << "Mobod " << t+1 << " :" << std::endl;
+        for(int k = 0; k < mobod.getNumU(someState); k++){
+            SimTK::SpatialVec HCol = mobod.getHCol(someState, SimTK::MobilizerUIndex(k));
+        }
+        // A bit of study end. TO BE DELETED
+
         t++;
     }
     setOldPE(getSetPE());
@@ -408,6 +417,17 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 
     // Propagate through phase space (integrate)
     //std::cout << "Before stepTo time: " << someState.getTime() << std::endl;
+
+    // TO BE DELETED
+    SimTK::Vector V1(nu);
+    // This stores the torques. Torques 3,4,5 of the 1st body are 0
+    SimTK::Vector V2(nu); // This stores the torques.
+    SimTK::Real* D0 = new SimTK::Real(1.0);
+    system->realize(someState, SimTK::Stage::Dynamics);
+    matter->calcFixmanTorque(someState, V1, V2, D0);
+    delete D0;
+    // TO BE DELETED
+
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
     //std::cout <<  "Sampler after stepTo State Cache Info: " << std::endl;
     //PrintSimbodyStateCache(someState);

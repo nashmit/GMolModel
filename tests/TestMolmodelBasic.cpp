@@ -25,6 +25,11 @@ try {
     Protein protein("SIMTK");
     protein.assignBiotypes();
     system.adoptCompound(protein);
+
+    for (unsigned int r=0 ; r<protein.getNumBonds(); r++){
+        protein.setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
+    }
+
     system.modelCompounds(); 
     system.addEventReporter(new Visualizer::Reporter(system, 0.020));
     system.addEventHandler(new VelocityRescalingThermostat(	   system,  293.15, 0.1));
