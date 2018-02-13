@@ -93,39 +93,39 @@ try {
     ts.initialize(state);
     ts.stepTo(0.12); // 0.12ps
 
-    // Check Fixman torque
-    unsigned int nq = state.getNQ();
-    SimTK::Vector Qs = state.getQ();
-    SimTK::Vector copyQs(nq);
-    for(int i = 0; i < nq; i++){copyQs[i] = Qs[i];} 
-    std::cout << "Qs: " << Qs << std::endl;
-    SimTK::Real prevQ = 0, prevFixmanPotential = 0, FixmanPotential = 0;
-    SimTK::Real dQ = 0, dFixman = 0, deriv = 0;
-    SimTK::Real TinyIncrement = 0.0001;
-
-    SimTK::Vector V1(nu);
-    SimTK::Vector V2(nu); // This stores the torques.
-    for(int qIx=0; qIx<nq; qIx++){
-        for(int i=0; i<10; i++){
-            matter.calcDetM(state, V, DetV, newDetM);
-            prevFixmanPotential = FixmanPotential;
-            SimTK::Real FixmanPotential = 0.5 * std::log(*newDetM);
-            dFixman = FixmanPotential - prevFixmanPotential;
-
-            prevQ = Qs[qIx];
-            copyQs[qIx] += TinyIncrement;
-            state.setQ(copyQs);
-
-            system.realize(state, SimTK::Stage::Dynamics);
-
-            matter.calcFixmanTorque(state, V1, V2, newDetM);
-            dQ = Qs[qIx] - prevQ;
-            deriv = dFixman / dQ;
-            std::cout << "calcFixmanTorque V2:" << V2 << std::endl;
-            std::cout << "numDeriv:" << deriv << std::endl;
-        }
-    }
-
+//    // Check Fixman torque
+//    unsigned int nq = state.getNQ();
+//    SimTK::Vector Qs = state.getQ();
+//    SimTK::Vector copyQs(nq);
+//    for(int i = 0; i < nq; i++){copyQs[i] = Qs[i];} 
+//    std::cout << "Qs: " << Qs << std::endl;
+//    SimTK::Real prevQ = 0, prevFixmanPotential = 0, FixmanPotential = 0;
+//    SimTK::Real dQ = 0, dFixman = 0, deriv = 0;
+//    SimTK::Real TinyIncrement = 0.0001;
+//
+//    SimTK::Vector V1(nu);
+//    SimTK::Vector V2(nu); // This stores the torques.
+//    for(int qIx=0; qIx<nq; qIx++){
+//        for(int i=0; i<10; i++){
+//            matter.calcDetM(state, V, DetV, newDetM);
+//            prevFixmanPotential = FixmanPotential;
+//            SimTK::Real FixmanPotential = 0.5 * std::log(*newDetM);
+//            dFixman = FixmanPotential - prevFixmanPotential;
+//
+//            prevQ = Qs[qIx];
+//            copyQs[qIx] += TinyIncrement;
+//            state.setQ(copyQs);
+//
+//            system.realize(state, SimTK::Stage::Dynamics);
+//
+//            matter.calcFixmanTorque(state, V1, V2, newDetM);
+//            dQ = Qs[qIx] - prevQ;
+//            deriv = dFixman / dQ;
+//            std::cout << "calcFixmanTorque V2:" << V2 << std::endl;
+//            std::cout << "numDeriv:" << deriv << std::endl;
+//        }
+//    }
+//
     return 0;
 } 
 catch(const std::exception& e) {

@@ -369,8 +369,17 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //SqrtMInvV *= sqrtRT * temperatureBoost; // Set stddev according to temperature
     SqrtMInvV *= sqrtRT; // Set stddev according to temperature
 
-    someState.updU() = SqrtMInvV;
+    //someState.updU() = SqrtMInvV;
     //std::cout << "Before stepTo U: " << someState.getU() << std::endl;
+
+    // TO BE DELETED
+    //SimTK::Vector myV(nu);
+    for(int i = 0; i < nu; i++){someState.updU()[i] = 0;}
+    //myV[7] = 0.001;
+    //std::cout << "FixmanTorque: " << "myV = " << myV << std::endl;
+    someState.updU()[7] = 1.2;
+    std::cout << "FixmanTorque: " << "Us = " << someState.getU() << std::endl;
+    // TO BE DELETED
 
     // Set old kinetic energy
     system->realize(someState, SimTK::Stage::Velocity);
@@ -419,17 +428,71 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //std::cout << "Before stepTo time: " << someState.getTime() << std::endl;
 
     // TO BE DELETED
-    SimTK::Vector V1(nu);
-    // This stores the torques. Torques 3,4,5 of the 1st body are 0
-    SimTK::Vector V2(nu); // This stores the torques.
-    SimTK::Real* D0 = new SimTK::Real(1.0);
-    system->realize(someState, SimTK::Stage::Dynamics);
-    matter->calcFixmanTorque(someState, V1, V2, D0);
-    delete D0;
+//    SimTK::Vector V1(nu);
+//    SimTK::Vector V2(nu);
+//    SimTK::Vector V3(nu);
+//    // This stores the torques. Torques 3,4,5 of the 1st body are 0
+//    SimTK::Vector V4(nu); // This stores the torques.
+//    SimTK::Real* D0 = new SimTK::Real(1.0);
+//
+//    SimTK::Real tinyModification = 1.00;
+//    unsigned int nq = someState.getNQ();
+//
+//        for(int k = 0; k < nq; k++){
+//            std::cout << "k = " << k << std::endl;
+//            for(int t = 0; t < 5; t++){
+//                std::cout << "t = " << t << std::endl;
+//                SimTK::Vector Qs = someState.updQ();
+//                system->realize(someState, SimTK::Stage::Position);
+//                std::cout << "Qs(t) = " << Qs << std::endl;
+//                matter->realizeArticulatedBodyInertias(someState);
+//                matter->calcDetM(someState, V1, V2, D0);
+//                std::cout << "lndetM(t) = " << std::log(*D0) << std::endl;
+//
+//
+//                Qs[k] += tinyModification;
+//                system->realize(someState, SimTK::Stage::Position);
+//                std::cout << "Qs(t+1) = " << Qs << std::endl;
+//
+//                system->realize(someState, SimTK::Stage::Dynamics);
+//                matter->calcFixmanTorque(someState, V3, V4, D0);
+//
+//                matter->realizeArticulatedBodyInertias(someState);
+//                matter->calcDetM(someState, V1, V2, D0);
+//                std::cout << "lndetM(t+1) = " << std::log(*D0) << std::endl;
+//
+//            }
+//
+//        //for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+//        //    std::cout << "mbx = " << mbx << std::endl;
+//        //    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+//        //    for(int nqi = 0; nqi < mobod.getNumQ(someState); nqi++){
+//        //        std::cout << "nqi = " << nqi << std::endl;
+//        //        SimTK::Vector oneMobodQ(someState.getNQ());
+//        //        mobod.updOneFromQPartition(someState, nqi, oneMobodQ);
+//        //        std::cout << "oneMobodQ = " << oneMobodQ << std::endl;
+//        //        system->realize(someState, SimTK::Stage::Dynamics);
+//        //        std::cout << "Qs = " << someState.getQ() << std::endl;
+//        //        matter->calcFixmanTorque(someState, V1, V2, D0);
+//        //    }
+//        //}
+//
+//
+//    } // k
+//    delete D0;
     // TO BE DELETED
 
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
-    //std::cout <<  "Sampler after stepTo State Cache Info: " << std::endl;
+
+    // TO BE DELETED
+    SimTK::Vector V3(nu);
+    SimTK::Vector V4(nu);
+    SimTK::Real* D0 = new SimTK::Real(1.0);
+    matter->calcFixmanTorque(someState, V3, V4, D0);
+    delete D0;
+    // TO BE DELETED
+ 
+   //std::cout <<  "Sampler after stepTo State Cache Info: " << std::endl;
     //PrintSimbodyStateCache(someState);
     //std::cout << "After  stepTo time: " << someState.getTime() << std::endl;
     //writePdb(*residue, someState, "pdbs", "sb_", 8, "HMCprop", trackStep);
@@ -545,6 +608,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
         << std:: endl;
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
+    std::cout << "FixmanTorque: " << "Qs = " << someState.getQ() << std::endl;
 
     #ifdef HARMONICOSCILLATOR
     /////////////////////////

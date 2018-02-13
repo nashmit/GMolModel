@@ -286,34 +286,36 @@ void World::Init(SimTK::Real timestep)
    
     //SimTK::State state = compoundSystem->updDefaultState();
     //ts->initialize(compoundSystem->getDefaultState());
+ 
+    // Amber like scale factors. These should be used during simulations.
+//    forceField->setVdw12ScaleFactor(0.0);
+//    forceField->setVdw13ScaleFactor(0.0);
+//    forceField->setVdw14ScaleFactor(0.5);
+//    forceField->setVdw15ScaleFactor(1.0);
+//    forceField->setCoulomb12ScaleFactor(0.0);
+//    forceField->setCoulomb13ScaleFactor(0.0);
+//    forceField->setCoulomb14ScaleFactor(0.8333333333);
+//    forceField->setCoulomb15ScaleFactor(1.0);
+//    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
+  
+    // My specific scale factors. These should be used during debugging.
+    //->setSpecificDuMMScaleFactor(*forceField);
+    forceField->setBondStretchGlobalScaleFactor(0.0);
+    forceField->setBondBendGlobalScaleFactor(0.0);
+    forceField->setBondTorsionGlobalScaleFactor(0.0);
+    forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
   
     forceField->setVdw12ScaleFactor(0.0);
     forceField->setVdw13ScaleFactor(0.0);
-    forceField->setVdw14ScaleFactor(0.5);
-    forceField->setVdw15ScaleFactor(1.0);
+    forceField->setVdw14ScaleFactor(0.0);
+    forceField->setVdw15ScaleFactor(0.0);
+    forceField->setVdwGlobalScaleFactor(0.0);
+  
     forceField->setCoulomb12ScaleFactor(0.0);
     forceField->setCoulomb13ScaleFactor(0.0);
-    forceField->setCoulomb14ScaleFactor(0.8333333333);
-    forceField->setCoulomb15ScaleFactor(1.0);
-    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
-  
-    //->setSpecificDuMMScaleFactor(*forceField);
-    //forceField->setBondStretchGlobalScaleFactor(0.0);
-    //forceField->setBondBendGlobalScaleFactor(0.0);
-    //forceField->setBondTorsionGlobalScaleFactor(0.0);
-    //forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
-  
-    //forceField->setVdw12ScaleFactor(0.0);
-    //forceField->setVdw13ScaleFactor(0.0);
-    //forceField->setVdw14ScaleFactor(0.0);
-    //forceField->setVdw15ScaleFactor(0.0);
-    //forceField->setVdwGlobalScaleFactor(0.0);
-  
-    //forceField->setCoulomb12ScaleFactor(0.0);
-    //forceField->setCoulomb13ScaleFactor(0.0);
-    //forceField->setCoulomb14ScaleFactor(0.0);
-    //forceField->setCoulomb15ScaleFactor(0.0);
-    //forceField->setCoulombGlobalScaleFactor(0.0);
+    forceField->setCoulomb14ScaleFactor(0.0);
+    forceField->setCoulomb15ScaleFactor(0.0);
+    forceField->setCoulombGlobalScaleFactor(0.0);
   
     forceField->setGbsaGlobalScaleFactor(0.0);
     //
