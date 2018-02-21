@@ -60,6 +60,13 @@ protected:
     SimTK::Real etot_set; // The kinetic energy retained for acc-rej step
     SimTK::Real etot_o; // The kinetic energy retained for acc-rej step
     int trackStep;
+    // TO BE DELETED
+    SimTK::Matrix prevM;
+    SimTK::Real prevThetaK;
+    SimTK::Real prevNumDetM;
+    SimTK::Real prevDetM;
+    int kForTheta;
+    // TO BE DELETED
 
 };
 

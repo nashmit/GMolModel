@@ -78,6 +78,10 @@ public:
     // Compute Fixman potential numerically
     SimTK::Real calcNumFixman(SimTK::State& someState);
 
+    // Compute mass matrix determinant numerically
+    // Not to be confused with the Fixman potential
+    SimTK::Real calcNumDetM(SimTK::State& someState);
+
     // Send configuration to an external evaluator
     void sendConfToEvaluator(void);
 

@@ -7,8 +7,8 @@ int main(){
 
 readAmberInput MOL;
 
-string inpcrdfile = "../../tests_inputs/2but/ligand.inpcrd";
-string prmtopfile = "../../tests_inputs/2but/ligand.prmtop";
+string inpcrdfile = "../../tests_inputs/lin5/ligand.inpcrd";
+string prmtopfile = "../../tests_inputs/lin5/ligand.prmtop";
 
 
 MOL.readAmberFiles(inpcrdfile, prmtopfile);

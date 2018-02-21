@@ -99,6 +99,24 @@ SimTK::Real MonteCarloSampler::calcNumFixman(SimTK::State& someState){
     return result;
 }
 
+// Compute mass matrix determinant numerically
+// Not to be confused with the Fixman potential
+SimTK::Real MonteCarloSampler::calcNumDetM(SimTK::State& someState){
+    // Get M
+    int nu = someState.getNU();
+    SimTK::Matrix M(nu, nu);
+    matter->calcM(someState, M);
+
+    // Eigen M determinant
+    Eigen::MatrixXd EiM(nu, nu);
+    for(int i=0; i<nu; i++){
+        for(int j=0; j<nu; j++){
+            EiM(i, j) = M(i, j);
+        }
+    }
+    return EiM.determinant();
+}
+
 // Get the set potential energy
 SimTK::Real MonteCarloSampler::getSetPE(void)
 {
