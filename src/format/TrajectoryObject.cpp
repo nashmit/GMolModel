@@ -28,7 +28,7 @@ try
     unitcell = selectedunitcell;
     nsets = 0;
 
-    printf("selectedatoms %i ; natoms %i \n", selectedatoms, natoms);
+    // printf("selectedatoms %i ; natoms %i \n", selectedatoms, natoms);
 
     v = open_dcd_write(TrajectoryFile.c_str(), "dcd", natoms, unitcell);
     if (!v) {
