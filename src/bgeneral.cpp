@@ -354,4 +354,42 @@ bool AreSame(double a, double b, double EPSILON)
     return fabs(a - b) < EPSILON;
 }
 
+/*
+ * Print Big Matrices separated by spaces
+ */
+void PrintBigMat(SimTK::Matrix M, int nrows, int ncols, int decimal_places, std::string header)
+{
+    std::cout << header << std::endl;
+    std::cout << std::setprecision(decimal_places);
+    for(int i = 0; i < nrows; i++){
+        for(int j = 0; j < ncols; j++){
+            std::cout << M[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+
+/*
+ * Print Spatial Matrix
+ */
+void PrintSpatialMat(SimTK::SpatialMat M, int decimal_places, std::string header)
+{
+    std::cout << header << std::endl;
+    std::cout << std::setprecision(decimal_places);
+    for(int i = 0; i < 2; i++){
+        for(int j = 0; j < 2; j++){
+            for(int k = 0; k < 3; k++){
+                for(int l = 0; l < 3; l++){
+                    std::cout << M[i][j][k][l] << " ";
+                }
+                std::cout << "  ";
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
+
+
 

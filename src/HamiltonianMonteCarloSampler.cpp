@@ -496,7 +496,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     SimTK::Vector V3(nu);
     SimTK::Vector V4(nu);
     SimTK::Real* D0 = new SimTK::Real(1.0);
-    matter->calcFixmanTorque(someState, V3, V4, D0);
+    //matter->calcFixmanTorque(someState, V3, V4, D0);
     delete D0;
     // TO BE DELETED
  
@@ -620,11 +620,15 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     // TO BE DELETED
     // Eq. 2.11 and 2.14 numerical derivs
     std::cout << "FixmanTorque: " << "Qs = " << someState.getQ() << std::endl;
-    SimTK::Matrix M(someState.getNU(), someState.getNU());
-    SimTK::Matrix MInv(someState.getNU(), someState.getNU());
-    SimTK::Matrix dM(someState.getNU(), someState.getNU());
-    SimTK::Matrix dMdThetaK(someState.getNU(), someState.getNU());
-    SimTK::Matrix MInvdMdThetaK(someState.getNU(), someState.getNU());
+    int NBODIESplusG = matter->getNumBodies();
+    int SPATIAL_DOFSplusG = NBODIESplusG * 6;
+    int SPATIAL_DOFS = SPATIAL_DOFSplusG - 6;
+    int NU = someState.getNU();
+    SimTK::Matrix M(NU, NU);
+    SimTK::Matrix MInv(NU, NU);
+    SimTK::Matrix dM(NU, NU);
+    SimTK::Matrix dMdThetaK(NU, NU);
+    SimTK::Matrix MInvdMdThetaK(NU, NU);
     SimTK::Real detM;
     SimTK::Real dDetM;
     SimTK::Real dDetMdThetaK;
@@ -634,8 +638,8 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     SimTK::Real dThetaK;
     SimTK::Real Trace = 0.0;
 
-    SimTK::Vector V1(someState.getNU());
-    SimTK::Vector V2(someState.getNU());
+    SimTK::Vector V1(NU);
+    SimTK::Vector V2(NU);
     SimTK::Real* D0 = new SimTK::Real(1.0);
     matter->calcDetM(someState, V1, V2, D0);
     detM = std::log(*D0);
@@ -656,8 +660,8 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     //std::cout << "FixmanTorque matrix: " << "dM = " << dM << std::endl;
     std::cout << "FixmanTorque matrix: " << "dMdThetaK = " << dMdThetaK << std::endl;
 
-    for(unsigned int i = 0; i < someState.getNU(); i++){
-        for(unsigned int j = 0; j < someState.getNU(); j++){prevM(i, j) = M(i, j);}
+    for(int i = 0; i < NU; i++){
+        for(int j = 0; j < NU; j++){prevM(i, j) = M(i, j);}
     }
     prevThetaK = someState.getQ()[kForTheta];
     prevDetM = detM;
@@ -666,7 +670,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     matter->calcMInv(someState, MInv);
 
     MInvdMdThetaK = MInv * dMdThetaK;
-    for(unsigned int i = 0; i < someState.getNU(); i++){
+    for(int i = 0; i < NU; i++){
         Trace += MInvdMdThetaK(i, i);
     }
     //std::cout << "FixmanTorque matrix: " << "MInv = " << MInv << std::endl;
@@ -677,25 +681,25 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
 
     // Eq. 4.11
     // First get Mks and Phi based on 3.4a
-    //SimTK::Matrix Jstar(6*someState.getNU(), someState.getNU());
-    SimTK::Matrix J;
+    //SimTK::Matrix J(6*NU, NU);
     SimTK::Matrix Jstar;
-    SimTK::Matrix MkTot(matter->getNumBodies()*6, matter->getNumBodies()*6, 0.0);
-    matter->calcSystemJacobian(someState, Jstar);
-    J = ~Jstar;
-    SimTK::Matrix M3_4a(someState.getNU(), someState.getNU(), 0.0);
-    //std::cout << "FixmanTorque matrix: " << "Jstar = " << Jstar << std::endl;
+    SimTK::Matrix J;
+    SimTK::Matrix MkTot(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
+    matter->calcSystemJacobian(someState, J);
+    Jstar = ~J;
+    SimTK::Matrix M3_4a(NU, NU, 0.0);
+    std::cout << "FixmanTorque matrix: " << "J = " << J << std::endl;
 
-    for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter->getNumBodies(); ++mbx){
+    for (SimTK::MobilizedBodyIndex mbx(0); mbx < NBODIESplusG; ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         const SimTK::SpatialInertia Mk = mobod.getBodySpatialInertiaInGround(someState);
         //std::cout << "FixmanTorque matrix: " << "Mk = " << Mk.toSpatialMat() << std::endl;
-        unsigned int ti = -1; // 6x6
-        unsigned int tj = -1; // 6x6
-        for(unsigned int i = 0; i < 2; i++){ // i for SpatialMatrix
-                for(unsigned int k = 0; k < 3; k++){ // k for 3x3 
-            for(unsigned int j = 0; j < 2; j++){ // j for SpatialMatrix
-                    for(unsigned int l = 0; l < 3; l++){ // l for 3x3
+        int ti = -1; // 6x6
+        int tj = -1; // 6x6
+        for(int i = 0; i < 2; i++){ // i for SpatialMatrix
+                for(int k = 0; k < 3; k++){ // k for 3x3 
+            for(int j = 0; j < 2; j++){ // j for SpatialMatrix
+                    for(int l = 0; l < 3; l++){ // l for 3x3
                         tj++;
                         tj = tj % 6;
                         if(!tj){ti++;}
@@ -711,80 +715,145 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     }
     //std::cout << "FixmanTorque matrix: " << "MkTot = " << MkTot << std::endl;
     // Get H and Phi
-    SimTK::Matrix H(someState.getNU(), 6*matter->getNumBodies(), 0.0);
-    SimTK::Matrix Hstar(6*matter->getNumBodies(), someState.getNU(), 0.0);
-    SimTK::Matrix Phi(6*matter->getNumBodies(), 6*matter->getNumBodies(), 1.0);
-    SimTK::Matrix Phistar(6*matter->getNumBodies(), 6*matter->getNumBodies(), 1.0);
-    for(int i = 0; i < 6*matter->getNumBodies(); i++){
-        Phi[i][i] = Phistar[i][i] = 1.0;
-    }
+    SimTK::Matrix H(NU, SPATIAL_DOFSplusG, 0.0);
+    SimTK::Matrix Hstar(SPATIAL_DOFSplusG, NU, 0.0);
+    SimTK::Matrix Phi(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
+    SimTK::Matrix Phistar(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
 
-    unsigned int tj = -1;
-    for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter->getNumBodies(); ++mbx){
+    int tj = -1;
+    for (SimTK::MobilizedBodyIndex mbx(0); mbx < NBODIESplusG; ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+
         for(int k = 0; k < mobod.getNumU(someState); k++){
             tj++;
             SimTK::SpatialVec HCol = mobod.getHCol(someState, SimTK::MobilizerUIndex(k));
             //std::cout << "mobod " << int(mbx) << " HCol " << k << " = " << HCol << std::endl;
-            unsigned int ti = -1;
-            for(unsigned int i = 0; i < 2; i++){
-                for(unsigned int j = 0; j < 3; j++){
+            int ti = -1;
+            for(int i = 0; i < 2; i++){
+                for(int j = 0; j < 3; j++){
                     ti++;
                     Hstar[int(mbx)*6 + ti][tj] = HCol[i][j];
                 }
             }
         }
+        
     }
-    H = ~Hstar;
-    Phistar = Jstar * ~Hstar;
-    Phi = ~Phistar;
-    //std::cout << "Hstar = " << Hstar << std::endl;
-    //std::cout << "Phistar = " << Phistar << std::endl;
-    //std::cout << "FixmanTorque matrix: " << "Jstar computed = " << (Phistar * Hstar) - Jstar<< std::endl;
-    //M3_4a = (~Jstar) * MkTot * Jstar; // Eq 3.4a
+
+    H = Hstar.transpose(); 
+
+    // Fill Phi
+    for(int phi_I = 1; phi_I < NBODIESplusG; phi_I++){
+        // Fill diagonal element
+        for(int i = 0; i < 6; i++){
+                Phistar[phi_I*6 + i][phi_I*6 + i] = 1.0;
+        }
+        // Fill lower triangle
+        for(int phi_J = 1; (phi_J < NBODIESplusG) && (phi_J < phi_I); phi_J++){
+
+            const SimTK::MobilizedBody& Pmobod = matter->getMobilizedBody(SimTK::MobilizedBodyIndex(phi_I));
+            const SimTK::MobilizedBody& Bmobod = matter->getMobilizedBody(SimTK::MobilizedBodyIndex(phi_J));
+
+            const SimTK::Transform X_GP = Pmobod.getBodyTransform(someState);
+            const SimTK::Transform X_GB = Bmobod.getBodyTransform(someState);
+
+            const SimTK::Transform X_PB = ~X_GP * X_GB;
+            //const SimTK::Transform X_PB = ~X_GB * X_GP;
+
+            SimTK::Mat33 PhiLCross = SimTK::crossMat(X_PB.p());
+            SimTK::Matrix PhiElem(6, 6, 0.0);
+
+            for(int i = 0; i < 6; i++){
+                    PhiElem[i][i] = 1.0;
+            }
+            for(int i = 0; i < 3; i++){
+                for(int j = 3; j < 6; j++){
+                    PhiElem[i][j] = PhiLCross[i][j - 3];
+                }
+            }
+
+            for(int i = 0; i < 6; i++){
+                for(int j = 0; j < 6; j++){
+                    Phistar[phi_I*6 + i][phi_J*6 + j] = PhiElem[i][j];
+                }
+            }
+    
+            //std::cout << "phi " << phi_I << " " << phi_J << " X_PB = " << X_PB << std::endl;
+            //std::cout << "phi " << phi_I << " " << phi_J << " X_PB.p = " << X_PB.p() << std::endl;
+            //std::cout << "phi " << phi_I << " " << phi_J << " PhiLCross = " << PhiLCross << std::endl;
+            std::cout << "phi " << phi_I << " " << phi_J << " PhiElem = " << PhiElem << std::endl;
+        }
+    }
+    //PrintBigMat(Phistar, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "FixmanTorque matrix: Phistar"); 
+
+    //M3_4a = (~J) * MkTot * J; // Eq 3.4a
     //M3_4a = (~Hstar * ~Phistar) * MkTot * (Phistar * Hstar); // Eq 3.4a
     //std::cout << "M = " << M << std::endl;
     //std::cout << "M3_4a = " << M3_4a << std::endl;
     //std::cout << "M - M3_4a = " << M - M3_4a << std::endl;
 
-    // Get Jain's versions of Phi H and J
-    SimTK::Matrix H_Jain(someState.getNU(), 6*matter->getNumBodies() - 6, 0.0);
-    SimTK::Matrix Hstar_Jain(6*matter->getNumBodies() - 6, someState.getNU(), 0.0);
+    // Get Jain's versions of H and J
 
-    SimTK::Matrix J_Jain(someState.getNU(), 6*matter->getNumBodies() - 6, 0.0);
-    SimTK::Matrix Jstar_Jain(6*matter->getNumBodies() - 6, someState.getNU(), 0.0);
+    SimTK::Matrix J_Jain(SPATIAL_DOFS, NU, 0.0);
+    SimTK::Matrix Phistar_Jain(SPATIAL_DOFS, SPATIAL_DOFS, 1.0);
+    SimTK::Matrix Hstar_Jain(SPATIAL_DOFS, NU, 0.0);
 
-    SimTK::Matrix Phi_Jain(6*matter->getNumBodies() - 6, 6*matter->getNumBodies() - 6, 1.0);
-    SimTK::Matrix Phistar_Jain(6*matter->getNumBodies() - 6, 6*matter->getNumBodies() - 6, 1.0);
+    SimTK::Matrix Jstar_Jain(NU, SPATIAL_DOFS, 0.0);
+    SimTK::Matrix Phi_Jain(SPATIAL_DOFS, SPATIAL_DOFS, 1.0);
+    SimTK::Matrix H_Jain(NU, SPATIAL_DOFS, 0.0);
 
-    for(unsigned int i = 0; i < 6*matter->getNumBodies() - 6; i++){
-        for(unsigned int j = 0; j < someState.getNU(); j++){
+    SimTK::Matrix MkTot_Jain(SPATIAL_DOFS, SPATIAL_DOFS, 0.0);
+
+    for(int i = 0; i < SPATIAL_DOFS; i++){
+        for(int j = 0; j < NU; j++){
             Hstar_Jain[i][j] = Hstar[i + 6][j];
-            Jstar_Jain[i][j] = Jstar[i + 6][j];
+            J_Jain[i][j] = J[i + 6][j];
+        }
+    }
+    for(int i = 0; i < SPATIAL_DOFS; i++){
+        for(int j = 0; j < SPATIAL_DOFS; j++){
+            MkTot_Jain[i][j] = MkTot[i + 6][j + 6];
+            Phistar_Jain[i][j] = Phistar[i + 6][j + 6];
+        }
+    }
+    PrintBigMat(Phistar_Jain, SPATIAL_DOFS, SPATIAL_DOFS, 3, "FixmanTorque matrix: Phistar_Jain"); 
+    //std::cout << "FixmanTorque matrix: " << "J_Jain computed = " << (Phistar_Jain * Hstar_Jain) - J_Jain << std::endl;
+    //std::cout << "FixmanTorque matrix: " << "J computed = " << (Phistar * Hstar) - J<< std::endl;
+    //std::cout << "verify" << Hstar_Jain  * Hstar_Jain.transpose() << std::endl;
+
+    // Transfer into Eigen
+    Eigen::MatrixXd EiHstar_Jain(SPATIAL_DOFS, NU);
+    Eigen::MatrixXd EiHstar_JainLeftInv(NU, SPATIAL_DOFS);
+    Eigen::MatrixXd EiHstar_JainRightInv(SPATIAL_DOFS, NU);
+
+    for(int i=0; i<SPATIAL_DOFS; i++){
+        for(int j=0; j<NU; j++){
+            EiHstar_Jain(i, j) = Hstar_Jain[i][j];
         }
     }
 
-    H_Jain = ~Hstar_Jain;
-    Phistar_Jain = Jstar_Jain * Hstar_Jain;
-   
-    std::cout << "verify " << J_Jain * Jstar_Jain << std::endl;
+    EiHstar_JainLeftInv = (EiHstar_Jain.transpose() * EiHstar_Jain).inverse() * EiHstar_Jain.transpose();
+    EiHstar_JainRightInv = EiHstar_Jain.transpose() * (EiHstar_Jain * EiHstar_Jain.transpose()).inverse();
+
+    //std::cout << "verify right inv MJ \n" << EiMJ_Jain * EiMJ_JainRightInv << std::endl;
+    //H_Jain = Hstar_Jain.transpose(); // 
+    //Phi_Jain = H_Jain * Jstar_Jain;
  
-    std::cout << "Phistar_Jain = " << std::setprecision(2) << std::endl;
-    for(unsigned int i = 0; i < 6*matter->getNumBodies() - 6; i++){
-    //for(unsigned int i = 0; i < someState.getNU(); i++){
-        for(unsigned int j = 0; j < 6*matter->getNumBodies() - 6; j++){
-        //for(unsigned int j = 0; j < someState.getNU(); j++){
-            std::cout << Phistar_Jain[i][j] << " ";
+    //std::cout << "Phi_Jain = " << std::setprecision(2) << std::endl;
+    for(int i = 0; i < SPATIAL_DOFS; i++){
+    //for(int i = 0; i < NU; i++){
+        for(int j = 0; j < SPATIAL_DOFS; j++){
+        //for(int j = 0; j < NU; j++){
+            //std::cout << Phi_Jain[i][j] << " ";
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
     }
 
     // Eq. 4.11
     // Build Hboldz
     int currKForTheta = 0;
-    SimTK::Matrix Hbold(6*matter->getNumBodies(), 6*matter->getNumBodies(), 0.0);
-    SimTK::Matrix Hboldstar(6*matter->getNumBodies(), 6*matter->getNumBodies(), 0.0);
-    for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter->getNumBodies(); ++mbx){
+    SimTK::Matrix Hbold(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
+    SimTK::Matrix Hboldstar(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
+    for (SimTK::MobilizedBodyIndex mbx(0); mbx < NBODIESplusG; ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         for(int k = 0; k < mobod.getNumU(someState); k++){
             currKForTheta++;
@@ -793,13 +862,13 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
                 std::cout << "mobod " << int(mbx) << " HCol " << k << " = " << HCol << std::endl;
                 SimTK::Mat33 crossH = SimTK::crossMat(HCol[0]);
                 std::cout << "crossH " << crossH << std::endl;
-                for(unsigned int i = 0; i < 3; i++){
-                    for(unsigned int j = 0; j < 3; j++){
+                for(int i = 0; i < 3; i++){
+                    for(int j = 0; j < 3; j++){
                         Hboldstar[int(mbx)*6 + i][int(mbx)*6 + j] = crossH[i][j];
                     }
                 }
-                for(unsigned int i = 0; i < 3; i++){
-                    for(unsigned int j = 0; j < 3; j++){
+                for(int i = 0; i < 3; i++){
+                    for(int j = 0; j < 3; j++){
                         Hboldstar[int(mbx)*6 + i + 3][int(mbx)*6 + j + 3] = crossH[i][j];
                     }
                 }
@@ -810,16 +879,16 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
 
     /*
     std::cout << "H = " << std::setprecision(2) << std::endl;
-    for(unsigned int i = 0; i < someState.getNU(); i++){
-        for(unsigned int j = 0; j < 6*matter->getNumBodies(); j++){
+    for(int i = 0; i < NU; i++){
+        for(int j = 0; j < SPATIAL_DOFSplusG; j++){
             std::cout << H[i][j] << " "; 
         }
         std::cout << std::endl;
     }
     //std::cout << "Hbold = " << std::setprecision(2) << std::endl;
     std::cout << "MkTot = " << std::setprecision(2) << std::endl;
-    for(unsigned int i = 0; i < 6*matter->getNumBodies(); i++){
-        for(unsigned int j = 0; j < 6*matter->getNumBodies(); j++){
+    for(int i = 0; i < SPATIAL_DOFSplusG; i++){
+        for(int j = 0; j < SPATIAL_DOFSplusG; j++){
             //std::cout << Hbold[i][j] << " ";
             std::cout << MkTot[i][j] << " ";
         }
@@ -827,24 +896,24 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     }
     */
 
-    SimTK::Matrix MPhistar(6*matter->getNumBodies(), 6*matter->getNumBodies(), 0.0);
+    SimTK::Matrix MPhistar(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
     MPhistar = MkTot * Phistar;
 
-    SimTK::Matrix HboldPhiM(6*matter->getNumBodies(), 6*matter->getNumBodies(), 0.0);
-    SimTK::Matrix MPhistarHbold(6*matter->getNumBodies(), 6*matter->getNumBodies(), 0.0);
-    SimTK::Matrix SqParan(6*matter->getNumBodies(), 6*matter->getNumBodies(), 0.0);
-    SimTK::Matrix dMdThetaK4_11(someState.getNU(), someState.getNU());
+    SimTK::Matrix HboldPhiM(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
+    SimTK::Matrix MPhistarHbold(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
+    SimTK::Matrix SqParan(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
+    SimTK::Matrix dMdThetaK4_11(NU, NU);
 
     HboldPhiM = Hbold * Phi * MkTot;
     MPhistarHbold = MkTot * Phistar * Hbold;
     SqParan = HboldPhiM - MPhistarHbold;
-    dMdThetaK4_11 = J * SqParan * Jstar;
+    dMdThetaK4_11 = Jstar * SqParan * J;
 
-    std::cout << "Jstar = " << std::setprecision(2) << std::endl;
-    for(unsigned int i = 0; i < 6*matter->getNumBodies(); i++){
-        //for(unsigned int j = 0; j < 6*matter->getNumBodies(); j++){
-        for(unsigned int j = 0; j < someState.getNU(); j++){
-            std::cout << Jstar[i][j] << " ";
+    std::cout << "J = " << std::setprecision(2) << std::endl;
+    for(int i = 0; i < SPATIAL_DOFSplusG; i++){
+        //for(int j = 0; j < SPATIAL_DOFSplusG; j++){
+        for(int j = 0; j < NU; j++){
+            std::cout << J[i][j] << " ";
         }
         std::cout << std::endl;
     }

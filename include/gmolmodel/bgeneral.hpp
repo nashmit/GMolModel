@@ -174,5 +174,14 @@ string decimal_prefix(double inp_no, long int limit);
  */
 bool AreSame(double a, double b, double EPSILON);
 
+/*
+ * Print Big Matrices separated by spaces
+ */
+void PrintBigMat(SimTK::Matrix M, int nrows, int ncols, int decimal_places, std::string header);
+
+/*
+ * Print Spatial Matrix
+ */
+void PrintSpatialMat(SimTK::Matrix M, int decimal_places, std::string header);
 
 #endif /*BGENERAL_H_*/

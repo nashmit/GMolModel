@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 #include <Eigen/LU>
+#include <Eigen/QR>
 
 #include <boost/algorithm/string.hpp>
 
