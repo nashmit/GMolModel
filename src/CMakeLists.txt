@@ -16,7 +16,7 @@ if ( OpenMM_ON )
 	INCLUDE_DIRECTORIES(${OpenMM_INCLUDE_DIR})
 	INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
 else( OpenMM_ON )
-	
+
 endif( OpenMM_ON )
 
 find_package(Simbody 3.6 CONFIG REQUIRED) # you may have to set a path for config file location e.g.  modify the environment variable list specific for find_package..
@@ -26,16 +26,16 @@ LINK_DIRECTORIES( ${Simbody_LIB_DIR} )
 
 #INCLUDE_DIRECTORIES("/home/nash_mit/git/refactoring/gmolmodel/simbody/SimTKmath/Integrators/src")
 #this is a patch for the current structure of the project, it will be refactor after redesign of the gmodmodel integrator is done
-set( Integrators_PATH 
+set( Integrators_PATH
 #     "${CMAKE_CURRENT_LIST_DIR}/../simbody/SimTKmath/Integrators/src"
      "${CMAKE_CURRENT_LIST_DIR}/../molmodel_legacy/simbody/SimTKmath/Integrators/src"
      CACHE FILEPATH "Path to Integrator.h from Simbody..." )
 INCLUDE_DIRECTORIES( ${Integrators_PATH} )
 
 
-set( MOL_MODEL_INCLUDE 
+set( MOL_MODEL_INCLUDE
      "${Simbody_INCLUDE_DIR}/.."
-     CACHE FILEPATH "header include folder path for Molmodel" ) 
+     CACHE FILEPATH "header include folder path for Molmodel" )
 INCLUDE_DIRECTORIES( ${MOL_MODEL_INCLUDE} )
 #I should add link_directories for molmodel and add them to TARTGET_LINK!!!
 #or maybe not.. at the moment I'm not convince that gmolmodel dependes by molmodel lib mostly because it's an extension that it's already compiled into gmolmode. but I need to look more into the code for that
@@ -58,22 +58,22 @@ include_directories( ${EIGEN3_INCLUDE_DIRS} )
 #include_directories( ${PYTHON_INCLUDE_DIRS} )
 #link_directories( ${PYTHON_LIBRARIES} )
 
-#set(mmtk_include 
-#    "${PYTHON_INCLUDE_DIRS}/MMTK" 
+#set(mmtk_include
+#    "${PYTHON_INCLUDE_DIRS}/MMTK"
 #    CACHE FILEPATH "Adding header path to MMTK installed location")
 #include_directories( ${mmtk_include} )
 
 #execute_process(
-#  COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" 
+#  COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
 #  OUTPUT_VARIABLE PYTHON_SITE_PATH
-#  OUTPUT_STRIP_TRAILING_WHITESPACE ) 
+#  OUTPUT_STRIP_TRAILING_WHITESPACE )
 
 #set(PYTHON_SITE-PACKAGES_PATH
-#    ${PYTHON_SITE_PATH} 
+#    ${PYTHON_SITE_PATH}
 #    CACHE FILEPATH "side-packages python path")
 
 #set(mmtk_libs "/home/nash_mit/git/refactoring/gmolmodel/mmtk_legacy/build/lib.linux-x86_64-2.6/MMTK/linux2")
-#set(mmtk_libs 
+#set(mmtk_libs
 #    "${PYTHON_SITE-PACKAGES_PATH}/MMTK/linux2"
 #    CACHE FILEPATH "Addinng path to MMTK libs folder")
 #link_directories( ${mmtk_libs} )
@@ -87,8 +87,8 @@ include_directories( ${EIGEN3_INCLUDE_DIRS} )
 #message( ${mmtk_LIBRARIES} )
 
 #set(numpy_include "/home/nash_mit/Anaconda/envs/mmtk_environment/lib/python2.7/site-packages/numpy/core/include" )
-#set(numpy_include 
-#    "${PYTHON_SITE-PACKAGES_PATH}/numpy/core/include" 
+#set(numpy_include
+#    "${PYTHON_SITE-PACKAGES_PATH}/numpy/core/include"
 #    CACHE FILEPATH "Header path to numpy installed location")
 #include_directories( ${numpy_include} )
 
@@ -117,13 +117,16 @@ set(LIBGMOLMODEL_SRC
         Sampler.cpp # LAUR
         MonteCarloSampler.cpp # LAUR
         HamiltonianMonteCarloSampler.cpp # LAUR
-	bAddParams.cpp 
-	Topology.cpp 
-	bMoleculeReader.cpp 
-	World.cpp
+	      bAddParams.cpp
+	      Topology.cpp
+	      bMoleculeReader.cpp
+	      World.cpp
         readAmberInput.cpp
-	bgeneral.cpp
+	      bgeneral.cpp
         SetupReader.cpp
+        format/dcdplugin.c
+        format/PDBObject.cpp
+        format/TrajectoryObject.cpp
 	)
 
 include_directories(../include/gmolmodel)
@@ -133,18 +136,18 @@ add_library(GMOLMODEL_static  STATIC ${LIBGMOLMODEL_SRC})
 add_executable(GMOLMODEL_test ${LIBGMOLMODEL_SRC} testMain.cpp )
 
 #simmain must be refactor since it contains mmtk data types and current version do not make use of mmtk anymore
-#PYTHON_ADD_MODULE( 
-#		GCHMC 
-#		#${LIBGMOLMODEL_SRC} 
-#		simmain.cpp 
-#		bArgParser.cpp 
+#PYTHON_ADD_MODULE(
+#		GCHMC
+#		#${LIBGMOLMODEL_SRC}
+#		simmain.cpp
+#		bArgParser.cpp
 #		)
 
 #add_library( GCHMC SHARED ${LIBGMOLMODEL_SRC} simmain.cpp )
 
 #since simmain.cpp contains mmtk data type this target it's not available until it's refactor
 #TARGET_LINK_LIBRARIES( GCHMC
-#		boost_python 
+#		boost_python
 #		GMOLMODEL_static
 #                ${Simbody_LIBRARIES}
 #                SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
@@ -155,7 +158,7 @@ add_executable(GMOLMODEL_test ${LIBGMOLMODEL_SRC} testMain.cpp )
 #                #${mmtk_libs} )
 #
 
-TARGET_LINK_LIBRARIES( GMOLMODEL_test 
+TARGET_LINK_LIBRARIES( GMOLMODEL_test
                 ${Simbody_LIBRARIES}
                 SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
                 ${BOOST_LIBRARIES}
@@ -165,15 +168,15 @@ TARGET_LINK_LIBRARIES( GMOLMODEL_test
                 #${mmtk_libs} )
 
 # link Simbody libraries
-TARGET_LINK_LIBRARIES(GMOLMODEL_dynamic 
+TARGET_LINK_LIBRARIES(GMOLMODEL_dynamic
 		${Simbody_LIBRARIES}
-		SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable 
-		${BOOST_LIBRARIES} 
+		SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
+		${BOOST_LIBRARIES}
                 #${PYTHON_LIBRARIES} # do I realy need to link python lib into gmolmodel? it make no sense... but I still don't know verry well code...
 		${OpenMM_LIBRARIES}
 		m )
 		#${mmtk_libs} )
-TARGET_LINK_LIBRARIES(GMOLMODEL_static 
+TARGET_LINK_LIBRARIES(GMOLMODEL_static
 		${Simbody_LIBRARIES}
 		SimTKmolmodel #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable
 		${BOOST_LIBRARIES}
