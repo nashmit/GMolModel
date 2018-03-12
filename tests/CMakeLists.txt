@@ -26,15 +26,15 @@ LINK_DIRECTORIES( ${Simbody_LIB_DIR} )
 MESSAGE("Simbody_INCLUDE_DIR: ${Simbody_INCLUDE_DIR}")
 MESSAGE("Simbody_LIB_DIR: ${Simbody_LIB_DIR}")
 
-set( Integrators_PATH 
+set( Integrators_PATH
      "${CMAKE_CURRENT_LIST_DIR}/../simbody/molmodel_legacy/SimTKmath/Integrators/src"
      CACHE FILEPATH "Path to Integrator.h from Simbody..." )
 INCLUDE_DIRECTORIES( ${Integrators_PATH} )
 MESSAGE("Integrators_PATH: ${Integrators_PATH}")
 
-set( MOL_MODEL_INCLUDE 
+set( MOL_MODEL_INCLUDE
      "${Simbody_INCLUDE_DIR}/.."
-     CACHE FILEPATH "header include folder path for Molmodel" ) 
+     CACHE FILEPATH "header include folder path for Molmodel" )
 INCLUDE_DIRECTORIES( ${MOL_MODEL_INCLUDE} )
 MESSAGE("MOL_MODEL_INCLUDE: ${MOL_MODEL_INCLUDE}")
 
@@ -53,23 +53,23 @@ MESSAGE("EIGEN3_INCLUDE_DIRS: ${EIGEN3_INCLUDE_DIRS}")
 #MESSAGE("PYTHON_INCLUDE_DIRS: ${PYTHON_INCLUDE_DIRS}")
 #MESSAGE("PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
 
-#set(mmtk_include 
-#    "${PYTHON_INCLUDE_DIRS}/MMTK" 
+#set(mmtk_include
+#    "${PYTHON_INCLUDE_DIRS}/MMTK"
 #    CACHE FILEPATH "Adding header path to MMTK installed location")
 #include_directories( ${mmtk_include} )
 #MESSAGE("mmtk_include: ${mmtk_include}")
 
 #execute_process(
-#  COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" 
+#  COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
 #  OUTPUT_VARIABLE PYTHON_SITE_PATH
-#  OUTPUT_STRIP_TRAILING_WHITESPACE ) 
+#  OUTPUT_STRIP_TRAILING_WHITESPACE )
 
 #set(PYTHON_SITE-PACKAGES_PATH
-#    ${PYTHON_SITE_PATH} 
+#    ${PYTHON_SITE_PATH}
 #    CACHE FILEPATH "side-packages python path")
 #MESSAGE("PYTHON_SITE_PATH: ${PYTHON_SITE_PATH}")
 
-#set(mmtk_libs 
+#set(mmtk_libs
 #    "${PYTHON_SITE-PACKAGES_PATH}/MMTK/linux2"
 #    CACHE FILEPATH "Addinng path to MMTK libs folder")
 #link_directories( ${mmtk_libs} )
@@ -80,8 +80,8 @@ MESSAGE("EIGEN3_INCLUDE_DIRS: ${EIGEN3_INCLUDE_DIRS}")
 #  OUTPUT_VARIABLE mmtk_LIBRARIES
 #  OUTPUT_STRIP_TRAILING_WHITESPACE )
 
-#set(numpy_include 
-#    "${PYTHON_SITE-PACKAGES_PATH}/numpy/core/include" 
+#set(numpy_include
+#    "${PYTHON_SITE-PACKAGES_PATH}/numpy/core/include"
 #    CACHE FILEPATH "Header path to numpy installed location")
 #include_directories( ${numpy_include} )
 #MESSAGE("numpy_include: ${numpy_include}")
@@ -110,21 +110,22 @@ INCLUDE_DIRECTORIES(../include/gmolmodel)
 LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/../build-debug/lib)
 MESSAGE("Gmolmodel libs dir: ${CMAKE_CURRENT_LIST_DIR}/../build-debug/lib")
 
-set(TESTS_SRCS 
-	TestSimbodyBasic.cpp
-	TestMolmodelBasic.cpp
+set(TESTS_SRCS
+	      TestSimbodyBasic.cpp
+	      TestMolmodelBasic.cpp
         TestMassSqrtAndDet.cpp
         TestOpenMMBasic.cpp
         TestPrmCrdPeptide.cpp
-	TestPDBReaderMolModel.cpp
+	      TestPDBReaderMolModel.cpp
         TestParallelExecutor.cpp
-	TestAmberInput.cpp
+	      TestAmberInput.cpp
         TestMixing.cpp
+        TestWriteDCD.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})
     STRING(REGEX REPLACE ".cpp" "" TEST_EXE ${TEST_SRC})
-    MESSAGE(${TEST_EXE} ${TEST_SRC}) 
+    MESSAGE(${TEST_EXE} ${TEST_SRC})
     add_executable(${TEST_EXE} ${TEST_SRC} )
     TARGET_LINK_LIBRARIES( ${TEST_EXE}
                 ${Simbody_LIBRARIES}
