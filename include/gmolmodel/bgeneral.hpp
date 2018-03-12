@@ -28,6 +28,8 @@
 #include "molmodel/internal/GrinPointer.h"
 #include "molmodel/internal/units.h"
 
+#include "Robo.hpp"
+
 //#ifndef DEBUG
 //#define DEBUG 1
 //#endif
@@ -175,9 +177,23 @@ string decimal_prefix(double inp_no, long int limit);
 bool AreSame(double a, double b, double EPSILON);
 
 /*
+ * Convert spatial maatrix (Mat< 2, 2, Mat33 >) to 6x6 matrix (Mat<6,6>)
+ * Replaces inf and nan with zeros
+ */
+bool SpatialMat2Mat66(SimTK::SpatialMat SM, SimTK::Mat<6,6>& destination);
+
+/*
+ * Compute numerical matrix inverse with Eigen if possible
+ */
+bool NumericalInverse(SimTK::Matrix M, SimTK::Matrix& MInv, int nrows, int ncols);
+bool NumericalLeftInverse(SimTK::Matrix M, SimTK::Matrix& MLeftInv, int nrows, int ncols);
+bool NumericalRightInverse(SimTK::Matrix M, SimTK::Matrix& MRightInv, int nrows, int ncols);
+
+/*
  * Print Big Matrices separated by spaces
  */
 void PrintBigMat(SimTK::Matrix M, int nrows, int ncols, int decimal_places, std::string header);
+void PrintBigMat(SimTK::Mat33 M, int nrows, int ncols, int decimal_places, std::string header);
 
 /*
  * Print Spatial Matrix

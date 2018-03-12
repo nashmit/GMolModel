@@ -355,6 +355,109 @@ bool AreSame(double a, double b, double EPSILON)
 }
 
 /*
+ * Convert spatial maatrix (Mat< 2, 2, Mat33 >) to 6x6 matrix (Mat<6,6>)
+ * Replaces inf and nan with zeros
+ */
+bool SpatialMat2Mat66(SimTK::SpatialMat SM, SimTK::Mat<6,6>& M66)
+{
+    int ti = -1; // 6x6
+    int tj = -1; // 6x6
+    for(int i = 0; i < 2; i++){ // i for SpatialMatrix
+            for(int k = 0; k < 3; k++){ // k for 3x3
+        for(int j = 0; j < 2; j++){ // j for SpatialMatrix
+                for(int l = 0; l < 3; l++){ // l for 3x3
+                    tj++;
+                    tj = tj % 6;
+                    if(!tj){ti++;}
+                    if(std::isinf(SM[i][j][k][l]) || std::isnan(SM[i][j][k][l])){
+                        M66[ti][tj] = 0.0;
+                    }else{
+                        M66[ti][tj] = SM[i][j][k][l];
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
+/*
+ * Compute numerical matrix inverse with Eigen if possible
+ */
+bool NumericalInverse(SimTK::Matrix M, SimTK::Matrix& MInv, int nrows, int ncols)
+{
+    assert((nrows == ncols) && "Robo::NumericalInverse: need a square matrix");
+    Eigen::MatrixXd EiM(nrows, ncols);
+    Eigen::MatrixXd EiMInv(nrows, ncols);
+
+    for(int i = 0; i < nrows; i++){
+        for(int j = 0; j < ncols; j++){
+            EiM(i, j) = M[i][j];
+        }
+    }
+    
+    EiMInv = EiM.inverse();
+
+    for(int i = 0; i < nrows; i++){
+        for(int j = 0; j < ncols; j++){
+            MInv[i][j] = EiMInv(i, j);
+        }
+    }
+    return true;
+    
+}
+
+/*
+ * Compute numerical left inverse with Eigen if possible
+ */
+bool NumericalLeftInverse(SimTK::Matrix M, SimTK::Matrix& MLeftInv, int nrows, int ncols)
+{
+    Eigen::MatrixXd EiM(nrows, ncols);
+    Eigen::MatrixXd EiMLeftInv(ncols, nrows);
+
+    for(int i = 0; i < nrows; i++){
+        for(int j = 0; j < ncols; j++){
+            EiM(i, j) = M[i][j];
+        }
+    }
+    
+    EiMLeftInv = (EiM.transpose() * EiM).inverse() * EiM.transpose();
+
+    for(int i = 0; i < ncols; i++){
+        for(int j = 0; j < nrows; j++){
+            MLeftInv[i][j] = EiMLeftInv(i, j);
+        }
+    }
+    return true;
+    
+}
+
+/*
+ * Compute numerical right inverse with Eigen if possible
+ */
+bool NumericalRightInverse(SimTK::Matrix M, SimTK::Matrix& MRightInv, int nrows, int ncols)
+{
+    Eigen::MatrixXd EiM(nrows, ncols);
+    Eigen::MatrixXd EiMRightInv(ncols, nrows);
+
+    for(int i = 0; i < nrows; i++){
+        for(int j = 0; j < ncols; j++){
+            EiM(i, j) = M[i][j];
+        }
+    }
+    
+    EiMRightInv = EiM.transpose() * (EiM * EiM.transpose()).inverse();
+
+    for(int i = 0; i < ncols; i++){
+        for(int j = 0; j < nrows; j++){
+            MRightInv[i][j] = EiMRightInv(i, j);
+        }
+    }
+    return true;
+    
+}
+
+/*
  * Print Big Matrices separated by spaces
  */
 void PrintBigMat(SimTK::Matrix M, int nrows, int ncols, int decimal_places, std::string header)
@@ -369,6 +472,21 @@ void PrintBigMat(SimTK::Matrix M, int nrows, int ncols, int decimal_places, std:
     }
 }
 
+
+/*
+ * Print Big Matrices separated by spaces
+ */
+void PrintBigMat(SimTK::Mat33 M, int nrows, int ncols, int decimal_places, std::string header)
+{
+    std::cout << header << std::endl;
+    std::cout << std::setprecision(decimal_places);
+    for(int i = 0; i < nrows; i++){
+        for(int j = 0; j < ncols; j++){
+            std::cout << M[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
 
 /*
  * Print Spatial Matrix

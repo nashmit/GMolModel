@@ -17,6 +17,8 @@
 
 #include <boost/math/distributions/normal.hpp>
 
+#include "bgeneral.hpp"
+
 //#ifndef DEBUG_ROBO
 //#define DEBUG_ROBO
 //#endif
