@@ -27,32 +27,40 @@ public:
         //TRACE("NonbondedForceTask::initialize END\n");
 	TRACE("NonbondedForceTask::initialize\n");
 
-	sum.upd() = 0;
+	sum = 0;
 
     }
 
     void finish() {
         TRACE("NonbondedForceTask::finish\n");
         //TRACE("NonbondedForceTask::finish END\n");
-	printf("sum = %d \n", sum.get() );
-	total += sum.get();
+	printf("sum = %i \n", sum );
+	total += sum;
     }
 
     void execute(int body1, int body2) {
         TRACE("NonbondedForceTask::execute\n");
         //TRACE("NonbondedForceTask::execute END\n");
 	
-	printf("body1, body2, sum before : %d %d %d \n", body1, body2, sum.get() );
+	printf("body1, body2, sum before : %i %i %i \n", body1, body2, sum );
 
-	sum.upd() += mat4x4[ body1 ][ body2 ];
+	sum += mat4x4[ body1 ][ body2 ];
     }
 
 private:
 	int mat4x4[4][4];
-	SimTK::ThreadLocal<int> sum;
+	static thread_local int sum;
 	int& total;
     
 };
+
+
+// because static
+
+thread_local int NonbondedForceTask::sum = 0 ;
+
+
+
 
 int main (int argc, char **argv)
 {
@@ -70,11 +78,16 @@ int main (int argc, char **argv)
     NonbondedForceTask task( mat4x4, total);
 
     SimTK::ParallelExecutor *executor = new SimTK::ParallelExecutor(numThreadsInUse);
-
+    
     SimTK::Parallel2DExecutor *nonbondedExecutor =  new SimTK::Parallel2DExecutor(nofIncludedBodies, *executor);
+    
 
-    nonbondedExecutor->execute(task, SimTK::Parallel2DExecutor::HalfMatrix);
 
+    for( int k=0; k < 100 ; k++)
+    {
+    	nonbondedExecutor->execute(task, SimTK::Parallel2DExecutor::HalfMatrix);
+    }
+    
     printf("Before finish: %d\n",total);
 
     return 0;
