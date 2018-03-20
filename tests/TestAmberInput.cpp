@@ -3,13 +3,14 @@
 
 using namespace std;
 
-int main(){
+int main(int argc, char **argv){
 
 readAmberInput MOL;
 
-string inpcrdfile = "../../tests_inputs/lin5/ligand.inpcrd";
-string prmtopfile = "../../tests_inputs/lin5/ligand.prmtop";
-
+//string inpcrdfile = "../../tests_inputs/lin5/ligand.inpcrd";
+//string prmtopfile = "../../tests_inputs/lin5/ligand.prmtop";
+string prmtopfile = argv[1];
+string inpcrdfile = argv[2];
 
 MOL.readAmberFiles(inpcrdfile, prmtopfile);
 
