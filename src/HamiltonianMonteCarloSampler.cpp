@@ -335,7 +335,7 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::
 // [qw, qx, qy, qz, x1, x2, x3]
 void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real timestep, int nosteps)
 {
-    //randomEngine.seed(4294653137UL); // for reproductibility
+    randomEngine.seed(4294653137UL); // for reproductibility
 
     system->realize(someState, SimTK::Stage::Position);
     // Initialize x - not necessary
@@ -375,7 +375,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     SqrtMInvV *= sqrtRT; // Set stddev according to temperature
 
     // TO BE RESTORED 
-    someState.updU() = SqrtMInvV;
+    //someState.updU() = SqrtMInvV;
     // TO BE RESTORED 
     //std::cout << "Before stepTo U: " << someState.getU() << std::endl;
 
@@ -388,8 +388,8 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     //std::cout << "FixmanTorque: " << "myV = " << myV << std::endl;
     //kForTheta = matter->getNumMobilities() - 1; // penultimul U
 
-//    kForTheta = someState.getNQ() - 1; // penultimul U
-//    someState.updU()[kForTheta - 1] = 10.5;
+////    kForTheta = someState.getNQ() - 1; // penultimul U
+////    someState.updU()[kForTheta - 1] = 10.5;
     //someState.updU() = 0.0;
 
 ////    std::cout << "FixmanTorque 0: " << "Qs = " << someState.getQ() << std::endl;
@@ -504,12 +504,12 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 
 ////    std::cout << "FixmanTorque 3: " << "Qs = " << someState.getQ() << std::endl;
     // TO BE DELETED
-    SimTK::Vector V3(nu);
-    SimTK::Vector V4(nu);
-    SimTK::Real* D0 = new SimTK::Real(1.0);
-    matter->calcFixmanTorque(someState, V3, V4, D0);
+////    SimTK::Vector V3(nu);
+////    SimTK::Vector V4(nu);
+////    SimTK::Real* D0 = new SimTK::Real(1.0);
+////    matter->calcFixmanTorque(someState, V3, V4, D0);
 ////    std::cout << "FixmanTorque 4: " << "Qs = " << someState.getQ() << std::endl;
-    delete D0;
+////    delete D0;
     // TO BE DELETED
  
    //std::cout <<  "Sampler after stepTo State Cache Info: " << std::endl;
@@ -1206,7 +1206,6 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     }
     // Eq. 4.11
 */
-
     /*
     // Build Hbold
     int currKForTheta = 0;
