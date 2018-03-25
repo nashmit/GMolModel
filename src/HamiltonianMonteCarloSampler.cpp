@@ -273,13 +273,40 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     SqrtMInvV *= sqrtRT; // Set stddev according to temperature
     someState.updU() = SqrtMInvV;
 
+    // TODEL
+    // Prescribe motion
+////    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+////        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+////
+////        SimTK::Motion::Level motionLevel = SimTK::Motion::Level::Position;
+////       //SimTK::Motion::Method motionMethod = SimTK::Motion::Method::Zero;
+////        if( int(mbx) == 4){
+////             mobod.lock(someState, motionLevel);
+////        }
+////    }
+    // END TODEL
+
     // Store the proposed kinetic energy
     system->realize(someState, SimTK::Stage::Velocity);
     setProposedKE(matter->calcKineticEnergy(someState));
 
     // Store the proposed total energy
     this->etot_proposed = getOldPE() + getProposedKE() + getOldFixman();
+
+    // TODEL
+////    std::cout << "Qs and Us before stepTo:" << std::endl;
+////    PrintBigMat(someState.getQ(), someState.getNQ(), 3, "Q");
+////    PrintBigMat(someState.getU(), someState.getNU(), 3, "U");
+    // END TODEL
+
+    // Integrate (propagate trajectory)
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
+
+    // TODEL
+////    std::cout << "Qs and Us after stepTo:" << std::endl;
+////    PrintBigMat(someState.getQ(), someState.getNQ(), 3, "Q");
+////    PrintBigMat(someState.getU(), someState.getNU(), 3, "U");
+    // END TODEL
 
     // Keep track of how many MC trials have been done 
     ++trackStep;
@@ -335,8 +362,8 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         ;
 
     // Apply Metropolis criterion
-    //if(1){ // Always accept
-    if ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))){ // Accept
+    if(1){ // Always accept // TODO
+    //if ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))){ // Accept
         std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
