@@ -275,32 +275,32 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 
     // TODEL
     // TODO: Implement this in a different function
-
-    // Unlock all mobilizers
-    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-        mobod.unlock(someState);
-    }
-
-    // Randomly choose what mobods to lock and store the chosen ones into
-    // a binary array
-    int BinaryArray[matter->getNumBodies()];
-    for(int i = 0; i < matter->getNumBodies(); i++){
-        BinaryArray[i] = 1;
-    }
-    for(int i = 0; i < 3; i++){
-        SimTK::Real rand_no = uniformRealDistribution(randomEngine);
-        BinaryArray[int(std::floor(matter->getNumBodies() * rand_no))] = 0;
-    }
-    
-    // Lock the chosen mobilizers
-    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-        if(BinaryArray[int(mbx) - 1] == 0){
-            SimTK::Motion::Level motionLevel = SimTK::Motion::Level::Position;
-            mobod.lock(someState, motionLevel);
-        }
-    }
+////
+////    // Unlock all mobilizers
+////    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+////        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+////        mobod.unlock(someState);
+////    }
+////
+////    // Randomly choose what mobods to lock and store the chosen ones into
+////    // a binary array
+////    int BinaryArray[matter->getNumBodies()];
+////    for(int i = 0; i < matter->getNumBodies(); i++){
+////        BinaryArray[i] = 1;
+////    }
+////    for(int i = 0; i < 3; i++){
+////        SimTK::Real rand_no = uniformRealDistribution(randomEngine);
+////        BinaryArray[int(std::floor(matter->getNumBodies() * rand_no))] = 0;
+////    }
+////    
+////    // Lock the chosen mobilizers
+////    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+////        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+////        if(BinaryArray[int(mbx) - 1] == 0){
+////            SimTK::Motion::Level motionLevel = SimTK::Motion::Level::Position;
+////            mobod.lock(someState, motionLevel);
+////        }
+////    }
     // END TODEL
 
     // Store the proposed kinetic energy
@@ -311,18 +311,18 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     this->etot_proposed = getOldPE() + getProposedKE() + getOldFixman();
 
     // TODEL
-    std::cout << "Qs and Us before stepTo:" << std::endl;
-    PrintBigMat(someState.getQ(), someState.getNQ(), 3, "Q");
-    PrintBigMat(someState.getU(), someState.getNU(), 3, "U");
+////    std::cout << "Qs and Us before stepTo:" << std::endl;
+////    PrintBigMat(someState.getQ(), someState.getNQ(), 3, "Q");
+////    PrintBigMat(someState.getU(), someState.getNU(), 3, "U");
     // END TODEL
 
     // Integrate (propagate trajectory)
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
 
     // TODEL
-    std::cout << "Qs and Us after stepTo:" << std::endl;
-    PrintBigMat(someState.getQ(), someState.getNQ(), 3, "Q");
-    PrintBigMat(someState.getU(), someState.getNU(), 3, "U");
+////    std::cout << "Qs and Us after stepTo:" << std::endl;
+////    PrintBigMat(someState.getQ(), someState.getNQ(), 3, "Q");
+////    PrintBigMat(someState.getU(), someState.getNU(), 3, "U");
     // END TODEL
 
     // Keep track of how many MC trials have been done 
