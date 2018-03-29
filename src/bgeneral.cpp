@@ -491,6 +491,21 @@ void PrintBigMat(SimTK::Mat33 M, int nrows, int ncols, int decimal_places, std::
 /*
  * Print Big Matrices separated by spaces
  */
+void PrintBigMat(SimTK::Mat44 M, int nrows, int ncols, int decimal_places, std::string header)
+{
+    std::cout << header << std::endl;
+    std::cout << std::setprecision(decimal_places);
+    for(int i = 0; i < nrows; i++){
+        for(int j = 0; j < ncols; j++){
+            std::cout << M[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+/*
+ * Print Big Matrices separated by spaces
+ */
 void PrintBigMat(SimTK::Mat66 M, int nrows, int ncols, int decimal_places, std::string header)
 {
     std::cout << header << std::endl;
@@ -523,6 +538,18 @@ void PrintSpatialMat(SimTK::SpatialMat M, int decimal_places, std::string header
     }
 }
 
+/*
+ * Print Big Vector separated by spaces
+ */
+void PrintBigMat(SimTK::Vector V, int nrows, int decimal_places, std::string header)
+{
+    std::cout << header << std::endl;
+    std::cout << std::setprecision(decimal_places) << std::fixed;
+    for(int i = 0; i < nrows; i++){
+            std::cout << V[i] << " ";
+    }
+    std::cout << std::endl;
+}
 
 
 

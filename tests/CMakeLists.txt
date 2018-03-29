@@ -121,6 +121,7 @@ set(TESTS_SRCS
 	      TestAmberInput.cpp
         TestMixing.cpp
         TestWriteDCD.cpp
+        TestHMCSOA.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})

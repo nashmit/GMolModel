@@ -194,7 +194,9 @@ bool NumericalRightInverse(SimTK::Matrix M, SimTK::Matrix& MRightInv, int nrows,
  */
 void PrintBigMat(SimTK::Matrix M, int nrows, int ncols, int decimal_places, std::string header);
 void PrintBigMat(SimTK::Mat33 M, int nrows, int ncols, int decimal_places, std::string header);
+void PrintBigMat(SimTK::Mat44 M, int nrows, int ncols, int decimal_places, std::string header);
 void PrintBigMat(SimTK::Mat66 M, int nrows, int ncols, int decimal_places, std::string header);
+void PrintBigMat(SimTK::Vector M, int nrows, int decimal_places, std::string header);
 
 /*
  * Print Spatial Matrix
