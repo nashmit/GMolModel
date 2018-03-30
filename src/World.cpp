@@ -300,25 +300,25 @@ void World::Init(SimTK::Real timestep)
   
     // My specific scale factors. These should be used during debugging.
     //->setSpecificDuMMScaleFactor(*forceField);
-//    forceField->setBondStretchGlobalScaleFactor(0.0);
-//    forceField->setBondBendGlobalScaleFactor(0.0);
-//    forceField->setBondTorsionGlobalScaleFactor(0.0);
-//    forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
-//  
-//    forceField->setVdw12ScaleFactor(0.0);
-//    forceField->setVdw13ScaleFactor(0.0);
-//    forceField->setVdw14ScaleFactor(0.0);
-//    forceField->setVdw15ScaleFactor(0.0);
-//    forceField->setVdwGlobalScaleFactor(0.0);
-//  
-//    forceField->setCoulomb12ScaleFactor(0.0);
-//    forceField->setCoulomb13ScaleFactor(0.0);
-//    forceField->setCoulomb14ScaleFactor(0.0);
-//    forceField->setCoulomb15ScaleFactor(0.0);
-//    forceField->setCoulombGlobalScaleFactor(0.0);
+    // Solvent treatment
+////    forceField->setGbsaGlobalScaleFactor(0.0);
   
-    forceField->setGbsaGlobalScaleFactor(0.0);
-    //
+////    forceField->setBondStretchGlobalScaleFactor(0.0);
+////    forceField->setBondBendGlobalScaleFactor(0.0);
+////    forceField->setBondTorsionGlobalScaleFactor(0.0);
+////    forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
+////  
+////    forceField->setVdw12ScaleFactor(0.0);
+////    forceField->setVdw13ScaleFactor(0.0);
+////    forceField->setVdw14ScaleFactor(0.0);
+////    forceField->setVdw15ScaleFactor(0.0);
+////    forceField->setVdwGlobalScaleFactor(0.0);
+////  
+////    forceField->setCoulomb12ScaleFactor(0.0);
+////    forceField->setCoulomb13ScaleFactor(0.0);
+////    forceField->setCoulomb14ScaleFactor(0.0);
+////    forceField->setCoulomb15ScaleFactor(0.0);
+////    forceField->setCoulombGlobalScaleFactor(0.0);
   
     *fassno = 0;
     ExtForce = new SimTK::Force::Custom(*forces, new GridForce(compoundSystem, *matter, fassno, this));
