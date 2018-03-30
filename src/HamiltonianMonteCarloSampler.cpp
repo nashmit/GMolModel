@@ -358,7 +358,6 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     SimTK::Real ke_n = matter->calcKineticEnergy(someState);
 
     SimTK::Real etot_proposed, etot_n;
-    assert(!isnan(pe_n));
     if(useFixman){
         etot_n = pe_n + ke_n + fix_n;
         etot_proposed = pe_o + ke_proposed + fix_o;
@@ -379,8 +378,9 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         ;
 
     // Apply Metropolis criterion
-    if(1){ // Always accept // TODO
-    //if ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))){ // Accept
+////    if(1){ // Always accept // TODO
+    //assert(!isnan(pe_n));
+    if ( (!isnan(pe_n)) || (etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT)) ){ // Accept
         std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
