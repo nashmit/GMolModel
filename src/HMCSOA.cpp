@@ -502,7 +502,7 @@ void TestHMCSOA::propose(SimTK::State& someState, SimTK::Real timestep, int nost
     SimTK::Vector V3(nu);
     SimTK::Vector V4(nu);
     SimTK::Real* D0 = new SimTK::Real(1.0);
-    matter->calcFixmanTorque(someState, V3, V4, D0);
+////    matter->calcFixmanTorque(someState, V3, V4, D0);
     std::cout << "FixmanTorque 4: " << "Qs = " << someState.getQ() << std::endl;
     delete D0;
     // TO BE DELETED
