@@ -201,6 +201,7 @@ void PrintBigMat(SimTK::Vector M, int nrows, int decimal_places, std::string hea
 /*
  * Print Spatial Matrix
  */
-void PrintSpatialMat(SimTK::Matrix M, int decimal_places, std::string header);
+void PrintSpatialVec(SimTK::SpatialVec V, int decimal_places, std::string header);
+void PrintSpatialMat(SimTK::SpatialMat M, int decimal_places, std::string header);
 
 #endif /*BGENERAL_H_*/

@@ -539,6 +539,21 @@ void PrintSpatialMat(SimTK::SpatialMat M, int decimal_places, std::string header
 }
 
 /*
+ * Print Spatial Vector
+ */
+void PrintSpatialVec(SimTK::SpatialVec M, int decimal_places, std::string header)
+{
+    std::cout << header << std::endl;
+    std::cout << std::setprecision(decimal_places) << std::fixed;
+    for(int i = 0; i < 2; i++){
+        for(int k = 0; k < 3; k++){
+            std::cout << M[i][k] << " ";
+        }
+    }
+    std::cout << std::endl;
+}
+
+/*
  * Print Big Vector separated by spaces
  */
 void PrintBigMat(SimTK::Vector V, int nrows, int decimal_places, std::string header)

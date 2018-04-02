@@ -384,7 +384,7 @@ void TestHMCSOA::propose(SimTK::State& someState, SimTK::Real timestep, int nost
     //kForTheta = matter->getNumMobilities() - 1; // penultimul U
 
     kForTheta = someState.getNQ() - 1; // penultimul U
-    someState.updU()[kForTheta - 1] = 10.5;
+    someState.updU()[kForTheta - 1] = 5.0;
     //someState.updU() = 0.0;
 
     std::cout << "FixmanTorque 0: " << "Qs = " << someState.getQ() << std::endl;
@@ -502,7 +502,7 @@ void TestHMCSOA::propose(SimTK::State& someState, SimTK::Real timestep, int nost
     SimTK::Vector V3(nu);
     SimTK::Vector V4(nu);
     SimTK::Real* D0 = new SimTK::Real(1.0);
-////    matter->calcFixmanTorque(someState, V3, V4, D0);
+    matter->calcFixmanTorque(someState, V3, V4, D0);
     std::cout << "FixmanTorque 4: " << "Qs = " << someState.getQ() << std::endl;
     delete D0;
     // TO BE DELETED
@@ -601,8 +601,8 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     //if (( (pe_n) < (pe_o) ) || (rand_no < exp(-( (pe_n) - (pe_o) ) / RT))){ // Accept
     //if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
 
-    //if(1){ // Always accept
-    if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
+    if(1){ // Always accept
+    //if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
         std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
@@ -628,7 +628,10 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
 
     // TO BE DELETED
-    // Eq. 2.11 and 2.14 numerical derivs
+    /////////////////////////////////////////////
+    // Get Fixman torque numerically. [Jain 1997] Eq. 2.11 and 2.14.
+    // TODO: detM quatities are actually log(det(M))
+    /////////////////////////////////////////////
     int NBODIESplusG = matter->getNumBodies();
     int SPATIAL_DOFSplusG = NBODIESplusG * 6;
     int SPATIAL_DOFS = SPATIAL_DOFSplusG - 6;
@@ -666,15 +669,9 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     dDetMdThetaK = dDetM / dThetaK;
     dNumDetMdThetaK = dNumDetM / dThetaK;
     dMdThetaK = dM / dThetaK;
-    std::cout << std::setprecision(10) << "prevThetaK = " << prevThetaK << std::endl;
-    std::cout << std::setprecision(10) << "ThetaK = " << ThetaK << std::endl;
-    //std::cout << "FixmanTorque matrix: " << "prevM = " << prevM << std::endl;
-    //std::cout << "FixmanTorque matrix: " << "M = " << M << std::endl;
     //PrintBigMat(M, NU, NU, 2, "M"); 
-    PrintBigMat(dM, NU, NU, 4, "dM");
-    std::cout << std::setprecision(10) << "dThetaK " << dThetaK << std::endl << std::setprecision(2);
-    //std::cout << "FixmanTorque matrix: " << "dM = " << dM << std::endl;
-    //std::cout << "FixmanTorque matrix: " << "dMdThetaK = " << dMdThetaK << std::endl;
+    //PrintBigMat(dM, NU, NU, 4, "dM");
+    //std::cout << std::setprecision(10) << "dThetaK " << dThetaK << std::endl << std::setprecision(2);
 
     for(int i = 0; i < NU; i++){
         for(int j = 0; j < NU; j++){prevM(i, j) = M(i, j);}
@@ -684,30 +681,30 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     prevNumDetM = numDetM;
 
     matter->calcMInv(someState, MInv);
-    PrintBigMat(MInv, NU, NU, 2, "MInv"); 
+    //PrintBigMat(MInv, NU, NU, 2, "MInv"); 
 
     MInvdMdThetaK = MInv * dMdThetaK;
     for(int i = 0; i < NU; i++){
         Trace += MInvdMdThetaK(i, i);
     }
-    //std::cout << "FixmanTorque matrix: " << "MInv = " << MInv << std::endl;
-    std::cout << "HMC FixmanTorque matrix: " << "MInvdMdThetaK = " << MInvdMdThetaK << std::endl;
+    //PrintBigMat(MInvdMdThetaK, NU, NU, 4, "MInvdMdThetaK");
     std::cout << "HMC FixmanTorque: " << std::setprecision(10) << "1/2 dNumDetMdThetaK = " << 0.5 * dNumDetMdThetaK << std::endl;
     std::cout << "HMC FixmanTorque: " << "1/2 dDetMdThetaK = " << 0.5 * dDetMdThetaK << std::endl;
     std::cout << "HMC FixmanTorque: 1/2 Trace(MInvdMdThetaK):" << 0.5 * Trace << std::endl << std::setprecision(2);
     std::cout << "FixmanTorque 9: " << "Qs = " << someState.getQ() << std::endl;
 
-    // Eq. 4.11
-    // First get Mks and Phi based on 3.4a
-    //SimTK::Matrix J(6*NU, NU);
+    /////////////////////////////////////////////
+    // Get Newton Euler Operators H, Phi, and MkTot. [Rodriguez 1991] Eq. 3.2
+    /////////////////////////////////////////////
+    //Get Jacobian J = Phi H
     SimTK::Matrix Jstar;
     SimTK::Matrix J;
     SimTK::Matrix MkTot(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
     matter->calcSystemJacobian(someState, J);
     Jstar = ~J;
-    SimTK::Matrix M3_4a(NU, NU, 0.0);
-    //std::cout << "FixmanTorque matrix: " << "J = " << J << std::endl;
 
+    // Get MkTot
+    SimTK::Matrix M3_4a(NU, NU, 0.0);
     for (SimTK::MobilizedBodyIndex mbx(0); mbx < NBODIESplusG; ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         const SimTK::SpatialInertia Mk = mobod.getBodySpatialInertiaInGround(someState);
@@ -715,8 +712,8 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
         int ti = -1; // 6x6
         int tj = -1; // 6x6
         for(int i = 0; i < 2; i++){ // i for SpatialMatrix
-                for(int k = 0; k < 3; k++){ // k for 3x3 
-            for(int j = 0; j < 2; j++){ // j for SpatialMatrix
+            for(int k = 0; k < 3; k++){ // k for 3x3 
+                for(int j = 0; j < 2; j++){ // j for SpatialMatrix
                     for(int l = 0; l < 3; l++){ // l for 3x3
                         tj++;
                         tj = tj % 6;
@@ -731,10 +728,13 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
             }
         }
     }
-    //std::cout << "FixmanTorque matrix: " << "MkTot = " << MkTot << std::endl;
-    // Get H and Phi
+    //PrintBigMat(MkTot, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "MkTot");
+
+    // Get H based on H_PB_G (what Jain calls Hstar) 
     SimTK::Matrix H(NU, SPATIAL_DOFSplusG, 0.0);
     SimTK::Matrix Hstar(SPATIAL_DOFSplusG, NU, 0.0);
+    SimTK::Matrix H_FM(NU, SPATIAL_DOFSplusG, 0.0);
+    SimTK::Matrix H_FMstar(SPATIAL_DOFSplusG, NU, 0.0);
     SimTK::Matrix Phi(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
     SimTK::Matrix Phistar(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
 
@@ -745,22 +745,26 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
         for(int k = 0; k < mobod.getNumU(someState); k++){
             tj++;
             SimTK::SpatialVec HCol = mobod.getHCol(someState, SimTK::MobilizerUIndex(k));
+            SimTK::SpatialVec H_FMCol = mobod.getH_FMCol(someState, SimTK::MobilizerUIndex(k));
             //std::cout << "mobod " << int(mbx) << " HCol " << k << " = " << HCol << std::endl;
             int ti = -1;
             for(int i = 0; i < 2; i++){
                 for(int j = 0; j < 3; j++){
                     ti++;
                     Hstar[int(mbx)*6 + ti][tj] = HCol[i][j];
+                    H_FMstar[int(mbx)*6 + ti][tj] = H_FMCol[i][j];
                 }
             }
         }
         
     }
 
-    H = Hstar.transpose(); 
-    //PrintBigMat(Hstar, SPATIAL_DOFSplusG, NU, 2, "Hstar"); 
+    H = Hstar.transpose();
+    H_FM = H_FMstar.transpose();
+    PrintBigMat(Hstar, SPATIAL_DOFSplusG, NU, 2, "Hstar"); 
+    PrintBigMat(H_FMstar, SPATIAL_DOFSplusG, NU, 2, "H_FMstar"); 
 
-    // Fill Phi
+    // Get Phi
     for(int phi_I = 0; phi_I < NBODIESplusG; phi_I++){
         // Fill diagonal element
         for(int i = 0; i < 6; i++){
@@ -779,20 +783,12 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
             const SimTK::Transform X_IBM = Imobod.getOutboardFrame(someState);
             const SimTK::Transform X_JBM = Jmobod.getOutboardFrame(someState);
 
-            // X_PB = X_PF(getInboardFrame) * X_FM(getMobilizerTransform) * X_MB(getOutboardFrame)
-            //const SimTK::Transform X_IJ = Jmobod.getDefaultInboardFrame() * Jmobod.getMobilizerTransform(someState) * ~Jmobod.getDefaultOutboardFrame();
-            //const SimTK::Transform X_IJ = Jmobod.getInboardFrame(someState) * Jmobod.getMobilizerTransform(someState) * ~Jmobod.getOutboardFrame(someState);
-
             const SimTK::Transform X_IFM = Imobod.getMobilizerTransform(someState);
             const SimTK::Transform X_JFM = Jmobod.getMobilizerTransform(someState);
 
-            // X_GP.R() * X_PB.p();
-            //SimTK::Mat33 PhiLCross = SimTK::crossMat( X_GI.R() * X_IJ.p() );
-            //SimTK::Mat33 PhiLCross = SimTK::crossMat( X_GJ.p() - X_GI.p() );
             SimTK::Mat33 PhiLCross = SimTK::crossMat( X_GJ.p() - X_GI.p() );
 
             SimTK::Matrix PhiElem(6, 6, 0.0);
-
             for(int i = 0; i < 6; i++){
                     PhiElem[i][i] = 1.0;
             }
@@ -809,33 +805,27 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
                 }
             }
     
-            //std::cout << "phi " << phi_I << " " << phi_J << " X_IJ = " << X_IJ << std::endl;
-            //std::cout << "phi " << phi_I << " " << phi_J << " X_IJ.p = " << X_IJ.p() << std::endl;
             //std::cout << "phi tree levels " << Imobod.getLevelInMultibodyTree() << " " << Jmobod.getLevelInMultibodyTree() << std::endl;
-            //std::cout << "phi mbx " << Imobod.getMobilizedBodyIndex() << " " << Jmobod.getMobilizedBodyIndex() << std::endl;
-            //std::cout << "phi I J " << phi_I << " " << phi_J << " PhiElem = " ; //<< PhiLCross << std::endl;
-            //PrintBigMat(PhiElem, 6, 6, 3, "");
-            //std::cout << "phi " << phi_I << " " << phi_J << " PhiElem = " << PhiElem << std::endl;
+            //PrintBigMat(PhiElem, 6, 6, 3, "PhiElem");
         }
     }
-    //PrintBigMat(Phistar, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "FixmanTorque matrix: Phistar"); 
     Phi = Phistar.transpose();
+    //PrintBigMat(Phistar, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "FixmanTorque matrix: Phistar"); 
 
-    //M3_4a = (~J) * MkTot * J; // Eq 3.4a
-    //M3_4a = (~Hstar * ~Phistar) * MkTot * (Phistar * Hstar); // Eq 3.4a
-    //std::cout << "M = " << M << std::endl;
-    //std::cout << "M3_4a = " << M3_4a << std::endl;
+    // Verify [Jain 1997] Eq. 3.4a
+    //M3_4a = (~J) * MkTot * J;
+    //M3_4a = (~Hstar * ~Phistar) * MkTot * (Phistar * Hstar);
     //std::cout << "M - M3_4a = " << M - M3_4a << std::endl;
 
-    // Get Jain's versions of H and J
+    /////////////////////////////////////////////
+    // Get operators Groundless truncated versions (Jain's versions ?)
+    /////////////////////////////////////////////
     SimTK::Matrix J_Jain(SPATIAL_DOFS, NU, 0.0);
     SimTK::Matrix Phistar_Jain(SPATIAL_DOFS, SPATIAL_DOFS, 1.0);
     SimTK::Matrix Hstar_Jain(SPATIAL_DOFS, NU, 0.0);
-
     SimTK::Matrix Jstar_Jain(NU, SPATIAL_DOFS, 0.0);
     SimTK::Matrix Phi_Jain(SPATIAL_DOFS, SPATIAL_DOFS, 1.0);
     SimTK::Matrix H_Jain(NU, SPATIAL_DOFS, 0.0);
-
     SimTK::Matrix MkTot_Jain(SPATIAL_DOFS, SPATIAL_DOFS, 0.0);
 
     for(int i = 0; i < SPATIAL_DOFS; i++){
@@ -855,22 +845,9 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     H_Jain = Hstar_Jain.transpose();
     Jstar_Jain = H_Jain.transpose();
 
-    //PrintBigMat(MkTot_Jain * MkTot_Jain.transpose(), SPATIAL_DOFS, SPATIAL_DOFS, 2, "MkTot * MkTotstar");
-    //PrintBigMat(MkTot_Jain.transpose() * MkTot_Jain, SPATIAL_DOFS, SPATIAL_DOFS, 2, "MkTotstar * MkTot");
-    //PrintBigMat(Phistar_Jain * Phi_Jain, SPATIAL_DOFS, SPATIAL_DOFS, 2, "Phistar * Phi");
-    //PrintBigMat(Phi_Jain * Phistar_Jain, SPATIAL_DOFS, SPATIAL_DOFS, 2, "Phi * Phistar");
-    //PrintBigMat(Hstar_Jain * H_Jain, SPATIAL_DOFS, SPATIAL_DOFS, 2, "Hstar * H");
-    //PrintBigMat(H_Jain * Hstar_Jain, NU, NU, 2, "H * Hstar");
-
-    //PrintBigMat((H_Jain * Phi_Jain * MkTot_Jain * Phistar_Jain * Hstar_Jain) - M, NU, NU, 2, "Verify 3.4a");
-    //PrintBigMat((H * Phi * MkTot * Phistar * Hstar) - M, NU, NU, 2, "Verify 3.4a");
-    //PrintBigMat(Phistar, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "Phistar"); 
-    //PrintBigMat(Phistar_Jain, SPATIAL_DOFS, SPATIAL_DOFS, 2, "Phistar_Jain"); 
-    //std::cout << "FixmanTorque matrix: " << "J_Jain computed = " << (Phistar_Jain * Hstar_Jain) - J_Jain << std::endl;
-    //std::cout << "FixmanTorque matrix: " << "J computed - J = " << (Phistar_Jain * Hstar_Jain) - J_Jain<< std::endl;
-    //std::cout << "verify" << Hstar_Jain  * Hstar_Jain.transpose() << std::endl;
-
-    // Check Eq. 417
+    /////////////////////////////////////////////
+    // Get SOA Operators [Rodriguez 1991, 1992]
+    /////////////////////////////////////////////
     SimTK::Matrix P(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
     SimTK::Matrix P_Jain(SPATIAL_DOFS, SPATIAL_DOFS, 0.0);
     SimTK::Matrix D(NU, NU, 0.0);
@@ -878,7 +855,8 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     SimTK::Matrix D_Jain(NU, NU, 0.0);
     SimTK::Matrix G(SPATIAL_DOFSplusG, NU, 0.0);
     SimTK::Matrix G_Jain(SPATIAL_DOFS, NU, 0.0);
-
+   
+    // Get P, D, and G 
     for (SimTK::MobilizedBodyIndex mbx(0); mbx < NBODIESplusG; ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         const SimTK::ArticulatedInertia Pk = matter->getArticulatedBodyInertia(someState, mbx);
@@ -902,14 +880,7 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     G = P * Hstar * DInv;
     G_Jain = P_Jain * Hstar_Jain * DInv;
     
-    //PrintBigMat(P, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "P");
-    //PrintBigMat(P_Jain, SPATIAL_DOFS, SPATIAL_DOFS, 2, "P_Jain");
-    //PrintBigMat(D, NU, NU, 2, "D");
-    //PrintBigMat(D_Jain, NU, NU, 2, "D_Jain");
-    //PrintBigMat(DInv, NU, NU, 2, "DInv");
-    //PrintBigMat(G, SPATIAL_DOFSplusG, NU, 2, "G");
-    //PrintBigMat(G_Jain, SPATIAL_DOFS, NU, 2, "G_Jain");
-
+    // Get Eta operators and K
     SimTK::Matrix EtaPhistar(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
     SimTK::Matrix EtaPhistar_Jain(SPATIAL_DOFS, SPATIAL_DOFS, 0.0);
     SimTK::Matrix EtaPhi(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
@@ -935,10 +906,10 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     EtaPhi_Jain = EtaPhistar_Jain.transpose();
     K = EtaPhi * G;
     K_Jain = EtaPhi_Jain * G_Jain;
-
     //PrintBigMat(EtaPhistar, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "EtaPhistar"); 
     //PrintBigMat(K, SPATIAL_DOFSplusG, NU, 2, "K"); 
 
+    // Verify SOA using the mass matrix
     //SimTK::Matrix I(NU, NU, 0.0);
     //for(int i = 0; i < NU; i++){
     //    I[i][i] = 1.0;
@@ -961,8 +932,7 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     //PrintBigMat(I_EtaPhistar, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "I_EtaPhistar"); 
     //PrintBigMat(Phistar - I_EtaPhistarInv, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "Check EtaPhistar"); 
 
-    // Build Psi
-    // don't copy for lines
+    // Get Psi and EtaPsi
     SimTK::Matrix Psi(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
     SimTK::Matrix Psistar(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
     SimTK::Matrix EtaPsi(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
@@ -999,18 +969,19 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     }
     Psistar = Psi.transpose();
 
-    // Omega
+    /////////////////////////////////////////////
+    // Get Omega using [Jain 1997] Eq. 4.13
+    /////////////////////////////////////////////
     SimTK::Matrix Omega(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
-
     Omega = Psistar * Hstar * DInv * H * Psi;
 
     // Check eq. 4.14b
     //PrintBigMat(Phi * MkTot * Omega, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "Phi M Omega");
     //PrintBigMat((Phi - Psi) + (P * Omega), SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "(Phi - Psi) + P Omega");
-    //PrintBigMat(Phi, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "Phi");
-    //PrintBigMat(Psistar, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "Psistar");
 
-    // Build Upsilon using Jain 1997 recursion
+    /////////////////////////////////////////////
+    // Get Upsilon and Psi bar using [Jain 1997] recursion
+    /////////////////////////////////////////////
     SimTK::Matrix Upsilon(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
     SimTK::Mat66 UpsK(0.0);
     SimTK::Mat66 PsistarKKm(0.0);
@@ -1069,20 +1040,13 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
         }
 
         if(k <= 1){
-            //std::cout << "Hstar0" << Hstar0 << std::endl;
-            //std::cout << "H0" << H0 << std::endl;
-            //std::cout << "DInv0" << DInv0 << std::endl;
             UpsK = (PsistarKKm * UpsK * PsiKKm) + (Hstar0 * DInv0 * H0);
         }else{
-            //std::cout << "HstarK" << HstarK << std::endl;
-            //std::cout << "HK" << HK << std::endl;
-            //std::cout << "DInvK" << DInvK << std::endl;
             UpsK = (PsistarKKm * UpsK * PsiKKm) + (HstarK * DInvK * HK);
         }
 
         //std::cout << "Upsilon(" << k << ") = " << std::endl;
         //std::cout << UpsK << std::endl;
-
         for(int i = 0; i < 6; i++){
             for(int j = 0; j < 6; j++){
                 Upsilon[(k*6) + i][(k*6) + j] = UpsK[i][j];
@@ -1092,14 +1056,14 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     }
 
     
-    // Check 4.15
-    //SimTK::Matrix IdPsi(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
-    //for(int i = 0; i < SPATIAL_DOFSplusG; i++){IdPsi[i][i] = 1.0;}
-    //SimTK::Matrix PsiBar(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
-    //SimTK::Matrix PsiBarstar(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
+    // Get PsiBar and Check 4.15
+    SimTK::Matrix IdPsi(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
+    for(int i = 0; i < SPATIAL_DOFSplusG; i++){IdPsi[i][i] = 1.0;}
+    SimTK::Matrix PsiBar(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
+    SimTK::Matrix PsiBarstar(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
 
-    //PsiBar = Psi - IdPsi;
-    //PsiBarstar = PsiBar.transpose();
+    PsiBar = Psi - IdPsi;
+    PsiBarstar = PsiBar.transpose();
 
     //PrintBigMat(Omega, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "Omega");
     //PrintBigMat(Upsilon + (PsiBarstar * Upsilon) + (Upsilon * PsiBar), SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "Omega(Upsilon)");
@@ -1109,6 +1073,10 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     //PrintBigMat(Upsilon, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "Upsilon");
     //PrintBigMat(Hstar, SPATIAL_DOFSplusG, NU, 2, "Hstar"); 
 
+    /////////////////////////////////////////////
+    // Get Fixman torque using [Jain 1997] Eq. 4.17 and setting 
+    // h(i) to Hstar(k)
+    /////////////////////////////////////////////
     SimTK::Mat66 PKK(0.0);
     SimTK::Mat66 UKK(0.0);
     SimTK::Mat66 Hi(0.0);
@@ -1123,7 +1091,6 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
         // Get PsistarKKm PKK
         for(int i = 0; i < 6; i++){
             for(int j = 0; j < 6; j++){
-                //std::cout << "PKK i j " << i << " " << j << " P[][] " << (k*6) + i << " " << (k*6) + j << std::flush << std::endl; 
                 PKK[i][j] = P[ (k*6) + i ][ (k*6) + j ];
                 UKK[i][j] = Upsilon[ (k*6) + i ][ (k*6) + j ];
             }
@@ -1133,20 +1100,17 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
         if(k == 0){
             for(int i = 0; i < 6; i++){
                 for(int j = 0; j < 6; j++){
-                    //std::cout << "Hstar0 i j " << i << " " << j << " = 0 " << std::flush << std::endl; 
                     Hstar0[i][j] =  0.0;
                 }
             }
         }else if(k == 1){
             for(int i = 0; i < 6; i++){
                 for(int j = 0; j < 6; j++){
-                    //std::cout << "Hstar0 i j " << i << " " << j << " Hstar[][] " << (k*6) + i << " " << j << std::flush << std::endl; 
                     Hstar0[i][j] =  Hstar[ (k*6) + i ][ j ];
                 }
             }
         }else if(k > 1){
             for(int i = 0; i < 6; i++){
-                //std::cout << "HstarK i j " << i << " " << 0 << " Hstar " << (6*k) + i << " " << 5 + (k - 1) << std::flush << std::endl;
                 HstarK[i][0] =  Hstar[ (6*k) + i ][5 + (k - 1)];
             }
         }
@@ -1158,10 +1122,8 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
                 }
                 const SimTK::Rotation R_GB = mobod.getBodyRotation(someState);
                 RotVec_G = R_GB * RotVec;
-                std::cout << "RotVec_G: " << RotVec_G << std::endl;
     
                 crossH = SimTK::crossMat(RotVec_G);
-                std::cout << "crossH: " << crossH << std::endl;
                 Hi = SimTK::Mat66(0.0);
     
                 for (int i = 0; i < 3; i++){
@@ -1169,7 +1131,6 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
                         Hi[i][j] = Hi[i +3][j + 3] = crossH[i][j];
                     }
                 }
-                std::cout << "Hi: " << Hi << std::endl;
     
                 PYH = PKK * UKK * Hi;
                 std::cout << std::setprecision(10) << "Tr{PYH} ExtDof " << ExtDof << " = " << PYH.trace() << std::endl << std::setprecision(2);
@@ -1180,18 +1141,17 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
             }
             const SimTK::Rotation R_GB = mobod.getBodyRotation(someState);
             RotVec_G = R_GB * RotVec;
-            std::cout << "RotVec_G: " << RotVec_G << std::endl;
 
-            crossH = SimTK::crossMat(RotVec_G);
-            std::cout << "crossH: " << crossH << std::endl;
+            //crossH = SimTK::crossMat(RotVec_G);
+            crossH = SimTK::crossMat(RotVec);
             Hi = SimTK::Mat66(0.0);
 
             for (int i = 0; i < 3; i++){
                 for (int j = 0; j < 3; j++){
-                    Hi[i][j] = Hi[i +3][j + 3] = crossH[i][j];
+                    Hi[i][j] = Hi[i + 3][j + 3] = crossH[i][j];
                 }
             }
-            std::cout << "Hi: " << Hi << std::endl;
+            //std::cout << "Hi: " << Hi << std::endl;
 
             PYH = PKK * UKK * Hi;
             std::cout << std::setprecision(10) << "Tr{PYH} = " << PYH.trace() << std::endl << std::setprecision(2);
@@ -1199,21 +1159,43 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
 
     }
 
-    // Eq. (19) 1995 Jain : forces and dynamics
+    /////////////////////////////////////////////
+    // Equations of motion (dynamics) [Jain 1995]Eq. 5
+    /////////////////////////////////////////////
+    SimTK::Matrix RBForces(SPATIAL_DOFSplusG, 1, 0.0);
+    SimTK::Matrix CoriolisForces(SPATIAL_DOFSplusG, 1, 0.0);
+    SimTK::Matrix QDotDotAsMatrix(NU, 1, 0.0);
+    SimTK::Matrix UDotAsMatrix(NU, 1, 0.0);
+    SimTK::Vector_< SimTK::SpatialVec > forcesAtMInG(matter->getNumBodies());
+    SimTK::Matrix forcesAtMInGAsMatrix(SPATIAL_DOFSplusG, NU, 0.0);
+
     const SimTK::MultibodySystem& multibodySystem = forces->getMultibodySystem();
-    //std::cout << "RigidBodyForces: " << multibodySystem.getRigidBodyForces(someState, SimTK::Stage::Dynamics) << std::endl;
     //std::cout << "MobilityForces: " << multibodySystem.getMobilityForces(someState, SimTK::Stage::Dynamics) << std::endl;
-    //std::cout << "Total centrifugal forces: " << std::endl;
+
+    matter->calcMobilizerReactionForces(someState, forcesAtMInG);
+    std::cout << "Mobilizer reaction forces for "<< matter->getNumBodies() << " bodies:" << std::endl;
+    for(int k = 0; k < (NBODIESplusG); k++){
+        std::cout << "body " << k << std::endl;
+        //SimTK::MobilizedBodyIndex mbx = SimTK::MobilizedBodyIndex(k);
+        //const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+        PrintSpatialVec(forcesAtMInG[k], 5, "");
+        if(k > 0){
+            for (int rotrans = 0; rotrans < 2; rotrans++){
+                for (int dim = 0; dim < 3; dim++){
+                    //std::cout << "i: " << 6*k + 3*rotrans + dim << " j: " << k + 6 << std::endl << std::flush;
+                    forcesAtMInGAsMatrix[(6*k) + 3*rotrans + dim][k + 4] = forcesAtMInG[k][rotrans][dim];
+                }
+            }
+        }
+    }
+    PrintBigMat(H_FMstar * forcesAtMInGAsMatrix.transpose(), NU, NU, 5, "H_FM * forcesAtMInGAsMatrix");
+    
+
     for(int k = 0; k < (NBODIESplusG); k++){
         SimTK::MobilizedBodyIndex mbx = SimTK::MobilizedBodyIndex(k);
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-        std::cout << "body " << k << " " << matter->getTotalCentrifugalForces(someState, mbx) << std::endl;
+        //std::cout << "body " << k << " " << matter->getTotalCentrifugalForces(someState, mbx) << std::endl;
     }
-
-    SimTK::Matrix RBForces(SPATIAL_DOFSplusG, 1, 0.0);
-    SimTK::Matrix CoriolisForces(SPATIAL_DOFSplusG, 1, 0.0);
-    SimTK::Matrix QDotDot(NU, 1, 0.0);
-    SimTK::Matrix UDot(NU, 1, 0.0);
 
     for(int k = 0; k < (NBODIESplusG); k++){
         SimTK::MobilizedBodyIndex mbx = SimTK::MobilizedBodyIndex(k);
@@ -1227,17 +1209,29 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     }
     
     for(int u = 0; u < (NU); u++){
-        QDotDot[u][0] = someState.getQDotDot()[u];
-        UDot = someState.getUDot()[u];
+        QDotDotAsMatrix[u][0] = someState.getQDotDot()[u];
+        UDotAsMatrix[u][0] = someState.getUDot()[u];
     }
 
+    PrintBigMat(RBForces, NU, 1, 5, "RBForces");
+    PrintBigMat(CoriolisForces, NU, 1, 5, "CoriolisForces");
     //PrintBigMat(H * RBForces, NU, 1, 2, "H * f");
     //PrintBigMat(H * CoriolisForces, NU, 1, 2, "H * cf");
     //PrintBigMat((H * RBForces) + (H * CoriolisForces), NU, 1, 2, "H * f + H * cf");
-    //PrintBigMat( (M * QDotDot), NU, 1, 2, "M * QDotDot");
-    //PrintBigMat( (M * UDot), NU, 1, 2, "M * UDot");
+    //PrintBigMat( (M * QDotDotAsMatrix), NU, 1, 2, "M * QDotDot");
+    PrintBigMat( (M * UDotAsMatrix), NU, 1, 5, "M * UDot");
+    //SimTK::Vector TotalForces(NBODIESplusG);
+    //SimTK::Vector UDotVector(NBODIESplusG);
+    //UDotVector = someState.getUDot();
+    //std::cout << "M udot: " ;
+    //matter->multiplyByM(someState, UDotVector, TotalForces);
+    //std::cout << std::setprecision(5) << std::endl; 
+    //std::cout << TotalForces << std::endl;
 
+
+    /////////////////////////////////////////////
     // Eq. (49) 1995 Jain: ThetaDot* Mtheta ThetaDot = 2 H VCross* Phi M V
+    /////////////////////////////////////////////
     std::cout << "Equation (49) Jain 1995" << std::endl;
 
     // Get V and VCross: V = col{V(k)}, VCross = diag{VCross(k)}, VCross(k) = 
@@ -1247,11 +1241,11 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
         SimTK::MobilizedBodyIndex mbx = SimTK::MobilizedBodyIndex(k);
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
 
-        SimTK::Transform X_FMk = mobod.getMobilizerTransform(someState);
-        std::cout << "mobod " << int(mbx) << " X_FM( " << k << " ) = " << std::endl;
-        PrintBigMat(X_FMk.toMat44(), 4, 4, 3, "");
+        //SimTK::SpatialVec V_FMk = mobod.getMobilizerVelocity(someState); // = getH_FMCol(i in getNumU()) * getOneU()
+        SimTK::SpatialVec V_FMk = mobod.getBodyVelocity(someState); // actually V_GB
+        //SimTK::SpatialVec V_GBk = mobod.getBodyVelocity(someState); // 
+        //SimTK::Transform  X_GBk = mobod.getBodyTransform(someState);
 
-        SimTK::SpatialVec V_FMk = mobod.getMobilizerVelocity(someState); // = getH_FMCol(i in getNumU()) * getOneU()
         //std::cout << "mobod " << int(mbx) << " V_FM( "<< int(mbx) << " ) = " << V_FMk << std::endl;
         for(int i = 0; i < 2; i++){
             for(int j = 0; j < 3; j++){
@@ -1281,6 +1275,8 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     }
     //std::cout << " V_FM = " << V_FM << std::endl;
     //PrintBigMat( crossV_FM, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "crossV_FM");
+    std::cout << std::setprecision(5) << std::endl; 
+    std::cout << " (49) = " << 2.0 * H * (~crossV_FM) * Phi * MkTot * V_FM << std::endl;
     
     //
 
@@ -1288,35 +1284,70 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
 
     // Eq. 4.11
     // Build HboldI
-    int currKForTheta = -1;
+    //int currKForTheta = -1;
+    //SimTK::Vector TMT(NBODIESplusG); // ThetaDot* x MThetaI x ThetaDot
+    SimTK::Vector TMT(NU, 0.0); // ThetaDot* x MThetaI x ThetaDot
     for (SimTK::MobilizedBodyIndex mbx(0); mbx < NBODIESplusG; ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-        for(int mobodMobility = 0; mobodMobility < mobod.getNumU(someState); mobodMobility++){
-            SimTK::Matrix HBoldI(6*NU, 6*NU, 0.0);
-            SimTK::Matrix MThetaI(NU, NU, 0.0);
-            currKForTheta++;
-            SimTK::SpatialVec HCol = mobod.getHCol(someState, SimTK::MobilizerUIndex(mobodMobility));
-            SimTK::Mat33 crossH = SimTK::crossMat(HCol[0]);
 
-            SimTK::SpatialMat Hi(0);
-            Hi[0][0] = crossH;
-            Hi[1][1] = crossH;
-            //std::cout << "Hi for mobod " << int(mbx) << ": " << Hi << std::endl;
+        SimTK::Matrix HBoldI(SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 0.0);
+        SimTK::Matrix MThetaI(NU, NU, 0.0);
+        SimTK::SpatialMat Hi(0);
+        SimTK::Transform X_FMk = mobod.getMobilizerTransform(someState);
+        SimTK::Transform X_GPk;
 
-            // Set Diagonal HboldI
-            for(int m = 0; m < 2; m++){
-                for(int n = 0; n < 2; n++){
-                    for(int o = 0; o < 3; o++){
-                        for(int p = 0; p < 3; p++){
-                            HBoldI[(6 * currKForTheta) + (m * 3) + o][(6 * currKForTheta) + (n * 3) + p] = Hi[m][n][o][p];
-                        }
+        if(int(mbx) > 0){
+            X_GPk = mobod.getParentMobilizedBody().getBodyTransform(someState);
+        }
+
+        std::cout << "mobod " << int(mbx) << " X_FM( " << int(mbx) << " ) = " << std::endl;
+        PrintBigMat(X_FMk.toMat44(), 4, 4, 3, "");
+        //std::cout << "parent mobod " << " X_GP( " << int(mbx) << " ) = " << std::endl;
+        //PrintBigMat(X_GPk.toMat44(), 4, 4, 3, "");
+
+        SimTK::Vec4 h4 = X_FMk.R().convertRotationToAngleAxis();
+        SimTK::Vec3 h, h_G;
+
+        h[0] = h4[1];
+        h[1] = h4[2];
+        h[2] = h4[3];
+
+        h_G = X_GPk.R() * h;
+        std::cout << "h for mobod " << int(mbx) << ": " << h << std::endl;
+        std::cout << "h_G for mobod " << int(mbx) << ": " << h_G << std::endl;
+
+        SimTK::Mat33 crossH = SimTK::crossMat(h_G);
+        //SimTK::Mat33 crossH = SimTK::crossMat(h);
+
+        Hi[0][0] = crossH;
+        Hi[1][1] = crossH;
+        //std::cout << "Hi for mobod " << int(mbx) << std::endl;
+        //PrintSpatialMat(Hi, 2, "");
+
+        // Set Diagonal HboldI
+        for(int m = 0; m < 2; m++){
+            for(int n = 0; n < 2; n++){
+                for(int o = 0; o < 3; o++){
+                    for(int p = 0; p < 3; p++){
+                        HBoldI[(6 * int(mbx)) + (m * 3) + o][(6 * int(mbx)) + (n * 3) + p] = Hi[m][n][o][p];
                     }
                 }
             }
-            //PrintBigMat(HBoldI, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "HBoldI:");
+        }
+        //std::cout << "HBoldI for mobod " << int(mbx) << std::endl;
+        //PrintBigMat(HBoldI, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "HBoldI:");
+
+        MThetaI = H * Phi * ( (HBoldI * Phi * MkTot) - (MkTot * Phistar * HBoldI) ) * Phistar * Hstar;
+        //std::cout << "MThetaI for mobod " << int(mbx) << std::endl;
+        //PrintBigMat(MThetaI, NU, NU, 2, "MThetaI:");
+
+        // U and QDot are the same in our situation because we only set last u
+        TMT[int(mbx)] = (~someState.getU()) * (MThetaI * someState.getU());
+        std::cout << std::setprecision(5) << std::endl; 
             
-        } // mobility
     } // mobod
+    
+    std::cout << "TMT: " << TMT << std::endl;
 
     //PrintBigMat(HboldI, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "HboldI:");
     //PrintBigMat(MThetaI, NU, NU, 2, "MThetaI:");
