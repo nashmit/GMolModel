@@ -458,6 +458,71 @@ bool NumericalRightInverse(SimTK::Matrix M, SimTK::Matrix& MRightInv, int nrows,
 }
 
 /*
+ * Convert spatial vector to 6-dim vector
+ */
+SimTK::Vector& SOA_SpatialVec2Vector(SimTK::SpatialVec in, SimTK::Vector& out)
+{
+    for(int i = 0; i < 2; i++){
+        for(int j = 0; j < 3; j++){
+            out[i*3 + j] = in[i][j];
+        }
+    }
+    return out;
+}
+
+/*
+ * Get the block corresponding to a body from an H-like matrix.
+ * Body index "which" starts from 0, 0 being the Ground body.
+ */
+SimTK::Matrix& SOA_GetHstarLikeElement(SimTK::Matrix inMatrix, int which, SimTK::Matrix& outMatrix)
+{
+    if(which == 0){ // Ground
+        for(int i = 0; i < 6; i++){
+            for(int j = 0; j < 6; j++){
+                outMatrix[i][j] = inMatrix[i][j];
+            }
+        }
+    }else if(which == 1){ // First body
+        for(int i = 0; i < 6; i++){
+            for(int j = 0; j < 6; j++){
+                outMatrix[i][j] = inMatrix[i + 6][j];
+            }
+        }
+    }else{
+        for(int i = 0; i < 6; i++){
+            outMatrix[i][0] = inMatrix[(which * 6) + i][4 + which];
+        }
+    }
+    return outMatrix;
+}
+
+/*
+ * Get the block corresponding to a body from an H-like matrix.
+ * Body index "which" starts from 0, 0 being the Ground body.
+ */
+SimTK::Matrix& SOA_GetHLikeElement(SimTK::Matrix inMatrix, int which, SimTK::Matrix& outMatrix)
+{
+    if(which == 0){ // Ground
+        for(int i = 0; i < 6; i++){
+            for(int j = 0; j < 6; j++){
+                outMatrix[i][j] = inMatrix[i][j];
+            }
+        }
+    }else if(which == 1){ // First body
+        for(int i = 0; i < 6; i++){
+            for(int j = 0; j < 6; j++){
+                outMatrix[i][j] = inMatrix[i][j + 6];
+            }
+        }
+    }else{
+        for(int i = 0; i < 6; i++){
+            outMatrix[0][i] = inMatrix[4 + which][(which * 6) + i];
+        }
+    }
+    return outMatrix;
+}
+
+/*
  * Print Big Matrices separated by spaces
  */
 void PrintBigMat(SimTK::Matrix M, int nrows, int ncols, int decimal_places, std::string header)

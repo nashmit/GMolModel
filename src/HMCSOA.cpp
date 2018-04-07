@@ -1160,73 +1160,94 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     }
 
     /////////////////////////////////////////////
-    // Equations of motion (dynamics) [Jain 1995]Eq. 5
+    // Equations of motion (dynamics) [Jain 1995] Eq. 5
     /////////////////////////////////////////////
-    SimTK::Matrix RBForces(SPATIAL_DOFSplusG, 1, 0.0);
-    SimTK::Matrix CoriolisForces(SPATIAL_DOFSplusG, 1, 0.0);
-    SimTK::Matrix QDotDotAsMatrix(NU, 1, 0.0);
-    SimTK::Matrix UDotAsMatrix(NU, 1, 0.0);
-    SimTK::Vector_< SimTK::SpatialVec > forcesAtMInG(matter->getNumBodies());
-    SimTK::Matrix forcesAtMInGAsMatrix(SPATIAL_DOFSplusG, NU, 0.0);
-
     const SimTK::MultibodySystem& multibodySystem = forces->getMultibodySystem();
-    //std::cout << "MobilityForces: " << multibodySystem.getMobilityForces(someState, SimTK::Stage::Dynamics) << std::endl;
 
-    matter->calcMobilizerReactionForces(someState, forcesAtMInG);
-    std::cout << "Mobilizer reaction forces for "<< matter->getNumBodies() << " bodies:" << std::endl;
+    // Declare Applied forces = mobility and body
+    SimTK::Vector mobilityForces(matter->getNumBodies());
+    SimTK::Vector_< SimTK::SpatialVec > rigidBodyForces(matter->getNumBodies());
+
+    // Declare bias forces
+    SimTK::Vector_< SimTK::SpatialVec > totalCentrifugalForces(matter->getNumBodies());
+    //SimTK::Vector_< SimTK::SpatialVec > totalCentrifugalForces(NU);
+    
+    // Declare Constraint forces
+    SimTK::Vector constraintGeneralizedForces(matter->getNumBodies());
+    SimTK::Vector_< SimTK::SpatialVec > constraintSpatialForces(matter->getNumBodies());
+
+    // Declare Unknown forces
+    SimTK::Vector_< SimTK::SpatialVec > mobReactF_AtMInG(matter->getNumBodies());
+    SimTK::Vector mobReactF_AtMInGAsVector(matter->getNumBodies() * 6);
+    SimTK::Matrix mobReactF_AtMInGAsMatrix(SPATIAL_DOFSplusG, NU, 0.0);
+    SimTK::Vector motionForces(matter->getNumBodies()); 
+    SimTK::Vector_< SimTK::SpatialVec > constraintForces(matter->getNumBodies()); // TODO
+
+    // Get Applied forces = mobility and body
+    mobilityForces = multibodySystem.getMobilityForces(someState, SimTK::Stage::Dynamics);
+    rigidBodyForces = multibodySystem.getRigidBodyForces(someState, SimTK::Stage::Dynamics);
+
+    // Declare bias forces
+
+
+    // Get Constraint forces
+    matter->findConstraintForces(someState, constraintSpatialForces, constraintGeneralizedForces);	
+
+    // Get Unknown forces
+    matter->findMotionForces(someState, motionForces);
+    matter->calcMobilizerReactionForces(someState, mobReactF_AtMInG);
+
+    // Print loop
     for(int k = 0; k < (NBODIESplusG); k++){
         std::cout << "body " << k << std::endl;
-        //SimTK::MobilizedBodyIndex mbx = SimTK::MobilizedBodyIndex(k);
-        //const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-        PrintSpatialVec(forcesAtMInG[k], 5, "");
-        if(k > 0){
-            for (int rotrans = 0; rotrans < 2; rotrans++){
-                for (int dim = 0; dim < 3; dim++){
-                    //std::cout << "i: " << 6*k + 3*rotrans + dim << " j: " << k + 6 << std::endl << std::flush;
-                    forcesAtMInGAsMatrix[(6*k) + 3*rotrans + dim][k + 4] = forcesAtMInG[k][rotrans][dim];
-                }
-            }
-        }
-    }
-    PrintBigMat(H_FMstar * forcesAtMInGAsMatrix.transpose(), NU, NU, 5, "H_FM * forcesAtMInGAsMatrix");
-    
-
-    for(int k = 0; k < (NBODIESplusG); k++){
         SimTK::MobilizedBodyIndex mbx = SimTK::MobilizedBodyIndex(k);
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-        //std::cout << "body " << k << " " << matter->getTotalCentrifugalForces(someState, mbx) << std::endl;
-    }
 
-    for(int k = 0; k < (NBODIESplusG); k++){
-        SimTK::MobilizedBodyIndex mbx = SimTK::MobilizedBodyIndex(k);
-        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-        for (int rotrans = 0; rotrans < 2; rotrans++){
-            for (int dim = 0; dim < 3; dim++){
-                RBForces[2*3*k + 3*rotrans + dim][0] = multibodySystem.getRigidBodyForces(someState, SimTK::Stage::Dynamics)[k][rotrans][dim];
-                CoriolisForces[6*k + 3*rotrans + dim][0] = matter->getTotalCentrifugalForces(someState, mbx)[rotrans][dim];
-            }
-        }
+        // Print Applied forces = mobility and body
+        std::cout <<  std::setprecision(5) << "MobilityForces: " << mobilityForces[k] << std::endl;
+
+        SimTK::Vector rigidBodyForcesAsVector_K(6);
+        SOA_SpatialVec2Vector(rigidBodyForces[k], rigidBodyForcesAsVector_K);
+        PrintSpatialVec(rigidBodyForces[k], 5, "RigidBodyForce:");
+       
+        // Print Bias forces
+        totalCentrifugalForces[k] = matter->getTotalCentrifugalForces(someState, mbx);
+        PrintSpatialVec(totalCentrifugalForces[k], 5, "TotalCentrifugalForces:");
+
+        PrintSpatialVec(matter->getTotalCoriolisAcceleration(someState, mbx), 5, "TotalCoriolisAcceleration:");
+        PrintSpatialVec(matter->getGyroscopicForce(someState, mbx), 5, "GyroscopicForce:");
+
+        // Print Constraint forces
+        SimTK::Vector constraintSpatialForcesAsVector_K(6);
+        SOA_SpatialVec2Vector(constraintSpatialForces[k], constraintSpatialForcesAsVector_K);
+        PrintBigMat(constraintSpatialForcesAsVector_K, 6, 5, "constraintSpatialForcesAsVector_K:");
+        std::cout << std::setprecision(5) << "constraintGeneralizedForces: " << constraintGeneralizedForces[k] << std::endl;
+
+        // Print Unknown forces
+        SimTK::Vector mobReactF_AtMInGAsVector_K(6);
+        SOA_SpatialVec2Vector(mobReactF_AtMInG[k], mobReactF_AtMInGAsVector_K);
+        PrintBigMat(mobReactF_AtMInGAsVector_K, 6, 5, "MobilizerReactionForce_AtMInGAsVector_K:");
+        std::cout << std::setprecision(5) << "MotionForces: " << motionForces[k] << std::endl;
+
+        // Get a block from a convertion matrix (H, H_FM,) 
+        //int HBlockNRows = 6, HBlockNCols;
+        //(k <= 1) ? (HBlockNCols = 6) : (HBlockNCols = 1);
+        //SimTK::Matrix HBlock(HBlockNRows, HBlockNCols);
+        //SOA_GetHstarLikeElement(Hstar, k, HBlock);
+        std::cout << "===================" << std::endl;
     }
-    
+   
+    SimTK::Vector generalizedForces(NU);
+    //matter->multiplyBySystemJacobianTranspose(someState, mobReactF_AtMInG, generalizedForces);
+    matter->multiplyBySystemJacobianTranspose(someState, totalCentrifugalForces, generalizedForces);
+    PrintBigMat(generalizedForces, NU, 5, "Resulting generalized forces:");
+ 
+    // Put UDot Vector in a matrix form
+    SimTK::Matrix UDotAsMatrix(NU, 1, 0.0);
     for(int u = 0; u < (NU); u++){
-        QDotDotAsMatrix[u][0] = someState.getQDotDot()[u];
         UDotAsMatrix[u][0] = someState.getUDot()[u];
     }
-
-    PrintBigMat(RBForces, NU, 1, 5, "RBForces");
-    PrintBigMat(CoriolisForces, NU, 1, 5, "CoriolisForces");
-    //PrintBigMat(H * RBForces, NU, 1, 2, "H * f");
-    //PrintBigMat(H * CoriolisForces, NU, 1, 2, "H * cf");
-    //PrintBigMat((H * RBForces) + (H * CoriolisForces), NU, 1, 2, "H * f + H * cf");
-    //PrintBigMat( (M * QDotDotAsMatrix), NU, 1, 2, "M * QDotDot");
     PrintBigMat( (M * UDotAsMatrix), NU, 1, 5, "M * UDot");
-    //SimTK::Vector TotalForces(NBODIESplusG);
-    //SimTK::Vector UDotVector(NBODIESplusG);
-    //UDotVector = someState.getUDot();
-    //std::cout << "M udot: " ;
-    //matter->multiplyByM(someState, UDotVector, TotalForces);
-    //std::cout << std::setprecision(5) << std::endl; 
-    //std::cout << TotalForces << std::endl;
 
 
     /////////////////////////////////////////////
@@ -1241,8 +1262,8 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
         SimTK::MobilizedBodyIndex mbx = SimTK::MobilizedBodyIndex(k);
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
 
-        //SimTK::SpatialVec V_FMk = mobod.getMobilizerVelocity(someState); // = getH_FMCol(i in getNumU()) * getOneU()
-        SimTK::SpatialVec V_FMk = mobod.getBodyVelocity(someState); // actually V_GB
+        SimTK::SpatialVec V_FMk = mobod.getMobilizerVelocity(someState); // = getH_FMCol(i in getNumU()) * getOneU()
+        //SimTK::SpatialVec V_FMk = mobod.getBodyVelocity(someState); // actually V_GB
         //SimTK::SpatialVec V_GBk = mobod.getBodyVelocity(someState); // 
         //SimTK::Transform  X_GBk = mobod.getBodyTransform(someState);
 
@@ -1295,10 +1316,12 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
         SimTK::SpatialMat Hi(0);
         SimTK::Transform X_FMk = mobod.getMobilizerTransform(someState);
         SimTK::Transform X_GPk;
+        SimTK::Transform X_GBk;
 
         if(int(mbx) > 0){
             X_GPk = mobod.getParentMobilizedBody().getBodyTransform(someState);
         }
+        X_GBk = mobod.getBodyTransform(someState);
 
         std::cout << "mobod " << int(mbx) << " X_FM( " << int(mbx) << " ) = " << std::endl;
         PrintBigMat(X_FMk.toMat44(), 4, 4, 3, "");
@@ -1312,7 +1335,8 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
         h[1] = h4[2];
         h[2] = h4[3];
 
-        h_G = X_GPk.R() * h;
+        //h_G = X_GPk.R() * h;
+        h_G = X_GBk.R() * h;
         std::cout << "h for mobod " << int(mbx) << ": " << h << std::endl;
         std::cout << "h_G for mobod " << int(mbx) << ": " << h_G << std::endl;
 
@@ -1348,6 +1372,8 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     } // mobod
     
     std::cout << "TMT: " << TMT << std::endl;
+
+    std::cout << "Eq. (5) should be equal to Coriolis term" << dM * someState.getU() - 0.5 * TMT << std::endl;
 
     //PrintBigMat(HboldI, SPATIAL_DOFSplusG, SPATIAL_DOFSplusG, 2, "HboldI:");
     //PrintBigMat(MThetaI, NU, NU, 2, "MThetaI:");

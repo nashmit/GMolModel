@@ -190,6 +190,18 @@ bool NumericalLeftInverse(SimTK::Matrix M, SimTK::Matrix& MLeftInv, int nrows, i
 bool NumericalRightInverse(SimTK::Matrix M, SimTK::Matrix& MRightInv, int nrows, int ncols);
 
 /*
+ * Get the block corresponding to a body from an H-like matrix
+ * Body index "which" starts from 0, 0 being the Ground body.
+ */
+SimTK::Matrix& SOA_GetHLikeElement(SimTK::Matrix inMatrix, int which, SimTK::Matrix& outMatrix);
+SimTK::Matrix& SOA_GetHstarLikeElement(SimTK::Matrix inMatrix, int which, SimTK::Matrix& outMatrix);
+
+/*
+ * Convert spatial vector to 6-dim vector
+ */
+SimTK::Vector& SOA_SpatialVec2Vector(SimTK::SpatialVec in, SimTK::Vector& out);
+
+/*
  * Print Big Matrices separated by spaces
  */
 void PrintBigMat(SimTK::Matrix M, int nrows, int ncols, int decimal_places, std::string header);
