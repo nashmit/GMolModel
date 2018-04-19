@@ -63,6 +63,7 @@ protected:
     // TO BE DELETED
     SimTK::Matrix prevM;
     SimTK::Real prevThetaK;
+    SimTK::Vector prevTheta;
     SimTK::Real prevNumDetM;
     SimTK::Real prevDetM;
     int kForTheta;
