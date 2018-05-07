@@ -128,35 +128,71 @@ GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatter
   this->Caller = Caller;
 }
 
+//void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
+//  SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const {
+//
+//  #ifdef DEBUG_TIME
+//  boost::timer GridForce_timer;
+//  printf("GridForce: calcForce START\n");
+//  #endif
+//
+//  const SimTK::Compound& c = compoundSystem->getCompound(SimTK::CompoundSystem::CompoundIndex(0));
+//
+//  if((*fassno>0)){ // Get forces from MMTK
+//
+//    // Apply external forces
+//    for(int a=0; a<c.getNumAtoms(); a++){
+//      SimTK::Compound::AtomIndex aIx = ( (Caller->getTopology(0)).bAtomList )[a].atomIndex;
+//      const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(c.getAtomMobilizedBodyIndex(aIx));
+//      SimTK::Vec3 v_check(0.0, 0.0, 0.0);
+//      mobod.applyForceToBodyPoint(state, c.getAtomLocationInMobilizedBodyFrame(aIx), v_check, bodyForces);
+//    }
+//
+//  }
+//
+//  (*fassno)++;
+//  #ifdef DEBUG_TIME
+//  printf("GridForce: calcForce time %.8lf\n", GridForce_timer.elapsed());
+//  #endif
+//
+//}
+
+
 void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
-  SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const {
+                           SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const
+{
+    // Compute Fixman torque
+    int nu = state.getNU();
+    SimTK::Vector V3(nu);
+    SimTK::Vector V4(nu);
+    SimTK::Real* D0 = new SimTK::Real(1.0);
+    matter.calcFixmanTorque(state, V3, V4, D0);
+    //std::cout << "GridForce Fixman torque " ;
+    //for(int i = 0; i < nu; i++){
+    //    std::cout << std::setprecision(10) << V4[i] << " ";
+    //}
+    //std::cout << std::endl;
+    delete D0;
+    // end - Compute Fixman torque
 
-  #ifdef DEBUG_TIME
-  boost::timer GridForce_timer;
-  printf("GridForce: calcForce START\n");
-  #endif
+    //std::cout << "Applied " ;
+    int uslot = -1;
+    for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter.getNumBodies(); ++mbx){
+        const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
 
-  const SimTK::Compound& c = compoundSystem->getCompound(SimTK::CompoundSystem::CompoundIndex(0));
+        for(int k = 0; k < mobod.getNumU(state); k++){
+            uslot++;
+            mobod.applyOneMobilityForce(state, k, V4[uslot], mobilityForces);
+            //std::cout << " " << std::setprecision(10) << std::fixed << V4[uslot] << " to " << int(mbx) ;
+        }
 
-  if((*fassno>0)){ // Get forces from MMTK
-
-    // Apply external forces
-    for(int a=0; a<c.getNumAtoms(); a++){
-      SimTK::Compound::AtomIndex aIx = ( (Caller->getTopology(0)).bAtomList )[a].atomIndex;
-      const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(c.getAtomMobilizedBodyIndex(aIx));
-      SimTK::Vec3 v_check(0.0, 0.0, 0.0);
-      mobod.applyForceToBodyPoint(state, c.getAtomLocationInMobilizedBodyFrame(aIx), v_check, bodyForces);
     }
+    //std::cout << std::endl;
 
-  }
-
-  (*fassno)++;
-  #ifdef DEBUG_TIME
-  printf("GridForce: calcForce time %.8lf\n", GridForce_timer.elapsed());
-  #endif
-
+    //const SimTK::Real q = knee.getOneQ(state, 0);
+    //const SimTK::Real x = q < low ? q-low : (q > high ? q-high : 0);
+    //knee.applyOneMobilityForce(state, 0, -k*x, mobilityForces);
 }
-
 
 // This should be carefully analyzed. Intended to be taken from somewhere else.
 SimTK::Real GridForce::calcPotentialEnergy(const SimTK::State& state) const {
@@ -288,37 +324,40 @@ void World::Init(SimTK::Real timestep)
     //ts->initialize(compoundSystem->getDefaultState());
  
     // Amber like scale factors. These should be used during simulations.
-    forceField->setVdw12ScaleFactor(0.0);
-    forceField->setVdw13ScaleFactor(0.0);
-    forceField->setVdw14ScaleFactor(0.5);
-    forceField->setVdw15ScaleFactor(1.0);
-    forceField->setCoulomb12ScaleFactor(0.0);
-    forceField->setCoulomb13ScaleFactor(0.0);
-    forceField->setCoulomb14ScaleFactor(0.8333333333);
-    forceField->setCoulomb15ScaleFactor(1.0);
-    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
+//    forceField->setVdw12ScaleFactor(0.0);
+//    forceField->setVdw13ScaleFactor(0.0);
+//    forceField->setVdw14ScaleFactor(0.5);
+//    forceField->setVdw15ScaleFactor(1.0);
+//    forceField->setCoulomb12ScaleFactor(0.0);
+//    forceField->setCoulomb13ScaleFactor(0.0);
+//    forceField->setCoulomb14ScaleFactor(0.8333333333);
+//    forceField->setCoulomb15ScaleFactor(1.0);
+//    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
   
     // My specific scale factors. These should be used during debugging.
     //->setSpecificDuMMScaleFactor(*forceField);
     // Solvent treatment
-////    forceField->setGbsaGlobalScaleFactor(0.0);
+    forceField->setGbsaGlobalScaleFactor(0.0);
+    std::cout << "GBSA solvent dielectric " << forceField->getSolventDielectric() << std::endl;
+    std::cout << "GBSA solute dielectric " << forceField->getSoluteDielectric() << std::endl;
   
-////    forceField->setBondStretchGlobalScaleFactor(0.0);
-////    forceField->setBondBendGlobalScaleFactor(0.0);
-////    forceField->setBondTorsionGlobalScaleFactor(0.0);
-////    forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
-////  
-////    forceField->setVdw12ScaleFactor(0.0);
-////    forceField->setVdw13ScaleFactor(0.0);
-////    forceField->setVdw14ScaleFactor(0.0);
-////    forceField->setVdw15ScaleFactor(0.0);
-////    forceField->setVdwGlobalScaleFactor(0.0);
-////  
-////    forceField->setCoulomb12ScaleFactor(0.0);
-////    forceField->setCoulomb13ScaleFactor(0.0);
-////    forceField->setCoulomb14ScaleFactor(0.0);
-////    forceField->setCoulomb15ScaleFactor(0.0);
-////    forceField->setCoulombGlobalScaleFactor(0.0);
+//    forceField->setBondStretchGlobalScaleFactor(0.0);
+//    forceField->setBondBendGlobalScaleFactor(0.0);
+//    forceField->setBondTorsionGlobalScaleFactor(0.0);
+//    forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
+  
+//    forceField->setVdw12ScaleFactor(0.0);
+//    forceField->setVdw13ScaleFactor(0.0);
+//    forceField->setVdw14ScaleFactor(0.0);
+//    forceField->setVdw15ScaleFactor(0.0);
+//    forceField->setVdwGlobalScaleFactor(0.0);
+  
+//    forceField->setCoulomb12ScaleFactor(0.0);
+//    forceField->setCoulomb13ScaleFactor(0.0);
+//    forceField->setCoulomb14ScaleFactor(0.0);
+//    forceField->setCoulomb15ScaleFactor(0.0);
+//    forceField->setCoulombGlobalScaleFactor(0.0);
+//
   
     *fassno = 0;
     ExtForce = new SimTK::Force::Custom(*forces, new GridForce(compoundSystem, *matter, fassno, this));
