@@ -175,7 +175,7 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
     delete D0;
     // end - Compute Fixman torque
 
-    //std::cout << "Applied " ;
+    std::cout << "Applied " ;
     int uslot = -1;
     for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter.getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
@@ -183,11 +183,11 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
         for(int k = 0; k < mobod.getNumU(state); k++){
             uslot++;
             mobod.applyOneMobilityForce(state, k, V4[uslot], mobilityForces);
-            //std::cout << " " << std::setprecision(10) << std::fixed << V4[uslot] << " to " << int(mbx) ;
+            std::cout << " " << std::setprecision(10) << std::fixed << V4[uslot] << " to " << int(mbx) ;
         }
 
     }
-    //std::cout << std::endl;
+    std::cout << std::endl;
 
     //const SimTK::Real q = knee.getOneQ(state, 0);
     //const SimTK::Real x = q < low ? q-low : (q > high ? q-high : 0);
