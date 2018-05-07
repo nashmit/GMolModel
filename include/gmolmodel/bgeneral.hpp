@@ -202,6 +202,11 @@ SimTK::Matrix& SOA_GetHstarLikeElement(SimTK::Matrix inMatrix, int which, SimTK:
 SimTK::Vector& SOA_SpatialVec2Vector(SimTK::SpatialVec in, SimTK::Vector& out);
 
 /*
+ * Convert spatial matrix to Mat66
+ */
+SimTK::Mat66& SOA_SpatialMat2Mat66(SimTK::SpatialMat in, SimTK::Mat66& out);
+
+/*
  * Print Big Matrices separated by spaces
  */
 void PrintBigMat(SimTK::Matrix M, int nrows, int ncols, int decimal_places, std::string header);

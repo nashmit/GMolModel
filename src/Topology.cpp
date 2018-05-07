@@ -9,6 +9,7 @@ Topology::Topology(std::string argName){setName(argName);}
 /* ==================================================
  *    BUILD AN UNLINKED MolModel NESTED IN THIS CLASS 
  * ================================================== */
+/*
 void Topology::setMolModel(void){
     bMolAtomList = new MolAtom[natms];
     mol_MolModelCreate ("MainModel", &model);
@@ -39,6 +40,7 @@ void Topology::clearMolModel(void){
     delete [] bMolAtomList;
     // TODO opposite of mol_MolModelCreate and  mol_StructureAtomAdd
 }
+*/
 
 /* ==================================================
  *    Scale all DuMM force field terms by scale_factor

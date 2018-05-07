@@ -471,6 +471,22 @@ SimTK::Vector& SOA_SpatialVec2Vector(SimTK::SpatialVec in, SimTK::Vector& out)
 }
 
 /*
+ * Convert spatial matrix to Mat66
+ */
+SimTK::Mat66& SOA_SpatialMat2Mat66(SimTK::SpatialMat in, SimTK::Mat66& out)
+{
+    for(int i = 0; i < 2; i++){
+        for(int j = 0; j < 2; j++){
+            for(int k = 0; k < 3; k++){
+                for(int l = 0; l < 3; l++){
+                    out[i*3 + k][j*3 + l] = in[i][j][k][l];
+                }
+            }
+        }
+    }
+}
+
+/*
  * Get the block corresponding to a body from an H-like matrix.
  * Body index "which" starts from 0, 0 being the Ground body.
  */
