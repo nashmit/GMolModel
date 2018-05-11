@@ -21,47 +21,31 @@
 #define MAIN_RESIDUE_DEBUG_LEVEL02
 #endif
 
-void mol_StructureChainsBuild (MolStructure *, int);
-
-/**
- * It encapsulates structural information related to one molecule. It maps to one compound in Molmodel. It is designed with to be simulated only in one regimen because the rigid bodies are defined here only.
+/** Topological information (bonds graph) for one molecule.
+ * It maps to one compound in Molmodel thus it is derived 
+ * from Molmodel Compound class.
+ * Has two main functionalities:
+   - contructs the graph based on a list of bSpecificAtom objects each of 
+     which already contains bonding information from the inmput files
+   - defines the rigid bodies.
+ * Contains a list of atoms bAtomList which consists of bSpecificAtom 
+ * objects 
  **/
 class Topology : public SimTK::Compound{
 public:
 
-    //MolAtom *bMolAtomList;
-    //MolStructure *struc;
-    //MolModel *model;
-
-    bool hasBuiltSystem;
-    int natms;
-    bSpecificAtom *bAtomList;
-    int nbnds; // EU
-    bBond *bonds; // EU
-    std::string ictdF;
-
-    // Constructor
+    /** Default Constructor **/
     Topology();
-    Topology(std::string argName);
 
-    // Destructor
+    /** Constructor that sets the name of the molecule.**/
+    Topology(std::string nameOfThisMolecule);
+
+    /** Default Destructor **/
     virtual ~Topology();
 
-    // Set/delete a MolModel and a MolStructure - to be removed
-////    void setMolModel(void);
-////    void clearMolModel(void);
-
-    // Scale all DuMM force field terms by scale_factor
-    void setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor);
-
-    // Scale specific DuMM force field terms by scale_factor
-    void setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm);
-
-    // Set graph
-    void insertAtom(bSpecificAtom *atom);
-    void insertBond(int atom_no1, int atom_no2, int bondOrder);
-
-    // Interface
+    // Interface functions
+    std::string getname(void){return this->name;}
+    void setName(std::string nameOfThisMolecule){this->name = nameOfThisMolecule;}
     int getNAtoms(void) const;
     int getNBonds(void) const;
 
@@ -73,6 +57,16 @@ public:
     bBond * getBond(int, int) const;
     int getBondOrder(int, int) const;
  
+    std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > getMbx2aIx(void){
+        return mbx2aIx;
+    }
+    std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > getAIx2mbx(void){
+        return aIx2mbx;
+    }
+
+    void writePdb(std::string dirname, std::string prefix, std::string sufix, int maxNofDigits, int index) const;
+
+    // Graph building functions
     // Process a graph node
     //void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses, int baseAtomNumber);
     void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode);
@@ -94,9 +88,6 @@ public:
     void setRegimen(std::string argRegimen, std::string flexFN);
     std::string getRegimen(void);
 
-    std::string getname(void){return this->name;}
-    void setName(std::string argName){this->name = argName;}
-
     void PrintStaticVars(void){
         std::cout << "Topology static vars:" 
             << " regimen " << regimen << " name " << name
@@ -107,20 +98,28 @@ public:
     void loadMaps(void);
     void printMaps(void);
 
-    std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > getMbx2aIx(void){
-        return mbx2aIx;
-    }
+    // Not sure they belong here
+    //// Scale all DuMM force field terms by scale_factor
+    void setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor);
+    
+    // Scale specific DuMM force field terms by scale_factor
+    void setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm);
+   
+    // Not sure we need them 
+    // Set graph
+    void insertAtom(bSpecificAtom *atom);
+    void insertBond(int atom_no1, int atom_no2, int bondOrder);
 
-    std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > getAIx2mbx(void){
-        return aIx2mbx;
-    }
+public:
 
-    void writePdb(std::string dirname, std::string prefix, std::string sufix, int maxNofDigits, int index) const;
+    bool hasBuiltSystem;
+    int natms;
+    bSpecificAtom *bAtomList;
+    int nbnds; // EU
+    bBond *bonds; // EU
+    std::string ictdF;
 
 private:
-////    MolAtom *bMolAtomList;
-////    MolStructure *struc;
-////    MolModel *model;
 
     std::string regimen;
     std::string name;

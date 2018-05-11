@@ -175,7 +175,7 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
     delete D0;
     // end - Compute Fixman torque
 
-    std::cout << "Applied " ;
+    //std::cout << "Applied " ;
     int uslot = -1;
     for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter.getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
@@ -183,11 +183,11 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
         for(int k = 0; k < mobod.getNumU(state); k++){
             uslot++;
             mobod.applyOneMobilityForce(state, k, V4[uslot], mobilityForces);
-            std::cout << " " << std::setprecision(10) << std::fixed << V4[uslot] << " to " << int(mbx) ;
+            //std::cout << " " << std::setprecision(10) << std::fixed << V4[uslot] << " to " << int(mbx) ;
         }
 
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 
     //const SimTK::Real q = knee.getOneQ(state, 0);
     //const SimTK::Real x = q < low ? q-low : (q > high ? q-high : 0);
@@ -324,15 +324,15 @@ void World::Init(SimTK::Real timestep)
     //ts->initialize(compoundSystem->getDefaultState());
  
     // Amber like scale factors. These should be used during simulations.
-//    forceField->setVdw12ScaleFactor(0.0);
-//    forceField->setVdw13ScaleFactor(0.0);
-//    forceField->setVdw14ScaleFactor(0.5);
-//    forceField->setVdw15ScaleFactor(1.0);
-//    forceField->setCoulomb12ScaleFactor(0.0);
-//    forceField->setCoulomb13ScaleFactor(0.0);
-//    forceField->setCoulomb14ScaleFactor(0.8333333333);
-//    forceField->setCoulomb15ScaleFactor(1.0);
-//    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
+    forceField->setVdw12ScaleFactor(0.0);
+    forceField->setVdw13ScaleFactor(0.0);
+    forceField->setVdw14ScaleFactor(0.5);
+    forceField->setVdw15ScaleFactor(1.0);
+    forceField->setCoulomb12ScaleFactor(0.0);
+    forceField->setCoulomb13ScaleFactor(0.0);
+    forceField->setCoulomb14ScaleFactor(0.8333333333);
+    forceField->setCoulomb15ScaleFactor(1.0);
+    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
   
     // My specific scale factors. These should be used during debugging.
     //->setSpecificDuMMScaleFactor(*forceField);

@@ -1,46 +1,19 @@
+/**@file
+Implementation of Topology class. **/
+
 #include "Topology.hpp"
 
 using namespace SimTK;
 
-Topology::Topology(){}
-Topology::Topology(std::string argName){setName(argName);}
-
-
-/* ==================================================
- *    BUILD AN UNLINKED MolModel NESTED IN THIS CLASS 
- * ================================================== */
-/*
-void Topology::setMolModel(void){
-    bMolAtomList = new MolAtom[natms];
-    mol_MolModelCreate ("MainModel", &model);
-
-    for(int k=0; k<natms; k++){
-        bAtomAssign(&bMolAtomList[k], &bAtomList[k]);
-        bMolAtomList[k].id = k;
-        bMolAtomList[k].insertion_code = ' ';
-        bMolAtomList[k].het = 1;
-        bMolAtomList[k].chain_id = 'A';
-
-       mol_MolModelCurrStrucGet (model, &struc);
-       mol_StructureAtomAdd (struc, MOL_FALSE, &bMolAtomList[k]);
-    }
-    #ifdef MAIN_RESIDUE_DEBUG_LEVEL02
-    for(int tz=0; tz<natms; tz++){
-        std::cout<<"bMainRes SpecAtom tz name bonds freebonds: "
-        <<tz<<' '<<bAtomList[tz].name<<' '<<bAtomList[tz].nbonds<<' '<<bAtomList[tz].freebonds<<std::endl;
-    }
-    #endif
-
-    mol_StructureChainsBuild(struc, 1);
-    struc[0].chain_names = new char*[1];
-    struc[0].chain_names[0] = &bMolAtomList[0].chain_id;
+/** Default constructor **/
+Topology::Topology(){
+    setName("no_name");
 }
 
-void Topology::clearMolModel(void){
-    delete [] bMolAtomList;
-    // TODO opposite of mol_MolModelCreate and  mol_StructureAtomAdd
+/** Constructor that sets the name of the molecule.**/
+Topology::Topology(std::string nameOfThisMolecule){
+    setName(nameOfThisMolecule);
 }
-*/
 
 /* ==================================================
  *    Scale all DuMM force field terms by scale_factor
