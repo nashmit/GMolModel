@@ -179,9 +179,12 @@ int main(int argc, char **argv)
 
         // Write pdb
         if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
-            (p_worlds[currentWorldIx])->updateAtomLists(currentAdvancedState);
-            for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
+            std::cout << "mc_step = " << mc_step << std::endl;
+            if(!((mc_step+1) % 20)){
+                (p_worlds[currentWorldIx])->updateAtomLists(currentAdvancedState);
+                for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+                    ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
+                }
             }
         }
 
