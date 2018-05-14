@@ -234,9 +234,19 @@ void Topology::build(
 
     // Walk graph
     std::cout << "Walk the graph" << std::endl;
-    bSpecificAtom *root = &(bAtomList[0]);
+
+    int baseAtomListIndex = 0;
+    for(int i=0; i<natoms; i++){
+        std::cout << bAtomList[i].getNBonds() << std::endl;
+        if(bAtomList[i].getNBonds() > 1){
+            baseAtomListIndex = i;
+            break;
+        }
+    }
+
+    bSpecificAtom *root = &(bAtomList[baseAtomListIndex]);
     baseAtomNumber = root->number;
-    walkGraph( &(bAtomList[0]));
+    walkGraph( &(bAtomList[baseAtomListIndex]));
 
     // Add ring closing bonds
     for(int i=0; i<nbonds; i++){
