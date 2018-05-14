@@ -37,29 +37,52 @@ public:
     /** Default Constructor **/
     Topology();
 
-    /** Constructor that sets the name of the molecule.**/
+    /** Constructor that sets the name of the molecule. The name has no 
+    particular function and is not guaranteed to be unique. **/
     Topology(std::string nameOfThisMolecule);
 
     /** Default Destructor **/
     virtual ~Topology();
 
-    // Interface functions
+    // Interface:
+
+    /** Get the name of this molecule **/
     std::string getname(void){return this->name;}
+
+    /** Set the name of this molecule **/
     void setName(std::string nameOfThisMolecule){this->name = nameOfThisMolecule;}
+
+    /** Get the number of atoms. **/
     int getNAtoms(void) const;
+
+    /** Get the number of bonds. **/
     int getNBonds(void) const;
 
+    /** Get a pointer to an atom object in the atom list inquiring
+    by number **/
     bSpecificAtom * getAtomByNumber(int number) const;
+
+    /** Get a pointer to an atom object in the atom list inquiring
+    by its Molmodel assigned atom index (SimTK::Compound::AtomIndex) .**/
     bSpecificAtom * getAtomByAtomIx(int aIx) const;
+
+    /** Get a pointer to an atom object in the atom list inquiring
+    by atom name **/
     bSpecificAtom * getAtomByName(std::string name) const;
- 
-    std::vector<bSpecificAtom> getNeighbours(int) const;
+
+    /** Get the neighbours in the graph **/
+    std::vector<bSpecificAtom *> getNeighbours(int) const;
+
+    /** **/
     bBond * getBond(int, int) const;
+
+    /** Get bond order. **/
     int getBondOrder(int, int) const;
  
     std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > getMbx2aIx(void){
         return mbx2aIx;
     }
+
     std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > getAIx2mbx(void){
         return aIx2mbx;
     }

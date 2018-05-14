@@ -15,116 +15,55 @@ Topology::Topology(std::string nameOfThisMolecule){
     setName(nameOfThisMolecule);
 }
 
-/* ==================================================
- *    Scale all DuMM force field terms by scale_factor
- * ================================================== */
-void Topology::setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor){    
-    dumm.setBondStretchGlobalScaleFactor(scale_factor);
-    dumm.setBondBendGlobalScaleFactor(scale_factor);
-    dumm.setBondTorsionGlobalScaleFactor(scale_factor);
-    dumm.setAmberImproperTorsionGlobalScaleFactor(scale_factor);
-    dumm.setVdw12ScaleFactor(scale_factor);
-    dumm.setVdw13ScaleFactor(scale_factor);
-    dumm.setVdw14ScaleFactor(scale_factor);
-    dumm.setVdw15ScaleFactor(scale_factor);
-    dumm.setVdwGlobalScaleFactor(scale_factor);
-    dumm.setCoulomb12ScaleFactor(scale_factor);
-    dumm.setCoulomb13ScaleFactor(scale_factor);
-    dumm.setCoulomb14ScaleFactor(scale_factor);
-    dumm.setCoulomb15ScaleFactor(scale_factor);
-    dumm.setCoulombGlobalScaleFactor(scale_factor);
-    dumm.setGbsaGlobalScaleFactor(scale_factor);
+
+Topology::~Topology(){
 }
 
-/* ==================================================
- *    Scale DuMM force field terms by scale_factor
- * ================================================== */
-void Topology::setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm){    
+/**
+ ** Interface **
+ **/
 
-    dumm.setBondStretchGlobalScaleFactor(0.0);
-
-    dumm.setBondBendGlobalScaleFactor(0.0);
-
-    dumm.setBondTorsionGlobalScaleFactor(0.0);
-
-    dumm.setAmberImproperTorsionGlobalScaleFactor(0.0);
-
-    dumm.setVdw12ScaleFactor(0.0);
-    dumm.setVdw13ScaleFactor(0.0);
-    dumm.setVdw14ScaleFactor(0.5);
-    dumm.setVdw15ScaleFactor(1.0);
-    //dumm.setVdwGlobalScaleFactor(1.0);
-
-    dumm.setCoulomb12ScaleFactor(0.0);
-    dumm.setCoulomb13ScaleFactor(0.0);
-    dumm.setCoulomb14ScaleFactor(0.0);
-    dumm.setCoulomb15ScaleFactor(0.0);
-    dumm.setCoulombGlobalScaleFactor(0.0);
-
-    dumm.setGbsaGlobalScaleFactor(0.0);
+/** Get the number of atoms in the molecule **/
+int Topology::getNAtoms(void) const{
+    assert(!"Not implemented.");
 }
 
+/** Get the number of bonds in the molecule **/
+int Topology::getNBonds(void) const{
+    assert(!"Not implemented.");
+}
 
-  Topology::~Topology(){
-  }
+/** Get a pointer to an atom object in the atom list inquiring
+by number **/
+bSpecificAtom * Topology::getAtomByNumber(int number) const{
+    assert(!"Not implemented.");
+}
 
-  // Topology interface
-  // Set graph
+/** Get a pointer to an atom object in the atom list inquiring
+by its Molmodel assigned atom index (SimTK::Compound::AtomIndex) .**/
+bSpecificAtom * Topology::getAtomByAtomIx(int aIx) const{
+    assert(!"Not implemented.");
+}
 
-  void Topology::insertAtom(bSpecificAtom *){}
-  void Topology::insertBond(int, int, int bondOrder){}
+/** Get a pointer to an atom object in the atom list inquiring
+by atom name. **/
+bSpecificAtom * Topology::getAtomByName(std::string name) const{assert(!"Not implemented.");}
 
-  // Parameters
- /*
-  void Topology::setDuMMAtomParam(int, SimTK::Real vdw, SimTK::Real well){assert(!"Not implemented.");}
-  void Topology::setDuMMBondParam(int, int, SimTK::Real k, SimTK::Real equil){assert(!"Not implemented.");}
-  void Topology::setDuMMAngleParam(int, int, int, SimTK::Real k, SimTK::Real equil){assert(!"Not implemented.");}
+/** Get the neighbours in the graph. **/
+std::vector<bSpecificAtom *> Topology::getNeighbours(int) const{assert(!"Not implemented.");}
 
-  void Topology::setDuMMDihedralParam(int, int, int, int,
-      int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
-  ){assert(!"Not implemented.");}
-  void Topology::setDuMMDihedralParam(int, int, int, int,
-      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
-      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
-  ){assert(!"Not implemented.");}
-  void Topology::setDuMMDihedralParam(int, int, int, int,
-      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
-      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
-      int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
-  ){assert(!"Not implemented.");}
+/** **/
+bBond * Topology::getBond(int, int) const{assert(!"Not implemented.");}
 
-  void Topology::setDuMMImproperParam(int, int, int, int,
-      int periodicity, SimTK::Real ampInKJ, SimTK::Real phaseInDegrees
-  ){assert(!"Not implemented.");}
-  void Topology::setDuMMImproperParam(int, int, int, int,
-      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
-      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2
-  ){assert(!"Not implemented.");}
-  void Topology::setDuMMImproperParam(int, int, int, int,
-      int periodicity1, SimTK::Real ampInKJ1, SimTK::Real phaseInDegrees1,
-      int periodicity2, SimTK::Real ampInKJ2, SimTK::Real phaseInDegrees2,
-      int periodicity3, SimTK::Real ampInKJ3, SimTK::Real phaseInDegrees3
-  ){assert(!"Not implemented.");}
-  */
-  // Get
+/** Get bond order. **/
+int Topology::getBondOrder(int, int) const{assert(!"Not implemented.");}
 
-  int Topology::getNAtoms(void) const{assert(!"Not implemented.");}
-  int Topology::getNBonds(void) const{assert(!"Not implemented.");}
 
-  bSpecificAtom * Topology::getAtomByNumber(int number) const{assert(!"Not implemented.");}
-  bSpecificAtom * Topology::getAtomByAtomIx(int aIx) const{assert(!"Not implemented.");}
-  bSpecificAtom * Topology::getAtomByName(std::string name) const{assert(!"Not implemented.");}
+/**
+ * Main functions *
+ **/
 
-  std::vector<bSpecificAtom> Topology::getNeighbours(int) const{assert(!"Not implemented.");}
-  bBond * Topology::getBond(int, int) const{assert(!"Not implemented.");}
-  int Topology::getBondOrder(int, int) const{assert(!"Not implemented.");}
-
-///////////////////////
-// Other functions
-///////////////////////
-
-// Process a graph node
-//void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses, int baseAtomNumber)
+/** Process a graph node **/
 void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode)
 {
     baseSetFlag = 0;
@@ -169,6 +108,10 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
                     << node->number << " to " << previousNode->number << "(" << previousNode->getInName() << ") "
                     << (sbuff.str()).c_str() << " ... " << std::flush;
 
+                std::cout << "Check 1: " << std::endl << std::flush;
+                std::cout << "Check 1: " << " (sbuff.str()).c_str() " << (sbuff.str()).c_str() << std::endl << std::flush;
+                std::cout << "Check 1: *(node->bAtomType) = " << *(node->bAtomType) << std::endl << std::flush;
+
                 std::cout << "Node inName: " << *(node->inName) << std::endl << std::flush;
 
                 this->bondAtom( *(node->bAtomType), (sbuff.str()).c_str(), 0.149, 0); // (Compound::SingleAtom&, BondCenterPathName, Length, Angle
@@ -201,6 +144,10 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
                 std::cout << "Trying to connect " << node->name << "(" << node->getInName() << ") " 
                     << node->number << " to " << previousNode->number << "(" << previousNode->getInName() << ") "
                     << (sbuff.str()).c_str() << " ... " << std::flush;
+
+                std::cout << "Check 2: " << std::endl << std::flush;
+                std::cout << "Check 2: " << " (sbuff.str()).c_str() " << (sbuff.str()).c_str() << std::endl << std::flush;
+                std::cout << "Check 2: *(node->bAtomType) = " << *(node->bAtomType) << std::endl << std::flush;
 
                 this->bondAtom( *(node->bAtomType), (sbuff.str()).c_str(), 0.149, 0);
                 //this->setAtomBiotype(node->name, (this->name), node->biotype);
@@ -551,5 +498,60 @@ void Topology::writePdb(std::string dirname, std::string prefix, std::string suf
     fclose(oF);
 }
 
+  // Not sure we need this
+  void Topology::insertAtom(bSpecificAtom *){}
+  void Topology::insertBond(int, int, int bondOrder){}
+
+
+// Not sure they belong here
+
+/* ==================================================
+ *    Scale all DuMM force field terms by scale_factor
+ * ================================================== */
+void Topology::setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor){    
+    dumm.setBondStretchGlobalScaleFactor(scale_factor);
+    dumm.setBondBendGlobalScaleFactor(scale_factor);
+    dumm.setBondTorsionGlobalScaleFactor(scale_factor);
+    dumm.setAmberImproperTorsionGlobalScaleFactor(scale_factor);
+    dumm.setVdw12ScaleFactor(scale_factor);
+    dumm.setVdw13ScaleFactor(scale_factor);
+    dumm.setVdw14ScaleFactor(scale_factor);
+    dumm.setVdw15ScaleFactor(scale_factor);
+    dumm.setVdwGlobalScaleFactor(scale_factor);
+    dumm.setCoulomb12ScaleFactor(scale_factor);
+    dumm.setCoulomb13ScaleFactor(scale_factor);
+    dumm.setCoulomb14ScaleFactor(scale_factor);
+    dumm.setCoulomb15ScaleFactor(scale_factor);
+    dumm.setCoulombGlobalScaleFactor(scale_factor);
+    dumm.setGbsaGlobalScaleFactor(scale_factor);
+}
+
+/* ==================================================
+ *    Scale DuMM force field terms by scale_factor
+ * ================================================== */
+void Topology::setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm){    
+
+    dumm.setBondStretchGlobalScaleFactor(0.0);
+
+    dumm.setBondBendGlobalScaleFactor(0.0);
+
+    dumm.setBondTorsionGlobalScaleFactor(0.0);
+
+    dumm.setAmberImproperTorsionGlobalScaleFactor(0.0);
+
+    dumm.setVdw12ScaleFactor(0.0);
+    dumm.setVdw13ScaleFactor(0.0);
+    dumm.setVdw14ScaleFactor(0.5);
+    dumm.setVdw15ScaleFactor(1.0);
+    //dumm.setVdwGlobalScaleFactor(1.0);
+
+    dumm.setCoulomb12ScaleFactor(0.0);
+    dumm.setCoulomb13ScaleFactor(0.0);
+    dumm.setCoulomb14ScaleFactor(0.0);
+    dumm.setCoulomb15ScaleFactor(0.0);
+    dumm.setCoulombGlobalScaleFactor(0.0);
+
+    dumm.setGbsaGlobalScaleFactor(0.0);
+}
 
 
