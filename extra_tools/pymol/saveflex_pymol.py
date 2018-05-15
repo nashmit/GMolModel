@@ -6,15 +6,22 @@ import numpy as numpy
 def saveflex_from_mol2 ( Filename, userSelection ):
 # saves bonds within selection in .flex format
 
-        # get atoms indexes from pymol selection
-        index = numpy.array( cmd.index( userSelection ) )
-        index_list = [ int(index[k, 1]) for k in range( len(index) ) ]
+        # get atoms indexes / IDs from pymol selection
+
+        # IF PROBLEMS CHECK IF MOL2 WAS GENERATED USING INDEX AS KEY
+        # index = numpy.array( cmd.index( userSelection ) )    
+        # index_list = [ int(index[k, 1]) for k in range( len(index) ) ]
+
+
+        index_list = numpy.array( cmd.identify( userSelection ) )
 
         # open needed files
         molFilename = Filename + ".mol2"
         flexFilename = Filename + ".flex"
         mol2 = open(molFilename, "r")
         flex = open(flexFilename, "w")
+
+        print(index_list)
 
         # gets bond list from mol2 and prints selected flexible bonds ( index - 1 )
         bondsection = 0
@@ -32,11 +39,9 @@ def saveflex_from_mol2 ( Filename, userSelection ):
                                 break
 
                         elif bondsection:
-                                for k in range ( len(index_list) ):
-                                        if index_list[k] == int( currentLine[1] ):
-                                                # prints in file.flex
-                                                print >> flex, int(currentLine[1]) - 1, int(currentLine[2]) - 1
-                                                # prints in pymol console
-                                                print(int(currentLine[1]) - 1, int(currentLine[2]) - 1)
+                            if int( currentLine[1] ) in index_list and int( currentLine[2] ) in index_list:
+                                    print >> flex, int(currentLine[1]) - 1, int(currentLine[2]) - 1
+                                    # prints in pymol console
+                                    print(int(currentLine[1]) - 1, int(currentLine[2]) - 1)
 
                                                                                                                          
