@@ -179,7 +179,6 @@ int main(int argc, char **argv)
 
         // Write pdb
         if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
-            std::cout << "mc_step = " << mc_step << std::endl;
             if(!((mc_step+1) % 20)){
                 (p_worlds[currentWorldIx])->updateAtomLists(currentAdvancedState);
                 for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
