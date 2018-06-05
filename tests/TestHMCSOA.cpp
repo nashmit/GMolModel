@@ -73,7 +73,7 @@ int main(int argc, char **argv)
             p_worlds[worldIx]->forceField, (p_worlds[worldIx])->forces, (p_worlds[worldIx])->ts ) );
 
         // Initialize samplers
-        bool useFixman = true;
+        bool useFixman = false;
         if(setupReader.getValues("REGIMENS")[worldIx] == "IC"){
             useFixman = false;
         }

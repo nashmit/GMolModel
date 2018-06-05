@@ -424,8 +424,8 @@ void Topology::setRegimen(std::string argRegimen, std::string flexFN){
             for (unsigned int j = 0 ; j < getNumBonds(); j++){
                 if( ((getBondAtomIndex(Compound::BondIndex(j), 0) == MolmodelFlexBonds[i].first) && (getBondAtomIndex(Compound::BondIndex(j), 1) == MolmodelFlexBonds[i].second)) || 
                     ((getBondAtomIndex(Compound::BondIndex(j), 1) == MolmodelFlexBonds[i].first) && (getBondAtomIndex(Compound::BondIndex(j), 0) == MolmodelFlexBonds[i].second)) ){
-                    setBondMobility(BondMobility::Torsion, Compound::BondIndex(j));
-                    std::cout << "Topology::setRegimen: Bond " << j << " set to torsion" << std::endl;
+                    setBondMobility(BondMobility::Free, Compound::BondIndex(j));
+                    std::cout << "Topology::setRegimen: Bond " << j << " set to free" << std::endl;
                     break;
                 }
             }
@@ -438,13 +438,14 @@ void Topology::setRegimen(std::string argRegimen, std::string flexFN){
 // Load MobilizedBody vs Compound::AtomIndex maps
 void Topology::loadMaps(void){
     // Load MobilizedBodyIndex vs CompoundAtomIndex maps. 
-    // These contain only atoms at the origin of mobods
+    // These contain only atoms at the origin of mobods !!!
     for (SimTK::Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
         SimTK::MobilizedBodyIndex mbx = getAtomMobilizedBodyIndex(aIx);
-        if(getAtomLocationInMobilizedBodyFrame(aIx) == 0){
+        //std::cout << "check transform = " << getAtomLocationInMobilizedBodyFrame(aIx) << std::endl;
+        //if(getAtomLocationInMobilizedBodyFrame(aIx) == 0){
             std::pair<SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > pairToBeInserted(mbx, aIx);
             mbx2aIx.insert(pairToBeInserted);
-        }
+        //}
         aIx2mbx.insert(std::pair< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex >(aIx, mbx));
         //for(int i = 0; i< getNumAtoms(); i++){
         //    if((bAtomList[i]).atomIndex == aIx){

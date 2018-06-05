@@ -221,4 +221,11 @@ void PrintBigMat(SimTK::Vector M, int nrows, int decimal_places, std::string hea
 void PrintSpatialVec(SimTK::SpatialVec V, int decimal_places, std::string header);
 void PrintSpatialMat(SimTK::SpatialMat M, int decimal_places, std::string header);
 
+
+/*
+ * Dihedral angle
+ */
+SimTK::Real bDihedral(SimTK::Vec3 pos0, SimTK::Vec3 pos1, SimTK::Vec3 pos2, SimTK::Vec3 pos3);
+
+
 #endif /*BGENERAL_H_*/

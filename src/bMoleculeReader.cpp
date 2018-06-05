@@ -123,6 +123,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         str_buf = amberReader->getAtomsName(i);
         boost::trim(str_buf);
         bAtomList[i].setElem(str_buf.at(0));
+
         //bAtomList[i].setName(str_buf);
         //std::string elemStr = std::string(1, bAtomList[i].getElem());
         //bAtomList[i].setName(elemStr + std::to_string(bAtomList[i].getNumber()));

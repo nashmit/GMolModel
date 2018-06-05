@@ -61,7 +61,8 @@ int main(int argc, char **argv)
         }
     
         // Initialize worlds
-        (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]) );
+        bool useFixmanTorque = true;
+        (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), useFixmanTorque );
     
         // Initialize sampler
         TRACE("NEW ALLOC\n");
@@ -71,15 +72,15 @@ int main(int argc, char **argv)
             p_worlds[worldIx]->forceField, (p_worlds[worldIx])->forces, (p_worlds[worldIx])->ts ) );
     
         // Initialize samplers
-        bool useFixman = true;
+        bool useFixmanPotential = false;
         if(setupReader.getValues("REGIMENS")[worldIx] == "IC"){
-            useFixman = false;
+            useFixmanPotential = false;
         }
         (p_samplers[worldIx])->initialize( (p_worlds[worldIx])->integ->updAdvancedState(), 
              std::stod(setupReader.getValues("TIMESTEPS")[worldIx]),
              std::stoi(setupReader.getValues("STEPS")[0]),
              SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
-             useFixman );
+             useFixmanPotential );
     
     }
     ////////////////////////////////////////////////////////// END creating Worlds
@@ -95,7 +96,7 @@ int main(int argc, char **argv)
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
         std::cout << "World " << worldIx << " initial const state PE: " << std::setprecision(20)
             << (p_worlds[worldIx])->forces->getMultibodySystem().calcPotentialEnergy((p_worlds[worldIx])->integ->updAdvancedState()) 
-            << " useFixman = " << p_samplers[worldIx]->isUsingFixman()
+            << " useFixmanPotential = " << p_samplers[worldIx]->isUsingFixman()
             << std::endl;
     }
 
@@ -186,6 +187,21 @@ int main(int argc, char **argv)
                 }
             }
         }
+
+        // Compute dihedral for linear bead molecules
+        //SimTK::Compound c = (p_worlds[currentWorldIx])->getTopology(0);
+        //SimTK::Vec3 pos[c.getNumAtoms()];
+        //for (SimTK::Compound::AtomIndex aIx(0); aIx < c.getNumAtoms(); ++aIx){
+        //    pos[int(aIx)] = c.calcAtomLocationInGroundFrame(currentAdvancedState, aIx);
+        //}
+        ////std::cout << "atoms 1 0 2 3 names = "
+        ////    << c.getAtomName(SimTK::Compound::AtomIndex(1)) << " "
+        ////    << c.getAtomName(SimTK::Compound::AtomIndex(0)) << " "
+        ////    << c.getAtomName(SimTK::Compound::AtomIndex(2)) << " "
+        ////    << c.getAtomName(SimTK::Compound::AtomIndex(3)) << " "
+        ////    << std::endl;
+        //std::cout << bDihedral(pos[1], pos[0], pos[2], pos[3]) << std::endl;
+
 
     } // for i in MC steps
 

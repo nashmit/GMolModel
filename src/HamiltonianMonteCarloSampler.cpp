@@ -371,8 +371,8 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
 
 
     std::cout<<std::setprecision(5)<<std::fixed;
-    std::cout << "pe_o " << pe_o + getREP() << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP()
-        << " pe_n " << pe_n  + getREP() << " ke_n " << ke_n << " fix_n " << fix_n
+//*    std::cout << "pe_o " << pe_o + getREP() << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP()
+//*        << " pe_n " << pe_n  + getREP() << " ke_n " << ke_n << " fix_n " << fix_n
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
         //<< " etot_n " << etot_n  + getREP() << " etot_proposed " << etot_proposed + getREP()
         ;
@@ -380,8 +380,8 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     // Apply Metropolis criterion
 ////    if(1){ // Always accept // TODO
     //assert(!isnan(pe_n));
-    if ( (!isnan(pe_n)) || (etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT)) ){ // Accept
-        std::cout << " acc 1 " ;
+    if ( (!isnan(pe_n)) && ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
+//*        std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
         setSetPE(pe_n);
@@ -390,14 +390,30 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         //this->etot_set = getSetPE() + getSetFixman() + getLastAcceptedKE(); // TODO:seems wrong
         this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
     }else{ // Reject
-        std::cout << " acc 0 " ;
+//*        std::cout << " acc 0 " ;
         assignConfFromSetTVector(someState);
     }
 
-    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman()
+//*    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman()
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
-        << std:: endl;
+//*        << std:: endl;
+
+
+    // To check the angle distribution in linear beads systems
+    //std::cout << someState.getQ() << std::endl ;
+    //for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+    //    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+        //const SimTK::MobilizedBody *p_mobod = &mobod;
+        //std::cout << SimTK::DuMM::Rad2Deg * ((SimTK::MobilizedBody::Pin *)(p_mobod))->getAngle(someState)  << " " ;
+        //std::cout << ((SimTK::MobilizedBody::Pin *)(p_mobod))->getAngle(someState)  << " " ;
+        //std::cout << mobod.getAngle(someState) << " " ;
+        //std::cout << "mobod " << int(mbx) << mobod.getQAsVector(someState) << "; ";
+    //}
+    //std::cout << std::endl ;
+
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
+  
+    
 
 
 }

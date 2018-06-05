@@ -173,12 +173,13 @@ class World{
   SimTK::Transform *TVector;
   int **mbxTreeMat;    // tree representing the bonding
   SimTK::Real *branchMassVec; // branch masses self body included
+  bool _useFixmanTorque;
 
   World(int worldIndex, bool isVisual=true, SimTK::Real visualizerFrequency = 0.0015);
 
   void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF);
 
-  void Init(SimTK::Real integTimestep);
+  void Init(SimTK::Real integTimestep, bool useFixmanTorque = false);
 
   std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > >  getAtomsLocationsInGround(const SimTK::State&);
 

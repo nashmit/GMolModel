@@ -215,7 +215,8 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
 {
     ownWorldIndex = worldIndex;
     std::cout << "World::World BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
-    fassno = new int; // External forces
+    fassno = new int; // External forcesa
+    _useFixmanTorque = false;
   
     compoundSystem = new SimTK::CompoundSystem;
     matter = new SimTK::SimbodyMatterSubsystem(*compoundSystem);
@@ -235,6 +236,7 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
     ts = new SimTK::TimeStepper(*compoundSystem, *integ);
 
     moleculeCount = -1;
+
     std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
@@ -281,7 +283,7 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
 }
 
 // Initialize simulation
-void World::Init(SimTK::Real timestep)
+void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
 {
     // Only model after loading all the compounds
     integ->setFixedStepSize(timestep);
@@ -296,6 +298,9 @@ void World::Init(SimTK::Real timestep)
         std::cout << "Print maps topology " << i << std::endl;
         ((this->topologies)[i])->printMaps();
     }
+
+    // Do we use Fixman torque
+    _useFixmanTorque = useFixmanTorqueOpt;
 
     // Generate a nonbonded list
     /*
@@ -345,22 +350,24 @@ void World::Init(SimTK::Real timestep)
 //    forceField->setBondBendGlobalScaleFactor(0.0);
 //    forceField->setBondTorsionGlobalScaleFactor(0.0);
 //    forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
-  
+//  
 //    forceField->setVdw12ScaleFactor(0.0);
 //    forceField->setVdw13ScaleFactor(0.0);
 //    forceField->setVdw14ScaleFactor(0.0);
 //    forceField->setVdw15ScaleFactor(0.0);
 //    forceField->setVdwGlobalScaleFactor(0.0);
-  
+//  
 //    forceField->setCoulomb12ScaleFactor(0.0);
 //    forceField->setCoulomb13ScaleFactor(0.0);
 //    forceField->setCoulomb14ScaleFactor(0.0);
 //    forceField->setCoulomb15ScaleFactor(0.0);
 //    forceField->setCoulombGlobalScaleFactor(0.0);
-//
+
   
     *fassno = 0;
-    ExtForce = new SimTK::Force::Custom(*forces, new GridForce(compoundSystem, *matter, fassno, this));
+    if(_useFixmanTorque){
+        ExtForce = new SimTK::Force::Custom(*forces, new GridForce(compoundSystem, *matter, fassno, this));
+    }
   
     #ifdef TRY_TO_USE_OPENMM
         //forceField->setUseOpenMMAcceleration(true);
@@ -426,7 +433,7 @@ void World::updateAtomLists(const SimTK::State & state)
 // 
 SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations)
 {
-    //std::cout << "World "<< ownWorldIndex << " setAtomsLocationsInGround" << std::endl;
+    std::cout << "World "<< ownWorldIndex << " setAtomsLocationsInGround" << std::endl << std::flush;
     //PrintSimbodyStateCache(someState);
     //someState.invalidateAll(SimTK::Stage::Topology);
     
@@ -541,6 +548,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
                     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
                     const SimTK::MobilizedBody& parentMobod =  mobod.getParentMobilizedBody();
                     SimTK::MobilizedBodyIndex parentMbx = parentMobod.getMobilizedBodyIndex();
+                    std::cout << "check parentMobod.getMobilizedBodyIndex() = " << parentMobod.getMobilizedBodyIndex() << std::endl << std::flush;
                     SimTK::Compound::AtomIndex parentAIx = (topologies[i]->getMbx2aIx()).at(parentMbx);
         
                     // Get inboard dihedral angle and put in BAt_X_M0
@@ -604,6 +612,8 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
     updateAtomLists(someState);
 
+    std::cout << "World "<< ownWorldIndex << " setAtomsLocationsInGround END" << std::endl << std::flush;
+
     return someState;
 }
 
@@ -649,7 +659,9 @@ World::~World(){
     delete ts;
     delete integ;
     delete forceField;
-    delete ExtForce;
+    if(_useFixmanTorque){
+        delete ExtForce;
+    }
     delete matter;
     delete forces;
     delete compoundSystem;
