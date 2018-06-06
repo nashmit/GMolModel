@@ -127,6 +127,11 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
                 node->atomIndex = getBondAtomIndex(Compound::BondIndex(getNumBonds() - 1), 1) ; // Set bSpecificAtom atomIndex to the last atom added to bond
                 previousNode->atomIndex = getBondAtomIndex(Compound::BondIndex(getNumBonds() - 1), 0) ; // The only time we have to set atomIndex to the previous node
 
+                // Set bBond Molmodel Compound::BondIndex
+                (*it)->setBondIndex(Compound::BondIndex(getNumBonds() - 1));
+                std::pair<SimTK::Compound::BondIndex, int > pairToBeInserted(Compound::BondIndex(getNumBonds() - 1), (*it)->getIndex());
+                bondIx2bond.insert(pairToBeInserted);
+
                 --previousNode->freebonds;
                 --node->freebonds;
 
@@ -159,6 +164,11 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
 
                 // Set bSpecificAtom atomIndex to the last atom added to bond
                 node->atomIndex = getBondAtomIndex(Compound::BondIndex(getNumBonds() - 1), 1) ; // Set bSpecificAtom atomIndex to the last atom added to bond
+
+                // Set bBond Molmodel Compound::BondIndex
+                (*it)->setBondIndex(Compound::BondIndex(getNumBonds() - 1));
+                std::pair<SimTK::Compound::BondIndex, int > pairToBeInserted(Compound::BondIndex(getNumBonds() - 1), (*it)->getIndex());
+                bondIx2bond.insert(pairToBeInserted);
 
                 --previousNode->freebonds;
                 --node->freebonds;
@@ -358,6 +368,7 @@ void Topology::setRegimen(std::string argRegimen, std::string flexFN){
     if(argRegimen == "IC"){
         for (unsigned int r=0 ; r<getNumBonds(); r++){
             setBondMobility(BondMobility::Free, Compound::BondIndex(r));
+            bonds[bondIx2bond[Compound::BondIndex(r)]].setBondMobility(BondMobility::Free);
         }
         std::cout << "Changed regimen to: " << "IC" << std::endl;
     }else if(argRegimen == "TD"){
@@ -424,8 +435,8 @@ void Topology::setRegimen(std::string argRegimen, std::string flexFN){
             for (unsigned int j = 0 ; j < getNumBonds(); j++){
                 if( ((getBondAtomIndex(Compound::BondIndex(j), 0) == MolmodelFlexBonds[i].first) && (getBondAtomIndex(Compound::BondIndex(j), 1) == MolmodelFlexBonds[i].second)) || 
                     ((getBondAtomIndex(Compound::BondIndex(j), 1) == MolmodelFlexBonds[i].first) && (getBondAtomIndex(Compound::BondIndex(j), 0) == MolmodelFlexBonds[i].second)) ){
-                    setBondMobility(BondMobility::Free, Compound::BondIndex(j));
-                    std::cout << "Topology::setRegimen: Bond " << j << " set to free" << std::endl;
+                    setBondMobility(BondMobility::Torsion, Compound::BondIndex(j));
+                    std::cout << "Topology::setRegimen: Bond " << j << " set to torsion" << std::endl;
                     break;
                 }
             }
@@ -470,6 +481,12 @@ void Topology::printMaps(void)
        it != aIx2mbx.end(); ++it)
     {
         std::cout << "atomIndex " << it->first << " mbx " << it->second << std::endl;
+    }
+
+    for(map<SimTK::Compound::BondIndex, int>::const_iterator it = bondIx2bond.begin();
+       it != bondIx2bond.end(); ++it)
+    {
+        std::cout << "Compound bondIndex " << it->first << " bBond index " << it->second << std::endl;
     }
 }
 

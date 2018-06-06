@@ -201,6 +201,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
 
     // READ BONDS
     for(int i=0; i<nbonds; i++){
+        bonds[i].setIndex(i);
         bonds[i].i = amberReader->getBondsAtomsIndex1(i);
         bonds[i].j = amberReader->getBondsAtomsIndex2(i);
     }

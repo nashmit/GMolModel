@@ -377,14 +377,6 @@ void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
   
     compoundSystem->realizeTopology();
 
-
-    // Try locking mobods
-    //for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter.getNumBodies(); ++mbx){
-    //    const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
-    //}
-
-
-
     std::cout << "World::Init END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
 }//end of InitSimulation
 
@@ -539,6 +531,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
     
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
             SimTK::Transform G_X_T = topologies[i]->getTopLevelTransform();
+            std::cout << "setAtomsLocationsInGround: G_X_T = " << G_X_T << std::endl;
             SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
             SimTK::Transform P_X_M[matter->getNumBodies()]; // related to X_PFs
             SimTK::Transform T_X_BAt[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
@@ -550,7 +543,6 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             // Iterate through atoms - get P_X_M for all the bodies
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
                 if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
-                    std::cout << "setAtomsLocationsInGround: Get default P_X_M for atoms in mobods B points " << std::endl;
                     // Get body, parentBody, parentAtom
                     SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
                     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
@@ -562,18 +554,12 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             
                         std::cout << "atom " << aIx << " mobod (" << mbx << ") parentAtom " << parentAIx 
                             << " parent mobod (" << parentMbx << ")" << std::endl;
-                        //if(IC){
-                        //else{
-                        //}
-                        //std::cout << "mobod G_X_P " << parentMobod.getBodyTransform(someState) << std::endl;
-                        //std::cout << "mobod P_X_F " << mobod.getInboardFrame(someState) << std::endl;
-                        //std::cout << "mobod F_X_M " << mobod.getMobilizerTransform(someState) << std::endl;
-                        //std::cout << "mobod P_X_M " << (mobod.getInboardFrame(someState)) * (mobod.getMobilizerTransform(someState)) << std::endl;
-                        //std::cout << "mobod P_X_F " << mobod.getDefaultInboardFrame() << std::endl;
+
 
                         // Get inboard dihedral angle and put in BAt_X_M0 !!!!!!!
                         inboardBondDihedralAngles[int(mbx)] = topologies[i]->bgetDefaultInboardDihedralAngle(aIx);
                         SimTK::Transform BAt_X_M0 = SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis);
+            
 
                         // Get P_X_M
                         T_X_BAt[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
@@ -583,7 +569,11 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
                         SimTK::Transform PAt_X_M0 = PAt_X_T * T_X_M0;
                         P_X_M[int(mbx)] = PAt_X_M0;
 
-                        std::cout << "atom default P_X_M = " << P_X_M[int(mbx)] << std::endl;
+                        std::cout << "atom P_X_M = " << P_X_M[int(mbx)] << std::endl;
+                        std::cout << "mobod G_X_P " << parentMobod.getBodyTransform(someState) << std::endl;
+                        std::cout << "mobod P_X_F " << mobod.getInboardFrame(someState) << std::endl;
+                        std::cout << "mobod F_X_M " << mobod.getMobilizerTransform(someState) << std::endl;
+                        std::cout << "mobod P_X_M " << (mobod.getInboardFrame(someState)) * (mobod.getMobilizerTransform(someState)) << std::endl;
 
                     }
                 }

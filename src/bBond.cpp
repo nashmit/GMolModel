@@ -68,7 +68,8 @@ std::string intpair::getString(void){
  ****/
 bBond::bBond(void) : intpair(){
   inring = 0;
-  rigid = 0;
+  //rigid = 0;
+  mobility = SimTK::BondMobility::Mobility::Free;
   ring_closing = 0; // later
   ring_no = 0; // later
   _isFirst = false;
@@ -78,7 +79,8 @@ bBond::bBond(void) : intpair(){
 
 bBond::bBond(int a, int b) : intpair(a, b){
   inring = 0;
-  rigid = 0;
+  //rigid = 0;
+  mobility = SimTK::BondMobility::Mobility::Free;
   ring_closing = 0;
   ring_no = 0; // later
   _isFirst = false;
@@ -102,12 +104,25 @@ bool bBond::isRingClosing(void){
     return false;
 }
 
+/*
 bool bBond::isRigid(void){
   if(this->rigid == 1)
     return true;
   else
     return false;
 }
+*/
+
+SimTK::BondMobility::Mobility bBond::getBondMobility(void)
+{
+    return mobility;
+}
+
+void bBond::setBondMobility(SimTK::BondMobility::Mobility argmobility)
+{
+    mobility = argmobility;
+}
+
 
 int bBond::ringNo(void){
   return this->ring_no;
@@ -120,11 +135,11 @@ void bBond::setInRing(void){
 void bBond::setAsRingClosing(void){
   this->ring_closing = 1;
 }
-
+/*
 void bBond::setAsRigid(void){
   this->rigid = 1;
 }
-
+*/
 void bBond::setRingNo(int rn){
   this->ring_no = rn;
 }
@@ -140,7 +155,7 @@ void bBond::setBondIndex(SimTK::Compound::BondIndex otherIx){
 // Print bond variables
 void bBond::Print(void)
 {
-    std::cout << "i " << i << " j " << j << " rigid " << rigid 
+    std::cout << "i " << i << " j " << j << " mobility " << SimTK::BondMobility::Rigid
         << " inring " << inring << " ring_no " << ring_no
         << " ring_closing " << ring_closing 
         << " visited " << visited << std::endl;
@@ -185,5 +200,14 @@ int bBond::isVisited(void)
     return this->visited;
 }
 
+// Gmolmodel indices (prmtop)
+void bBond::setIndex(int someOtherIndex)
+{
+    myindex = someOtherIndex;
+}
 
+int bBond::getIndex(void)
+{
+    return myindex;
+}
 

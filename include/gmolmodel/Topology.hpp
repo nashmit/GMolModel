@@ -154,6 +154,7 @@ private:
     std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > mbx2aIx;
     std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > aIx2mbx;
     //std::map< SimTK::Compound::AtomIndex, int > aIx2number;
+    std::map< SimTK::Compound::BondIndex, int > bondIx2bond;
 
 };
 
