@@ -487,6 +487,7 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     //std::cout <<  "Sampler after energies calculations State Cache Info: " << std::endl;
     //PrintSimbodyStateCache(someState);
 
+    std::cout << "UDot = " << someState.getUDot() << std::endl;
     std::cout<<std::setprecision(5)<<std::fixed;
     std::cout << "pe_o " << pe_o + getREP() << " ke_o " << ke_o << " fix_o " << fix_o << " rep " << getREP()
         << " pe_n " << pe_n  + getREP() << " ke_n " << ke_n << " fix_n " << fix_n
@@ -498,9 +499,9 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
     //if (( (pe_n) < (pe_o) ) || (rand_no < exp(-( (pe_n) - (pe_o) ) / RT))){ // Accept
     //if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
 
-    //if(1){ // Always accept
+    if(1){ // Always accept
     //if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
-    if ( (!isnan(pe_n)) || (etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT)) ){ // Accept
+    //if ( (!isnan(pe_n)) && (etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT)) ){ // Accept
         std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM

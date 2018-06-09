@@ -371,8 +371,8 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
 
 
     std::cout<<std::setprecision(5)<<std::fixed;
-//*    std::cout << "pe_o " << pe_o + getREP() << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP()
-//*        << " pe_n " << pe_n  + getREP() << " ke_n " << ke_n << " fix_n " << fix_n
+//p    std::cout << "pe_o " << pe_o << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP()
+//p        << " pe_n " << pe_n  << " ke_n " << ke_n << " fix_n " << fix_n
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
         //<< " etot_n " << etot_n  + getREP() << " etot_proposed " << etot_proposed + getREP()
         ;
@@ -381,7 +381,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
 ////    if(1){ // Always accept // TODO
     //assert(!isnan(pe_n));
     if ( (!isnan(pe_n)) && ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
-//*        std::cout << " acc 1 " ;
+//p        std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
         setSetPE(pe_n);
@@ -390,16 +390,28 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         //this->etot_set = getSetPE() + getSetFixman() + getLastAcceptedKE(); // TODO:seems wrong
         this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
     }else{ // Reject
-//*        std::cout << " acc 0 " ;
+//p        std::cout << " acc 0 " ;
         assignConfFromSetTVector(someState);
     }
 
-//*    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman()
+//p    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman()
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
-//*        << std:: endl;
+//p        << std:: endl;
 
+    // Configuration
+    //std::cout << "HMC conf: ";
+    //for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+    //    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+    //    std::cout << " mobod " << int(mbx) << " = ";
+    //    std::cout << mobod.getQAsVector(someState) << std::endl ;
+    //    std::cout << " P_X_F " << mobod.getInboardFrame(someState) << " ";
+    //    std::cout << " F_X_M " << mobod.getMobilizerTransform(someState) << " ";
+    //    //std::cout << " P_X_F * F_X_M " << mobod.getInboardFrame(someState) * mobod.getMobilizerTransform(someState) << " ";
+    //    std::cout << "; ";
+    //}
+    //std::cout << std::endl;
 
-    // To check the angle distribution in linear beads systems
+    // Calculate geometric features fast
     //std::cout << someState.getQ() << std::endl ;
     //for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
     //    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);

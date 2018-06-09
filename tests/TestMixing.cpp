@@ -72,7 +72,7 @@ int main(int argc, char **argv)
             p_worlds[worldIx]->forceField, (p_worlds[worldIx])->forces, (p_worlds[worldIx])->ts ) );
     
         // Initialize samplers
-        bool useFixmanPotential = false;
+        bool useFixmanPotential = true;
         if(setupReader.getValues("REGIMENS")[worldIx] == "IC"){
             useFixmanPotential = false;
         }
@@ -149,16 +149,17 @@ int main(int argc, char **argv)
         // Transfer coordinates from last world to current
         //std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
         //    << " at MC step " << mc_step << std::endl;
+        /// !!!! Temporary DON'T TRANSFER COORDINATES FOR NOW = ONLY USING ONE REGIMEN !!!!!
         SimTK::State& lastAdvancedState = (p_worlds[worldIndexes.back()])->integ->updAdvancedState();
         SimTK::State& currentAdvancedState = (p_worlds[currentWorldIx])->integ->updAdvancedState();
 
-        currentAdvancedState = (p_worlds[currentWorldIx])->setAtomsLocationsInGround(
-            currentAdvancedState, (p_worlds[worldIndexes.back()])->getAtomsLocationsInGround( lastAdvancedState ));
-
-        // Reinitialize current sampler
-        p_samplers[currentWorldIx]->reinitialize( currentAdvancedState, 
-            timesteps[currentWorldIx], total_mcsteps,
-            SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
+//@@        currentAdvancedState = (p_worlds[currentWorldIx])->setAtomsLocationsInGround(
+//@@            currentAdvancedState, (p_worlds[worldIndexes.back()])->getAtomsLocationsInGround( lastAdvancedState ));
+//@@
+//@@        // Reinitialize current sampler
+//@@        p_samplers[currentWorldIx]->reinitialize( currentAdvancedState, 
+//@@            timesteps[currentWorldIx], total_mcsteps,
+//@@            SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
 
         // Set residual energy for the rest of the samplers
         if(setupReader.getValues("REGIMENS")[worldIndexes.back()] == "IC"){
@@ -180,7 +181,8 @@ int main(int argc, char **argv)
 
         // Write pdb
         if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
-            if(!((mc_step+1) % 20)){
+            //if(!((mc_step+1) % 20)){
+            if(1){
                 (p_worlds[currentWorldIx])->updateAtomLists(currentAdvancedState);
                 for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
                     ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
@@ -188,19 +190,26 @@ int main(int argc, char **argv)
             }
         }
 
-        // Compute dihedral for linear bead molecules
-        //SimTK::Compound c = (p_worlds[currentWorldIx])->getTopology(0);
-        //SimTK::Vec3 pos[c.getNumAtoms()];
-        //for (SimTK::Compound::AtomIndex aIx(0); aIx < c.getNumAtoms(); ++aIx){
-        //    pos[int(aIx)] = c.calcAtomLocationInGroundFrame(currentAdvancedState, aIx);
-        //}
-        ////std::cout << "atoms 1 0 2 3 names = "
-        ////    << c.getAtomName(SimTK::Compound::AtomIndex(1)) << " "
-        ////    << c.getAtomName(SimTK::Compound::AtomIndex(0)) << " "
-        ////    << c.getAtomName(SimTK::Compound::AtomIndex(2)) << " "
-        ////    << c.getAtomName(SimTK::Compound::AtomIndex(3)) << " "
-        ////    << std::endl;
-        //std::cout << bDihedral(pos[1], pos[0], pos[2], pos[3]) << std::endl;
+        // Calculate geomtric features fast
+        SimTK::Compound c = (p_worlds[currentWorldIx])->getTopology(0);
+        SimTK::Vec3 pos[c.getNumAtoms()];
+        for (SimTK::Compound::AtomIndex aIx(0); aIx < c.getNumAtoms(); ++aIx){
+            pos[int(aIx)] = c.calcAtomLocationInGroundFrame(currentAdvancedState, aIx);
+        }
+        //std::cout << "phi atoms 4 5 7 13 names = "
+        //    << c.getAtomName(SimTK::Compound::AtomIndex(4)) << " "
+        //    << c.getAtomName(SimTK::Compound::AtomIndex(5)) << " "
+        //    << c.getAtomName(SimTK::Compound::AtomIndex(7)) << " "
+        //    << c.getAtomName(SimTK::Compound::AtomIndex(13)) << " "
+        //    << std::endl;
+        //std::cout << "psi atoms 5 7 13 14 names = "
+        //    << c.getAtomName(SimTK::Compound::AtomIndex(5)) << " "
+        //    << c.getAtomName(SimTK::Compound::AtomIndex(7)) << " "
+        //    << c.getAtomName(SimTK::Compound::AtomIndex(13)) << " "
+        //    << c.getAtomName(SimTK::Compound::AtomIndex(14)) << " "
+        //    << std::endl;
+        std::cout << bDihedral(pos[4], pos[5], pos[7], pos[13]) << " ";
+        std::cout << bDihedral(pos[5], pos[7], pos[13], pos[14]) << std::endl;
 
 
     } // for i in MC steps

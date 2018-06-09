@@ -435,8 +435,8 @@ void Topology::setRegimen(std::string argRegimen, std::string flexFN){
             for (unsigned int j = 0 ; j < getNumBonds(); j++){
                 if( ((getBondAtomIndex(Compound::BondIndex(j), 0) == MolmodelFlexBonds[i].first) && (getBondAtomIndex(Compound::BondIndex(j), 1) == MolmodelFlexBonds[i].second)) || 
                     ((getBondAtomIndex(Compound::BondIndex(j), 1) == MolmodelFlexBonds[i].first) && (getBondAtomIndex(Compound::BondIndex(j), 0) == MolmodelFlexBonds[i].second)) ){
-                    setBondMobility(BondMobility::Torsion, Compound::BondIndex(j));
-                    std::cout << "Topology::setRegimen: Bond " << j << " set to torsion" << std::endl;
+                    setBondMobility(BondMobility::Free, Compound::BondIndex(j));
+                    std::cout << "Topology::setRegimen: Bond " << j << " set to free" << std::endl;
                     break;
                 }
             }
