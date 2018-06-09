@@ -368,11 +368,12 @@ void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
     if(_useFixmanTorque){
         ExtForce = new SimTK::Force::Custom(*forces, new GridForce(compoundSystem, *matter, fassno, this));
     }
-  
+    
+    //ELIZA
     #ifdef TRY_TO_USE_OPENMM
-        //forceField->setUseOpenMMAcceleration(true);
+        forceField->setUseOpenMMAcceleration(true);
     #endif
-    //forceField->setTracing(true); // log OpenMM info to console
+    forceField->setTracing(true); // log OpenMM info to console
     //forceField->setNumThreadsRequested(1); // don't use this unless
   
     compoundSystem->realizeTopology();
