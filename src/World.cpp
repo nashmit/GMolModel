@@ -369,7 +369,6 @@ void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
         ExtForce = new SimTK::Force::Custom(*forces, new GridForce(compoundSystem, *matter, fassno, this));
     }
     
-    //ELIZA
     #ifdef TRY_TO_USE_OPENMM
         forceField->setUseOpenMMAcceleration(true);
     #endif
