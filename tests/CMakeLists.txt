@@ -113,6 +113,7 @@ MESSAGE("Gmolmodel libs dir: ${CMAKE_CURRENT_LIST_DIR}/../build-debug/lib")
 set(TESTS_SRCS
 	      TestSimbodyBasic.cpp
 	      TestMolmodelBasic.cpp
+              TestMolmodelBuildCompound.cpp
         TestMassSqrtAndDet.cpp
         TestOpenMMBasic.cpp
         TestPrmCrdPeptide.cpp
