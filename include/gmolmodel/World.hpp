@@ -23,6 +23,8 @@
 
 #include "readAmberInput.hpp"
 
+#include "ParaMolecularDecorator.hpp"
+
 #include <boost/timer.hpp>
 
 //#include "/home/lspirido/Installers/armadillo-6.400.3/include/armadillo.hpp"
@@ -147,9 +149,18 @@ class World{
   SimTK::SimbodyMatterSubsystem *matter;
   SimTK::GeneralForceSubsystem *forces;
   SimTK::Force::Custom *ExtForce;
+
+  // Our decorations
+  //SimTK::DecorationGenerator *ourDecorationGenerator;
+  //SimTK::Array_< SimTK::DecorativeGeometry > ourDecorativeGeometries;
+  ParaMolecularDecorator *paraMolecularDecorator;
+  //
+
   SimTK::DecorationSubsystem *decorations;
-  SimTK::Visualizer::Reporter *vizReporter;
+  SimTK::Visualizer::Reporter *visualizerReporter;
   bool visual;
+
+
   SimTK::DuMMForceFieldSubsystem *forceField;
 
   std::vector<bMoleculeReader *> moleculeReaders;

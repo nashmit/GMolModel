@@ -123,6 +123,7 @@ set(LIBGMOLMODEL_SRC
 	      Topology.cpp
 	      bMoleculeReader.cpp
 	      World.cpp
+        ParaMolecularDecorator.cpp
         readAmberInput.cpp
 	      bgeneral.cpp
         SetupReader.cpp
