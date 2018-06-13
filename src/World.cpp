@@ -785,7 +785,7 @@ void World::Advance(int nosteps){
 // Destructor
 World::~World(){
     if(this->visual == true){
-        delete paraMolecularDecorator;
+        //delete paraMolecularDecorator;
 
         delete decorations;
         //delete vizReporter;
