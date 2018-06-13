@@ -237,6 +237,8 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
 
     moleculeCount = -1;
 
+    trackStep = 0;
+
     std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
@@ -370,7 +372,7 @@ void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
     }
     
     #ifdef TRY_TO_USE_OPENMM
-        forceField->setUseOpenMMAcceleration(true);
+        //forceField->setUseOpenMMAcceleration(true);
     #endif
     forceField->setTracing(true); // log OpenMM info to console
     //forceField->setNumThreadsRequested(1); // don't use this unless
@@ -468,6 +470,12 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             topologies[i]->matchDefaultTopLevelTransform(atomTargets);
             topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
+            // Checked if match is done correctly
+            this->trackStep += 1;
+            std::string FN(std::string("pdbs/ICmatch") + std::to_string(this->trackStep) + std::string("before.pdb"));
+            std::cout << "Writing file " << FN << std::endl;
+            topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
+
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();
             //SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
@@ -538,6 +546,12 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             topologies[i]->matchDefaultDihedralAngles(atomTargets, SimTK::Compound::DistortPlanarBonds);
             topologies[i]->matchDefaultTopLevelTransform(atomTargets);
             topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
+
+            // Checked if match is done correctly
+            this->trackStep += 1;
+            std::string FN(std::string("pdbs/RBmatch") + std::to_string(this->trackStep) + std::string("before.pdb"));
+            std::cout << "Writing file " << FN << std::endl;
+            topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
 
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();
@@ -642,6 +656,22 @@ P_X_M[int(mbx)] = G_X_T * T_X_BAt[int(mbx)];
 
     this->compoundSystem->realize(someState, SimTK::Stage::Position);
 
+    // Write a check file after updating someState and realizing Position
+    std::string prefix;
+    if(topologies[0]->getRegimen() == "IC"){
+        prefix = "pdbs/ICmatch";
+    }else{
+        prefix = "pdbs/RBmatch";
+    }
+    std::string FN2(prefix + std::to_string(this->trackStep) + std::string("after.pdb"));
+    std::cout << "Writing file " << FN2 << std::endl;
+    std::filebuf fb;
+    fb.open (FN2, std::ios::out);
+    std::ostream os(&fb);
+    ((SimTK::Compound *)topologies[0])->writePdb(someState, os);
+    fb.close();
+     //
+
     updateAtomLists(someState);
 
 
@@ -688,6 +718,7 @@ void World::Advance(int nosteps){
   std::cout<<"Advance start: integ->updAdvancedState: "<< advanced.getQ() <<std::endl;
 
   ts->stepTo(advanced.getTime() + nosteps*0.0015);
+
 
   std::cout<<"Advance stop: integ->updAdvancedState: "<< advanced.getQ() <<std::endl;
   

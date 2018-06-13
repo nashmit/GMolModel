@@ -90,6 +90,9 @@ public:
     move is accepted. It's a component of the total energy stored. **/
     void setLastAcceptedKE(SimTK::Real);
 
+    /** Returns the number of MC trials done by this integrator. **/
+    int getTrackStep(void);
+
 protected:
     SimTK::Real ke_lastAccepted; // last accepted kinetic energy
     SimTK::Real ke_proposed; // proposed kinetic energy

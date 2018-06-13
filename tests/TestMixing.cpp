@@ -135,6 +135,7 @@ int main(int argc, char **argv)
     // Write pdb
     if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
         (p_worlds[currentWorldIx])->updateAtomLists(advancedState);
+        std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
         for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
             ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
         }
@@ -147,19 +148,18 @@ int main(int argc, char **argv)
         currentWorldIx = worldIndexes.front();
 
         // Transfer coordinates from last world to current
-        //std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
-        //    << " at MC step " << mc_step << std::endl;
-        /// !!!! Temporary DON'T TRANSFER COORDINATES FOR NOW = ONLY USING ONE REGIMEN !!!!!
+        std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
+            << " at MC step " << mc_step << std::endl;
         SimTK::State& lastAdvancedState = (p_worlds[worldIndexes.back()])->integ->updAdvancedState();
         SimTK::State& currentAdvancedState = (p_worlds[currentWorldIx])->integ->updAdvancedState();
 
-//@@        currentAdvancedState = (p_worlds[currentWorldIx])->setAtomsLocationsInGround(
-//@@            currentAdvancedState, (p_worlds[worldIndexes.back()])->getAtomsLocationsInGround( lastAdvancedState ));
-//@@
-//@@        // Reinitialize current sampler
-//@@        p_samplers[currentWorldIx]->reinitialize( currentAdvancedState, 
-//@@            timesteps[currentWorldIx], total_mcsteps,
-//@@            SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
+        currentAdvancedState = (p_worlds[currentWorldIx])->setAtomsLocationsInGround(
+            currentAdvancedState, (p_worlds[worldIndexes.back()])->getAtomsLocationsInGround( lastAdvancedState ));
+
+        // Reinitialize current sampler
+        p_samplers[currentWorldIx]->reinitialize( currentAdvancedState, 
+            timesteps[currentWorldIx], total_mcsteps,
+            SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
 
         // Set residual energy for the rest of the samplers
         if(setupReader.getValues("REGIMENS")[worldIndexes.back()] == "IC"){
@@ -184,6 +184,7 @@ int main(int argc, char **argv)
             //if(!((mc_step+1) % 20)){
             if(1){
                 (p_worlds[currentWorldIx])->updateAtomLists(currentAdvancedState);
+                std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
                 for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
                     ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
                 }
@@ -191,6 +192,7 @@ int main(int argc, char **argv)
         }
 
         // Calculate geomtric features fast
+        /*
         SimTK::Compound c = (p_worlds[currentWorldIx])->getTopology(0);
         SimTK::Vec3 pos[c.getNumAtoms()];
         for (SimTK::Compound::AtomIndex aIx(0); aIx < c.getNumAtoms(); ++aIx){
@@ -210,6 +212,7 @@ int main(int argc, char **argv)
         //    << std::endl;
         std::cout << bDihedral(pos[4], pos[5], pos[7], pos[13]) << " ";
         std::cout << bDihedral(pos[5], pos[7], pos[13], pos[14]) << std::endl;
+        */
 
 
     } // for i in MC steps

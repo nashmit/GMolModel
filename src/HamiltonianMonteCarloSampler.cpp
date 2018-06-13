@@ -28,6 +28,11 @@ HamiltonianMonteCarloSampler::~HamiltonianMonteCarloSampler()
 {
 }
 
+/** Returns the number of MC trials done by this integrator. **/
+int HamiltonianMonteCarloSampler::getTrackStep(void){
+    return trackStep;
+}
+
 /** Calculate sqrt(M) using Eigen. For debug purposes. **/
 void HamiltonianMonteCarloSampler::calcNumSqrtMUpper(SimTK::State& someState, SimTK::Matrix& SqrtMUpper)
 {
@@ -316,6 +321,19 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 ////    PrintBigMat(someState.getU(), someState.getNU(), 3, "U");
     // END TODEL
 
+    // Write a check file
+    std::string prefix;
+    prefix = std::string("pdbs/HMC");
+    std::string FN;
+    FN = prefix + std::to_string(this->trackStep) + std::string("before.pdb");
+    std::cout << "Writing file " << FN << std::endl;
+    std::filebuf fb;
+    fb.open (FN, std::ios::out);
+    std::ostream os(&fb);
+    ((SimTK::Compound *)residue)->writePdb(someState, os);
+    fb.close();
+    //
+
     // Integrate (propagate trajectory)
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
 
@@ -327,6 +345,19 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 
     // Keep track of how many MC trials have been done 
     ++trackStep;
+
+    // Write a check file
+    //std::string prefix;
+    //prefix = std::string("pdbs/HMC");
+    //std::string FN;
+    FN = prefix + std::to_string(this->trackStep) + std::string("after.pdb");
+    std::cout << "Writing file " << FN << std::endl;
+    //std::filebuf fb;
+    fb.open (FN, std::ios::out);
+    std::ostream os2(&fb);
+    ((SimTK::Compound *)residue)->writePdb(someState, os2);
+    fb.close();
+    //
 
 }
 
@@ -378,9 +409,8 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         ;
 
     // Apply Metropolis criterion
-////    if(1){ // Always accept // TODO
-    //assert(!isnan(pe_n));
-    if ( (!isnan(pe_n)) && ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
+    if(1){ // Always accept // TODO
+//@@    if ( (!isnan(pe_n)) && ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
 //p        std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
@@ -397,6 +427,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
 //p    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman()
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
 //p        << std:: endl;
+
 
     // Configuration
     //std::cout << "HMC conf: ";
