@@ -151,12 +151,11 @@ class World{
   SimTK::Force::Custom *ExtForce;
 
   // Our decorations
-  //SimTK::DecorationGenerator *ourDecorationGenerator;
-  //SimTK::Array_< SimTK::DecorativeGeometry > ourDecorativeGeometries;
   ParaMolecularDecorator *paraMolecularDecorator;
   //
 
   SimTK::DecorationSubsystem *decorations;
+  SimTK::Visualizer *visualizer;
   SimTK::Visualizer::Reporter *visualizerReporter;
   bool visual;
 

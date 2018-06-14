@@ -226,18 +226,9 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
     if(visual){
 
         decorations = new SimTK::DecorationSubsystem(*compoundSystem);
-        SimTK::Visualizer visualizer(*compoundSystem);
+        visualizer = new SimTK::Visualizer(*compoundSystem);
 
-        // Also generate our decorations
-        paraMolecularDecorator = new ParaMolecularDecorator;
-        visualizer.addDecorationGenerator(paraMolecularDecorator);
-        //ourDecorationGenerator = new SimTK::DecorationGenerator();
-        //decorations->addDecorationGenerator(SimTK::Stage::Topology, ourDecorationGenerator);
-        //
-
-
-
-        visualizerReporter = new SimTK::Visualizer::Reporter(visualizer, visualizerFrequency);
+        visualizerReporter = new SimTK::Visualizer::Reporter(*visualizer, visualizerFrequency);
         compoundSystem->addEventReporter( visualizerReporter );
     }
   
@@ -292,15 +283,18 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
             << std::endl << std::flush;
     }
   
-    // Our decorations
-    //if(visual){
-    //    for(int i = 0; i < (topologies.back())->natms; i++){
-    //        ourDecorativeGeometries.push_back(SimTK::DecorativeSphere(0.1));
-    //    }
-    //    for(int i = 0; i < (topologies.back())->nbnds; i++){
-    //        ourDecorativeGeometries.push_back(SimTK::DecorativeLine());
-    //    }
-    //}
+    // Also generate our decorations
+    if(visual){
+        paraMolecularDecorator = new ParaMolecularDecorator(
+            compoundSystem,
+            matter,
+            topologies[0],
+            forceField,
+            forces
+        );
+        visualizer->addDecorationGenerator(paraMolecularDecorator);
+    }
+    //
 
     std::cout << "World::AddMolecule END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
@@ -732,6 +726,48 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
     updateAtomLists(someState);
 
+    // Draw our decorations
+        /*
+    if(this->visual){
+        paraMolecularDecorator->clearPoints();
+        paraMolecularDecorator->clearLines();
+
+        // Draw Compound based geometry
+        //for(SimTK::Compound::AtomIndex aIx(1); aIx < topologies[0]->getNumAtoms(); ++aIx){
+        //    paraMolecularDecorator->loadPoint(topologies[0]->calcAtomLocationInGroundFrame(someState, aIx));
+        //}
+        for(SimTK::Compound::BondIndex bondIx(0); bondIx < topologies[0]->getNumBonds(); ++bondIx){
+            SimTK::Compound::AtomIndex p1AIx = topologies[0]->getBondAtomIndex(bondIx, 0);
+            SimTK::Compound::AtomIndex p2AIx = topologies[0]->getBondAtomIndex(bondIx, 1);
+
+            SimTK::Vec3 p1 = topologies[0]->calcAtomLocationInGroundFrame(someState, p1AIx);
+            SimTK::Vec3 p2 = topologies[0]->calcAtomLocationInGroundFrame(someState, p2AIx);
+            paraMolecularDecorator->loadLine(p1, p2);
+        }
+
+        // Draw DuMM based geometry
+        for (SimTK::DuMM::BondIndex bIx(0); bIx < forceField->getNumBonds(); ++bIx) {
+            const SimTK::DuMM::AtomIndex aIx1 = forceField->getBondAtom(bIx, 0);
+            const SimTK::DuMM::AtomIndex aIx2 = forceField->getBondAtom(bIx, 1);
+            const SimTK::MobilizedBodyIndex mbx1 = forceField->getAtomBody(aIx1);
+            const SimTK::MobilizedBodyIndex mbx2 = forceField->getAtomBody(aIx2);
+            const SimTK::MobilizedBody mobod1 = matter->getMobilizedBody(mbx1);
+            const SimTK::MobilizedBody mobod2 = matter->getMobilizedBody(mbx2);
+
+            SimTK::Transform X_GB1 = mobod1.getBodyTransform(someState);
+            SimTK::Transform X_GB2 = mobod2.getBodyTransform(someState);
+
+            SimTK::Vec3 p_BS1 = forceField->getAtomStationOnBody(aIx1);
+            SimTK::Vec3 p_GS1 = X_GB1 * p_BS1;
+
+            SimTK::Vec3 p_BS2 = forceField->getAtomStationOnBody(aIx2);
+            SimTK::Vec3 p_GS2 = X_GB2 * p_BS2;
+            paraMolecularDecorator->loadLine(p_GS1, p_GS2);
+        }
+    }
+    //
+        */
+
 
     // Configuration
     //std::cout << "assigned conf: ";
@@ -788,6 +824,7 @@ World::~World(){
         //delete paraMolecularDecorator;
 
         delete decorations;
+        delete visualizer;
         //delete vizReporter;
     }
     delete fassno;

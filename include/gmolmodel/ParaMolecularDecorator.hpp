@@ -13,7 +13,11 @@ using namespace SimTK;
 
 class ParaMolecularDecorator : public DecorationGenerator {
 public:
-    ParaMolecularDecorator(void);
+    ParaMolecularDecorator(SimTK::CompoundSystem *argCompoundSystem,
+        SimTK::SimbodyMatterSubsystem *argMatter,
+        SimTK::Compound *argResidue,
+        SimTK::DuMMForceFieldSubsystem *argDumm,
+        SimTK::GeneralForceSubsystem *argForces);
 
     void loadPoint(const Vec3 point);
 
@@ -29,6 +33,12 @@ public:
     ~ParaMolecularDecorator(void);
 
 private:
+    SimTK::CompoundSystem *compoundSystem;
+    SimTK::SimbodyMatterSubsystem *matter;
+    SimTK::Compound *residue;
+    SimTK::DuMMForceFieldSubsystem *dumm;
+    SimTK::GeneralForceSubsystem *forces; 
+
     Array_< Vec3 >  points;
     Array_< std::pair< Vec3, Vec3 > > lines;
 };
