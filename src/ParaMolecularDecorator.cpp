@@ -73,7 +73,11 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
         geometry.push_back(DecorativeLine( p_GS1, p_GS2 ));
         (geometry.back()).setLineThickness(4);
-        (geometry.back()).setColor( Vec3(255, 0, 255) );
+        if( mbx1 == mbx2 ){
+            (geometry.back()).setColor( Vec3(0.5, 0.5, 0.5) );
+        }else{
+            (geometry.back()).setColor( Vec3(255, 0, 255) );
+        }
     }
 
     for (DuMM::AtomIndex daIx(0); daIx < dumm->getNumAtoms(); ++daIx) {
