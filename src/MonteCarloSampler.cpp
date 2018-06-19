@@ -21,6 +21,8 @@ MonteCarloSampler::MonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
     TRACE("NEW ALLOC\n");
     SetTVector = new SimTK::Transform[matter->getNumBodies()];
     this->residualEmbeddedPotential = 0.0;
+    this->alwaysAccept = false;
+    acceptedSteps = 0;
 }
 
 // Destructor
@@ -35,6 +37,19 @@ bool MonteCarloSampler::isUsingFixman(void)
 {
     return useFixman;
 }
+
+// Is the sampler always accepting the proposed moves
+bool MonteCarloSampler::getAlwaysAccept(void)
+{
+    return alwaysAccept;
+}
+
+// Is the sampler always accepting the proposed moves
+void MonteCarloSampler::setAlwaysAccept(bool argAlwaysAccept)
+{
+    alwaysAccept = argAlwaysAccept;
+}
+
 
 // Compute Fixman potential
 SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
@@ -335,6 +350,7 @@ void MonteCarloSampler::update(SimTK::State& someState){
     if ((pe_n < pe_o) or (rand_no < exp(-(pe_n - pe_o)/RT))){ // Accept
         setTVector(someState);
         setOldPE(pe_n);
+        ++acceptedSteps;
     }else{ // Reject
         assignConfFromTVector(someState);
     }
@@ -366,7 +382,11 @@ void MonteCarloSampler::sendConfToEvaluator(void){
     assert(!"Not implemented");
 }
 
-
+// Get the number of accpted conformations
+int MonteCarloSampler::getAcceptedSteps(void)
+{
+    return acceptedSteps;
+}
 
 
 

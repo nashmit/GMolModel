@@ -183,7 +183,7 @@ class World{
   int ownWorldIndex;
 
   int *fassno;
-  int trackStep;
+  int sampleNumber;
   SimTK::Transform *TVector;
   int **mbxTreeMat;    // tree representing the bonding
   SimTK::Real *branchMassVec; // branch masses self body included

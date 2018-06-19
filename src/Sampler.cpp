@@ -84,6 +84,12 @@ SimTK::Real Sampler::calcMassDeterminant(const SimTK::State& state)
     return D0;
 }
 
+/** Returns the number of MC trials done by this integrator. **/
+int Sampler::getSampleNumber(void){
+    return sampleNumber;
+}
+
+
 // Update - to be implemented by every specific sampler
 
 void Sampler::update(SimTK::State& somState){}

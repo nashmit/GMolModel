@@ -237,9 +237,6 @@ void GirolamiSampler::propose(SimTK::State& someState, SimTK::Real timestep, int
 ////    PrintBigMat(someState.getU(), someState.getNU(), 3, "U");
     // END TODEL
 
-    // Keep track of how many MC trials have been done 
-    ++trackStep;
-
 }
 
 /** Main function that contains all the 3 steps of HMC.
@@ -310,6 +307,9 @@ void GirolamiSampler::update(SimTK::State& someState, SimTK::Real timestep, int 
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
         << std:: endl;
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
+
+    // Keep track of how many MC trials have been done 
+    ++sampleNumber;
 
 
 }

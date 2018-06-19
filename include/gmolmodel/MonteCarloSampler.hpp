@@ -84,10 +84,19 @@ public:
 
     // Send configuration to an external evaluator
     void sendConfToEvaluator(void);
+    
+    // Is the sampler always accepting the proposed moves
+    bool getAlwaysAccept(void);
+
+    // Is the sampler always accepting the proposed moves
+    void setAlwaysAccept(bool);
 
     // Performs the acception-rejection step and sets the state of the compound
     // to the appropriate conformation
     void update(SimTK::State&);
+
+    // Get the number of accpted conformations
+    int getAcceptedSteps(void);
 
 protected:
     SimTK::Transform *SetTVector; // Transform matrices
@@ -96,9 +105,12 @@ protected:
     SimTK::Real temperature;
     SimTK::Real RT;
 
-    bool useFixman;    
+    bool useFixman;
+    bool alwaysAccept;
     SimTK::Real fix_set, fix_o, fix_n;
     SimTK::Real residualEmbeddedPotential; // inside rigid bodies if weren't rigid
+
+    int acceptedSteps;
  
     // Random number generators - not sure if I need two
     // Needs testing

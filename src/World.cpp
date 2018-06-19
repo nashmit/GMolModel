@@ -210,7 +210,7 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
 
     moleculeCount = -1;
 
-    trackStep = 0;
+    sampleNumber = 0;
 
     std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
@@ -459,8 +459,8 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
             // Checked if match is done correctly
             /*
-            this->trackStep += 1;
-            std::string FN(std::string("pdbs/ICmatch") + std::to_string(this->trackStep) + std::string("before.pdb"));
+            this->sampleNumber += 1;
+            std::string FN(std::string("pdbs/ICmatch") + std::to_string(this->sampleNumber) + std::string("before.pdb"));
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
             */
@@ -515,8 +515,8 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
             // Checked if match is done correctlya
             /*
-            this->trackStep += 1;
-            std::string FN(std::string("pdbs/RBmatch") + std::to_string(this->trackStep) + std::string("before.pdb"));
+            this->sampleNumber += 1;
+            std::string FN(std::string("pdbs/RBmatch") + std::to_string(this->sampleNumber) + std::string("before.pdb"));
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
             */
@@ -597,8 +597,8 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
             // Checked if match is done correctly
             /*
-            this->trackStep += 1;
-            std::string FN(std::string("pdbs/TDmatch") + std::to_string(this->trackStep) + std::string("before.pdb"));
+            this->sampleNumber += 1;
+            std::string FN(std::string("pdbs/TDmatch") + std::to_string(this->sampleNumber) + std::string("before.pdb"));
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
             */
@@ -694,7 +694,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
     /*
     std::string prefix;
     prefix = std::string("pdbs/") + std::string(topologies[0]->getRegimen()) + std::string("match") ;
-    std::string FN2(prefix + std::to_string(this->trackStep) + std::string("after.pdb"));
+    std::string FN2(prefix + std::to_string(this->sampleNumber) + std::string("after.pdb"));
     std::cout << "Writing file " << FN2 << std::endl;
     std::filebuf fb;
     fb.open (FN2, std::ios::out);

@@ -14,7 +14,7 @@ TestHMCSOA::TestHMCSOA(SimTK::CompoundSystem *argCompoundSystem,
     this->useFixman = true;  
     this->fix_n = this->fix_o = 0.0;
     this->residualEmbeddedPotential = 0.0;
-    trackStep = 0;
+    sampleNumber = 0;
 
     //TO BE DELETED
     prevM = SimTK::Matrix(matter->getNumMobilities(), matter->getNumMobilities());
@@ -409,8 +409,7 @@ void TestHMCSOA::propose(SimTK::State& someState, SimTK::Real timestep, int nost
  
     //PrintSimbodyStateCache(someState);
     //std::cout << "After  stepTo time: " << someState.getTime() << std::endl;
-    //writePdb(*residue, someState, "pdbs", "sb_", 8, "HMCprop", trackStep);
-    ++trackStep;
+    //writePdb(*residue, someState, "pdbs", "sb_", 8, "HMCprop", sampleNumber);
 
     //std::cout << "After  stepTo Q: " << someState.getQ() << std::endl;
     //std::cout << "After  stepTo U: " << someState.getU() << std::endl;
@@ -524,6 +523,9 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
         << " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
         << std:: endl;
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
+
+    ++sampleNumber;
+
 
     // SOA
     /////////////////////////////////////////////

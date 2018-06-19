@@ -34,6 +34,9 @@ public:
     // Update
     virtual void update(SimTK::State&);
 
+    /** Returns the number of MC trials done by this integrator. **/
+    int getSampleNumber(void);
+
     void PrintSimbodyStateCache(SimTK::State& someState);
 
     //////////////////////////////////
@@ -61,6 +64,8 @@ public:
     SimTK::DuMMForceFieldSubsystem *dumm;
     SimTK::GeneralForceSubsystem *forces;
     SimTK::TimeStepper *timeStepper;
+
+    int sampleNumber;
   
     // Harmonic oscillator constants
     static const int HO_D = 20; // Dimensionality

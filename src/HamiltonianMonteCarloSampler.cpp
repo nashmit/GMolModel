@@ -19,18 +19,14 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
     this->useFixman = true;  
     this->fix_n = this->fix_o = 0.0;
     this->residualEmbeddedPotential = 0.0;
-    trackStep = 0;
+    sampleNumber = 0;
+    this->alwaysAccept = false;
 
 }
 
 /** Destructor **/
 HamiltonianMonteCarloSampler::~HamiltonianMonteCarloSampler()
 {
-}
-
-/** Returns the number of MC trials done by this integrator. **/
-int HamiltonianMonteCarloSampler::getTrackStep(void){
-    return trackStep;
 }
 
 /** Calculate sqrt(M) using Eigen. For debug purposes. **/
@@ -326,7 +322,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     std::string prefix;
     prefix = std::string("pdbs/HMC");
     std::string FN;
-    FN = prefix + std::to_string(this->trackStep) + std::string("before.pdb");
+    FN = prefix + std::to_string(this->sampleNumber) + std::string("before.pdb");
     std::cout << "Writing file " << FN << std::endl;
     std::filebuf fb;
     fb.open (FN, std::ios::out);
@@ -345,23 +341,6 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 ////    PrintBigMat(someState.getU(), someState.getNU(), 3, "U");
     // END TODEL
 
-    // Keep track of how many MC trials have been done 
-    ++trackStep;
-
-    // Write a check file
-    /*
-    //std::string prefix;
-    //prefix = std::string("pdbs/HMC");
-    //std::string FN;
-    FN = prefix + std::to_string(this->trackStep) + std::string("after.pdb");
-    std::cout << "Writing file " << FN << std::endl;
-    //std::filebuf fb;
-    fb.open (FN, std::ios::out);
-    std::ostream os2(&fb);
-    ((SimTK::Compound *)residue)->writePdb(someState, os2);
-    fb.close();
-    //
-    */
 
 }
 
@@ -413,16 +392,25 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         ;
 
     // Apply Metropolis criterion
-//    if(1){ // Always accept // TODO
-    if ( (!isnan(pe_n)) && ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
+    if ( getAlwaysAccept() ){ // MD with Andersen thermostat
         std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
         setSetPE(pe_n);
         setSetFixman(fix_n);
         setLastAcceptedKE(ke_n);
-        //this->etot_set = getSetPE() + getSetFixman() + getLastAcceptedKE(); // TODO:seems wrong
         this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
+    }
+    else if( (!isnan(pe_n)) && 
+    ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
+        std::cout << " acc 1 " ;
+        setSetTVector(someState);
+        //sendConfToEvaluator(); // OPENMM
+        setSetPE(pe_n);
+        setSetFixman(fix_n);
+        setLastAcceptedKE(ke_n);
+        this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
+        ++acceptedSteps;
     }else{ // Reject
         std::cout << " acc 0 " ;
         assignConfFromSetTVector(someState);
@@ -432,6 +420,23 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
         << std:: endl;
 
+    // Keep track of how many MC trials have been done 
+    ++sampleNumber;
+
+    // Write a check file
+    /*
+    //std::string prefix;
+    //prefix = std::string("pdbs/HMC");
+    //std::string FN;
+    FN = prefix + std::to_string(this->sampleNumber) + std::string("after.pdb");
+    std::cout << "Writing file " << FN << std::endl;
+    //std::filebuf fb;
+    fb.open (FN, std::ios::out);
+    std::ostream os2(&fb);
+    ((SimTK::Compound *)residue)->writePdb(someState, os2);
+    fb.close();
+    //
+    */
 
     // Configuration
     //std::cout << "HMC conf: ";

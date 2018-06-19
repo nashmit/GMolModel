@@ -75,6 +75,17 @@ int main(int argc, char **argv)
         if(setupReader.getValues("REGIMENS")[worldIx] == "IC"){
             useFixmanPotential = false;
         }
+
+        // MD
+        if(setupReader.getValues("THERMOSTAT")[worldIx] == "Andersen"){
+            useFixmanPotential = false;
+            (p_samplers[worldIx])->setAlwaysAccept(true);
+        }else if(setupReader.getValues("THERMOSTAT")[worldIx] == "None"){
+            ;
+        }else{
+            std::cerr << "Unknown thermostat." << std::endl;
+        }
+
         (p_samplers[worldIx])->initialize( (p_worlds[worldIx])->integ->updAdvancedState(), 
              std::stod(setupReader.getValues("TIMESTEPS")[worldIx]),
              std::stoi(setupReader.getValues("STEPS")[0]),

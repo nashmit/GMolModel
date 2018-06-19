@@ -91,14 +91,14 @@ public:
     void setLastAcceptedKE(SimTK::Real);
 
     /** Returns the number of MC trials done by this integrator. **/
-    int getTrackStep(void);
+    //int getSampleNumber(void);
 
 protected:
     SimTK::Real ke_lastAccepted; // last accepted kinetic energy
     SimTK::Real ke_proposed; // proposed kinetic energy
     SimTK::Real etot_set; // stored total energy
     SimTK::Real etot_proposed; // last accepted total energ (same with stored)
-    int trackStep; // counter for the number of MC trials 
+    int sampleNumber; // counter for the number of MC trials 
 
 };
 
