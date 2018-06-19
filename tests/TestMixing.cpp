@@ -1,6 +1,5 @@
 /** @file
- * This file contains a native Gmolmodel test. A 2-butanol molecule
- * is simulated.
+ * This file contains a native Gmolmodel test. 
  */
 
 #include <string>
@@ -167,7 +166,7 @@ int main(int argc, char **argv)
                 int restIx = worldIndexes[i];
                 int backIx = worldIndexes.back();
                 SimTK::Real diffPE = (p_samplers[backIx])->getSetPE() - (p_samplers[restIx])->getSetPE();
-                //std::cout << "Setting sampler " << restIx << " REP to " << (p_samplers[backIx])->getSetPE() << " - " << (p_samplers[restIx])->getSetPE() << " = " << diffPE << std::endl;
+                std::cout << "Setting sampler " << restIx << " REP to " << (p_samplers[backIx])->getSetPE() << " - " << (p_samplers[restIx])->getSetPE() << " = " << diffPE << std::endl;
                 (p_samplers[restIx])->setREP( diffPE );
             }
         }

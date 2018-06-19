@@ -118,11 +118,12 @@ set(LIBGMOLMODEL_SRC
         MonteCarloSampler.cpp # LAUR
         HamiltonianMonteCarloSampler.cpp # LAUR
         GirolamiSampler.cpp # LAUR
-        HMCSOA.cpp
+        HMCSOA.cpp # LAUR
 	      bAddParams.cpp
 	      Topology.cpp
 	      bMoleculeReader.cpp
 	      World.cpp
+              FixmanTorque.cpp
         ParaMolecularDecorator.cpp
         readAmberInput.cpp
 	      bgeneral.cpp

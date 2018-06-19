@@ -24,6 +24,7 @@
 #include "readAmberInput.hpp"
 
 #include "ParaMolecularDecorator.hpp"
+#include "FixmanTorque.hpp"
 
 #include <boost/timer.hpp>
 
@@ -108,20 +109,21 @@ void writePdb(SimTK::PdbStructure pdb, const char *FN);
 class World;
 
 //==============================================================================
-//                           CLASS GridForce
+//                           CLASS FixmanTorque
 //==============================================================================
 /**
  * External Custom Forces Class. It sends the cartesian coordinates calculated
  * by Compound and applies the forces passed by MMTK through PyArrayObjects 
  **/
-class GridForce : public SimTK::Force::Custom::Implementation {
+/*
+class FixmanTorque : public SimTK::Force::Custom::Implementation {
  public:
   SimTK::CompoundSystem *compoundSystem;
   int *fassno;
   int *flag;
   World *Caller;
 
-  GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
+  FixmanTorque(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
             , int *fassno
             , World *Caller
             );
@@ -136,6 +138,7 @@ class GridForce : public SimTK::Force::Custom::Implementation {
  private:
   SimTK::SimbodyMatterSubsystem& matter;
 };
+*/
 
 //==============================================================================
 //                           CLASS World

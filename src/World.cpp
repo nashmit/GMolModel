@@ -116,10 +116,11 @@ void shmDump(TARGET_TYPE *shm, unsigned int natms)
   assert(!"Not implemented");
 }
 
+/*
 ////////////////////////////
 ////// GRID FORCE //////////
 ////////////////////////////
-GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
+FixmanTorque::FixmanTorque(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
                      , int *fassno
                      , World *Caller
                     ) : matter(matter){
@@ -128,37 +129,7 @@ GridForce::GridForce(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatter
   this->Caller = Caller;
 }
 
-//void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
-//  SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const {
-//
-//  #ifdef DEBUG_TIME
-//  boost::timer GridForce_timer;
-//  printf("GridForce: calcForce START\n");
-//  #endif
-//
-//  const SimTK::Compound& c = compoundSystem->getCompound(SimTK::CompoundSystem::CompoundIndex(0));
-//
-//  if((*fassno>0)){ // Get forces from MMTK
-//
-//    // Apply external forces
-//    for(int a=0; a<c.getNumAtoms(); a++){
-//      SimTK::Compound::AtomIndex aIx = ( (Caller->getTopology(0)).bAtomList )[a].atomIndex;
-//      const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(c.getAtomMobilizedBodyIndex(aIx));
-//      SimTK::Vec3 v_check(0.0, 0.0, 0.0);
-//      mobod.applyForceToBodyPoint(state, c.getAtomLocationInMobilizedBodyFrame(aIx), v_check, bodyForces);
-//    }
-//
-//  }
-//
-//  (*fassno)++;
-//  #ifdef DEBUG_TIME
-//  printf("GridForce: calcForce time %.8lf\n", GridForce_timer.elapsed());
-//  #endif
-//
-//}
-
-
-void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
+void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
                            SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const
 {
     // Compute Fixman torque
@@ -167,7 +138,7 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
     SimTK::Vector V4(nu);
     SimTK::Real* D0 = new SimTK::Real(1.0);
     matter.calcFixmanTorque(state, V3, V4, D0);
-    //std::cout << "GridForce Fixman torque " ;
+    //std::cout << "FixmanTorque Fixman torque " ;
     //for(int i = 0; i < nu; i++){
     //    std::cout << std::setprecision(10) << V4[i] << " ";
     //}
@@ -195,18 +166,18 @@ void GridForce::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Spati
 }
 
 // This should be carefully analyzed. Intended to be taken from somewhere else.
-SimTK::Real GridForce::calcPotentialEnergy(const SimTK::State& state) const {
+SimTK::Real FixmanTorque::calcPotentialEnergy(const SimTK::State& state) const {
   SimTK::Real energy = 0.0;
   return energy;
 }
 
-bool GridForce::dependsOnlyOnPositions() const {
+bool FixmanTorque::dependsOnlyOnPositions() const {
   return true;
 }
 ////////////////////////////
 ////// END GRID FORCE //////
 ////////////////////////////
-
+*/
 
 ////////////////////////////
 ////// SYMBODY SYSTEM //////
@@ -383,13 +354,14 @@ void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
   
     *fassno = 0;
     if(_useFixmanTorque){
-        ExtForce = new SimTK::Force::Custom(*forces, new GridForce(compoundSystem, *matter, fassno, this));
+        //ExtForce = new SimTK::Force::Custom(*forces, new FixmanTorque(compoundSystem, *matter, fassno, this));
+        ExtForce = new SimTK::Force::Custom(*forces, new FixmanTorque(compoundSystem, *matter, fassno));
     }
     
     #ifdef TRY_TO_USE_OPENMM
         //forceField->setUseOpenMMAcceleration(true);
     #endif
-    forceField->setTracing(true); // log OpenMM info to console
+    //forceField->setTracing(true); // log OpenMM info to console
     //forceField->setNumThreadsRequested(1); // don't use this unless
   
     compoundSystem->realizeTopology();
@@ -486,10 +458,12 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
             // Checked if match is done correctly
+            /*
             this->trackStep += 1;
             std::string FN(std::string("pdbs/ICmatch") + std::to_string(this->trackStep) + std::string("before.pdb"));
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
+            */
 
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();
@@ -539,11 +513,13 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             topologies[i]->matchDefaultTopLevelTransform(atomTargets);
             topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
-            // Checked if match is done correctly
+            // Checked if match is done correctlya
+            /*
             this->trackStep += 1;
             std::string FN(std::string("pdbs/RBmatch") + std::to_string(this->trackStep) + std::string("before.pdb"));
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
+            */
 
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();
@@ -561,8 +537,8 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
                     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
                     const SimTK::MobilizedBody& parentMobod =  mobod.getParentMobilizedBody();
                     SimTK::MobilizedBodyIndex parentMbx = parentMobod.getMobilizedBodyIndex();
-                    std::cout << "RB origin atom " << aIx << " mobod (" << mbx  
-                        << " parent mobod  ("<< parentMbx << ")" << std::endl;
+                    //std::cout << "RB origin atom " << aIx << " mobod (" << mbx  
+                    //    << " parent mobod  ("<< parentMbx << ")" << std::endl;
                     T_X_atom[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
                     P_X_M[int(mbx)] = G_X_T * T_X_atom[int(mbx)];
                 }
@@ -620,10 +596,12 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
             // Checked if match is done correctly
+            /*
             this->trackStep += 1;
             std::string FN(std::string("pdbs/TDmatch") + std::to_string(this->trackStep) + std::string("before.pdb"));
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
+            */
 
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();
@@ -713,6 +691,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
     this->compoundSystem->realize(someState, SimTK::Stage::Position);
 
     // Write a check file after updating someState and realizing Position
+    /*
     std::string prefix;
     prefix = std::string("pdbs/") + std::string(topologies[0]->getRegimen()) + std::string("match") ;
     std::string FN2(prefix + std::to_string(this->trackStep) + std::string("after.pdb"));
@@ -723,6 +702,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
     ((SimTK::Compound *)topologies[0])->writePdb(someState, os);
     fb.close();
      //
+     */
 
     updateAtomLists(someState);
 

@@ -322,6 +322,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     // END TODEL
 
     // Write a check file
+    /*
     std::string prefix;
     prefix = std::string("pdbs/HMC");
     std::string FN;
@@ -333,6 +334,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     ((SimTK::Compound *)residue)->writePdb(someState, os);
     fb.close();
     //
+    */
 
     // Integrate (propagate trajectory)
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
@@ -347,6 +349,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     ++trackStep;
 
     // Write a check file
+    /*
     //std::string prefix;
     //prefix = std::string("pdbs/HMC");
     //std::string FN;
@@ -358,6 +361,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     ((SimTK::Compound *)residue)->writePdb(someState, os2);
     fb.close();
     //
+    */
 
 }
 
@@ -402,16 +406,16 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
 
 
     std::cout<<std::setprecision(5)<<std::fixed;
-//p    std::cout << "pe_o " << pe_o << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP()
-//p        << " pe_n " << pe_n  << " ke_n " << ke_n << " fix_n " << fix_n
+    std::cout << "pe_o " << pe_o << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP()
+       << " pe_n " << pe_n  << " ke_n " << ke_n << " fix_n " << fix_n
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
         //<< " etot_n " << etot_n  + getREP() << " etot_proposed " << etot_proposed + getREP()
         ;
 
     // Apply Metropolis criterion
-    if(1){ // Always accept // TODO
-//@@    if ( (!isnan(pe_n)) && ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
-//p        std::cout << " acc 1 " ;
+//    if(1){ // Always accept // TODO
+    if ( (!isnan(pe_n)) && ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
+        std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
         setSetPE(pe_n);
@@ -420,13 +424,13 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         //this->etot_set = getSetPE() + getSetFixman() + getLastAcceptedKE(); // TODO:seems wrong
         this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
     }else{ // Reject
-//p        std::cout << " acc 0 " ;
+        std::cout << " acc 0 " ;
         assignConfFromSetTVector(someState);
     }
 
-//p    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman()
+    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman()
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
-//p        << std:: endl;
+        << std:: endl;
 
 
     // Configuration
