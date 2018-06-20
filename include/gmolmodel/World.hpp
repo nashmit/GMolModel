@@ -1,5 +1,11 @@
-#ifndef BSYSTEM_H_
-#define BSYSTEM_H_
+#ifndef WORLD_H_
+#define WORLD_H_
+
+/* -------------------------------------------------------------------------- *
+ *                               Robosampling                                 *
+ * -------------------------------------------------------------------------- *
+ * This is part of Robosampling                                               *
+ */
 
 #include <iostream>
 #include <iomanip>
@@ -30,59 +36,9 @@
 
 //#include "/home/lspirido/Installers/armadillo-6.400.3/include/armadillo.hpp"
 
-#ifndef TRY_SOFT_LJ
-#define TRY_SOFT_LJ
-#endif
-
-/*
-*/
-#ifndef DEBUG_LEVEL01
-#define DEBUG_LEVEL01
-#endif
-#ifndef DEBUG_LEVEL02
-#define DEBUG_LEVEL02
-#endif
-#ifndef DEBUG_WRITEDATA
-#define DEBUG_WRITEDATA
-#endif
-
-/*
-#ifndef DEBUG_WRITEALLPDBS
-#define DEBUG_WRITEALLPDBS
-#endif
-*/
-
-/*
-#ifndef DEBUG_WRITEPDBS
-#define DEBUG_WRITEPDBS
-#endif
-#ifndef DEBUG_WRITEPFPDB
-#define DEBUG_WRITEPFPDB
-#endif
-*/
-
-#ifndef DEBUG_CONF
-#define DEBUG_CONF
-#endif
-
-/*
-#ifndef DEBUG_SPECIFIC
-#define DEBUG_SPECIFIC
-#endif
-#ifndef DEBUG_ENERGY
-#define DEBUG_ENERGY
-#endif
-*/
-/*
-#ifndef DEBUG_TIME
-#define DEBUG_TIME
-#endif
-*/
-
 #ifndef TRY_TO_USE_OPENMM
 #define TRY_TO_USE_OPENMM
 #endif
-
 
 #include "bMoleculeReader.hpp"
 #include "bAddParams.hpp"
@@ -105,40 +61,6 @@ void writePdb(      SimTK::Compound& c, SimTK::State& advanced,
          const char *dirname, const char *prefix, int midlength, const char *sufix, double aTime);
 
 void writePdb(SimTK::PdbStructure pdb, const char *FN);
-
-class World;
-
-//==============================================================================
-//                           CLASS FixmanTorque
-//==============================================================================
-/**
- * External Custom Forces Class. It sends the cartesian coordinates calculated
- * by Compound and applies the forces passed by MMTK through PyArrayObjects 
- **/
-/*
-class FixmanTorque : public SimTK::Force::Custom::Implementation {
- public:
-  SimTK::CompoundSystem *compoundSystem;
-  int *fassno;
-  int *flag;
-  World *Caller;
-
-  FixmanTorque(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
-            , int *fassno
-            , World *Caller
-            );
-
-  void calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
-    SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const;
-
-  SimTK::Real calcPotentialEnergy(const SimTK::State& state) const;
-
-  bool dependsOnlyOnPositions() const;
-
- private:
-  SimTK::SimbodyMatterSubsystem& matter;
-};
-*/
 
 //==============================================================================
 //                           CLASS World
@@ -182,7 +104,6 @@ class World{
   int moleculeCount;
   int ownWorldIndex;
 
-  int *fassno;
   int sampleNumber;
   SimTK::Transform *TVector;
   int **mbxTreeMat;    // tree representing the bonding
@@ -215,4 +136,4 @@ class World{
   ~World(); // destructor
 };
 
-#endif /*BSYSTEM_H_*/
+#endif /*WORLD_H_*/

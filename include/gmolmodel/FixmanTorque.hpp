@@ -16,13 +16,9 @@
 class FixmanTorque : public SimTK::Force::Custom::Implementation {
  public:
   SimTK::CompoundSystem *compoundSystem;
-  int *fassno;
   int *flag;
-  //World *Caller;
 
   FixmanTorque(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
-            , int *fassno
-            //, World *Caller
             );
 
   void calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,

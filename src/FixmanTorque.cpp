@@ -6,12 +6,8 @@
 ////// GRID FORCE //////////
 ////////////////////////////
 FixmanTorque::FixmanTorque(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
-                     , int *fassno
-                     //, World *Caller
                     ) : matter(matter){
   this->compoundSystem = compoundSystem;
-  this->fassno = fassno;
-  //this->Caller = Caller;
 }
 
 void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
