@@ -293,7 +293,7 @@ void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
     }
     
     #ifdef TRY_TO_USE_OPENMM
-        forceField->setUseOpenMMAcceleration(true);
+        //forceField->setUseOpenMMAcceleration(true);
     #endif
     //forceField->setTracing(true); // log OpenMM info to console
     //forceField->setNumThreadsRequested(1); // don't use this unless
