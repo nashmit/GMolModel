@@ -253,15 +253,15 @@ void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
     //ts->initialize(compoundSystem->getDefaultState());
  
     // Amber like scale factors. These should be used during simulations.
-    forceField->setVdw12ScaleFactor(0.0);
-    forceField->setVdw13ScaleFactor(0.0);
-    forceField->setVdw14ScaleFactor(0.5);
-    forceField->setVdw15ScaleFactor(1.0);
-    forceField->setCoulomb12ScaleFactor(0.0);
-    forceField->setCoulomb13ScaleFactor(0.0);
-    forceField->setCoulomb14ScaleFactor(0.8333333333);
-    forceField->setCoulomb15ScaleFactor(1.0);
-    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
+//    forceField->setVdw12ScaleFactor(0.0);
+//    forceField->setVdw13ScaleFactor(0.0);
+//    forceField->setVdw14ScaleFactor(0.5);
+//    forceField->setVdw15ScaleFactor(1.0);
+//    forceField->setCoulomb12ScaleFactor(0.0);
+//    forceField->setCoulomb13ScaleFactor(0.0);
+//    forceField->setCoulomb14ScaleFactor(0.8333333333);
+//    forceField->setCoulomb15ScaleFactor(1.0);
+//    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
   
     // My specific scale factors. These should be used during debugging.
     //->setSpecificDuMMScaleFactor(*forceField);
@@ -270,22 +270,22 @@ void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
     std::cout << "GBSA solvent dielectric " << forceField->getSolventDielectric() << std::endl;
     std::cout << "GBSA solute dielectric " << forceField->getSoluteDielectric() << std::endl;
   
-//    forceField->setBondStretchGlobalScaleFactor(0.0);
-//    forceField->setBondBendGlobalScaleFactor(0.0);
-//    forceField->setBondTorsionGlobalScaleFactor(0.0);
-//    forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
-//  
-//    forceField->setVdw12ScaleFactor(0.0);
-//    forceField->setVdw13ScaleFactor(0.0);
-//    forceField->setVdw14ScaleFactor(0.0);
-//    forceField->setVdw15ScaleFactor(0.0);
-//    forceField->setVdwGlobalScaleFactor(0.0);
-//  
-//    forceField->setCoulomb12ScaleFactor(0.0);
-//    forceField->setCoulomb13ScaleFactor(0.0);
-//    forceField->setCoulomb14ScaleFactor(0.0);
-//    forceField->setCoulomb15ScaleFactor(0.0);
-//    forceField->setCoulombGlobalScaleFactor(0.0);
+    forceField->setBondStretchGlobalScaleFactor(0.0);
+    forceField->setBondBendGlobalScaleFactor(0.0);
+    forceField->setBondTorsionGlobalScaleFactor(0.0);
+    forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
+  
+    forceField->setVdw12ScaleFactor(0.0);
+    forceField->setVdw13ScaleFactor(0.0);
+    forceField->setVdw14ScaleFactor(0.0);
+    forceField->setVdw15ScaleFactor(0.0);
+    forceField->setVdwGlobalScaleFactor(0.0);
+  
+    forceField->setCoulomb12ScaleFactor(0.0);
+    forceField->setCoulomb13ScaleFactor(0.0);
+    forceField->setCoulomb14ScaleFactor(0.0);
+    forceField->setCoulomb15ScaleFactor(0.0);
+    forceField->setCoulombGlobalScaleFactor(0.0);
 
   
     if(_useFixmanTorque){
