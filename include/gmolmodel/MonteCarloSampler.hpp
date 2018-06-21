@@ -30,6 +30,16 @@ public:
     SimTK::Real getTemperature(void);
     void setTemperature(SimTK::Real);
 
+    /** Seed the random number generator. Set simulation temperature,
+    variables that store the configuration
+    and variables that store the energies, both needed for the
+    acception-rejection step. Also realize velocities and initialize
+    the timestepper. **/
+    virtual void initialize(SimTK::State& advanced, SimTK::Real argTemperature, bool argUseFixman = true) ;
+
+    /** Same as initialize **/
+    virtual void reinitialize(SimTK::State& advanced, SimTK::Real argTemperature) ;
+
     // Store/restore the configuration from the set nternal transforms vector
     // TVector
     void setSetTVector(const SimTK::State& advanced);

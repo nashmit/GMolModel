@@ -31,12 +31,25 @@ public:
     SimTK::Real calcMassDeterminant(const SimTK::State& );
     SimTK::Real calcMassDeterminant(SimTK::State& );
 
-    // Update
-    virtual void update(SimTK::State&);
+    // Initializtion functions
+    virtual void initialize(void) {}
+    virtual void reinitialize(void) {}
 
-    /** Returns the number of MC trials done by this integrator. **/
+    // Set a thermostat (even for MCMC)
+    virtual void setThermostat(Thermostat);
+    virtual void setThermostat(std::string);
+    virtual void setThermostat(const char *);
+
+    // Get the name of the thermostat
+    virtual Thermostat getThermostat(void);
+
+    // Extract one or more samples
+    virtual void update(SimTK::State&) = 0;
+
+    /** Returns the number of samples extracted so far. **/
     int getSampleNumber(void);
 
+    // For debugging purposes
     void PrintSimbodyStateCache(SimTK::State& someState);
 
     //////////////////////////////////
@@ -65,6 +78,10 @@ public:
     SimTK::GeneralForceSubsystem *forces;
     SimTK::TimeStepper *timeStepper;
 
+    // THermodynamics
+    Thermostat thermostat;
+
+    // Sampling
     int sampleNumber;
   
     // Harmonic oscillator constants

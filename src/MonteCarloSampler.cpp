@@ -32,6 +32,23 @@ MonteCarloSampler::~MonteCarloSampler()
     delete [] SetTVector;
 }
 
+// Seed the random number generator. Set simulation temperature,
+// variables that store the configuration
+// and variables that store the energies, both needed for the
+// acception-rejection step. Also realize velocities and initialize
+// the timestepper.
+void MonteCarloSampler::initialize(SimTK::State& advanced, SimTK::Real argTemperature, bool argUseFixman) 
+{
+    assert(!"Not implemented");
+}
+
+// Same as initialize 
+void MonteCarloSampler::reinitialize(SimTK::State& advanced, SimTK::Real argTemperature) 
+{
+    assert(!"Not implemented");
+}
+
+
 // Return true if use Fixman potential
 bool MonteCarloSampler::isUsingFixman(void)
 {

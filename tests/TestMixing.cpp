@@ -76,12 +76,9 @@ int main(int argc, char **argv)
             useFixmanPotential = false;
         }
 
-        // MD
-        if(setupReader.getValues("THERMOSTAT")[worldIx] == "Andersen"){
+        (p_samplers[worldIx])->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
+        if(setupReader.getValues("THERMOSTAT")[worldIx] == "Andersen"){ // MD
             useFixmanPotential = false;
-            (p_samplers[worldIx])->setAlwaysAccept(true);
-        }else if(setupReader.getValues("THERMOSTAT")[worldIx] == "None"){
-            ;
         }else{
             std::cerr << "Unknown thermostat." << std::endl;
         }
@@ -128,6 +125,15 @@ int main(int argc, char **argv)
         timesteps[worldIx] = std::stod(setupReader.getValues("TIMESTEPS")[worldIx]);
     }
 
+    // Calculate geometric features fast
+    const SimTK::Compound * p_compounds[nofRegimens];
+    if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
+        for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
+            p_compounds[worldIx] = &((p_worlds[worldIx])->getTopology(0));
+        }
+    }
+    //
+
     // Simulate the two worlds
     int mc_step = -1;
 
@@ -158,8 +164,8 @@ int main(int argc, char **argv)
         currentWorldIx = worldIndexes.front();
 
         // Transfer coordinates from last world to current
-        std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
-            << " at MC step " << mc_step << std::endl;
+        //std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
+        //    << " at MC step " << mc_step << std::endl;
         SimTK::State& lastAdvancedState = (p_worlds[worldIndexes.back()])->integ->updAdvancedState();
         SimTK::State& currentAdvancedState = (p_worlds[currentWorldIx])->integ->updAdvancedState();
 
@@ -202,35 +208,44 @@ int main(int argc, char **argv)
         }
 
         // Calculate geomtric features fast
-        /*
-        SimTK::Compound c = (p_worlds[currentWorldIx])->getTopology(0);
-        SimTK::Vec3 pos[c.getNumAtoms()];
-        for (SimTK::Compound::AtomIndex aIx(0); aIx < c.getNumAtoms(); ++aIx){
-            pos[int(aIx)] = c.calcAtomLocationInGroundFrame(currentAdvancedState, aIx);
+        if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
+            int dihedralIx[setupReader.getValues("DIHEDRAL").size()];
+            for(unsigned int i = 0; i < setupReader.getValues("DIHEDRAL").size(); i++){
+                dihedralIx[i] = atoi(setupReader.getValues("DIHEDRAL")[i].c_str());
+            }
+
+            for(int ai = 0; ai < setupReader.getValues("DIHEDRAL").size(); ai += 4){
+                //std::cout << " atoms = " 
+                //    << dihedralIx[ai + 0] << " " 
+                //    << dihedralIx[ai + 1] << " " 
+                //    << dihedralIx[ai + 2] << " " 
+                //    << dihedralIx[ai + 3] << "; names = "
+                //    << (p_compounds[currentWorldIx])->getAtomName(SimTK::Compound::AtomIndex(dihedralIx[ai + 0])) << " "
+                //    << (p_compounds[currentWorldIx])->getAtomName(SimTK::Compound::AtomIndex(dihedralIx[ai + 1])) << " "
+                //    << (p_compounds[currentWorldIx])->getAtomName(SimTK::Compound::AtomIndex(dihedralIx[ai + 2])) << " "
+                //    << (p_compounds[currentWorldIx])->getAtomName(SimTK::Compound::AtomIndex(dihedralIx[ai + 3])) 
+                //    << "; dihedral = " ;
+                std::cout << bDihedral( (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 0])), 
+                                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 1])), 
+                                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 2])), 
+                                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 3])) )  << " ";
+            }
+            std::cout << std::endl;
         }
-        //std::cout << "phi atoms 4 5 7 13 names = "
-        //    << c.getAtomName(SimTK::Compound::AtomIndex(4)) << " "
-        //    << c.getAtomName(SimTK::Compound::AtomIndex(5)) << " "
-        //    << c.getAtomName(SimTK::Compound::AtomIndex(7)) << " "
-        //    << c.getAtomName(SimTK::Compound::AtomIndex(13)) << " "
-        //    << std::endl;
-        //std::cout << "psi atoms 5 7 13 14 names = "
-        //    << c.getAtomName(SimTK::Compound::AtomIndex(5)) << " "
-        //    << c.getAtomName(SimTK::Compound::AtomIndex(7)) << " "
-        //    << c.getAtomName(SimTK::Compound::AtomIndex(13)) << " "
-        //    << c.getAtomName(SimTK::Compound::AtomIndex(14)) << " "
-        //    << std::endl;
-        std::cout << bDihedral(pos[4], pos[5], pos[7], pos[13]) << " ";
-        std::cout << bDihedral(pos[5], pos[7], pos[13], pos[14]) << std::endl;
-        */
 
 
     } // for i in MC steps
 
+    // Free the memory
     for(int wIx = 0; wIx < nofRegimens; wIx++){
         delete p_worlds[wIx];
         delete p_samplers[wIx];
     }
+
+    if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
+        delete p_compounds;
+    }
+
     delete context;
 
 } // END MAIN ////////////

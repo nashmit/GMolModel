@@ -19,9 +19,6 @@
 
 #include "bgeneral.hpp"
 
-//#ifndef DEBUG_ROBO
-//#define DEBUG_ROBO
-//#endif
 
 #ifdef DEBUG_ROBO
 #define TRACE(STR) printf("%s", STR);

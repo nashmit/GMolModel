@@ -227,5 +227,17 @@ void PrintSpatialMat(SimTK::SpatialMat M, int decimal_places, std::string header
  */
 SimTK::Real bDihedral(SimTK::Vec3 pos0, SimTK::Vec3 pos1, SimTK::Vec3 pos2, SimTK::Vec3 pos3);
 
+/*
+ * Thermodynamics
+ */
+
+enum Thermostat { // Thermostats
+    NONE,
+    ANDERSEN,
+    BERENDSEN,
+    LANGEVIN,
+    NOSE_HOOVER
+};
+
 
 #endif /*BGENERAL_H_*/

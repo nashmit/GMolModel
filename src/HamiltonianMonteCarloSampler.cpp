@@ -118,7 +118,7 @@ velocities to desired temperature, variables that store the configuration
 and variables that store the energies, both needed for the
 acception-rejection step. Also realize velocities and initialize
 the timestepper. **/
-void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman)
+void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman) 
 {
     // Seed the random number generator
     randomEngine.seed( std::time(0) );
@@ -175,11 +175,12 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
     // Store total energies
     this->etot_proposed = getOldPE() + getProposedKE() + getOldFixman();
     this->etot_set = this->etot_proposed;
+
   
 }
 
 /** Same as initialize **/
-void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature)
+void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature) 
 {
     // After an event handler has made a discontinuous change to the 
     // Integrator's "advanced state", this method must be called to 
@@ -385,15 +386,15 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
 
 
     std::cout<<std::setprecision(5)<<std::fixed;
-    std::cout << "pe_o " << pe_o << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP()
-       << " pe_n " << pe_n  << " ke_n " << ke_n << " fix_n " << fix_n
+//p    std::cout << "pe_o " << pe_o << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP()
+//p       << " pe_n " << pe_n  << " ke_n " << ke_n << " fix_n " << fix_n
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
         //<< " etot_n " << etot_n  + getREP() << " etot_proposed " << etot_proposed + getREP()
-        ;
+//p        ;
 
     // Apply Metropolis criterion
-    if ( getAlwaysAccept() ){ // MD with Andersen thermostat
-        std::cout << " acc 1 " ;
+    if ( getThermostat() == ANDERSEN ){ // MD with Andersen thermostat
+//p        std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
         setSetPE(pe_n);
@@ -403,7 +404,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
     }
     else if( (!isnan(pe_n)) && 
     ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
-        std::cout << " acc 1 " ;
+//p        std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
         setSetPE(pe_n);
@@ -412,13 +413,13 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
         ++acceptedSteps;
     }else{ // Reject
-        std::cout << " acc 0 " ;
+//p        std::cout << " acc 0 " ;
         assignConfFromSetTVector(someState);
     }
 
-    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman()
+//p    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman()
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
-        << std:: endl;
+//p        << std:: endl;
 
     // Keep track of how many MC trials have been done 
     ++sampleNumber;
