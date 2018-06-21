@@ -75,11 +75,11 @@ void Sampler::setThermostat(std::string argThermostat){
     std::transform(argThermostat.begin(), argThermostat.end(),
         _thermostat.begin(), ::tolower);
    
-    this->thermostat = NONE; 
-
     try{
 
-        if(_thermostat == "andersen"){
+        if(_thermostat == "none"){
+            this->thermostat = NONE; 
+        }else if(_thermostat == "andersen"){
             this->thermostat = ANDERSEN;
         }else if(_thermostat == "berendsen"){
             this->thermostat = BERENDSEN;
@@ -105,11 +105,12 @@ void Sampler::setThermostat(const char *argThermostat){
     std::transform(_sthermostat.begin(), _sthermostat.end(),
         _thermostat.begin(), ::tolower);
    
-    this->thermostat = NONE; 
 
     try{
 
-        if(_thermostat == "andersen"){
+        if(_thermostat == "none"){
+            this->thermostat = NONE; 
+        }else if(_thermostat == "andersen"){
             this->thermostat = ANDERSEN;
         }else if(_thermostat == "berendsen"){
             this->thermostat = BERENDSEN;

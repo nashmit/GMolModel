@@ -60,8 +60,11 @@ int main(int argc, char **argv)
         }
     
         // Initialize worlds
-        bool useFixmanTorque = true;
-        (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), useFixmanTorque );
+        if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
+            (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), true );
+        }else{
+            (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), false );
+        }
     
         // Initialize sampler
         TRACE("NEW ALLOC\n");
@@ -71,17 +74,18 @@ int main(int argc, char **argv)
             p_worlds[worldIx]->forceField, (p_worlds[worldIx])->forces, (p_worlds[worldIx])->ts ) );
     
         // Initialize samplers
-        bool useFixmanPotential = true;
-        if(setupReader.getValues("REGIMENS")[worldIx] == "IC"){
-            useFixmanPotential = false;
+        bool useFixmanPotential = false;
+        if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
+            useFixmanPotential = true;
         }
 
+        // We don't need Fixman potential for IC !! WATCH OUT !!
+        //if(setupReader.getValues("REGIMENS")[worldIx] == "IC"){
+        //    useFixmanPotential = false;
+        //}
+
+        // Set thermostats
         (p_samplers[worldIx])->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
-        if(setupReader.getValues("THERMOSTAT")[worldIx] == "Andersen"){ // MD
-            useFixmanPotential = false;
-        }else{
-            std::cerr << "Unknown thermostat." << std::endl;
-        }
 
         (p_samplers[worldIx])->initialize( (p_worlds[worldIx])->integ->updAdvancedState(), 
              std::stod(setupReader.getValues("TIMESTEPS")[worldIx]),
@@ -243,7 +247,7 @@ int main(int argc, char **argv)
     }
 
     if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
-        delete p_compounds;
+        //delete[] p_compounds;
     }
 
     delete context;

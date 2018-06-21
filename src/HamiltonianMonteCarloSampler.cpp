@@ -148,6 +148,8 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
     // Store Fixman potential
     this->useFixman = argUseFixman;
     if(useFixman){
+        std::cout << "Hamiltonian Monte Carlo sampler: using Fixman potential." << std::endl;
+
         setOldFixman(calcFixman(someState));
         setSetFixman(getOldFixman());
     }else{

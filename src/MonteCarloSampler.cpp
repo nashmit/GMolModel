@@ -37,15 +37,71 @@ MonteCarloSampler::~MonteCarloSampler()
 // and variables that store the energies, both needed for the
 // acception-rejection step. Also realize velocities and initialize
 // the timestepper.
-void MonteCarloSampler::initialize(SimTK::State& advanced, SimTK::Real argTemperature, bool argUseFixman) 
+void MonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real argTemperature, bool argUseFixman) 
 {
-    assert(!"Not implemented");
+    // Seed the random number generator
+    randomEngine.seed( std::time(0) );
+
+    // Set the simulation temperature
+    setTemperature(argTemperature); // Needed for Fixman
+
+    // Store the configuration
+    system->realize(someState, SimTK::Stage::Position);
+    int i = 0;
+    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+        const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
+        SetTVector[i] = TVector[i] = mobod.getMobilizerTransform(someState);
+        i++;
+    }
+
+    // Store potential energies
+    setOldPE(getPEFromEvaluator(someState));
+    setSetPE(getOldPE());
+
+    // Store Fixman potential
+    this->useFixman = argUseFixman;
+
+    if(useFixman){
+        std::cout << "Monte Carlo sampler: using Fixman potential." << std::endl;
+
+        setOldFixman(calcFixman(someState));
+        setSetFixman(getOldFixman());
+    }else{
+        setOldFixman(0.0);
+        setSetFixman(getOldFixman());
+    }
+
 }
 
 // Same as initialize 
-void MonteCarloSampler::reinitialize(SimTK::State& advanced, SimTK::Real argTemperature) 
+void MonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real argTemperature) 
 {
-    assert(!"Not implemented");
+    // Set the simulation temperature
+    setTemperature(argTemperature); // Needed for Fixman
+
+    // Store the configuration
+    system->realize(someState, SimTK::Stage::Position);
+    int i = 0;
+    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+        const SimTK::Vec3& vertex = mobod.getBodyOriginLocation(someState);
+        SetTVector[i] = TVector[i] = mobod.getMobilizerTransform(someState);
+        i++;
+    }
+
+    // Store potential energies
+    setOldPE(getPEFromEvaluator(someState));
+    setSetPE(getOldPE());
+
+    // Store Fixman potential
+    if(useFixman){
+        setOldFixman(calcFixman(someState));
+        setSetFixman(getOldFixman());
+    }else{
+        setOldFixman(0.0);
+        setSetFixman(getOldFixman());
+    }
 }
 
 
