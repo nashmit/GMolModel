@@ -1,0 +1,15 @@
+name='lin4.db'
+C1 = Atom('C')
+C2 = Atom('C')
+C3 = Atom('C')
+C4 = Atom('C')
+prmtop_order = [C1, C2, C3, C4]
+bonds = [Bond(C1, C2), Bond(C2, C3), Bond(C3, C4)]
+pdbmap = [('.but', {'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4})]
+amber12_atom_type = {C1: 'b2', C2: 'b2', C3: 'b2', C4: 'b2'}
+amber_charge = {C1: '0.000000', C2: '0.000000', C3: '0.000000', C4: '0.000000'}
+scaling_factor_electrostatic = {C1: '1.000000', C2: '1.000000', C3: '1.000000', C4: '1.000000'}
+scaling_factor_LJr = {C1: '1.000000', C2: '1.000000', C3: '1.000000', C4: '1.000000'}
+scaling_factor_LJa = {C1: '1.000000', C2: '1.000000', C3: '1.000000', C4: '1.000000'}
+configurations = {
+'default': Cartesian({C1: (0.00000, -0.15400, 0.000000), C2: (0.00000, 0.00000, 0.000000), C3: (0.15400, 0.00000, 0.000000), C4: (0.15400, 0.15400, 0.000000)})}
