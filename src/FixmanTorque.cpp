@@ -34,7 +34,7 @@ void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Sp
 
         for(int k = 0; k < mobod.getNumU(state); k++){
             uslot++;
-            mobod.applyOneMobilityForce(state, k, V4[uslot], mobilityForces);
+            mobod.applyOneMobilityForce(state, k, (-1.0) * V4[uslot], mobilityForces);
             //std::cout << " " << std::setprecision(10) << std::fixed << V4[uslot] << " to " << int(mbx) ;
         }
 
