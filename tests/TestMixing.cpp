@@ -65,6 +65,8 @@ int main(int argc, char **argv)
         }else{
             (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), false );
         }
+
+        (p_worlds[worldIx])->setTemperature( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
     
         // Initialize sampler
         TRACE("NEW ALLOC\n");
@@ -90,7 +92,7 @@ int main(int argc, char **argv)
         (p_samplers[worldIx])->initialize( (p_worlds[worldIx])->integ->updAdvancedState(), 
              std::stod(setupReader.getValues("TIMESTEPS")[worldIx]),
              std::stoi(setupReader.getValues("STEPS")[0]),
-             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
+             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) ),
              useFixmanPotential );
     
     }

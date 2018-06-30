@@ -446,6 +446,9 @@ SimTK::Real MonteCarloSampler::getTemperature(void){
 void MonteCarloSampler::setTemperature(SimTK::Real argTemperature)
 {
     this->temperature = argTemperature;
+    if(this->temperature < 0){
+        std::cerr << "Temperature set to " << this->temperature << std::endl;
+    }
     RT = this->temperature * SimTK_BOLTZMANN_CONSTANT_MD;
 }
 

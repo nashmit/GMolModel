@@ -148,6 +148,8 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
 
     sampleNumber = 0;
 
+    this->temperature = -1; // this leads to unusal behaviour hopefully
+
     std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
@@ -305,6 +307,24 @@ void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
     std::cout << "World::Init END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
 }//end of InitSimulation
 
+// --- Thermodynamics ---
+SimTK::Real World::getTemperature(void)
+{
+    return this->temperature;
+}
+
+void World::setTemperature(SimTK::Real argTemperature)
+{
+    this->temperature = argTemperature;
+}
+//...............
+
+// --- Statistics ---
+int World::getSampleNumber(void)
+{
+    return this->sampleNumber;
+}
+//...............
 
 // Interface
 const Topology& World::getTopology(int moleculeNumber) const{
