@@ -112,6 +112,17 @@ public:
     void setTemperature(SimTK::Real);
     //...............
 
+    // --- Simulation ---
+    // Amber like scale factors.
+    void setAmberForceFieldScaleFactors(void);
+
+    // Set a global scaling factor for the forcefield
+    void setGlobalForceFieldScaleFactor(SimTK::Real);
+
+    // Set GBSA implicit solvent scale factor
+    void setGbsaGlobalScaleFactor(SimTK::Real);
+    //...............
+
     // --- Statistics ---
     int getSampleNumber(void);
     //...............

@@ -59,6 +59,15 @@ int main(int argc, char **argv)
             delete amberReader;
         }
     
+        // Set Worlds Amber like scale factors.
+        //(p_worlds[worldIx])->setAmberForceFieldScaleFactors();
+
+        // Set world global scaling factor for the forcefield
+        (p_worlds[worldIx])->setGlobalForceFieldScaleFactor(0.0);
+
+        // Set world GBSA implicit solvent scale factor
+        (p_worlds[worldIx])->setGbsaGlobalScaleFactor(0.0);
+    
         // Initialize worlds
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
             (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), true );
@@ -67,7 +76,7 @@ int main(int argc, char **argv)
         }
 
         (p_worlds[worldIx])->setTemperature( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
-    
+
         // Initialize sampler
         TRACE("NEW ALLOC\n");
         p_samplers.push_back( new HamiltonianMonteCarloSampler(

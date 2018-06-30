@@ -254,41 +254,6 @@ void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
     //SimTK::State state = compoundSystem->updDefaultState();
     //ts->initialize(compoundSystem->getDefaultState());
  
-    // Amber like scale factors. These should be used during simulations.
-//    forceField->setVdw12ScaleFactor(0.0);
-//    forceField->setVdw13ScaleFactor(0.0);
-//    forceField->setVdw14ScaleFactor(0.5);
-//    forceField->setVdw15ScaleFactor(1.0);
-//    forceField->setCoulomb12ScaleFactor(0.0);
-//    forceField->setCoulomb13ScaleFactor(0.0);
-//    forceField->setCoulomb14ScaleFactor(0.8333333333);
-//    forceField->setCoulomb15ScaleFactor(1.0);
-//    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
-  
-    // My specific scale factors. These should be used during debugging.
-    //->setSpecificDuMMScaleFactor(*forceField);
-    // Solvent treatment
-    forceField->setGbsaGlobalScaleFactor(0.0);
-    std::cout << "GBSA solvent dielectric " << forceField->getSolventDielectric() << std::endl;
-    std::cout << "GBSA solute dielectric " << forceField->getSoluteDielectric() << std::endl;
-  
-    forceField->setBondStretchGlobalScaleFactor(0.0);
-    forceField->setBondBendGlobalScaleFactor(0.0);
-    forceField->setBondTorsionGlobalScaleFactor(0.0);
-    forceField->setAmberImproperTorsionGlobalScaleFactor(0.0);
-  
-    forceField->setVdw12ScaleFactor(0.0);
-    forceField->setVdw13ScaleFactor(0.0);
-    forceField->setVdw14ScaleFactor(0.0);
-    forceField->setVdw15ScaleFactor(0.0);
-    forceField->setVdwGlobalScaleFactor(0.0);
-  
-    forceField->setCoulomb12ScaleFactor(0.0);
-    forceField->setCoulomb13ScaleFactor(0.0);
-    forceField->setCoulomb14ScaleFactor(0.0);
-    forceField->setCoulomb15ScaleFactor(0.0);
-    forceField->setCoulombGlobalScaleFactor(0.0);
-
   
     if(_useFixmanTorque){
         ExtForce = new SimTK::Force::Custom(*forces, new FixmanTorque(compoundSystem, *matter));
@@ -317,6 +282,56 @@ void World::setTemperature(SimTK::Real argTemperature)
 {
     this->temperature = argTemperature;
 }
+//...............
+
+// --- Simulation ---
+
+// Amber like scale factors.
+void World::setAmberForceFieldScaleFactors(void)
+{
+    forceField->setVdw12ScaleFactor(0.0);
+    forceField->setVdw13ScaleFactor(0.0);
+    forceField->setVdw14ScaleFactor(0.5);
+    forceField->setVdw15ScaleFactor(1.0);
+    forceField->setCoulomb12ScaleFactor(0.0);
+    forceField->setCoulomb13ScaleFactor(0.0);
+    forceField->setCoulomb14ScaleFactor(0.8333333333);
+    forceField->setCoulomb15ScaleFactor(1.0);
+    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
+  
+}
+
+// Set a global scaling factor for the forcefield
+void World::setGlobalForceFieldScaleFactor(SimTK::Real scaleFactor)
+{
+  
+    forceField->setBondStretchGlobalScaleFactor(scaleFactor);
+    forceField->setBondBendGlobalScaleFactor(scaleFactor);
+    forceField->setBondTorsionGlobalScaleFactor(scaleFactor);
+    forceField->setAmberImproperTorsionGlobalScaleFactor(scaleFactor);
+  
+    forceField->setVdw12ScaleFactor(scaleFactor);
+    forceField->setVdw13ScaleFactor(scaleFactor);
+    forceField->setVdw14ScaleFactor(scaleFactor);
+    forceField->setVdw15ScaleFactor(scaleFactor);
+    forceField->setVdwGlobalScaleFactor(scaleFactor);
+  
+    forceField->setCoulomb12ScaleFactor(scaleFactor);
+    forceField->setCoulomb13ScaleFactor(scaleFactor);
+    forceField->setCoulomb14ScaleFactor(scaleFactor);
+    forceField->setCoulomb15ScaleFactor(scaleFactor);
+    forceField->setCoulombGlobalScaleFactor(scaleFactor);
+
+}
+
+// Set GBSA implicit solvent scale factor
+void World::setGbsaGlobalScaleFactor(SimTK::Real scaleFactor)
+{
+    forceField->setGbsaGlobalScaleFactor(scaleFactor);
+    std::cout << "GBSA solvent dielectric " << forceField->getSolventDielectric() << std::endl;
+    std::cout << "GBSA solute dielectric " << forceField->getSoluteDielectric() << std::endl;
+}
+
 //...............
 
 // --- Statistics ---
