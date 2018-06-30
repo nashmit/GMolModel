@@ -28,8 +28,12 @@ class FixmanTorque : public SimTK::Force::Custom::Implementation {
 
   bool dependsOnlyOnPositions() const;
 
+  SimTK::Real getScaleFactor(void);
+  void setScaleFactor(SimTK::Real);
+
  private:
   SimTK::SimbodyMatterSubsystem& matter;
+  SimTK::Real scaleFactor;
 };
 
 #endif //__FIXMANTORQUE_HPP__

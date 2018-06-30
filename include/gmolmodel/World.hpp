@@ -66,74 +66,120 @@ void writePdb(SimTK::PdbStructure pdb, const char *FN);
 //                           CLASS World
 //==============================================================================
 /**
- *  Symbols System Class. Manages Molmodel-gMolmodel-MMTK communication.
+ *  Contains a Symbody system and additional data that define a regimen
  **/
 class World{
- public:
-  SimTK::CompoundSystem *compoundSystem;
-  SimTK::SimbodyMatterSubsystem *matter;
-  SimTK::GeneralForceSubsystem *forces;
-  SimTK::Force::Custom *ExtForce;
+public:
+    // --- Each World has a unique number in a Gmolmodel Context
+    int ownWorldIndex;
+    //...............
 
-  // Our decorations
-  ParaMolecularDecorator *paraMolecularDecorator;
-  //
+    // --- Necessary Simbody (sub)systems ---
+    // System->MultibodySystem->MolecularMechanicsSystems->CompoundSystem
+    SimTK::CompoundSystem *compoundSystem;
 
-  SimTK::DecorationSubsystem *decorations;
-  SimTK::Visualizer *visualizer;
-  SimTK::Visualizer::Reporter *visualizerReporter;
-  bool visual;
+    // Subsystem->SimbodyMatterSubsystem
+    SimTK::SimbodyMatterSubsystem *matter;
 
+    // Subsystem->ForceSubsystem->GeneralForceSubsystem
+    SimTK::GeneralForceSubsystem *forces;
 
-  SimTK::DuMMForceFieldSubsystem *forceField;
+    // Force::Custom
+    SimTK::Force::Custom *ExtForce;
 
-  std::vector<bMoleculeReader *> moleculeReaders;
-  std::vector<Topology *> topologies;
+    // Subsystem->ForceSubsystem->DuMMForceFieldSubsystem
+    SimTK::DuMMForceFieldSubsystem *forceField;
+    //...............
+  
+    // --- Visualization ---
+    bool visual;
+    // Our decorations
+    ParaMolecularDecorator *paraMolecularDecorator;
 
-  SimTK::Visualizer *viz;
-  #ifdef NOSETHERMOS
-  SimTK::NoseHooverThermostat *thermo;
-  #endif
-  #ifdef VELSTHERMOS
-  SimTK::VelocityRescalingThermostat *vthermo;
-  #endif
-  SimTK::VerletIntegrator *integ;
-  SimTK::TimeStepper *ts;
-  std::string mol2F, rbFN, frcmodF, flexFN, ictdF;
+    // Decoration subsystem
+    SimTK::DecorationSubsystem *decorations;
 
-  int moleculeCount;
-  int ownWorldIndex;
+    // Visualizer
+    SimTK::Visualizer *visualizer;
 
-  int sampleNumber;
-  SimTK::Transform *TVector;
-  int **mbxTreeMat;    // tree representing the bonding
-  SimTK::Real *branchMassVec; // branch masses self body included
-  bool _useFixmanTorque;
+    // Visualizer reporter
+    SimTK::Visualizer::Reporter *visualizerReporter;
+    //...............
+  
+    // --- Simulation objects and parameters ---
+    SimTK::VerletIntegrator *integ;
+    SimTK::TimeStepper *ts;
+    bool _useFixmanTorque;
+    //...............
 
-  World(int worldIndex, bool isVisual=true, SimTK::Real visualizerFrequency = 0.0015);
+    // --- Molecules (topologies) building ---
+    // Nof molecules
+    int moleculeCount;
 
-  void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF);
+    // Filenames for files needed to build molecules (topologies)
+    std::string rbFN; // rigid bodies specifications
+    std::string frcmodF; // to be removed
+    std::string flexFN; // flexible bonds specifications
+    std::string ictdF; // regimen specification
+  
+    // Molecules (topologies) objects
+    std::vector<bMoleculeReader *> moleculeReaders;
+    std::vector<Topology *> topologies;
 
-  void Init(SimTK::Real integTimestep, bool useFixmanTorque = false);
+    // This vector stores a configuration if is needed for later use
+    SimTK::Transform *TVector;
+  
+    // Topologies graphs as tables - to be removed
+    int **mbxTreeMat;    // tree representing the bonding
+    SimTK::Real *branchMassVec; // branch masses self body included
+    //...............
 
-  std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > >  getAtomsLocationsInGround(const SimTK::State&);
-
-  SimTK::State& setAtomsLocationsInGround(SimTK::State&, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations);
-
-  void updateAtomLists(const SimTK::State&);
+    // --- Sampling data ---
+    int sampleNumber;
+    //...............
  
-  void PrintSimbodyStateCache(SimTK::State&);
-
-  void printPoss(const SimTK::Compound& c, SimTK::State& someState);
+    // --- Interface ---
+    // Constructor 
+    World(int worldIndex, bool isVisual=true, SimTK::Real visualizerFrequency = 0.0015);
  
-  // Interface
-  const Topology& getTopology(int moleculeNumber) const;
-  Topology& updTopology(void);
+    // Creates a topology object and based on amberReader forcefield parameters
+    //  - defines Biotypes; - adds BAT parameters to DuMM
+    void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF);
+ 
+    // Intializes simulation parameters.
+    // Beside passing the integrator step and Fixman torque option,
+    // it also initializes default scaling factors for Amber
+    void Init(SimTK::Real integTimestep, bool useFixmanTorque = false);
+ 
+    // Get the current Compound Cartesian coords
+    std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > >  getAtomsLocationsInGround(const SimTK::State&);
 
-  // Manages the TimeStepper actions
-  void Advance(int nosteps);
+    // Set Compound, MultibodySystem and DuMM configurations according to
+    // some other World's atoms
+    SimTK::State& setAtomsLocationsInGround(SimTK::State&, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations);
+  
+    // Update Gmolmodel bSpecificAtom Cartesian coordinates according to
+    // Molmodel Compound
+    void updateAtomLists(const SimTK::State&);
+   
+    // Print information about Simbody systems
+    void PrintSimbodyStateCache(SimTK::State&);
+  
+    // Print Compound Cartesian coordinates
+    void printPoss(const SimTK::Compound& c, SimTK::State& someState);
+  
+    // Get a readble reference of one of the molecules 
+    const Topology& getTopology(int moleculeNumber) const;
 
-  ~World(); // destructor
+    // Get a writeble reference of one of the molecules 
+    Topology& updTopology(void);
+  
+    // To be removed
+    void Advance(int nosteps);
+    //...............
+ 
+    // Destructor 
+    ~World(); // destructor
 };
 
 #endif /*WORLD_H_*/

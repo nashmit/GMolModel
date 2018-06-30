@@ -8,6 +8,7 @@
 FixmanTorque::FixmanTorque(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
                     ) : matter(matter){
   this->compoundSystem = compoundSystem;
+  scaleFactor = 1.0;
 }
 
 void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
@@ -19,11 +20,6 @@ void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Sp
     SimTK::Vector V4(nu);
     SimTK::Real* D0 = new SimTK::Real(1.0);
     matter.calcFixmanTorque(state, V3, V4, D0);
-    //std::cout << "FixmanTorque Fixman torque " ;
-    //for(int i = 0; i < nu; i++){
-    //    std::cout << std::setprecision(10) << V4[i] << " ";
-    //}
-    //std::cout << std::endl;
     delete D0;
     // end - Compute Fixman torque
 
@@ -34,8 +30,9 @@ void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Sp
 
         for(int k = 0; k < mobod.getNumU(state); k++){
             uslot++;
-            mobod.applyOneMobilityForce(state, k, (-1.0) * V4[uslot], mobilityForces);
+            mobod.applyOneMobilityForce(state, k, scaleFactor * V4[uslot], mobilityForces);
             //std::cout << " " << std::setprecision(10) << std::fixed << V4[uslot] << " to " << int(mbx) ;
+            //std::cout << std::setprecision(5) << std::fixed << V4[uslot] << ' ';
         }
 
     }
@@ -55,6 +52,17 @@ SimTK::Real FixmanTorque::calcPotentialEnergy(const SimTK::State& state) const {
 bool FixmanTorque::dependsOnlyOnPositions() const {
   return true;
 }
+
+SimTK::Real FixmanTorque::getScaleFactor(void)
+{
+    return scaleFactor;
+}
+
+void FixmanTorque::setScaleFactor(SimTK::Real argScaleFactor)
+{
+    this->scaleFactor = argScaleFactor;
+}
+
 ////////////////////////////
 ////// END GRID FORCE //////
 ////////////////////////////

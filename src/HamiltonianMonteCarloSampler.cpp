@@ -336,6 +336,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
     */
 
     // Integrate (propagate trajectory)
+//pp    std::cout << sampleNumber << ' ';
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
 
     // TODEL
@@ -393,6 +394,8 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real t
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
         //<< " etot_n " << etot_n  + getREP() << " etot_proposed " << etot_proposed + getREP()
 //p        ;
+
+//pp     std::cout << std::setprecision(10) << std::fixed << fix_n << ' ';
 
     // Apply Metropolis criterion
     if ( getThermostat() == ANDERSEN ){ // MD with Andersen thermostat
