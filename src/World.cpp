@@ -828,6 +828,9 @@ World::~World(){
     for(unsigned int i = 0; i < topologies.size(); i++){
         delete topologies[i];
     }
+    for(unsigned int i = 0; i < samplers.size(); i++){
+        delete samplers[i];
+    }
     //forceField->loadAmber99Parameters();
 }
 

@@ -24,7 +24,6 @@ int main(int argc, char **argv)
     int nofRegimens = setupReader.getValues("REGIMENS").size();
     std::vector<int> worldIndexes;
     std::vector<World *> p_worlds;
-    std::vector<HamiltonianMonteCarloSampler *> p_samplers;
    
     // Iterate through worlds (regimens)
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
@@ -79,14 +78,12 @@ int main(int argc, char **argv)
 
         (p_worlds[worldIx])->setTemperature( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
 
-        // Initialize sampler
+        // Add samplers
         TRACE("NEW ALLOC\n");
-        p_samplers.push_back( new HamiltonianMonteCarloSampler(
-            (p_worlds[worldIx])->compoundSystem, (p_worlds[worldIx])->matter, 
-            (SimTK::Compound *)(&((p_worlds[worldIx])->getTopology(0))),
-            p_worlds[worldIx]->forceField, (p_worlds[worldIx])->forces, (p_worlds[worldIx])->ts ) );
+
+        p_worlds[worldIx]->addSampler(HMC);
     
-        // Initialize samplers
+        // Do we use Fixman potential
         bool useFixmanPotential = false;
         if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
             useFixmanPotential = true;
@@ -98,9 +95,11 @@ int main(int argc, char **argv)
         //}
 
         // Set thermostats
-        (p_samplers[worldIx])->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
+        (p_worlds[worldIx])->updSampler(0)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
 
-        (p_samplers[worldIx])->initialize( (p_worlds[worldIx])->integ->updAdvancedState(), 
+
+        // Initialize samplers
+        (p_worlds[worldIx])->updSampler(0)->initialize( (p_worlds[worldIx])->integ->updAdvancedState(), 
              std::stod(setupReader.getValues("TIMESTEPS")[worldIx]),
              std::stoi(setupReader.getValues("STEPS")[0]),
              SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) ),
@@ -118,7 +117,7 @@ int main(int argc, char **argv)
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
         std::cout << "World " << worldIx << " initial const state PE: " << std::setprecision(20)
             << (p_worlds[worldIx])->forces->getMultibodySystem().calcPotentialEnergy((p_worlds[worldIx])->integ->updAdvancedState()) 
-            << " useFixmanPotential = " << p_samplers[worldIx]->isUsingFixman()
+            << " useFixmanPotential = " << p_worlds[worldIx]->updSampler(0)->isUsingFixman()
             << std::endl;
     }
 
@@ -160,7 +159,7 @@ int main(int argc, char **argv)
     //std::cout << "Sampler " << currentWorldIx << " updating initially" << std::endl;
     for(int k = 0; k < mix_mcsteps[currentWorldIx]; k++){
         ++mc_step; // Increment mc_step
-        p_samplers[currentWorldIx]->update(advancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
+        p_worlds[currentWorldIx]->updSampler(0)->update(advancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
     }
 
     // Write pdb
@@ -188,7 +187,7 @@ int main(int argc, char **argv)
             currentAdvancedState, (p_worlds[worldIndexes.back()])->getAtomsLocationsInGround( lastAdvancedState ));
 
         // Reinitialize current sampler
-        p_samplers[currentWorldIx]->reinitialize( currentAdvancedState, 
+        p_worlds[currentWorldIx]->updSampler(0)->reinitialize( currentAdvancedState, 
             timesteps[currentWorldIx], total_mcsteps,
             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
 
@@ -197,9 +196,9 @@ int main(int argc, char **argv)
             for(int i = 0; i < nofRegimens - 1; i++){
                 int restIx = worldIndexes[i];
                 int backIx = worldIndexes.back();
-                SimTK::Real diffPE = (p_samplers[backIx])->getSetPE() - (p_samplers[restIx])->getSetPE();
-                std::cout << "Setting sampler " << restIx << " REP to " << (p_samplers[backIx])->getSetPE() << " - " << (p_samplers[restIx])->getSetPE() << " = " << diffPE << std::endl;
-                (p_samplers[restIx])->setREP( diffPE );
+                SimTK::Real diffPE = (p_worlds[backIx])->updSampler(0)->getSetPE() - (p_worlds[restIx])->updSampler(0)->getSetPE();
+                std::cout << "Setting sampler " << restIx << " REP to " << (p_worlds[backIx])->updSampler(0)->getSetPE() << " - " << (p_worlds[restIx])->updSampler(0)->getSetPE() << " = " << diffPE << std::endl;
+                (p_worlds[restIx])->updSampler(0)->setREP( diffPE );
             }
         }
 
@@ -207,7 +206,7 @@ int main(int argc, char **argv)
         //std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
         for(int k = 0; k < mix_mcsteps[currentWorldIx]; k++){
             ++mc_step; // Increment mc_step
-            p_samplers[currentWorldIx]->update(currentAdvancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
+            p_worlds[currentWorldIx]->updSampler(0)->update(currentAdvancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
         }
 
         // Write pdb
@@ -254,7 +253,6 @@ int main(int argc, char **argv)
     // Free the memory
     for(int wIx = 0; wIx < nofRegimens; wIx++){
         delete p_worlds[wIx];
-        delete p_samplers[wIx];
     }
 
     if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
