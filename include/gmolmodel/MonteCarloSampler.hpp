@@ -21,7 +21,7 @@ public:
                       SimTK::Compound *argResidue,
                       SimTK::DuMMForceFieldSubsystem *argDumm,
                       SimTK::GeneralForceSubsystem *forces,
-                      SimTK::TimeStepper *argTimeStepper);
+                      SimTK::TimeStepper *argTimeStepper) ;
 
     // Destructor
     virtual ~MonteCarloSampler();

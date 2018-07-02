@@ -25,7 +25,8 @@ int main(int argc, char **argv)
     std::vector<int> worldIndexes;
     std::vector<World *> p_worlds;
     std::vector<HamiltonianMonteCarloSampler *> p_samplers;
-    
+   
+    // Iterate through worlds (regimens)
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
         if(setupReader.getValues("VISUAL")[0] == "TRUE"){
             TRACE("NEW ALLOC\n");
@@ -58,15 +59,16 @@ int main(int argc, char **argv)
     
             delete amberReader;
         }
-    
-        // Set Worlds Amber like scale factors.
-        //(p_worlds[worldIx])->setAmberForceFieldScaleFactors();
-
-        // Set world global scaling factor for the forcefield
-        (p_worlds[worldIx])->setGlobalForceFieldScaleFactor(0.0);
+   
+        // Set force field scale factors.
+        if(setupReader.getValues("FFSCALE")[worldIx] == "AMBER"){ 
+            (p_worlds[worldIx])->setAmberForceFieldScaleFactors();
+        }else{
+            (p_worlds[worldIx])->setGlobalForceFieldScaleFactor(std::stod(setupReader.getValues("FFSCALE")[worldIx]));
+        }
 
         // Set world GBSA implicit solvent scale factor
-        (p_worlds[worldIx])->setGbsaGlobalScaleFactor(0.0);
+        (p_worlds[worldIx])->setGbsaGlobalScaleFactor(std::stod(setupReader.getValues("GBSA")[worldIx]));
     
         // Initialize worlds
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
@@ -109,12 +111,10 @@ int main(int argc, char **argv)
 
     // Add worlds to context
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
-        context->AddWorld(p_worlds[worldIx], p_samplers[worldIx]);
+        context->AddWorld(p_worlds[worldIx]);
     }
 
     // Set convenient names
-    //World *world0 = context->getWorld(0);
-    //World *world1 = context->getWorld(1);
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
         std::cout << "World " << worldIx << " initial const state PE: " << std::setprecision(20)
             << (p_worlds[worldIx])->forces->getMultibodySystem().calcPotentialEnergy((p_worlds[worldIx])->integ->updAdvancedState()) 

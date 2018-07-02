@@ -231,13 +231,45 @@ SimTK::Real bDihedral(SimTK::Vec3 pos0, SimTK::Vec3 pos1, SimTK::Vec3 pos2, SimT
  * Thermodynamics
  */
 
-enum Thermostat { // Thermostats
+enum ThermostatName { // Thermostats
     NONE,
     ANDERSEN,
     BERENDSEN,
     LANGEVIN,
     NOSE_HOOVER
 };
+
+/*
+ * Simulation
+ */
+
+enum IntegratorName { // Samplers
+    VERLET,
+    EULER,
+    EULER2,
+    CPODES,
+    RUNGEKUTTA,
+    RUNGEKUTTA2,
+    RUNGEKUTTA3,
+    RUNGEKUTTAFELDBERG
+};
+
+/*
+ * Statistics
+ */
+
+enum SamplerName { // Samplers
+    MC,
+    HMC
+};
+
+#ifndef MONTECARLOSAMPLER
+#define MONTECARLOSAMPLER MC
+#endif
+
+#ifndef HAMILTONIANMONTECARLOSAMPLER
+#define HAMILTONIANMONTECARLOSAMPLER HMC
+#endif
 
 
 #endif /*BGENERAL_H_*/

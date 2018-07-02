@@ -32,16 +32,16 @@ public:
     SimTK::Real calcMassDeterminant(SimTK::State& );
 
     // Initializtion functions
-    virtual void initialize(void) {}
+    virtual void initialize(void) {};
     virtual void reinitialize(void) {}
 
     // Set a thermostat (even for MCMC)
-    virtual void setThermostat(Thermostat);
+    virtual void setThermostat(ThermostatName);
     virtual void setThermostat(std::string);
     virtual void setThermostat(const char *);
 
     // Get the name of the thermostat
-    virtual Thermostat getThermostat(void);
+    virtual ThermostatName getThermostat(void);
 
     // Extract one or more samples
     virtual void update(SimTK::State&) = 0;
@@ -79,7 +79,7 @@ public:
     SimTK::TimeStepper *timeStepper;
 
     // THermodynamics
-    Thermostat thermostat;
+    ThermostatName thermostat;
 
     // Sampling
     int sampleNumber;

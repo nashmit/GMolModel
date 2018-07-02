@@ -339,6 +339,43 @@ int World::getSampleNumber(void)
 {
     return this->sampleNumber;
 }
+
+// Sampler manipulation functions
+int World::addSampler(std::string samplerName)
+{
+    if((samplerName == "HamiltonianMonteCarlo") || (samplerName == "HMC")){
+        HamiltonianMonteCarloSampler * pHMC = new HamiltonianMonteCarloSampler(
+            compoundSystem, matter, topologies[0],
+            forceField, forces, ts );
+        samplers.push_back(pHMC);
+    }
+    return samplers.size();
+}
+
+// Sampler manipulation functions
+int World::addSampler(SamplerName samplerName)
+{
+    if(samplerName == HMC){
+        HamiltonianMonteCarloSampler * pHMC = new HamiltonianMonteCarloSampler(
+            compoundSystem, matter, topologies[0],
+            forceField, forces, ts );
+        samplers.push_back(pHMC);
+    }
+    return samplers.size();
+}
+
+// Get a sampler based on its position in the samplers vector
+const HamiltonianMonteCarloSampler * World::getSampler(int which)
+{
+    return samplers[which];
+}
+
+// Get a writable sampler based on its position in the samplers vector
+HamiltonianMonteCarloSampler * World::updSampler(int which)
+{
+    return samplers[which];
+}
+
 //...............
 
 // Interface

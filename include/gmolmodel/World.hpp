@@ -45,6 +45,7 @@
 #include "server.hpp"
 #include "Topology.hpp"
 #include "bArgParser.hpp"
+#include "HamiltonianMonteCarloSampler.hpp"
 
 //typedef double Vector3[3];
 
@@ -124,7 +125,19 @@ public:
     //...............
 
     // --- Statistics ---
+    // How many samples did we have so far
     int getSampleNumber(void);
+
+    // Sampler manipulation functions
+    int addSampler(std::string);
+    int addSampler(SamplerName);
+
+    // Get a sampler based on its position in the samplers vector
+    const HamiltonianMonteCarloSampler * getSampler(int which);
+
+    // Get a writable sampler based on its position in the samplers vector
+    HamiltonianMonteCarloSampler * updSampler(int which);
+
     //...............
   
     // -- Debugging / helper functions ---
@@ -188,6 +201,7 @@ public:
     // --- Simulation ---
     SimTK::VerletIntegrator *integ;
     SimTK::TimeStepper *ts;
+    std::vector<HamiltonianMonteCarloSampler *> samplers;
     bool _useFixmanTorque;
     //...............
 

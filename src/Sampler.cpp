@@ -64,7 +64,7 @@ Sampler::~Sampler(){
 
 
 // Set a thermostat 
-void Sampler::setThermostat(Thermostat argThermostat){
+void Sampler::setThermostat(ThermostatName argThermostat){
     this->thermostat = argThermostat;
 }
 
@@ -129,7 +129,7 @@ void Sampler::setThermostat(const char *argThermostat){
 }
 
 // Get the name of the thermostat
-Thermostat Sampler::getThermostat(void){
+ThermostatName Sampler::getThermostat(void){
     return this->thermostat;
 }
 
