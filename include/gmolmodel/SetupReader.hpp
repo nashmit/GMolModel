@@ -1,3 +1,6 @@
+#ifndef __SETUPREADER_HPP__
+#define __SETUPREADER_HPP__
+
 #include "Robo.hpp"
 
 // This class implements the functionality for reading arguments from a setup
@@ -27,3 +30,7 @@ private:
     std::map<std::string, std::vector<std::string>> Args; // arguments
     std::map<std::string, std::vector<std::string>>::iterator ArgsIt; // arguments
 };
+
+
+#endif //__SETUPREADER_HPP__
+

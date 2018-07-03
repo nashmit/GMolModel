@@ -23,99 +23,13 @@ int main(int argc, char **argv)
     // Build Gmolmodel simulation worlds
     int nofRegimens = setupReader.getValues("REGIMENS").size();
     std::vector<int> worldIndexes;
-//r    std::vector<World *> p_worlds;
-   
-    // Iterate thorugh regimens and add worlds to the context
+
+    // Create a vector of world indeces   
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
-        if(setupReader.getValues("VISUAL")[0] == "TRUE"){
-            TRACE("NEW ALLOC\n");
-            World * pWorld = new World(worldIx, true, std::stod(setupReader.getValues("TIMESTEPS")[worldIx]));
-            context->AddWorld(pWorld);
-//r            p_worlds.push_back( new World(worldIx, true, std::stod(setupReader.getValues("TIMESTEPS")[worldIx])) );
-        }else{
-            TRACE("NEW ALLOC\n");
-            World * pWorld = new World(worldIx, false, std::stod(setupReader.getValues("TIMESTEPS")[worldIx]));
-            context->AddWorld(pWorld);
-//r            p_worlds.push_back( new World(worldIx, false, std::stod(setupReader.getValues("TIMESTEPS")[worldIx])) );
-        }
-
-        // Set world identifiers
-        (context->updWorld(worldIx))->ownWorldIndex = worldIx;
         worldIndexes.push_back(worldIx);
-    
-        // Get input filenames and add molecules
-        std::vector<std::string> argValues;
-        std::vector<std::string>::iterator argValuesIt;
-        argValues = setupReader.getValues("MOLECULES");
-        for(argValuesIt = argValues.begin(); argValuesIt != argValues.end(); ++argValuesIt){
-            std::string prmtopFN = *argValuesIt + std::string("/ligand.prmtop");
-            std::string inpcrdFN = *argValuesIt + std::string("/ligand.inpcrd");
-            std::string rbFN = *argValuesIt + std::string("/ligand.rb");
-            std::string flexFN = *argValuesIt + std::string("/ligand.flex");
-    
-            std::string ictd = setupReader.getValues("REGIMENS")[worldIx];
-    
-            TRACE("NEW ALLOC\n");
-            readAmberInput *amberReader = new readAmberInput();
-            amberReader->readAmberFiles(inpcrdFN, prmtopFN);
-            (context->updWorld(worldIx))->AddMolecule(amberReader, rbFN, flexFN, ictd);
-    
-            delete amberReader;
-        }
-   
-        // Set force field scale factors.
-        if(setupReader.getValues("FFSCALE")[worldIx] == "AMBER"){ 
-            (context->updWorld(worldIx))->setAmberForceFieldScaleFactors();
-        }else{
-            (context->updWorld(worldIx))->setGlobalForceFieldScaleFactor(std::stod(setupReader.getValues("FFSCALE")[worldIx]));
-        }
-
-        // Set world GBSA implicit solvent scale factor
-        (context->updWorld(worldIx))->setGbsaGlobalScaleFactor(std::stod(setupReader.getValues("GBSA")[worldIx]));
-    
-        // Initialize worlds
-        if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
-            (context->updWorld(worldIx))->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), true );
-        }else{
-            (context->updWorld(worldIx))->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), false );
-        }
-
-        (context->updWorld(worldIx))->setTemperature( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
-
-        // Add samplers
-        TRACE("NEW ALLOC\n");
-
-        context->updWorld(worldIx)->addSampler(HMC);
-    
-        // Do we use Fixman potential
-        bool useFixmanPotential = false;
-        if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
-            useFixmanPotential = true;
-        }
-
-        // We don't need Fixman potential for IC !! WATCH OUT !!
-        //if(setupReader.getValues("REGIMENS")[worldIx] == "IC"){
-        //    useFixmanPotential = false;
-        //}
-
-        // Set thermostats
-        (context->updWorld(worldIx))->updSampler(0)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
-
-
-        // Initialize samplers
-        (context->updWorld(worldIx))->updSampler(0)->initialize( (context->updWorld(worldIx))->integ->updAdvancedState(), 
-             std::stod(setupReader.getValues("TIMESTEPS")[worldIx]),
-             std::stoi(setupReader.getValues("STEPS")[0]),
-             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) ),
-             useFixmanPotential );
-    
     }
-    ////////////////////////////////////////////////////////// END creating Worlds
 
-    // Add worlds to context
-    for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
-        context->AddWorld(context->updWorld(worldIx));
-    }
+    context->LoadWorldsFromSetup(setupReader);
 
     // Set convenient names
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    

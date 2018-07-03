@@ -1,4 +1,8 @@
+#ifndef __CONTEXT_HPP__
+#define __CONTEXT_HPP__
+
 #include "Robo.hpp"
+//#include "SetupReader.hpp"
 
 class Sampler;
 class World;
@@ -20,8 +24,13 @@ public:
     World * updWorld(void);
     World * updWorld(int which);
 
+    // Use a SetupReader Object to read worlds information from a file
+    void LoadWorldsFromSetup(SetupReader&);
+
 private:
     std::vector<World *> worlds;
+    std::vector<int> worldIndexes;
 
 };
 
+#endif //__CONTEXT_HPP__
