@@ -4,8 +4,8 @@ class Sampler;
 class World;
 
 class Context{
-private:
-    World *p_world;
+//private:
+//    World *p_world;
 
 public:
     Context(World *);

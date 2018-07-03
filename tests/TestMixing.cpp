@@ -23,20 +23,24 @@ int main(int argc, char **argv)
     // Build Gmolmodel simulation worlds
     int nofRegimens = setupReader.getValues("REGIMENS").size();
     std::vector<int> worldIndexes;
-    std::vector<World *> p_worlds;
+//r    std::vector<World *> p_worlds;
    
-    // Iterate through worlds (regimens)
+    // Iterate thorugh regimens and add worlds to the context
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
         if(setupReader.getValues("VISUAL")[0] == "TRUE"){
             TRACE("NEW ALLOC\n");
-            p_worlds.push_back( new World(worldIx, true, std::stod(setupReader.getValues("TIMESTEPS")[worldIx])) );
+            World * pWorld = new World(worldIx, true, std::stod(setupReader.getValues("TIMESTEPS")[worldIx]));
+            context->AddWorld(pWorld);
+//r            p_worlds.push_back( new World(worldIx, true, std::stod(setupReader.getValues("TIMESTEPS")[worldIx])) );
         }else{
             TRACE("NEW ALLOC\n");
-            p_worlds.push_back( new World(worldIx, false, std::stod(setupReader.getValues("TIMESTEPS")[worldIx])) );
+            World * pWorld = new World(worldIx, false, std::stod(setupReader.getValues("TIMESTEPS")[worldIx]));
+            context->AddWorld(pWorld);
+//r            p_worlds.push_back( new World(worldIx, false, std::stod(setupReader.getValues("TIMESTEPS")[worldIx])) );
         }
 
         // Set world identifiers
-        (p_worlds[worldIx])->ownWorldIndex = worldIx;
+        (context->updWorld(worldIx))->ownWorldIndex = worldIx;
         worldIndexes.push_back(worldIx);
     
         // Get input filenames and add molecules
@@ -54,34 +58,34 @@ int main(int argc, char **argv)
             TRACE("NEW ALLOC\n");
             readAmberInput *amberReader = new readAmberInput();
             amberReader->readAmberFiles(inpcrdFN, prmtopFN);
-            (p_worlds[worldIx])->AddMolecule(amberReader, rbFN, flexFN, ictd);
+            (context->updWorld(worldIx))->AddMolecule(amberReader, rbFN, flexFN, ictd);
     
             delete amberReader;
         }
    
         // Set force field scale factors.
         if(setupReader.getValues("FFSCALE")[worldIx] == "AMBER"){ 
-            (p_worlds[worldIx])->setAmberForceFieldScaleFactors();
+            (context->updWorld(worldIx))->setAmberForceFieldScaleFactors();
         }else{
-            (p_worlds[worldIx])->setGlobalForceFieldScaleFactor(std::stod(setupReader.getValues("FFSCALE")[worldIx]));
+            (context->updWorld(worldIx))->setGlobalForceFieldScaleFactor(std::stod(setupReader.getValues("FFSCALE")[worldIx]));
         }
 
         // Set world GBSA implicit solvent scale factor
-        (p_worlds[worldIx])->setGbsaGlobalScaleFactor(std::stod(setupReader.getValues("GBSA")[worldIx]));
+        (context->updWorld(worldIx))->setGbsaGlobalScaleFactor(std::stod(setupReader.getValues("GBSA")[worldIx]));
     
         // Initialize worlds
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
-            (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), true );
+            (context->updWorld(worldIx))->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), true );
         }else{
-            (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), false );
+            (context->updWorld(worldIx))->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), false );
         }
 
-        (p_worlds[worldIx])->setTemperature( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
+        (context->updWorld(worldIx))->setTemperature( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
 
         // Add samplers
         TRACE("NEW ALLOC\n");
 
-        p_worlds[worldIx]->addSampler(HMC);
+        context->updWorld(worldIx)->addSampler(HMC);
     
         // Do we use Fixman potential
         bool useFixmanPotential = false;
@@ -95,11 +99,11 @@ int main(int argc, char **argv)
         //}
 
         // Set thermostats
-        (p_worlds[worldIx])->updSampler(0)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
+        (context->updWorld(worldIx))->updSampler(0)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
 
 
         // Initialize samplers
-        (p_worlds[worldIx])->updSampler(0)->initialize( (p_worlds[worldIx])->integ->updAdvancedState(), 
+        (context->updWorld(worldIx))->updSampler(0)->initialize( (context->updWorld(worldIx))->integ->updAdvancedState(), 
              std::stod(setupReader.getValues("TIMESTEPS")[worldIx]),
              std::stoi(setupReader.getValues("STEPS")[0]),
              SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) ),
@@ -110,14 +114,14 @@ int main(int argc, char **argv)
 
     // Add worlds to context
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
-        context->AddWorld(p_worlds[worldIx]);
+        context->AddWorld(context->updWorld(worldIx));
     }
 
     // Set convenient names
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
         std::cout << "World " << worldIx << " initial const state PE: " << std::setprecision(20)
-            << (p_worlds[worldIx])->forces->getMultibodySystem().calcPotentialEnergy((p_worlds[worldIx])->integ->updAdvancedState()) 
-            << " useFixmanPotential = " << p_worlds[worldIx]->updSampler(0)->isUsingFixman()
+            << (context->updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy((context->updWorld(worldIx))->integ->updAdvancedState()) 
+            << " useFixmanPotential = " << context->updWorld(worldIx)->updSampler(0)->isUsingFixman()
             << std::endl;
     }
 
@@ -143,7 +147,7 @@ int main(int argc, char **argv)
     const SimTK::Compound * p_compounds[nofRegimens];
     if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
         for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
-            p_compounds[worldIx] = &((p_worlds[worldIx])->getTopology(0));
+            p_compounds[worldIx] = &((context->updWorld(worldIx))->getTopology(0));
         }
     }
     //
@@ -153,21 +157,21 @@ int main(int argc, char **argv)
 
     // Update one round for the first regimen
     currentWorldIx = worldIndexes.front();
-    SimTK::State& advancedState = (p_worlds[currentWorldIx])->integ->updAdvancedState();
+    SimTK::State& advancedState = (context->updWorld(currentWorldIx))->integ->updAdvancedState();
 
     // Update
     //std::cout << "Sampler " << currentWorldIx << " updating initially" << std::endl;
     for(int k = 0; k < mix_mcsteps[currentWorldIx]; k++){
         ++mc_step; // Increment mc_step
-        p_worlds[currentWorldIx]->updSampler(0)->update(advancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
+        context->updWorld(currentWorldIx)->updSampler(0)->update(advancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
     }
 
     // Write pdb
     if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
-        (p_worlds[currentWorldIx])->updateAtomLists(advancedState);
+        (context->updWorld(currentWorldIx))->updateAtomLists(advancedState);
         std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
         for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-            ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
+            ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
         }
     }
 
@@ -180,14 +184,14 @@ int main(int argc, char **argv)
         // Transfer coordinates from last world to current
         //std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
         //    << " at MC step " << mc_step << std::endl;
-        SimTK::State& lastAdvancedState = (p_worlds[worldIndexes.back()])->integ->updAdvancedState();
-        SimTK::State& currentAdvancedState = (p_worlds[currentWorldIx])->integ->updAdvancedState();
+        SimTK::State& lastAdvancedState = (context->updWorld(worldIndexes.back()))->integ->updAdvancedState();
+        SimTK::State& currentAdvancedState = (context->updWorld(currentWorldIx))->integ->updAdvancedState();
 
-        currentAdvancedState = (p_worlds[currentWorldIx])->setAtomsLocationsInGround(
-            currentAdvancedState, (p_worlds[worldIndexes.back()])->getAtomsLocationsInGround( lastAdvancedState ));
+        currentAdvancedState = (context->updWorld(currentWorldIx))->setAtomsLocationsInGround(
+            currentAdvancedState, (context->updWorld(worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
 
         // Reinitialize current sampler
-        p_worlds[currentWorldIx]->updSampler(0)->reinitialize( currentAdvancedState, 
+        context->updWorld(currentWorldIx)->updSampler(0)->reinitialize( currentAdvancedState, 
             timesteps[currentWorldIx], total_mcsteps,
             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
 
@@ -196,9 +200,9 @@ int main(int argc, char **argv)
             for(int i = 0; i < nofRegimens - 1; i++){
                 int restIx = worldIndexes[i];
                 int backIx = worldIndexes.back();
-                SimTK::Real diffPE = (p_worlds[backIx])->updSampler(0)->getSetPE() - (p_worlds[restIx])->updSampler(0)->getSetPE();
-                std::cout << "Setting sampler " << restIx << " REP to " << (p_worlds[backIx])->updSampler(0)->getSetPE() << " - " << (p_worlds[restIx])->updSampler(0)->getSetPE() << " = " << diffPE << std::endl;
-                (p_worlds[restIx])->updSampler(0)->setREP( diffPE );
+                SimTK::Real diffPE = (context->updWorld(backIx))->updSampler(0)->getSetPE() - (context->updWorld(restIx))->updSampler(0)->getSetPE();
+                std::cout << "Setting sampler " << restIx << " REP to " << (context->updWorld(backIx))->updSampler(0)->getSetPE() << " - " << (context->updWorld(restIx))->updSampler(0)->getSetPE() << " = " << diffPE << std::endl;
+                (context->updWorld(restIx))->updSampler(0)->setREP( diffPE );
             }
         }
 
@@ -206,17 +210,17 @@ int main(int argc, char **argv)
         //std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
         for(int k = 0; k < mix_mcsteps[currentWorldIx]; k++){
             ++mc_step; // Increment mc_step
-            p_worlds[currentWorldIx]->updSampler(0)->update(currentAdvancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
+            context->updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
         }
 
         // Write pdb
         if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
             //if(!((mc_step+1) % 20)){
             if(1){
-                (p_worlds[currentWorldIx])->updateAtomLists(currentAdvancedState);
+                (context->updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
                 std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
                 for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                    ((p_worlds[currentWorldIx])->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
+                    ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
                 }
             }
         }
@@ -251,9 +255,9 @@ int main(int argc, char **argv)
     } // for i in MC steps
 
     // Free the memory
-    for(int wIx = 0; wIx < nofRegimens; wIx++){
-        delete p_worlds[wIx];
-    }
+//r    for(int wIx = 0; wIx < nofRegimens; wIx++){
+//r        delete p_worlds[wIx];
+//r    }
 
     if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
         //delete[] p_compounds;
