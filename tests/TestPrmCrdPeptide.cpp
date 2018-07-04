@@ -57,7 +57,7 @@ int main(int argc, char **argv)
     HamiltonianMonteCarloSampler *p_HMCsampler = new HamiltonianMonteCarloSampler(p_world->compoundSystem, p_world->matter, (SimTK::Compound *)(&(p_world->getTopology(0))), p_world->forceField, p_world->forces, p_world->ts);
 
     Context *context = new Context();
-    context->AddWorld(p_world);
+    context->AddWorld(p_world, true);
     World *world = context->getWorld();
     world->forceField->setTracing(true);
 

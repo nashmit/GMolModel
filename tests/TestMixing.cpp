@@ -20,6 +20,11 @@ int main(int argc, char **argv)
     Context *context = new Context();
     srand (time(NULL));
 
+    context->LoadWorldsFromSetup(setupReader);
+
+    context->Run(setupReader);
+
+    /*
     // Build Gmolmodel simulation worlds
     int nofRegimens = setupReader.getValues("REGIMENS").size();
     std::vector<int> worldIndexes;
@@ -28,8 +33,6 @@ int main(int argc, char **argv)
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
         worldIndexes.push_back(worldIx);
     }
-
-    context->LoadWorldsFromSetup(setupReader);
 
     // Set convenient names
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
@@ -41,19 +44,20 @@ int main(int argc, char **argv)
 
     // Get simulation parameters
     int total_mcsteps = std::stoi(setupReader.getValues("STEPS")[0]);
-    int mix_mcsteps[nofRegimens];
-    int mdsteps[nofRegimens];
+    int nofSamplesPerRound[nofRegimens];
+    int nofMDSteps[nofRegimens];
     float timesteps[nofRegimens];
-    int remainders[nofRegimens];
+
+
     int currentWorldIx = 0;
     int round_mcsteps = 0;
 
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){    
-        mix_mcsteps[worldIx] = std::stoi(setupReader.getValues("MIXMCSTEPS")[worldIx]);
-        assert( (!(total_mcsteps % mix_mcsteps[worldIx])) &&
+        nofSamplesPerRound[worldIx] = std::stoi(setupReader.getValues("MIXMCSTEPS")[worldIx]);
+        assert( (!(total_mcsteps % nofSamplesPerRound[worldIx])) &&
             "Total number of steps must be divisible with each regimen MC steps." );
-        round_mcsteps += mix_mcsteps[worldIx];
-        mdsteps[worldIx] = std::stoi(setupReader.getValues("MDSTEPS")[worldIx]);
+        round_mcsteps += nofSamplesPerRound[worldIx];
+        nofMDSteps[worldIx] = std::stoi(setupReader.getValues("MDSTEPS")[worldIx]);
         timesteps[worldIx] = std::stod(setupReader.getValues("TIMESTEPS")[worldIx]);
     }
 
@@ -75,9 +79,9 @@ int main(int argc, char **argv)
 
     // Update
     //std::cout << "Sampler " << currentWorldIx << " updating initially" << std::endl;
-    for(int k = 0; k < mix_mcsteps[currentWorldIx]; k++){
+    for(int k = 0; k < nofSamplesPerRound[currentWorldIx]; k++){
         ++mc_step; // Increment mc_step
-        context->updWorld(currentWorldIx)->updSampler(0)->update(advancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
+        context->updWorld(currentWorldIx)->updSampler(0)->update(advancedState, timesteps[currentWorldIx], nofMDSteps[currentWorldIx]);
     }
 
     // Write pdb
@@ -122,9 +126,9 @@ int main(int argc, char **argv)
 
         // Update
         //std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
-        for(int k = 0; k < mix_mcsteps[currentWorldIx]; k++){
+        for(int k = 0; k < nofSamplesPerRound[currentWorldIx]; k++){
             ++mc_step; // Increment mc_step
-            context->updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, timesteps[currentWorldIx], mdsteps[currentWorldIx]);
+            context->updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, timesteps[currentWorldIx], nofMDSteps[currentWorldIx]);
         }
 
         // Write pdb
@@ -168,14 +172,11 @@ int main(int argc, char **argv)
 
     } // for i in MC steps
 
-    // Free the memory
-//r    for(int wIx = 0; wIx < nofRegimens; wIx++){
-//r        delete p_worlds[wIx];
-//r    }
-
     if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
         //delete[] p_compounds;
     }
+    */
+
 
     delete context;
 

@@ -87,7 +87,7 @@ int main(int argc, char **argv)
 
     // Add worlds to context
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
-        context->AddWorld(p_worlds[worldIx]);
+        context->AddWorld(p_worlds[worldIx], true);
     }
 
     // Set convenient names
