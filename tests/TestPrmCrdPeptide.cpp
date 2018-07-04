@@ -68,13 +68,13 @@ int main(int argc, char **argv)
     if( setupReader.getValues("REGIMEN")[0] == "IC" ){
         p_HMCsampler->initialize( integAdvancedState, 
            std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
-           std::stoi(setupReader.getValues("STEPS")[0]),
+//           std::stoi(setupReader.getValues("STEPS")[0]),
            SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
            false );
     }else{
         p_HMCsampler->initialize( integAdvancedState, 
            std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
-           std::stoi(setupReader.getValues("STEPS")[0]),
+//           std::stoi(setupReader.getValues("STEPS")[0]),
            SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
            true );
     }

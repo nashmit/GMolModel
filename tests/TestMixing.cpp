@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 
     /*
     // Build Gmolmodel simulation worlds
-    int nofRegimens = setupReader.getValues("REGIMENS").size();
+    int nofRegimens = setupReader.getValues("WORLDS").size();
     std::vector<int> worldIndexes;
 
     // Create a vector of world indeces   
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
 
         // Set residual energy for the rest of the samplers
-        if(setupReader.getValues("REGIMENS")[worldIndexes.back()] == "IC"){
+        if(setupReader.getValues("WORLDS")[worldIndexes.back()] == "IC"){
             for(int i = 0; i < nofRegimens - 1; i++){
                 int restIx = worldIndexes[i];
                 int backIx = worldIndexes.back();
