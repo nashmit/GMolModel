@@ -82,7 +82,7 @@ public:
     // Intializes simulation parameters.
     // Beside passing the integrator step and Fixman torque option,
     // it also initializes default scaling factors for Amber
-    void Init(SimTK::Real integTimestep, bool useFixmanTorque = false);
+    void ModelTopologies(bool useFixmanTorque = false);
     //...............
 
     // --- Mixing functions: Pass configurations among Worlds
@@ -129,6 +129,7 @@ public:
     int getSampleNumber(void);
 
     // Sampler manipulation functions
+    int getNofSamplers(void);
     int addSampler(std::string);
     int addSampler(SamplerName);
 

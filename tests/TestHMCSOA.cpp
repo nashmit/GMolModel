@@ -63,7 +63,7 @@ int main(int argc, char **argv)
         }
 
         // Initialize worlds
-        (p_worlds[worldIx])->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]) );
+        (p_worlds[worldIx])->ModelTopologies( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]) );
 
         // Initialize sampler
         TRACE("NEW ALLOC\n");

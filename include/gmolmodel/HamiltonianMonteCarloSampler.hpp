@@ -58,23 +58,30 @@ public:
     and variables that store the energies, both needed for the 
     acception-rejection step. Also realize velocities and initialize 
     the timestepper. **/
-//r    virtual void initialize(SimTK::State& advanced, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman = true); 
-    virtual void initialize(SimTK::State& advanced, SimTK::Real timestep, SimTK::Real argTemperature, bool argUseFixman = true); 
+    virtual void initialize(SimTK::State& advanced, SimTK::Real argTemperature, bool argUseFixman = true); 
 
     /** Same as initialize **/
-//r    virtual void reinitialize(SimTK::State& advanced, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature) ; 
-    virtual void reinitialize(SimTK::State& advanced, SimTK::Real timestep, SimTK::Real argTemperature) ; 
+    virtual void reinitialize(SimTK::State& advanced, SimTK::Real argTemperature) ; 
+
+    /** Get the TimeStepper that manages the integrator **/
+    const SimTK::TimeStepper * getTimeStepper(void);
+    SimTK::TimeStepper * updTimeStepper(void);
+    void setTimeStepper(SimTK::TimeStepper * someTimeStepper);
+
+    /** Get/Set the timestep for integration **/
+    virtual float getTimestep(void);
+    virtual void setTimestep(float);
 
     /** It implements the proposal move in the Hamiltonian Monte Carlo
     algorithm. It essentially propagates the trajectory after it stores
     the configuration and energies. TODO: break in two functions:
     initializeVelocities and propagate/integrate **/
-    void propose(SimTK::State& someState, SimTK::Real timestep, int nosteps);
+    void propose(SimTK::State& someState, int nosteps);
 
     /** Main function that contains all the 3 steps of HMC.
     Implements the acception-rejection step and sets the state of the 
     compound to the appropriate conformation wether it accepted or not. **/
-    void update(SimTK::State& someState, SimTK::Real timestep, int nosteps);
+    void update(SimTK::State& someState, int nosteps);
 
     /** Get the proposed kinetic energy. This is set right  after velocities
     are initialized. **/
@@ -101,6 +108,8 @@ protected:
     SimTK::Real etot_set; // stored total energy
     SimTK::Real etot_proposed; // last accepted total energ (same with stored)
     int sampleNumber; // counter for the number of MC trials 
+
+    float timestep;
 
 };
 

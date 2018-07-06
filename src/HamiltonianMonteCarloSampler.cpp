@@ -21,7 +21,7 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
     this->residualEmbeddedPotential = 0.0;
     sampleNumber = 0;
     this->alwaysAccept = false;
-
+    this->timestep = 0.002; // ps
 }
 
 /** Destructor **/
@@ -113,13 +113,29 @@ void HamiltonianMonteCarloSampler::setProposedKE(SimTK::Real inpKE)
     this->ke_proposed = inpKE;
 }
 
+/** Get/set the TimeStepper that manages the integrator **/
+const SimTK::TimeStepper * HamiltonianMonteCarloSampler::getTimeStepper(void)
+{
+    return timeStepper;
+}
+
+SimTK::TimeStepper * HamiltonianMonteCarloSampler::updTimeStepper(void)
+{
+    return timeStepper;
+}
+
+void HamiltonianMonteCarloSampler::setTimeStepper(SimTK::TimeStepper * someTimeStepper)
+{
+    timeStepper = someTimeStepper;
+}
+
 /** Seed the random number generator. Set simulation temperature,
 velocities to desired temperature, variables that store the configuration
 and variables that store the energies, both needed for the
 acception-rejection step. Also realize velocities and initialize
 the timestepper. **/
 //r void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman) 
-void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, SimTK::Real argTemperature, bool argUseFixman) 
+void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real argTemperature, bool argUseFixman) 
 {
     // Seed the random number generator
     randomEngine.seed( std::time(0) );
@@ -184,7 +200,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
 
 /** Same as initialize **/
 //r void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature) 
-void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real timestep, SimTK::Real argTemperature) 
+void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real argTemperature) 
 {
     // After an event handler has made a discontinuous change to the 
     // Integrator's "advanced state", this method must be called to 
@@ -240,11 +256,23 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::
 
 }
 
+/** Get/Set the timestep for integration **/
+float HamiltonianMonteCarloSampler::getTimestep(void)
+{
+    return timeStepper->updIntegrator().getPredictedNextStepSize();
+}
+
+void HamiltonianMonteCarloSampler::setTimestep(float argTimestep)
+{
+    timeStepper->updIntegrator().setFixedStepSize(timestep);
+}
+
+
 /** It implements the proposal move in the Hamiltonian Monte Carlo
 algorithm. It essentially propagates the trajectory after it stores
 the configuration and energies. TODO: break in two functions:
 initializeVelocities and propagate/integrate **/
-void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real timestep, int nosteps)
+void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
 {
     // Seed the random number generator every move
     //randomEngine.seed(4294653137UL); // for reproductibility
@@ -353,12 +381,12 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, SimTK::Real 
 /** Main function that contains all the 3 steps of HMC.
 Implements the acception-rejection step and sets the state of the
 compound to the appropriate conformation wether it accepted or not. **/
-void HamiltonianMonteCarloSampler::update(SimTK::State& someState, SimTK::Real timestep, int nosteps)
+void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 {
     SimTK::Real rand_no = uniformRealDistribution(randomEngine);
 
     // Do a trial move
-    propose(someState, timestep, nosteps);
+    propose(someState, nosteps);
 
     // Get needed energies
     SimTK::Real pe_o  = getOldPE();

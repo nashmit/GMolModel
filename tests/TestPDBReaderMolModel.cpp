@@ -46,7 +46,7 @@ try {
 
     const SimTK::State& constRefState = ts.getIntegrator().getState();
     SimTK::State& integAdvancedState = ts.updIntegrator().updAdvancedState();
-    p_HMCsampler->initialize(integAdvancedState, atof(argv[3]), atoi(argv[4]), SimTK::Real(atof(argv[5])) );
+    p_HMCsampler->initialize(integAdvancedState, atoi(argv[4]), SimTK::Real(atof(argv[5])) );
 
     // Force field scaling
     forceField.setBondStretchGlobalScaleFactor(0.0);
@@ -85,7 +85,7 @@ try {
                   << integAdvancedState.getU() << std::endl;
         std::cout << "Time before update: " << ts.getTime() << std::endl;
 
-        p_HMCsampler->update(integAdvancedState, atof(argv[3]), atof(argv[4]));
+        p_HMCsampler->update(integAdvancedState, atof(argv[4]));
 
         std::cout << "Q after update integAdvancedState "
                   << integAdvancedState.getQ() << std::endl;

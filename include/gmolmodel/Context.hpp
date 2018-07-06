@@ -16,6 +16,7 @@ public:
     Context();
     ~Context();
 
+    World * AddWorld(bool visual);
     World * AddWorld(World *, bool visual);
 
     World * getWorld(void) const;
@@ -40,12 +41,12 @@ public:
 
     // --- Simulation parameters ---
     // If HMC, get/set the number of MD steps
-    int getNofMDSteps(int whichWorld);
-    void setNofMDSteps(int whichWorld, int nofMDSteps);
+    int getNofMDStepsPerSample(int whichWorld);
+    void setNofMDStepsPerSample(int whichWorld, int MDStepsPerSample);
 
     // If HMC, get/set timestep forMD
-    float getTimeStep(int whichWorld);
-    void setTimeStep(int whichWorld, float timeStep);
+    const float getTimestep(int whichWorld, int whichSampler);
+    void setTimestep(int whichWorld, int whichSampler, float timeStep);
     //------------
 
     // --- Mixing parameters ---
@@ -83,7 +84,7 @@ private:
     int nofRounds;
     int total_mcsteps;
     std::vector<int> nofSamplesPerRound;
-    std::vector<int> nofMDSteps;
+    std::vector<int> nofMDStepsPerSample;
     std::vector<float> timesteps;
 };
 

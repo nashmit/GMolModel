@@ -209,10 +209,10 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
 }
 
 // Initialize simulation
-void World::Init(SimTK::Real timestep, bool useFixmanTorqueOpt)
+void World::ModelTopologies(bool useFixmanTorqueOpt)
 {
     // Only model after loading all the compounds
-    integ->setFixedStepSize(timestep);
+    //integ->setFixedStepSize(timestep);
 
     std::cout << "World::Init BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
     std::cout << "World::Init model Compound" << std::endl << std::flush;
@@ -341,6 +341,12 @@ int World::getSampleNumber(void)
 }
 
 // Sampler manipulation functions
+
+int World::getNofSamplers(void)
+{
+    return samplers.size();
+}
+
 int World::addSampler(std::string samplerName)
 {
     if((samplerName == "HamiltonianMonteCarlo") || (samplerName == "HMC")){

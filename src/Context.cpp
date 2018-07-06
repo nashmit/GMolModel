@@ -17,8 +17,23 @@ Context::Context(World *inp_p_world){
     worldIndexes.push_back(0);
 
     nofSamplesPerRound.push_back(1);
-    nofMDSteps.push_back(1);
+    nofMDStepsPerSample.push_back(1);
     timesteps.push_back(0.002); // ps
+}
+
+// Add another world and a sampler to the context
+World * Context::AddWorld(bool visual){
+
+    worldIndexes.push_back(worldIndexes.size());
+
+    World * inp_p_world = new World(worldIndexes.back(), true);
+    worlds.push_back(inp_p_world);
+
+    nofSamplesPerRound.push_back(1);
+    nofMDStepsPerSample.push_back(1);
+    timesteps.push_back(0.002); // ps
+
+    return worlds.back();
 }
 
 // Add another world and a sampler to the context
@@ -27,7 +42,7 @@ World * Context::AddWorld(World *inp_p_world, bool visual){
     worldIndexes.push_back(worldIndexes.size());
 
     nofSamplesPerRound.push_back(1);
-    nofMDSteps.push_back(1);
+    nofMDStepsPerSample.push_back(1);
     timesteps.push_back(0.002); // ps
 
     return worlds.back();
@@ -39,7 +54,7 @@ Context::~Context(){
     worldIndexes.clear();
     
     nofSamplesPerRound.clear();
-    nofMDSteps.clear();
+    nofMDStepsPerSample.clear();
     timesteps.clear(); 
 }
 
@@ -67,7 +82,8 @@ World * Context::updWorld(int which){
 void Context::LoadWorldsFromSetup(SetupReader& setupReader)
 {
     // Build Gmolmodel simulation worlds
-    int nofWorlds = setupReader.getValues("WORLDS").size();
+    unsigned int nofWorlds = setupReader.getValues("WORLDS").size();
+    bool useFixmanPotential = false;
 
     // Create a vector of world indeces
     /*
@@ -81,21 +97,30 @@ void Context::LoadWorldsFromSetup(SetupReader& setupReader)
             std::cout << " ]" << std::endl;
     */
 
-    // Iterate thorugh regimens and add worlds to the context
+    // Add worlds
+    /*
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         if(setupReader.getValues("VISUAL")[0] == "TRUE"){
             TRACE("NEW ALLOC\n");
-            World * pWorld = new World(worldIx, true, std::stod(setupReader.getValues("TIMESTEPS")[worldIx]));
-            AddWorld(pWorld, true);
+//r            World * pWorld = new World(worldIx, true);
+//r            AddWorld(pWorld, true);
+            AddWorld(true);
         }else{
             TRACE("NEW ALLOC\n");
-            World * pWorld = new World(worldIx, false, std::stod(setupReader.getValues("TIMESTEPS")[worldIx]));
-            AddWorld(pWorld, false);
+//r            World * pWorld = new World(worldIx, false);
+//r            AddWorld(pWorld, false);
+            AddWorld(false);
         }
 
         // Set world identifiers
-        (updWorld(worldIx))->ownWorldIndex = worldIx;
+//r        (updWorld(worldIx))->ownWorldIndex = worldIx;
     
+    }
+    */
+
+
+    // Add molecules to worlds
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         // Get input filenames and add molecules
         std::vector<std::string> argValues;
         std::vector<std::string>::iterator argValuesIt;
@@ -115,7 +140,11 @@ void Context::LoadWorldsFromSetup(SetupReader& setupReader)
     
             delete amberReader;
         }
-   
+
+    }
+
+    //
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         // Set force field scale factors.
         if(setupReader.getValues("FFSCALE")[worldIx] == "AMBER"){ 
             (updWorld(worldIx))->setAmberForceFieldScaleFactors();
@@ -128,31 +157,34 @@ void Context::LoadWorldsFromSetup(SetupReader& setupReader)
     
         // Initialize worlds
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
-            (updWorld(worldIx))->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), true );
+            (updWorld(worldIx))->ModelTopologies( true );
         }else{
-            (updWorld(worldIx))->Init( std::stod(setupReader.getValues("TIMESTEPS")[worldIx]), false );
+            (updWorld(worldIx))->ModelTopologies( false );
         }
 
         (updWorld(worldIx))->setTemperature( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
 
         // Add samplers
         TRACE("NEW ALLOC\n");
-
-        updWorld(worldIx)->addSampler(HMC);
     
         // Do we use Fixman potential
-        bool useFixmanPotential = false;
         if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
             useFixmanPotential = true;
         }
+     }
 
+    // Set integrators timesteps
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        updWorld(worldIx)->addSampler(HMC);
+        setTimestep(worldIx, 0, std::stod(setupReader.getValues("TIMESTEPS")[worldIx]) );
+    }
+        
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         // Set thermostats
         (updWorld(worldIx))->updSampler(0)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
 
         // Initialize samplers
         (updWorld(worldIx))->updSampler(0)->initialize( (updWorld(worldIx))->integ->updAdvancedState(), 
-             std::stod(setupReader.getValues("TIMESTEPS")[worldIx]),
-//r             std::stoi(setupReader.getValues("STEPS")[0]),
              SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) ),
              useFixmanPotential );
     
@@ -185,15 +217,26 @@ void Context::setGuidanceTemperature(float someTemperature)
 
 // --- Simulation parameters ---
 // If HMC, get/set the number of MD steps
-int Context::getNofMDSteps(int whichWorld){
-   assert(!"Not implemented"); 
+int Context::getNofMDStepsPerSample(int whichWorld){
+   return nofMDStepsPerSample[whichWorld]; 
 }
 
-void Context::setNofMDSteps(int whichWorld, int nofMDSteps){assert(!"Not implemented");}
+void Context::setNofMDStepsPerSample(int whichWorld, int MDStepsPerSample)
+{
+   nofMDStepsPerSample[whichWorld] = MDStepsPerSample;
+}
 
 // If HMC, get/set timestep forMD
-float Context::getTimeStep(int whichWorld){assert(!"Not implemented");}
-void Context::setTimeStep(int whichWorld, float timeStep){assert(!"Not implemented");}
+const float Context::getTimestep(int whichWorld, int whichSampler)
+{
+    return worlds[whichWorld]->updSampler(whichSampler)->getTimeStepper()->getIntegrator().getPredictedNextStepSize();
+
+}
+
+void Context::setTimestep(int whichWorld, int whichSampler, float argTimestep)
+{
+    worlds[whichWorld]->updSampler(whichSampler)->updTimeStepper()->updIntegrator().setFixedStepSize(argTimestep);
+}
 //------------
 
 // --- Mixing parameters ---
@@ -201,8 +244,17 @@ void Context::setTimeStep(int whichWorld, float timeStep){assert(!"Not implement
 int Context::getNofRounds(int nofRounds){assert(!"Not implemented");}
 void Context::setNofRounds(int nofRounds){assert(!"Not implemented");}
 
-int Context::getNofSamplesPerRound(int whichWorld){assert(!"Not implemented");}
-void Context::setNofSamplesPerRound(int whichWorld, int MCStepsPerRound){assert(!"Not implemented");}
+// Get the number of samples returned by the sampler in one round
+int Context::getNofSamplesPerRound(int whichWorld)
+{
+    return nofSamplesPerRound[whichWorld];
+}
+
+// Set the number of samples returned by the sampler in one round
+void Context::setNofSamplesPerRound(int whichWorld, int MCStepsPerRound)
+{
+    nofSamplesPerRound[whichWorld] = MCStepsPerRound;
+}
 
 // Return the world index in position 'which'. To be used when rotationg
 int Context::getWorldIndex(int which)
@@ -232,19 +284,20 @@ void Context::Run(SetupReader& setupReader)
     // Get simulation parameters
     //total_mcsteps = std::stoi(setupReader.getValues("STEPS")[0]);
 
-    nofSamplesPerRound[worlds.size()];
-    nofMDSteps[worlds.size()];
-    timesteps[worlds.size()];
+    //nofSamplesPerRound[worlds.size()];
+    //nofMDStepsPerSample[worlds.size()];
+    //timesteps[worlds.size()];
 
     int currentWorldIx = 0;
     int round_mcsteps = 0;
 
     nofRounds = std::stoi(setupReader.getValues("ROUNDS")[0]);
+
     for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){    
-        nofSamplesPerRound[worldIx] = std::stoi(setupReader.getValues("MIXMCSTEPS")[worldIx]);
+        //nofSamplesPerRound[worldIx] = std::stoi(setupReader.getValues("MIXMCSTEPS")[worldIx]);
         round_mcsteps += nofSamplesPerRound[worldIx];
-        nofMDSteps[worldIx] = std::stoi(setupReader.getValues("MDSTEPS")[worldIx]);
-        timesteps[worldIx] = std::stod(setupReader.getValues("TIMESTEPS")[worldIx]);
+        //nofMDStepsPerSample[worldIx] = std::stoi(setupReader.getValues("MDSTEPS")[worldIx]);
+        //timesteps[worldIx] = std::stod(setupReader.getValues("TIMESTEPS")[worldIx]);
     }
     total_mcsteps = round_mcsteps * nofRounds;
 
@@ -268,7 +321,7 @@ void Context::Run(SetupReader& setupReader)
     //std::cout << "Sampler " << currentWorldIx << " updating initially" << std::endl;
     for(int k = 0; k < nofSamplesPerRound[currentWorldIx]; k++){
         ++mc_step; // Increment mc_step
-        updWorld(currentWorldIx)->updSampler(0)->update(advancedState, timesteps[currentWorldIx], nofMDSteps[currentWorldIx]);
+        updWorld(currentWorldIx)->updSampler(0)->update(advancedState, nofMDStepsPerSample[currentWorldIx]);
     }
 
     // Write pdb
@@ -280,18 +333,11 @@ void Context::Run(SetupReader& setupReader)
         }
     }
 
-//r    while(mc_step < total_mcsteps){
     for(int round = 0; round < nofRounds; round++){
         for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){
     
             // Rotate worlds indeces (translate from right to left) 
             std::rotate(worldIndexes.begin(), worldIndexes.begin() + 1, worldIndexes.end());
-
-            std::cout << "indeces vector = [" ;
-            for(unsigned int Ix = 0; Ix < worldIndexes.size(); Ix++){
-                std::cout << " " << worldIndexes[Ix] ;
-            }
-            std::cout << " ]" << std::endl;
 
             currentWorldIx = worldIndexes.front();
     
@@ -306,8 +352,6 @@ void Context::Run(SetupReader& setupReader)
     
             // Reinitialize current sampler
             updWorld(currentWorldIx)->updSampler(0)->reinitialize( currentAdvancedState, 
-    //r            timesteps[currentWorldIx], total_mcsteps,
-                timesteps[currentWorldIx],
                 SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
     
             // INCORRECT !!
@@ -324,8 +368,7 @@ void Context::Run(SetupReader& setupReader)
             // Update
             std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
             for(int k = 0; k < nofSamplesPerRound[currentWorldIx]; k++){
-    //r            ++mc_step; // Increment mc_step
-                updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, timesteps[currentWorldIx], nofMDSteps[currentWorldIx]);
+                updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, nofMDStepsPerSample[currentWorldIx]);
             }
     
             // Write pdb

@@ -49,7 +49,7 @@ int main(int argc, char **argv)
         delete amberReader;
     }
 
-    p_world->Init(0.0015);
+    p_world->ModelTopologies(0.0015);
 
 
     // Initialize sampler
@@ -67,13 +67,11 @@ int main(int argc, char **argv)
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
     if( setupReader.getValues("REGIMEN")[0] == "IC" ){
         p_HMCsampler->initialize( integAdvancedState, 
-           std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
 //           std::stoi(setupReader.getValues("STEPS")[0]),
            SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
            false );
     }else{
         p_HMCsampler->initialize( integAdvancedState, 
-           std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
 //           std::stoi(setupReader.getValues("STEPS")[0]),
            SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
            true );
@@ -92,7 +90,6 @@ int main(int argc, char **argv)
     for(int i = 0; i < std::stoi(setupReader.getValues("STEPS")[0]); i++){
 
         p_HMCsampler->update(integAdvancedState, 
-            std::stod(setupReader.getValues("FREE_TIMESTEP")[0]),
             std::stoi(setupReader.getValues("FREE_MDSTEPS")[0]) );
 
         if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
