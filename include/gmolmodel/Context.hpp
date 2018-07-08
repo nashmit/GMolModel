@@ -2,14 +2,11 @@
 #define __CONTEXT_HPP__
 
 #include "Robo.hpp"
-//#include "SetupReader.hpp"
 
 class Sampler;
 class World;
 
 class Context{
-//private:
-//    World *p_world;
 
 public:
     Context(World *);
@@ -26,6 +23,13 @@ public:
     World * updWorld(int which);
 
     // --- Use a SetupReader Object to read worlds information from a file ---
+    bool loadTopologyFile(int whichWorld, int whichMolecule, std::string topologyFilename);
+    bool loadCoordinatesFile(int whichWorld, int whichMolecule, std::string coordinatesFilename);
+    bool loadRigidBodiesSpecs(int whichWorld, int whichMolecule, std::string RBSpecsFN);
+    bool loadFlexibleBondsSpecs(int whichWorld, int whichMolecule, std::string FlexSpecsFN);
+    void setRegimen (int whichWorld, int whichMolecule, std::string regimen);
+    void loadMolecules();
+
     void LoadWorldsFromSetup(SetupReader&);
     //------------
 
@@ -79,6 +83,13 @@ public:
 private:
     std::vector<World *> worlds;
     std::vector<int> worldIndexes;
+
+    // Molecules files
+    std::vector<std::vector<std::string>> topFNs;
+    std::vector<std::vector<std::string>> crdFNs;
+    std::vector<std::vector<std::string>> rbSpecsFNs;
+    std::vector<std::vector<std::string>> flexSpecsFNs;
+    std::vector<std::vector<std::string>> regimens;
 
     // Simulation parameters
     int nofRounds;

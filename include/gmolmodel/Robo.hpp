@@ -1,3 +1,6 @@
+#ifndef __ROBO_HPP
+#define __ROBO_HPP
+
 #include "Simbody.h"
 #include "Molmodel.h"
 
@@ -19,6 +22,7 @@
 
 #include "bgeneral.hpp"
 #include "SetupReader.hpp"
+#include "readAmberInput.hpp"
 
 
 #ifdef DEBUG_ROBO
@@ -26,3 +30,6 @@
 #else
 #define TRACE(STR)
 #endif
+
+
+#endif // __ROBO_HPP

@@ -259,12 +259,14 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::
 /** Get/Set the timestep for integration **/
 float HamiltonianMonteCarloSampler::getTimestep(void)
 {
-    return timeStepper->updIntegrator().getPredictedNextStepSize();
+    return timestep;
+    //return timeStepper->updIntegrator().getPredictedNextStepSize();
 }
 
 void HamiltonianMonteCarloSampler::setTimestep(float argTimestep)
 {
     timeStepper->updIntegrator().setFixedStepSize(timestep);
+    this->timestep = argTimestep;
 }
 
 
@@ -439,6 +441,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     }
     else if( (!isnan(pe_n)) && 
     ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
+//    ((etot_n > etot_proposed) || (rand_no < exp((etot_n - etot_proposed)/RT))) ){ // Unfold
         std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM

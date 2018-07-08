@@ -16,6 +16,12 @@ Context::Context(World *inp_p_world){
     worlds.push_back(inp_p_world);
     worldIndexes.push_back(0);
 
+    topFNs.push_back(std::vector<std::string>());
+    crdFNs.push_back(std::vector<std::string>());
+    rbSpecsFNs.push_back(std::vector<std::string>());
+    flexSpecsFNs.push_back(std::vector<std::string>());
+    regimens.push_back(std::vector<std::string>());
+
     nofSamplesPerRound.push_back(1);
     nofMDStepsPerSample.push_back(1);
     timesteps.push_back(0.002); // ps
@@ -26,8 +32,14 @@ World * Context::AddWorld(bool visual){
 
     worldIndexes.push_back(worldIndexes.size());
 
-    World * inp_p_world = new World(worldIndexes.back(), true);
+    World * inp_p_world = new World(worldIndexes.back(), visual);
     worlds.push_back(inp_p_world);
+
+    topFNs.push_back(std::vector<std::string>());
+    crdFNs.push_back(std::vector<std::string>());
+    rbSpecsFNs.push_back(std::vector<std::string>());
+    flexSpecsFNs.push_back(std::vector<std::string>());
+    regimens.push_back(std::vector<std::string>());
 
     nofSamplesPerRound.push_back(1);
     nofMDStepsPerSample.push_back(1);
@@ -41,6 +53,12 @@ World * Context::AddWorld(World *inp_p_world, bool visual){
     worlds.push_back(inp_p_world);
     worldIndexes.push_back(worldIndexes.size());
 
+    topFNs.push_back(std::vector<std::string>());
+    crdFNs.push_back(std::vector<std::string>());
+    rbSpecsFNs.push_back(std::vector<std::string>());
+    flexSpecsFNs.push_back(std::vector<std::string>());
+    regimens.push_back(std::vector<std::string>());
+
     nofSamplesPerRound.push_back(1);
     nofMDStepsPerSample.push_back(1);
     timesteps.push_back(0.002); // ps
@@ -52,7 +70,20 @@ World * Context::AddWorld(World *inp_p_world, bool visual){
 Context::~Context(){
     worlds.clear();
     worldIndexes.clear();
-    
+   
+    for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){
+        topFNs[worldIx].clear();
+        crdFNs[worldIx].clear();
+        rbSpecsFNs[worldIx].clear();
+        flexSpecsFNs[worldIx].clear();
+        regimens[worldIx].clear();
+    }
+    topFNs.clear();
+    crdFNs.clear();
+    rbSpecsFNs.clear();
+    flexSpecsFNs.clear();
+    regimens.clear();
+ 
     nofSamplesPerRound.clear();
     nofMDStepsPerSample.clear();
     timesteps.clear(); 
@@ -77,6 +108,47 @@ World * Context::updWorld(void){
 World * Context::updWorld(int which){
     return worlds[which];
 }
+
+// Input molecular files
+bool Context::loadTopologyFile(int whichWorld, int whichMolecule, std::string topologyFilename)
+{
+    topFNs[whichWorld].push_back(topologyFilename);
+}
+
+bool Context::loadCoordinatesFile(int whichWorld, int whichMolecule, std::string coordinatesFilename)
+{
+    crdFNs[whichWorld].push_back(coordinatesFilename);
+}
+
+bool Context::loadRigidBodiesSpecs(int whichWorld, int whichMolecule, std::string RBSpecsFN)
+{
+    rbSpecsFNs[whichWorld].push_back(RBSpecsFN);
+}
+
+bool Context::loadFlexibleBondsSpecs(int whichWorld, int whichMolecule, std::string flexSpecsFN)
+{
+    flexSpecsFNs[whichWorld].push_back(flexSpecsFN);
+}
+
+void Context::setRegimen (int whichWorld, int whichMolecule, std::string regimen)
+{
+    regimens[whichWorld].push_back(regimen);
+}
+
+void Context::loadMolecules(void)
+{
+
+    for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){
+        for(unsigned int molIx = 0; molIx < topFNs[worldIx].size(); molIx++){
+            readAmberInput *amberReader = new readAmberInput();
+            amberReader->readAmberFiles(crdFNs[worldIx][molIx], topFNs[worldIx][molIx]);
+            (updWorld(worldIx))->AddMolecule(amberReader,
+                rbSpecsFNs[worldIx][molIx], flexSpecsFNs[worldIx][molIx], regimens[worldIx][molIx]);
+            delete amberReader; 
+        }
+    }
+}
+
 
 // Use a SetupReader Object to read worlds information from a file
 void Context::LoadWorldsFromSetup(SetupReader& setupReader)
@@ -118,30 +190,52 @@ void Context::LoadWorldsFromSetup(SetupReader& setupReader)
     }
     */
 
-
+    /*
     // Add molecules to worlds
+    std::cout << " Context::loadMolecules " << std::endl << std::flush;
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         // Get input filenames and add molecules
         std::vector<std::string> argValues;
         std::vector<std::string>::iterator argValuesIt;
         argValues = setupReader.getValues("MOLECULES");
-        for(argValuesIt = argValues.begin(); argValuesIt != argValues.end(); ++argValuesIt){
-            std::string prmtopFN = *argValuesIt + std::string("/ligand.prmtop");
-            std::string inpcrdFN = *argValuesIt + std::string("/ligand.inpcrd");
-            std::string rbFN = *argValuesIt + std::string("/ligand.rb");
-            std::string flexFN = *argValuesIt + std::string("/ligand.flex");
+        for(unsigned int molIx = 0; molIx < setupReader.getValues("MOLECULES").size(); molIx++){
+//r        for(argValuesIt = argValues.begin(); argValuesIt != argValues.end(); ++argValuesIt){
+//r            std::string prmtopFN = *argValuesIt + std::string("/ligand.prmtop");
+//r            std::string inpcrdFN = *argValuesIt + std::string("/ligand.inpcrd");
+//r            std::string rbFN = *argValuesIt + std::string("/ligand.rb");
+//r            std::string flexFN = *argValuesIt + std::string("/ligand.flex");
+//r            std::string ictd = setupReader.getValues("WORLDS")[worldIx];
     
-            std::string ictd = setupReader.getValues("WORLDS")[worldIx];
+            loadTopologyFile( worldIx, molIx,
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/ligand.prmtop") );
+            loadCoordinatesFile( worldIx, molIx,
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/ligand.inpcrd") );
+            loadRigidBodiesSpecs( worldIx, molIx,
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/ligand.rb") );
+            loadFlexibleBondsSpecs( worldIx, molIx,
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/ligand.flex") );
+            setRegimen( worldIx, molIx,
+                setupReader.getValues("WORLDS")[worldIx] );
     
+            std::cout << "world " << worldIx << " molecule " << molIx 
+                << " crdFN " << crdFNs[worldIx][molIx] << " topFN " << topFNs[worldIx][molIx]  
+                << " rbSpecsFN " << rbSpecsFNs[worldIx][molIx] << " flexSpecsFN " << flexSpecsFNs[worldIx][molIx]
+                << " regimen " << regimens[worldIx][molIx]
+                << std::endl << std::flush;
+
             TRACE("NEW ALLOC\n");
             readAmberInput *amberReader = new readAmberInput();
-            amberReader->readAmberFiles(inpcrdFN, prmtopFN);
-            (updWorld(worldIx))->AddMolecule(amberReader, rbFN, flexFN, ictd);
+//r            amberReader->readAmberFiles(inpcrdFN, prmtopFN);
+            amberReader->readAmberFiles(crdFNs[worldIx][molIx], topFNs[worldIx][molIx]);
+
+            (updWorld(worldIx))->AddMolecule(amberReader,
+                rbSpecsFNs[worldIx][molIx], flexSpecsFNs[worldIx][molIx], regimens[worldIx][molIx]);
     
             delete amberReader;
         }
+    } // END Ad molecules
+    */
 
-    }
 
     //
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
