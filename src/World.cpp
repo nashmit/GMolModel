@@ -280,6 +280,10 @@ SimTK::Real World::getTemperature(void)
 
 void World::setTemperature(SimTK::Real argTemperature)
 {
+    for(unsigned int samplerIx = 0; samplerIx < samplers.size(); samplerIx++){
+        std::cout << " World::setTemperature for sampler "<< samplerIx << " " << argTemperature << std::endl;
+        samplers[samplerIx]->setTemperature(argTemperature);
+    }
     this->temperature = argTemperature;
 }
 //...............
@@ -332,6 +336,11 @@ void World::setGbsaGlobalScaleFactor(SimTK::Real scaleFactor)
     std::cout << "GBSA solute dielectric " << forceField->getSoluteDielectric() << std::endl;
 }
 
+SimTK::DuMMForceFieldSubsystem * World::updForceField(void)
+{
+    return forceField;
+}
+
 //...............
 
 // --- Statistics ---
@@ -381,6 +390,8 @@ HamiltonianMonteCarloSampler * World::updSampler(int which)
 {
     return samplers[which];
 }
+
+
 
 //...............
 

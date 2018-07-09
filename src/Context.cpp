@@ -109,6 +109,12 @@ World * Context::updWorld(int which){
     return worlds[which];
 }
 
+SimTK::DuMMForceFieldSubsystem * Context::updForceField(int whichWorld)
+{
+    return worlds[whichWorld]->updForceField();
+}
+
+
 // Input molecular files
 bool Context::loadTopologyFile(int whichWorld, int whichMolecule, std::string topologyFilename)
 {
@@ -294,7 +300,7 @@ void Context::LoadWorldsFromSetup(SetupReader& setupReader)
 
     // Set simulation temperature
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
-        (updWorld(worldIx))->setTemperature( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
+        setTemperature( worldIx, std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
 
         // Do we use Fixman potential
         if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
@@ -314,7 +320,7 @@ void Context::LoadWorldsFromSetup(SetupReader& setupReader)
 
         // Initialize samplers
         (updWorld(worldIx))->updSampler(0)->initialize( (updWorld(worldIx))->integ->updAdvancedState(), 
-             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) ),
+//r             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) ),
              useFixmanPotential );
     
     }
@@ -329,16 +335,17 @@ float Context::getTemperature(int whichWorld){
 }
 
 void  Context::setTemperature(int whichWorld, float someTemperature){
+    std::cout << " Context::setTemperature for world "<< whichWorld << " " << someTemperature << std::endl;
     worlds[whichWorld]->setTemperature(someTemperature);
 }
 
     // If HMC, get/set the guidance Hamiltonian temperature
-float Context::getGuidanceTemperature(void)
+float Context::getGuidanceTemperature(int whichWorld, int whichSampler)
 {
    assert(!"Not implemented"); 
 }
 
-void Context::setGuidanceTemperature(float someTemperature)
+void Context::setGuidanceTemperature(int whichWorld, int whichSampler, float someTemperature)
 {
    assert(!"Not implemented"); 
 }
@@ -499,8 +506,9 @@ void Context::Run(SetupReader& setupReader)
                 currentAdvancedState, (updWorld(worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
     
             // Reinitialize current sampler
-            updWorld(currentWorldIx)->updSampler(0)->reinitialize( currentAdvancedState, 
-                SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) );
+            updWorld(currentWorldIx)->updSampler(0)->reinitialize( currentAdvancedState
+//r                , SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) 
+            );
     
             // INCORRECT !!
             if(setupReader.getValues("WORLDS")[worldIndexes.back()] == "IC"){
