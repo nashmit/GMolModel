@@ -84,6 +84,8 @@ int main(int argc, char **argv)
     context->LoadWorldsFromSetup(setupReader);
 
     for(int worldIx = 0; worldIx < setupReader.getValues("WORLDS").size(); worldIx++){
+        context->setTemperature(worldIx, std::stof(setupReader.getValues("TEMPERATURE")[worldIx]));
+
         context->setNofSamplesPerRound(worldIx, std::stoi(setupReader.getValues("MIXMCSTEPS")[worldIx]));
         context->setNofMDStepsPerSample(worldIx, std::stoi(setupReader.getValues("MDSTEPS")[worldIx]));
     }

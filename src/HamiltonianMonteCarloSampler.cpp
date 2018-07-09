@@ -22,6 +22,7 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
     sampleNumber = 0;
     this->alwaysAccept = false;
     this->timestep = 0.002; // ps
+    this->temperature = 300.0;
 }
 
 /** Destructor **/
@@ -135,7 +136,7 @@ and variables that store the energies, both needed for the
 acception-rejection step. Also realize velocities and initialize
 the timestepper. **/
 //r void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman) 
-void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real argTemperature, bool argUseFixman) 
+void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, /*SimTK::Real argTemperature,*/ bool argUseFixman) 
 {
     // Seed the random number generator
     randomEngine.seed( std::time(0) );
@@ -146,7 +147,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
     timeStepper->initialize(compoundSystem->getDefaultState());
 
     // Set the simulation temperature
-    setTemperature(argTemperature); // Needed for Fixman
+//r    setTemperature(argTemperature); // Needed for Fixman
 
     // Store the configuration
     system->realize(someState, SimTK::Stage::Position);
@@ -200,7 +201,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Re
 
 /** Same as initialize **/
 //r void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature) 
-void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real argTemperature) 
+void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState/*, SimTK::Real argTemperature*/) 
 {
     // After an event handler has made a discontinuous change to the 
     // Integrator's "advanced state", this method must be called to 
@@ -208,7 +209,7 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::
     //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Topology, false);
 
     // Set the simulation temperature
-    setTemperature(argTemperature); // Needed for Fixman
+//r    setTemperature(argTemperature); // Needed for Fixman
 
     // Store the configuration
     system->realize(someState, SimTK::Stage::Position);

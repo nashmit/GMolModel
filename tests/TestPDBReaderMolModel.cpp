@@ -46,7 +46,8 @@ try {
 
     const SimTK::State& constRefState = ts.getIntegrator().getState();
     SimTK::State& integAdvancedState = ts.updIntegrator().updAdvancedState();
-    p_HMCsampler->initialize(integAdvancedState, atoi(argv[4]), SimTK::Real(atof(argv[5])) );
+    //p_HMCsampler->initialize(integAdvancedState, atoi(argv[4]), SimTK::Real(atof(argv[5])) );
+    p_HMCsampler->initialize(integAdvancedState, SimTK::Real(atof(argv[5])) );
 
     // Force field scaling
     forceField.setBondStretchGlobalScaleFactor(0.0);

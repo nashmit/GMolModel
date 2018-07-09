@@ -22,6 +22,8 @@ public:
     World * updWorld(void);
     World * updWorld(int which);
 
+    SimTK::DuMMForceFieldSubsystem * updForceField(int whichWorld);
+
     // --- Use a SetupReader Object to read worlds information from a file ---
     bool loadTopologyFile(int whichWorld, int whichMolecule, std::string topologyFilename);
     bool loadCoordinatesFile(int whichWorld, int whichMolecule, std::string coordinatesFilename);
@@ -39,8 +41,8 @@ public:
     void  setTemperature(int whichWorld, float someTemperature);
 
     // If HMC, get/set the guidance Hamiltonian temperature
-    float getGuidanceTemperature(void);
-    void  setGuidanceTemperature(float someTemperature);
+    float getGuidanceTemperature(int whichWorld, int whichSampler);
+    void  setGuidanceTemperature(int whichWorld, int whichSampler, float someTemperature);
     //------------
 
     // --- Simulation parameters ---

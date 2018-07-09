@@ -58,10 +58,10 @@ public:
     and variables that store the energies, both needed for the 
     acception-rejection step. Also realize velocities and initialize 
     the timestepper. **/
-    virtual void initialize(SimTK::State& advanced, SimTK::Real argTemperature, bool argUseFixman = true); 
+    virtual void initialize(SimTK::State& advanced, /*SimTK::Real argTemperature,*/ bool argUseFixman = true); 
 
     /** Same as initialize **/
-    virtual void reinitialize(SimTK::State& advanced, SimTK::Real argTemperature) ; 
+    virtual void reinitialize(SimTK::State& advanced/*, SimTK::Real argTemperature*/) ; 
 
     /** Get the TimeStepper that manages the integrator **/
     const SimTK::TimeStepper * getTimeStepper(void);
