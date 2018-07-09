@@ -44,6 +44,15 @@ public:
     //------------
 
     // --- Simulation parameters ---
+    // Amber like scale factors.
+    void setAmberForceFieldScaleFactors(int whichWorld);
+
+    // Set a global scaling factor for the forcefield
+    void setGlobalForceFieldScaleFactor(int whichWorld, SimTK::Real);
+
+    // Set GBSA implicit solvent scale factor
+    void setGbsaGlobalScaleFactor(int whichWorld, SimTK::Real);
+
     // If HMC, get/set the number of MD steps
     int getNofMDStepsPerSample(int whichWorld);
     void setNofMDStepsPerSample(int whichWorld, int MDStepsPerSample);

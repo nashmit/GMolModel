@@ -112,22 +112,46 @@ World * Context::updWorld(int which){
 // Input molecular files
 bool Context::loadTopologyFile(int whichWorld, int whichMolecule, std::string topologyFilename)
 {
+    std::ifstream file(topologyFilename);
+    if(!file){
+        std::cout << topologyFilename << " not found." << std::endl;
+        return false;
+    }
     topFNs[whichWorld].push_back(topologyFilename);
+    return true;
 }
 
 bool Context::loadCoordinatesFile(int whichWorld, int whichMolecule, std::string coordinatesFilename)
 {
+    std::ifstream file(coordinatesFilename);
+    if(!file){
+        std::cout << coordinatesFilename << " not found." << std::endl;
+        return false;
+    }
     crdFNs[whichWorld].push_back(coordinatesFilename);
+    return true;
 }
 
 bool Context::loadRigidBodiesSpecs(int whichWorld, int whichMolecule, std::string RBSpecsFN)
 {
+    std::ifstream file(RBSpecsFN);
+    if(!file){
+        std::cout << RBSpecsFN << " not found." << std::endl;
+        return false;
+    }
     rbSpecsFNs[whichWorld].push_back(RBSpecsFN);
+    return true;
 }
 
 bool Context::loadFlexibleBondsSpecs(int whichWorld, int whichMolecule, std::string flexSpecsFN)
 {
+    std::ifstream file(flexSpecsFN);
+    if(!file){
+        std::cout << flexSpecsFN << " not found." << std::endl;
+        return false;
+    }
     flexSpecsFNs[whichWorld].push_back(flexSpecsFN);
+    return true;
 }
 
 void Context::setRegimen (int whichWorld, int whichMolecule, std::string regimen)
@@ -236,36 +260,47 @@ void Context::LoadWorldsFromSetup(SetupReader& setupReader)
     } // END Ad molecules
     */
 
-
-    //
+/*
+    // Set worlds force field scale factors
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+//r        // Set force field scale factors.
+//r        if(setupReader.getValues("FFSCALE")[worldIx] == "AMBER"){ 
+//r            (updWorld(worldIx))->setAmberForceFieldScaleFactors();
+//r        }else{
+//r            (updWorld(worldIx))->setGlobalForceFieldScaleFactor(std::stod(setupReader.getValues("FFSCALE")[worldIx]));
+//r        }
+//r        // Set world GBSA implicit solvent scale factor
+//r        (updWorld(worldIx))->setGbsaGlobalScaleFactor(std::stod(setupReader.getValues("GBSA")[worldIx]));
+
         // Set force field scale factors.
         if(setupReader.getValues("FFSCALE")[worldIx] == "AMBER"){ 
-            (updWorld(worldIx))->setAmberForceFieldScaleFactors();
+            setAmberForceFieldScaleFactors(worldIx);
         }else{
-            (updWorld(worldIx))->setGlobalForceFieldScaleFactor(std::stod(setupReader.getValues("FFSCALE")[worldIx]));
+            setGlobalForceFieldScaleFactor(worldIx, std::stod(setupReader.getValues("FFSCALE")[worldIx]));
         }
-
         // Set world GBSA implicit solvent scale factor
-        (updWorld(worldIx))->setGbsaGlobalScaleFactor(std::stod(setupReader.getValues("GBSA")[worldIx]));
+        setGbsaGlobalScaleFactor(worldIx, std::stod(setupReader.getValues("GBSA")[worldIx]));
+    } 
+*/
     
-        // Initialize worlds
+    // Model molecules
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
             (updWorld(worldIx))->ModelTopologies( true );
         }else{
             (updWorld(worldIx))->ModelTopologies( false );
         }
+    }
 
+    // Set simulation temperature
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         (updWorld(worldIx))->setTemperature( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
 
-        // Add samplers
-        TRACE("NEW ALLOC\n");
-    
         // Do we use Fixman potential
         if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
             useFixmanPotential = true;
         }
-     }
+    }
 
     // Set integrators timesteps
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
@@ -310,6 +345,25 @@ void Context::setGuidanceTemperature(float someTemperature)
 //------------
 
 // --- Simulation parameters ---
+
+// Amber like scale factors.
+void Context::setAmberForceFieldScaleFactors(int whichWorld)
+{
+    worlds[whichWorld]->setAmberForceFieldScaleFactors();
+}
+
+// Set a global scaling factor for the forcefield
+void Context::setGlobalForceFieldScaleFactor(int whichWorld, SimTK::Real globalScaleFactor)
+{
+    worlds[whichWorld]->setGlobalForceFieldScaleFactor(globalScaleFactor);
+}
+
+// Set GBSA implicit solvent scale factor
+void Context::setGbsaGlobalScaleFactor(int whichWorld, SimTK::Real gbsaGlobalScaleFactor)
+{
+    worlds[whichWorld]->setGbsaGlobalScaleFactor(gbsaGlobalScaleFactor);
+}
+
 // If HMC, get/set the number of MD steps
 int Context::getNofMDStepsPerSample(int whichWorld){
    return nofMDStepsPerSample[whichWorld]; 

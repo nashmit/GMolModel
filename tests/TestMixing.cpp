@@ -47,6 +47,19 @@ int main(int argc, char **argv)
     }
     context->loadMolecules();
 
+    // Set worlds force field scale factors
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        // Set force field scale factors.
+        if(setupReader.getValues("FFSCALE")[worldIx] == "AMBER"){
+            context->setAmberForceFieldScaleFactors(worldIx);
+        }else{
+            context->setGlobalForceFieldScaleFactor(worldIx, std::stod(setupReader.getValues("FFSCALE")[worldIx]));
+        }
+        // Set world GBSA scale factor
+        context->setGbsaGlobalScaleFactor(worldIx, std::stod(setupReader.getValues("GBSA")[worldIx]));
+    }
+
+    // To be removed
     context->LoadWorldsFromSetup(setupReader);
 
     for(int worldIx = 0; worldIx < setupReader.getValues("WORLDS").size(); worldIx++){
