@@ -49,15 +49,36 @@ int main(int argc, char **argv)
 
     // Set worlds force field scale factors
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+
+/*
         // Set force field scale factors.
         if(setupReader.getValues("FFSCALE")[worldIx] == "AMBER"){
             context->setAmberForceFieldScaleFactors(worldIx);
         }else{
             context->setGlobalForceFieldScaleFactor(worldIx, std::stod(setupReader.getValues("FFSCALE")[worldIx]));
         }
+*/
+
+	
+	context -> updForceField( worldIx ) -> setVdw12ScaleFactor( float(setupReader.getValues("setVdw12ScaleFactor")[worldIx] ) )
+	context -> updForceField( worldIx ) -> setVdw13ScaleFactor( float(setupReader.getValues("setVdw13ScaleFactor")[worldIx] ) )
+	context -> updForceField( worldIx ) -> setVdw14ScaleFactor( float(setupReader.getValues("setVdw14ScaleFactor")[worldIx] ) )
+	context -> updForceField( worldIx ) -> setVdw15ScaleFactor( float(setupReader.getValues("setVdw15ScaleFactor")[worldIx] ) )
+	
+	context -> updForceField( worldIx ) -> setCoulomb12ScaleFactor( float(setupReader.getValues("setCoulomb12ScaleFactor")[worldIx] ) )
+	context -> updForceField( worldIx ) -> setCoulomb13ScaleFactor( float(setupReader.getValues("setCoulomb13ScaleFactor")[worldIx] ) )
+	context -> updForceField( worldIx ) -> setCoulomb14ScaleFactor( float(setupReader.getValues("setCoulomb14ScaleFactor")[worldIx] ) )
+	context -> updForceField( worldIx ) -> setCoulomb15ScaleFactor( float(setupReader.getValues("setCoulomb15ScaleFactor")[worldIx] ) )
+
+
+
+
+
         // Set world GBSA scale factor
         context->setGbsaGlobalScaleFactor(worldIx, std::stod(setupReader.getValues("GBSA")[worldIx]));
     }
+
+    
 
     // To be removed
     context->LoadWorldsFromSetup(setupReader);

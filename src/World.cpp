@@ -72,43 +72,43 @@ void writePdb(SimTK::PdbStructure pdb, const char *FN)
 void World::printPoss(const SimTK::Compound& c, SimTK::State& advanced)
 {
     SimTK::Vec3 vertex;
-    std::cout<<"Positions:"<<std::endl;
+    //std::cout<<"Positions:"<<std::endl;
     for (SimTK::Compound::AtomIndex aIx(0); aIx < c.getNumAtoms(); ++aIx){
         vertex   = c.calcAtomLocationInGroundFrame(advanced, aIx);
-        std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
-          <<"["<<vertex[0]<<" "<<vertex[1]<<" "<<vertex[2]<<"]"<<std::endl;
+        //std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
+        //  <<"["<<vertex[0]<<" "<<vertex[1]<<" "<<vertex[2]<<"]"<<std::endl;
     }
 }
 
 void printVels(const SimTK::Compound& c, SimTK::State& advanced)
 {
     SimTK::Vec3 vel;
-    std::cout<<"Velocities:"<<std::endl;
+    //std::cout<<"Velocities:"<<std::endl;
     for (SimTK::Compound::AtomIndex aIx(0); aIx < c.getNumAtoms(); ++aIx){
         vel      = c.calcAtomVelocityInGroundFrame(advanced, aIx);
-        std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
-          <<"["<<vel[0]<<" "<<vel[1]<<" "<<vel[2]<<"]"<<std::endl;
+        //std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
+        //  <<"["<<vel[0]<<" "<<vel[1]<<" "<<vel[2]<<"]"<<std::endl;
     }
-    std::cout<<std::endl;
+    //std::cout<<std::endl;
 }
 
 void printPossVels(const SimTK::Compound& c, SimTK::State& advanced)
 {
     SimTK::Vec3 vertex, vel;
-    std::cout<<"Positions:"<<std::endl;
+    //std::cout<<"Positions:"<<std::endl;
     for (SimTK::Compound::AtomIndex aIx(0); aIx < c.getNumAtoms(); ++aIx){
         vertex   = c.calcAtomLocationInGroundFrame(advanced, aIx);
-        std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
-          <<"["<<vertex[0]<<" "<<vertex[1]<<" "<<vertex[2]<<"]"<<std::endl;
+        //std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
+        //  <<"["<<vertex[0]<<" "<<vertex[1]<<" "<<vertex[2]<<"]"<<std::endl;
     }
-    std::cout<<std::endl;
-    std::cout<<"Velocities:"<<std::endl;
+    //std::cout<<std::endl;
+    //std::cout<<"Velocities:"<<std::endl;
     for (SimTK::Compound::AtomIndex aIx(0); aIx < c.getNumAtoms(); ++aIx){
         vel      = c.calcAtomVelocityInGroundFrame(advanced, aIx);
-        std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
-          <<"["<<vel[0]<<" "<<vel[1]<<" "<<vel[2]<<"]"<<std::endl;
+        //std::cout<<c.getAtomName(aIx)<<"="<<std::setprecision(8)<<std::fixed
+        //  <<"["<<vel[0]<<" "<<vel[1]<<" "<<vel[2]<<"]"<<std::endl;
     }
-    std::cout<<std::endl;
+    //std::cout<<std::endl;
 }
 
 void shmDump(TARGET_TYPE *shm, unsigned int natms)
@@ -122,7 +122,7 @@ void shmDump(TARGET_TYPE *shm, unsigned int natms)
 World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
 {
     ownWorldIndex = worldIndex;
-    std::cout << "World::World BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
+    //std::cout << "World::World BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
     _useFixmanTorque = false;
   
     compoundSystem = new SimTK::CompoundSystem;
@@ -150,12 +150,12 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
 
     this->temperature = -1; // this leads to unusal behaviour hopefully
 
-    std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
+    //std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
 void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF)
 {
-    std::cout << "World::AddMolecule BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
+    //std::cout << "World::AddMolecule BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
     moleculeCount++; // Used for unique names of molecules
 
     this->rbFN = rbFN;
@@ -163,33 +163,33 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
     this->flexFN = flexFN;
     this->ictdF = ictdF;
  
-    std::cout << "World::AddMolecule moleculeReaders.push_back" << std::endl << std::flush;
+    //std::cout << "World::AddMolecule moleculeReaders.push_back" << std::endl << std::flush;
     bMoleculeReader * molRead = new bMoleculeReader(amberReader, rbFN.c_str());
     moleculeReaders.push_back(molRead);
 
-    std::cout << "World::AddMolecule add parameters" << std::endl << std::flush;
+    //std::cout << "World::AddMolecule add parameters" << std::endl << std::flush;
     bAddAllParams(std::string("lig") + std::to_string(moleculeCount), amberReader, *forceField, (moleculeReaders.back())->bAtomList, (moleculeReaders.back())->bonds);
   
-    std::cout << "World::AddMolecule add Compound" << std::endl << std::flush;
+    //std::cout << "World::AddMolecule add Compound" << std::endl << std::flush;
     Topology * top = new Topology(std::string("lig") + std::to_string(moleculeCount));
     topologies.push_back(top);
   
-    std::cout << "World::AddMolecule build Compound" << std::endl << std::flush;
+    //std::cout << "World::AddMolecule build Compound" << std::endl << std::flush;
     (topologies.back())->build(*forceField, (moleculeReaders.back())->natoms, (moleculeReaders.back())->bAtomList, (moleculeReaders.back())->nbonds, (moleculeReaders.back())->bonds, flexFN, ictdF);
   
-    std::cout << "World::AddMolecule adopt Compound " << topologies.back() << std::endl << std::flush;
+    //std::cout << "World::AddMolecule adopt Compound " << topologies.back() << std::endl << std::flush;
     compoundSystem->adoptCompound( *(topologies.back()) );
-    std::cout << "World::AddMolecule realizeTopology" << std::endl << std::flush;
+    //std::cout << "World::AddMolecule realizeTopology" << std::endl << std::flush;
     compoundSystem->realizeTopology();
 
-    std::cout << "Number of included atoms in nonbonded interactions: " << forceField->getNumNonbondAtoms() << std::endl << std::flush;
-    std::cout << "getVdwGlobalScaleFactor() " << forceField->getVdwGlobalScaleFactor() << std::endl << std::flush;
+    //std::cout << "Number of included atoms in nonbonded interactions: " << forceField->getNumNonbondAtoms() << std::endl << std::flush;
+    //std::cout << "getVdwGlobalScaleFactor() " << forceField->getVdwGlobalScaleFactor() << std::endl << std::flush;
     for(int i=0; i<(topologies.back())->natms; i++){
-        std::cout << " DuMM VdW Radius " 
-            << forceField->getVdwRadius(((topologies.back())->bAtomList[i]).getAtomClassIndex()) 
-            << " DuMM VdW Well Depth "
-            << forceField->getVdwWellDepth(((topologies.back())->bAtomList[i]).getAtomClassIndex())
-            << std::endl << std::flush;
+        //std::cout << " DuMM VdW Radius " 
+        //    << forceField->getVdwRadius(((topologies.back())->bAtomList[i]).getAtomClassIndex()) 
+        //    << " DuMM VdW Well Depth "
+        //    << forceField->getVdwWellDepth(((topologies.back())->bAtomList[i]).getAtomClassIndex())
+        //    << std::endl << std::flush;
     }
   
     // Also generate our decorations
@@ -205,7 +205,7 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
     }
     //
 
-    std::cout << "World::AddMolecule END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
+    //std::cout << "World::AddMolecule END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
 // Initialize simulation
@@ -214,8 +214,8 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
     // Only model after loading all the compounds
     //integ->setFixedStepSize(timestep);
 
-    std::cout << "World::Init BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
-    std::cout << "World::Init model Compound" << std::endl << std::flush;
+    //std::cout << "World::Init BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
+    //std::cout << "World::Init model Compound" << std::endl << std::flush;
     compoundSystem->modelCompounds();
 
     // Load MobilizedBodyIndex vs Compound::AtomIndex maps 
@@ -269,7 +269,7 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
 
 
 
-    std::cout << "World::Init END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
+    //std::cout << "World::Init END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
 }//end of InitSimulation
 
 // --- Thermodynamics ---
@@ -328,8 +328,8 @@ void World::setGlobalForceFieldScaleFactor(SimTK::Real scaleFactor)
 void World::setGbsaGlobalScaleFactor(SimTK::Real scaleFactor)
 {
     forceField->setGbsaGlobalScaleFactor(scaleFactor);
-    std::cout << "GBSA solvent dielectric " << forceField->getSolventDielectric() << std::endl;
-    std::cout << "GBSA solute dielectric " << forceField->getSoluteDielectric() << std::endl;
+    //std::cout << "GBSA solvent dielectric " << forceField->getSolventDielectric() << std::endl;
+    //std::cout << "GBSA solute dielectric " << forceField->getSoluteDielectric() << std::endl;
 }
 
 //...............
@@ -778,11 +778,11 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 }
 
 void World::PrintSimbodyStateCache(SimTK::State& someState){
-    std::cout << " System Stage: " << someState.getSystemStage() << std::endl;
+   // std::cout << " System Stage: " << someState.getSystemStage() << std::endl;
     for(int i = 0; i < someState.getNumSubsystems(); i++){
-        std::cout << " Subsystem " << i << " Name: " << someState.getSubsystemName(SimTK::SubsystemIndex(i))
-            << " Stage: " << someState.getSubsystemStage(SimTK::SubsystemIndex(i))
-            << " Version: " << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
+     //   std::cout << " Subsystem " << i << " Name: " << someState.getSubsystemName(SimTK::SubsystemIndex(i))
+      //      << " Stage: " << someState.getSubsystemStage(SimTK::SubsystemIndex(i))
+      //      << " Version: " << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
     }
 }
 
@@ -798,15 +798,15 @@ void World::Advance(int nosteps){
 
   TARGET_TYPE myrealtime=0;
   myrealtime = (TARGET_TYPE)nosteps * (0.0015);
-  std::cout<<"myrealtime: "<<myrealtime<<std::endl;
+  //std::cout<<"myrealtime: "<<myrealtime<<std::endl;
 
   SimTK::State& advanced = integ->updAdvancedState();
-  std::cout<<"Advance start: integ->updAdvancedState: "<< advanced.getQ() <<std::endl;
+  ///std::cout<<"Advance start: integ->updAdvancedState: "<< advanced.getQ() <<std::endl;
 
   ts->stepTo(advanced.getTime() + nosteps*0.0015);
 
 
-  std::cout<<"Advance stop: integ->updAdvancedState: "<< advanced.getQ() <<std::endl;
+//  std::cout<<"Advance stop: integ->updAdvancedState: "<< advanced.getQ() <<std::endl;
   
 }
 
