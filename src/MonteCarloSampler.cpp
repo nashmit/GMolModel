@@ -64,7 +64,6 @@ void MonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real argTempe
 
     if(useFixman){
         std::cout << "Monte Carlo sampler: using Fixman potential." << std::endl;
-
         setOldFixman(calcFixman(someState));
         setSetFixman(getOldFixman());
     }else{
@@ -104,9 +103,14 @@ void MonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real argTem
     }
 }
 
+void MonteCarloSampler::useFixmanPotential(void)
+{
+    useFixman = true;
+}
+
 
 // Return true if use Fixman potential
-bool MonteCarloSampler::isUsingFixman(void)
+bool MonteCarloSampler::isUsingFixmanPotential(void)
 {
     return useFixman;
 }

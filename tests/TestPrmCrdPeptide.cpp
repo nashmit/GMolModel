@@ -66,15 +66,15 @@ int main(int argc, char **argv)
     const SimTK::State& constRefState = world->integ->getState();
     SimTK::State& integAdvancedState = world->integ->updAdvancedState();
     if( setupReader.getValues("REGIMEN")[0] == "IC" ){
-        p_HMCsampler->initialize( integAdvancedState, 
+        p_HMCsampler->initialize( integAdvancedState);
 //           std::stoi(setupReader.getValues("STEPS")[0]),
 //           SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
-           false );
+//           false );
     }else{
-        p_HMCsampler->initialize( integAdvancedState, 
+        p_HMCsampler->initialize( integAdvancedState );
 //           std::stoi(setupReader.getValues("STEPS")[0]),
 //           SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ),
-           true );
+//           true );
     }
     //world->forceField->dump();
     //world->forceField->dumpCForceFieldParameters(std::cout);

@@ -125,7 +125,9 @@ public:
 
     SimTK::DuMMForceFieldSubsystem * updForceField(void);
 
+    // Use the Fixman torque as an additional force subsystem
     void useFixmanTorque(void);
+    bool isUsingFixmanTorque(void);
     //...............
 
     // --- Statistics ---
@@ -134,6 +136,7 @@ public:
 
     // Sampler manipulation functions
     int getNofSamplers(void);
+
     int addSampler(std::string);
     int addSampler(SamplerName);
 

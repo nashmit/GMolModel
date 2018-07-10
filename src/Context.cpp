@@ -109,6 +109,13 @@ World * Context::updWorld(int which){
     return worlds[which];
 }
 
+unsigned int Context::getNofWorlds(void)
+{
+    return worlds.size();
+}
+
+
+
 SimTK::DuMMForceFieldSubsystem * Context::updForceField(int whichWorld)
 {
     return worlds[whichWorld]->updForceField();
@@ -193,8 +200,7 @@ void Context::modelTopologies(void)
 void Context::LoadWorldsFromSetup(SetupReader& setupReader)
 {
     // Build Gmolmodel simulation worlds
-    unsigned int nofWorlds = setupReader.getValues("WORLDS").size();
-    bool useFixmanPotential = false;
+    //unsigned int nofWorlds = setupReader.getValues("WORLDS").size();
 
     // Create a vector of world indeces
     /*
@@ -314,30 +320,45 @@ void Context::LoadWorldsFromSetup(SetupReader& setupReader)
         setTemperature( worldIx, std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
     }
 */
+/*
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         // Do we use Fixman potential
-        if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
-            useFixmanPotential = true;
+        if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
             (updWorld(worldIx))->useFixmanTorque();
         }
     }
+*/
 
+/*
     // Set integrators timesteps
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
-        updWorld(worldIx)->addSampler(HMC);
+        addSampler(worldIx, HMC);
+    }
+*/
+/*
+    // Initialize samplers
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+            for (unsigned int samplerIx = 0; samplerIx < worlds[worldIx]->getNofSamplers(); samplerIx ++){
         setTimestep(worldIx, 0, std::stod(setupReader.getValues("TIMESTEPS")[worldIx]) );
     //}
     //for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         // Set thermostats
         (updWorld(worldIx))->updSampler(0)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
 
+        if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
+            for (unsigned int samplerIx = 0; samplerIx < worlds[worldIx]->getNofSamplers(); samplerIx ++){
+//r            worlds[worldIx]->updSampler(0)->useFixmanPotential();
+                useFixmanPotential(worldIx, samplerIx);
+            }
+        }
         // Initialize samplers
-        (updWorld(worldIx))->updSampler(0)->initialize( (updWorld(worldIx))->integ->updAdvancedState(), 
-//r             SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) ),
-             useFixmanPotential );
-    
+//        (updWorld(worldIx))->updSampler(0)->initialize( (updWorld(worldIx))->integ->updAdvancedState()
+        initializeSampler(worldIx, samplerIx);
+//r             ,SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) )
+//r             ,useFixmanPotential 
+        } 
     }
-    ////////////////////////////////////////////////////////// END creating Worlds
+*/
 
 }
 
@@ -365,6 +386,21 @@ void Context::setGuidanceTemperature(int whichWorld, int whichSampler, float som
 //------------
 
 // --- Simulation parameters ---
+
+int Context::addSampler(int whichWorld, std::string whichSampler)
+{
+    worlds[whichWorld]->addSampler(whichSampler);
+}
+
+int Context::addSampler(int whichWorld, SamplerName whichSampler)
+{
+    worlds[whichWorld]->addSampler(whichSampler);
+}
+
+void Context::initializeSampler(int whichWorld, int whichSampler)
+{
+    worlds[whichWorld]->updSampler(whichSampler)->initialize( worlds[whichWorld]->integ->updAdvancedState() );
+}
 
 // Amber like scale factors.
 void Context::setAmberForceFieldScaleFactors(int whichWorld)
@@ -405,6 +441,30 @@ void Context::setTimestep(int whichWorld, int whichSampler, float argTimestep)
 {
     worlds[whichWorld]->updSampler(whichSampler)->updTimeStepper()->updIntegrator().setFixedStepSize(argTimestep);
 }
+
+// Use Fixman torque as an additional force subsystem
+void Context::useFixmanTorque(int whichWorld)
+{
+    worlds[whichWorld]->useFixmanTorque();
+}
+
+bool Context::isUsingFixmanTorque(int whichWorld)
+{
+    return worlds[whichWorld]->isUsingFixmanTorque();
+}
+
+// Use Fixman potential
+void Context::useFixmanPotential(int whichWorld, int whichSampler)
+{
+    worlds[whichWorld]->updSampler(whichSampler)->useFixmanPotential();
+}
+
+bool Context::isUsingFixmanPotential(int whichWorld, int whichSampler)
+{
+    return worlds[whichWorld]->updSampler(whichSampler)->isUsingFixmanPotential();
+}
+
+
 //------------
 
 // --- Mixing parameters ---
@@ -445,7 +505,7 @@ void Context::Run(SetupReader& setupReader)
     for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){    
         std::cout << "World " << worldIx << " initial const state PE: " << std::setprecision(20)
             << (updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy((updWorld(worldIx))->integ->updAdvancedState()) 
-            << " useFixmanPotential = " << updWorld(worldIx)->updSampler(0)->isUsingFixman()
+            << " useFixmanPotential = " << updWorld(worldIx)->updSampler(0)->isUsingFixmanPotential()
             << std::endl;
     }
 

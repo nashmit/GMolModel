@@ -80,7 +80,8 @@ public:
     SimTK::Real getPEFromEvaluator(SimTK::State& someState); 
 
     // Return true if use Fixman potential
-    bool isUsingFixman(void);
+    void useFixmanPotential(void);
+    bool isUsingFixmanPotential(void);
 
     // Compute Fixman potential
     SimTK::Real calcFixman(SimTK::State& someState);

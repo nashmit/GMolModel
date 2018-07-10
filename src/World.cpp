@@ -280,6 +280,10 @@ void World::useFixmanTorque(void)
     
 }
 
+bool World::isUsingFixmanTorque(void)
+{
+    return _useFixmanTorque;
+}
 
 // --- Thermodynamics ---
 SimTK::Real World::getTemperature(void)

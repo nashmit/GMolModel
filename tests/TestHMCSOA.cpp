@@ -96,7 +96,7 @@ int main(int argc, char **argv)
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
         std::cout << "World " << worldIx << " initial const state PE: " << std::setprecision(20)
             << (p_worlds[worldIx])->forces->getMultibodySystem().calcPotentialEnergy((p_worlds[worldIx])->integ->updAdvancedState())
-            << " useFixman = " << p_samplers[worldIx]->isUsingFixman()
+            << " useFixman = " << p_samplers[worldIx]->isUsingFixmanPotential()
             << std::endl;
     }
 

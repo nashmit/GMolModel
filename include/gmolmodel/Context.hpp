@@ -22,6 +22,8 @@ public:
     World * updWorld(void);
     World * updWorld(int which);
 
+    unsigned int getNofWorlds(void);
+
     SimTK::DuMMForceFieldSubsystem * updForceField(int whichWorld);
 
     // --- Use a SetupReader Object to read worlds information from a file ---
@@ -47,6 +49,10 @@ public:
     //------------
 
     // --- Simulation parameters ---
+    int addSampler(int whichWorld, std::string whichSampler);
+    int addSampler(int whichWorld, SamplerName whichSampler);
+    void initializeSampler(int whichWorld, int whichSampler);
+
     // Amber like scale factors.
     void setAmberForceFieldScaleFactors(int whichWorld);
 
@@ -63,6 +69,12 @@ public:
     // If HMC, get/set timestep forMD
     const float getTimestep(int whichWorld, int whichSampler);
     void setTimestep(int whichWorld, int whichSampler, float timeStep);
+
+    // Use Fixman torque as an additional force subsystem
+    void useFixmanPotential(int whichWorld, int whichSampler);
+    bool isUsingFixmanPotential(int whichWorld, int whichSampler);
+    void useFixmanTorque(int whichWorld);
+    bool isUsingFixmanTorque(int whichWorld);
     //------------
 
     // --- Mixing parameters ---

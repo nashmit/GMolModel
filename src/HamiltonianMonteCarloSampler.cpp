@@ -16,7 +16,7 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
                                      SimTK::TimeStepper *argTimeStepper)
     : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
 {
-    this->useFixman = true;  
+    this->useFixman = false;  
     this->fix_n = this->fix_o = 0.0;
     this->residualEmbeddedPotential = 0.0;
     sampleNumber = 0;
@@ -137,7 +137,7 @@ and variables that store the energies, both needed for the
 acception-rejection step. Also realize velocities and initialize
 the timestepper. **/
 //r void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman) 
-void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, /*SimTK::Real argTemperature,*/ bool argUseFixman) 
+void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState) //SimTK::Real argTemperature, bool argUseFixman) 
 {
     // Seed the random number generator
     if(reproducible){
@@ -169,7 +169,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, /*SimTK::
     setSetPE(getOldPE());
 
     // Store Fixman potential
-    this->useFixman = argUseFixman;
+//r    this->useFixman = argUseFixman;
     if(useFixman){
         std::cout << "Hamiltonian Monte Carlo sampler: using Fixman potential." << std::endl;
 

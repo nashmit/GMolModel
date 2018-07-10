@@ -58,12 +58,45 @@ int main(int argc, char **argv)
         context->setGbsaGlobalScaleFactor(worldIx, std::stod(setupReader.getValues("GBSA")[worldIx]));
     }
 
+    // Use Fixman torque
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        // Do we use Fixman potential
+        if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
+            context->useFixmanTorque(worldIx);
+        }
+    }
+
     // Model topologies
     context->modelTopologies();
 
-    // To be removed
-    context->LoadWorldsFromSetup(setupReader);
+    // Add samplers to the worlds
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        context->addSampler(worldIx, HMC);
+    }
 
+    // Set sampler parameters and initialize
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
+            // Set timesteps
+            context->setTimestep(worldIx, samplerIx, std::stod(setupReader.getValues("TIMESTEPS")[worldIx]) );
+
+            // Set thermostats
+            context->updWorld()->updSampler(samplerIx)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
+
+            // Activate Fixman potential if needed
+            if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
+                 context->useFixmanPotential(worldIx, samplerIx);
+            }
+
+            // Initialize samplers
+            context->initializeSampler(worldIx, samplerIx);
+        }
+    }
+
+    // To be removed
+    //context->LoadWorldsFromSetup(setupReader);
+
+    // Make the simulation reproducible 
     if(setupReader.getValues("REPRODUCIBLE")[0] == "TRUE"){
         context->setReproducible();
         srand (0);
@@ -73,8 +106,7 @@ int main(int argc, char **argv)
 
     for(int worldIx = 0; worldIx < setupReader.getValues("WORLDS").size(); worldIx++){
         context->setTemperature(worldIx, std::stof(setupReader.getValues("TEMPERATURE")[worldIx]));
-
-        context->setNofSamplesPerRound(worldIx, std::stoi(setupReader.getValues("MIXMCSTEPS")[worldIx]));
+        context->setNofSamplesPerRound(worldIx, std::stoi(setupReader.getValues("SAMPLES_PER_ROUND")[worldIx]));
         context->setNofMDStepsPerSample(worldIx, std::stoi(setupReader.getValues("MDSTEPS")[worldIx]));
     }
 
