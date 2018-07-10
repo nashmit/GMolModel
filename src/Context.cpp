@@ -179,6 +179,15 @@ void Context::loadMolecules(void)
     }
 }
 
+void Context::modelTopologies(void)
+{
+    // Model molecules
+    for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){
+        (updWorld(worldIx))->ModelTopologies();
+    }
+
+}
+
 
 // Use a SetupReader Object to read worlds information from a file
 void Context::LoadWorldsFromSetup(SetupReader& setupReader)
@@ -288,7 +297,8 @@ void Context::LoadWorldsFromSetup(SetupReader& setupReader)
         setGbsaGlobalScaleFactor(worldIx, std::stod(setupReader.getValues("GBSA")[worldIx]));
     } 
 */
-    
+   
+/* 
     // Model molecules
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
@@ -297,14 +307,18 @@ void Context::LoadWorldsFromSetup(SetupReader& setupReader)
             (updWorld(worldIx))->ModelTopologies( false );
         }
     }
-
+*/
+/*
     // Set simulation temperature
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         setTemperature( worldIx, std::stod(setupReader.getValues("TEMPERATURE")[worldIx]) );
-
+    }
+*/
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         // Do we use Fixman potential
         if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
             useFixmanPotential = true;
+            (updWorld(worldIx))->useFixmanTorque();
         }
     }
 
@@ -312,9 +326,8 @@ void Context::LoadWorldsFromSetup(SetupReader& setupReader)
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         updWorld(worldIx)->addSampler(HMC);
         setTimestep(worldIx, 0, std::stod(setupReader.getValues("TIMESTEPS")[worldIx]) );
-    }
-        
-    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+    //}
+    //for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         // Set thermostats
         (updWorld(worldIx))->updSampler(0)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
 
@@ -571,6 +584,24 @@ void Context::Run(SetupReader& setupReader)
 
 
 } // END of Run()
+
+
+/** Initialize the same velocities **/
+bool Context::getReproducible(void)
+{
+   return reproducible;
+}
+
+void Context::setReproducible(void)
+{
+    reproducible = true;
+    for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){
+        for (unsigned int samplerIx = 0; samplerIx < worlds[worldIx]->getNofSamplers(); samplerIx ++){
+            worlds[worldIx]->updSampler(samplerIx)->setReproducible();
+        }
+    }
+}
+    //------------
 //------------
 
 // --- Printing functions ---

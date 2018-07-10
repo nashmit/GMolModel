@@ -11,8 +11,9 @@ FFSCALE AMBER AMBER 		# Force field scale factors
 GBSA 0.0 0.0 		# GBSA scale factor
 FIXMAN_POTENTIAL FALSE FALSE 	# Use Fixman potential 
 FIXMAN_TORQUE FALSE FALSE 		# Use Fixman torque
-VISUAL TRUE TRUE 			# Use the visualizer
-#VISUAL FALSE FALSE 			# Use the visualizer
+#VISUAL TRUE TRUE 			# Use the visualizer
+VISUAL FALSE FALSE 			# Use the visualizer
 WRITEPDBS FALSE	FALSE 		# Write pdbs
 GEOMETRY FALSE FALSE 			# Calculate geometric features
 DIHEDRAL 1 0 2 3
+REPRODUCIBLE FALSE

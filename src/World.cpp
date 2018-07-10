@@ -226,7 +226,6 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
     }
 
     // Do we use Fixman torque
-    _useFixmanTorque = useFixmanTorqueOpt;
 
     // Generate a nonbonded list
     /*
@@ -255,6 +254,7 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
     //ts->initialize(compoundSystem->getDefaultState());
  
   
+    _useFixmanTorque = useFixmanTorqueOpt;
     if(_useFixmanTorque){
         ExtForce = new SimTK::Force::Custom(*forces, new FixmanTorque(compoundSystem, *matter));
     }
@@ -271,6 +271,15 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
 
     //std::cout << "World::Init END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
 }//end of InitSimulation
+
+// Fixman torque
+void World::useFixmanTorque(void)
+{
+    _useFixmanTorque = true;
+    ExtForce = new SimTK::Force::Custom(*forces, new FixmanTorque(compoundSystem, *matter));
+    
+}
+
 
 // --- Thermodynamics ---
 SimTK::Real World::getTemperature(void)
