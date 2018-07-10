@@ -124,6 +124,8 @@ public:
     void setGbsaGlobalScaleFactor(SimTK::Real);
 
     SimTK::DuMMForceFieldSubsystem * updForceField(void);
+
+    void useFixmanTorque(void);
     //...............
 
     // --- Statistics ---

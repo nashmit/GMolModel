@@ -18,7 +18,6 @@ int main(int argc, char **argv)
     SetupReader setupReader(argv[1]);
     Context *context = new Context();
 
-    srand (time(NULL));
 
     // Add Worlds
     unsigned int nofWorlds = setupReader.getValues("WORLDS").size();
@@ -59,8 +58,18 @@ int main(int argc, char **argv)
         context->setGbsaGlobalScaleFactor(worldIx, std::stod(setupReader.getValues("GBSA")[worldIx]));
     }
 
+    // Model topologies
+    context->modelTopologies();
+
     // To be removed
     context->LoadWorldsFromSetup(setupReader);
+
+    if(setupReader.getValues("REPRODUCIBLE")[0] == "TRUE"){
+        context->setReproducible();
+        srand (0);
+    }else{
+        srand (time(NULL));
+    }
 
     for(int worldIx = 0; worldIx < setupReader.getValues("WORLDS").size(); worldIx++){
         context->setTemperature(worldIx, std::stof(setupReader.getValues("TEMPERATURE")[worldIx]));

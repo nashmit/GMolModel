@@ -31,6 +31,7 @@ public:
     bool loadFlexibleBondsSpecs(int whichWorld, int whichMolecule, std::string FlexSpecsFN);
     void setRegimen (int whichWorld, int whichMolecule, std::string regimen);
     void loadMolecules();
+    void modelTopologies(void);
 
     void LoadWorldsFromSetup(SetupReader&);
     //------------
@@ -84,6 +85,10 @@ public:
 
     // --- Main ---
     void Run(SetupReader&);
+
+    /** Initialize the same velocities **/
+    bool getReproducible(void);
+    void setReproducible(void);
     //------------
 
     // --- Printing functions ---
@@ -108,6 +113,9 @@ private:
     std::vector<int> nofSamplesPerRound;
     std::vector<int> nofMDStepsPerSample;
     std::vector<float> timesteps;
+
+    //
+    bool reproducible;
 };
 
 #endif //__CONTEXT_HPP__

@@ -102,14 +102,20 @@ public:
     /** Returns the number of MC trials done by this integrator. **/
     //int getSampleNumber(void);
 
+    /** Initialize the same velocities **/
+    bool getReproducible(void);
+    void setReproducible(void);
+
 protected:
+
+    float timestep;
     SimTK::Real ke_lastAccepted; // last accepted kinetic energy
     SimTK::Real ke_proposed; // proposed kinetic energy
     SimTK::Real etot_set; // stored total energy
     SimTK::Real etot_proposed; // last accepted total energ (same with stored)
-    int sampleNumber; // counter for the number of MC trials 
 
-    float timestep;
+    int sampleNumber; // counter for the number of MC trials 
+    bool reproducible;
 
 };
 
