@@ -5,12 +5,12 @@ THERMOSTAT None None   	# Thermostat (HMC + Andersen = MD)
 ROUNDS 30 			# MC steps (Acception-rejection steps)
 TIMESTEPS 0.002	0.002 	# Timesteps to be used with regimens
 MDSTEPS  30 30 	# Number of MD trial steps
-MIXMCSTEPS 1 1 	# Number of MC trials within a mixing round
+SAMPLES_PER_ROUND 1 1 	# Number of MC trials within a mixing round
 TEMPERATURE  300 600 	# Temperature for constant temperature simulations
 FFSCALE AMBER AMBER 		# Force field scale factors
 GBSA 0.0 0.0 		# GBSA scale factor
 FIXMAN_POTENTIAL FALSE FALSE 	# Use Fixman potential 
-FIXMAN_TORQUE FALSE FALSE 		# Use Fixman torque
+FIXMAN_TORQUE TRUE TRUE 		# Use Fixman torque
 #VISUAL TRUE TRUE 			# Use the visualizer
 VISUAL FALSE FALSE 			# Use the visualizer
 WRITEPDBS FALSE	FALSE 		# Write pdbs
