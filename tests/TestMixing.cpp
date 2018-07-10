@@ -57,25 +57,44 @@ int main(int argc, char **argv)
         }else{
             context->setGlobalForceFieldScaleFactor(worldIx, std::stod(setupReader.getValues("FFSCALE")[worldIx]));
         }
-*/
 
+*/	
 	
-	context -> updForceField( worldIx ) -> setVdw12ScaleFactor( float(setupReader.getValues("setVdw12ScaleFactor")[worldIx] ) )
-	context -> updForceField( worldIx ) -> setVdw13ScaleFactor( float(setupReader.getValues("setVdw13ScaleFactor")[worldIx] ) )
-	context -> updForceField( worldIx ) -> setVdw14ScaleFactor( float(setupReader.getValues("setVdw14ScaleFactor")[worldIx] ) )
-	context -> updForceField( worldIx ) -> setVdw15ScaleFactor( float(setupReader.getValues("setVdw15ScaleFactor")[worldIx] ) )
-	
-	context -> updForceField( worldIx ) -> setCoulomb12ScaleFactor( float(setupReader.getValues("setCoulomb12ScaleFactor")[worldIx] ) )
-	context -> updForceField( worldIx ) -> setCoulomb13ScaleFactor( float(setupReader.getValues("setCoulomb13ScaleFactor")[worldIx] ) )
-	context -> updForceField( worldIx ) -> setCoulomb14ScaleFactor( float(setupReader.getValues("setCoulomb14ScaleFactor")[worldIx] ) )
-	context -> updForceField( worldIx ) -> setCoulomb15ScaleFactor( float(setupReader.getValues("setCoulomb15ScaleFactor")[worldIx] ) )
+//	context -> updForceField( worldIx ) -> setAllGlobalScaleFactors( std::stof(setupReader.getValues("setAllGlobalScaleFactors")[worldIx] ) );
 
+	context -> updForceField( worldIx ) -> setVdwGlobalScaleFactor( std::stof(setupReader.getValues("setVdwGlobalScaleFactor")[worldIx] ) );
+
+	context -> updForceField( worldIx ) -> setVdw12ScaleFactor( std::stof(setupReader.getValues("setVdw12ScaleFactor")[worldIx] ) );
+	context -> updForceField( worldIx ) -> setVdw13ScaleFactor( std::stof(setupReader.getValues("setVdw13ScaleFactor")[worldIx] ) );
+	context -> updForceField( worldIx ) -> setVdw14ScaleFactor( std::stof(setupReader.getValues("setVdw14ScaleFactor")[worldIx] ) );
+	context -> updForceField( worldIx ) -> setVdw15ScaleFactor( std::stof(setupReader.getValues("setVdw15ScaleFactor")[worldIx] ) );
+	
+
+	context -> updForceField( worldIx ) -> setCoulombGlobalScaleFactor( std::stof(setupReader.getValues("setCoulombGlobalScaleFactor")[worldIx] ) );
+
+
+	context -> updForceField( worldIx ) -> setCoulomb12ScaleFactor( std::stof(setupReader.getValues("setCoulomb12ScaleFactor")[worldIx] ) );
+	context -> updForceField( worldIx ) -> setCoulomb13ScaleFactor( std::stof(setupReader.getValues("setCoulomb13ScaleFactor")[worldIx] ) );
+	context -> updForceField( worldIx ) -> setCoulomb14ScaleFactor( std::stof(setupReader.getValues("setCoulomb14ScaleFactor")[worldIx] ) );
+	context -> updForceField( worldIx ) -> setCoulomb15ScaleFactor( std::stof(setupReader.getValues("setCoulomb15ScaleFactor")[worldIx] ) );
+
+
+	context -> updForceField( worldIx ) -> setGbsaGlobalScaleFactor( std::stof(setupReader.getValues("setGbsaGlobalScaleFactor")[worldIx] ) );
+
+	context -> updForceField( worldIx ) -> setBondStretchGlobalScaleFactor( std::stof(setupReader.getValues("setBondStretchGlobalScaleFactor")[worldIx] ) );
+	context -> updForceField( worldIx ) -> setBondBendGlobalScaleFactor( std::stof(setupReader.getValues("setBondBendGlobalScaleFactor")[worldIx] ) );
+	context -> updForceField( worldIx ) -> setBondTorsionGlobalScaleFactor( std::stof(setupReader.getValues("setBondTorsionGlobalScaleFactor")[worldIx] ) );
+	context -> updForceField( worldIx ) -> setAmberImproperTorsionGlobalScaleFactor( std::stof(setupReader.getValues("setAmberImproperTorsionGlobalScaleFactor")[worldIx] ) );
+
+//	context -> updForceField( worldIx ) -> setCustomBondStretchGlobalScaleFactor( std::stof(setupReader.getValues("setCustomBondStretchGlobalScaleFactor")[worldIx] ) );
+//	context -> updForceField( worldIx ) -> setCustomBondBendGlobalScaleFactor( std::stof(setupReader.getValues("setCustomBondBendGlobalScaleFactor")[worldIx] ) );
+//	context -> updForceField( worldIx ) -> setCustomBondTorsionGlobalScaleFactor( std::stof(setupReader.getValues("setCustomBondTorsionGlobalScaleFactor")[worldIx] ) );
 
 
 
 
         // Set world GBSA scale factor
-        context->setGbsaGlobalScaleFactor(worldIx, std::stod(setupReader.getValues("GBSA")[worldIx]));
+        // context->setGbsaGlobalScaleFactor(worldIx, std::stod(setupReader.getValues("GBSA")[worldIx]));
     }
 
     
