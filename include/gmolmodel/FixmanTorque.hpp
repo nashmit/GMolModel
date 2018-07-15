@@ -14,26 +14,32 @@
  **/
 
 class FixmanTorque : public SimTK::Force::Custom::Implementation {
- public:
-  SimTK::CompoundSystem *compoundSystem;
-  int *flag;
+public:
+    SimTK::CompoundSystem *compoundSystem;
+    int *flag;
 
-  FixmanTorque(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
-            );
+    FixmanTorque(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter);
+    ~FixmanTorque();
 
-  void calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
-    SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const;
+    void calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
+        SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const;
 
-  SimTK::Real calcPotentialEnergy(const SimTK::State& state) const;
+    SimTK::Real calcPotentialEnergy(const SimTK::State& state) const;
 
-  bool dependsOnlyOnPositions() const;
+    bool dependsOnlyOnPositions() const;
 
-  SimTK::Real getScaleFactor(void);
-  void setScaleFactor(SimTK::Real);
+    SimTK::Real getScaleFactor(void);
+    void setScaleFactor(SimTK::Real);
 
- private:
-  SimTK::SimbodyMatterSubsystem& matter;
-  SimTK::Real scaleFactor;
+    SimTK::Real getTemperature(void);
+    void setTemperature(SimTK::Real);
+
+private:
+    SimTK::SimbodyMatterSubsystem& matter;
+    SimTK::Real temperature;
+    SimTK::Real RT;
+    SimTK::Real scaleFactor;
+
 };
 
 #endif //__FIXMANTORQUE_HPP__

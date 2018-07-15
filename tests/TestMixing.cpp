@@ -58,16 +58,29 @@ int main(int argc, char **argv)
         context->setGbsaGlobalScaleFactor(worldIx, std::stod(setupReader.getValues("GBSA")[worldIx]));
     }
 
-    // Use Fixman torque
+    /*
+    // Model topologies
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
-        // Do we use Fixman potential
+        // Do we use Fixman torque
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
-            context->useFixmanTorque(worldIx);
+            //context->useFixmanTorque(worldIx);
+            context->updWorld(worldIx)->ModelTopologies(true);
+        }else{
+            context->updWorld(worldIx)->ModelTopologies(false);
         }
     }
+    */
 
     // Model topologies
     context->modelTopologies();
+
+    // Set Fixman torques scale factors
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
+            std::cout << "main call context->setFixmanTorqueScaleFactor(" << worldIx << ", -1.0)" << std::endl;
+            context->setFixmanTorqueScaleFactor(worldIx, -1.0);
+        }
+    }
 
     // Add samplers to the worlds
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
@@ -89,6 +102,13 @@ int main(int argc, char **argv)
             }
 
             // Initialize samplers
+//r            context->initializeSampler(worldIx, samplerIx);
+        }
+    }
+
+    // Add samplers to the worlds
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
             context->initializeSampler(worldIx, samplerIx);
         }
     }

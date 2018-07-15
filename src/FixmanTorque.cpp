@@ -7,8 +7,11 @@
 ////////////////////////////
 FixmanTorque::FixmanTorque(SimTK::CompoundSystem *compoundSystem, SimTK::SimbodyMatterSubsystem& matter
                     ) : matter(matter){
-  this->compoundSystem = compoundSystem;
-  scaleFactor = 1.0;
+    this->compoundSystem = compoundSystem;
+    scaleFactor = 1.0;
+    this->temperature = 300.0;
+    this->RT = temperature * SimTK_BOLTZMANN_CONSTANT_MD;
+    
 }
 
 void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
@@ -23,18 +26,23 @@ void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Sp
     delete D0;
     // end - Compute Fixman torque
 
-    //std::cout << "Applied " ;
+    //std::cout << "Apply mobility forces: " ;
     int uslot = -1;
     for (SimTK::MobilizedBodyIndex mbx(0); mbx < matter.getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter.getMobilizedBody(mbx);
 
         for(int k = 0; k < mobod.getNumU(state); k++){
             uslot++;
-            mobod.applyOneMobilityForce(state, k, scaleFactor * V4[uslot], mobilityForces);
-            //std::cout << " " << std::setprecision(10) << std::fixed << V4[uslot] << " to " << int(mbx) ;
-            //std::cout << std::setprecision(5) << std::fixed << V4[uslot] << ' ';
-        }
 
+            //mobod.applyOneMobilityForce(state, k, scaleFactor * V4[uslot], mobilityForces);
+            mobod.applyOneMobilityForce(state, k, (-1.0) * RT * V4[uslot], mobilityForces);
+
+            //std::cout << std::setprecision(10) << std::fixed << V4[uslot] 
+            //    << " to body " << int(mbx) << " slot " << uslot << " ";
+
+            //std::cout << "scaleFactor " << scaleFactor << "; " ;
+            //std::cout << " -RT " << (-1.0) * RT << "; " ;
+        }
     }
     //std::cout << std::endl;
 
@@ -43,14 +51,27 @@ void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Sp
     //knee.applyOneMobilityForce(state, 0, -k*x, mobilityForces);
 }
 
+FixmanTorque::~FixmanTorque(){}
+
 // This should be carefully analyzed. Intended to be taken from somewhere else.
 SimTK::Real FixmanTorque::calcPotentialEnergy(const SimTK::State& state) const {
-  SimTK::Real energy = 0.0;
-  return energy;
+    SimTK::Real energy = 0.0;
+    return energy;
 }
 
 bool FixmanTorque::dependsOnlyOnPositions() const {
-  return true;
+    return true;
+}
+
+SimTK::Real FixmanTorque::getTemperature(void)
+{
+    return this->temperature;
+}
+
+void FixmanTorque::setTemperature(SimTK::Real argTemperature)
+{
+    this->temperature = argTemperature;
+    this->RT = temperature * SimTK_BOLTZMANN_CONSTANT_MD;
 }
 
 SimTK::Real FixmanTorque::getScaleFactor(void)
@@ -60,8 +81,11 @@ SimTK::Real FixmanTorque::getScaleFactor(void)
 
 void FixmanTorque::setScaleFactor(SimTK::Real argScaleFactor)
 {
-    this->scaleFactor = argScaleFactor;
+    scaleFactor = argScaleFactor;
+    std::cout << "FixmanTorque::setScaleFactor("<< this->scaleFactor << ")" << std::endl;
 }
+
+
 
 ////////////////////////////
 ////// END GRID FORCE //////

@@ -252,13 +252,13 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
    
     //SimTK::State state = compoundSystem->updDefaultState();
     //ts->initialize(compoundSystem->getDefaultState());
- 
-  
-    _useFixmanTorque = useFixmanTorqueOpt;
+
+    //_useFixmanTorque = useFixmanTorqueOpt;
+    _useFixmanTorque = true;
     if(_useFixmanTorque){
         ExtForce = new SimTK::Force::Custom(*forces, new FixmanTorque(compoundSystem, *matter));
     }
-    
+
     #ifdef TRY_TO_USE_OPENMM
         //forceField->setUseOpenMMAcceleration(true);
     #endif
@@ -266,8 +266,6 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
     //forceField->setNumThreadsRequested(1); // don't use this unless
   
     compoundSystem->realizeTopology();
-
-
 
     std::cout << "World::Init END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
 }//end of InitSimulation
@@ -277,12 +275,17 @@ void World::useFixmanTorque(void)
 {
     _useFixmanTorque = true;
     ExtForce = new SimTK::Force::Custom(*forces, new FixmanTorque(compoundSystem, *matter));
-    
+    compoundSystem->realizeTopology();
 }
 
 bool World::isUsingFixmanTorque(void)
 {
     return _useFixmanTorque;
+}
+
+SimTK::Force::Custom * World::updFixmanTorque(void)
+{
+    return ExtForce;
 }
 
 // --- Thermodynamics ---

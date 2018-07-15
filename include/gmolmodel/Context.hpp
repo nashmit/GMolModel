@@ -75,6 +75,7 @@ public:
     bool isUsingFixmanPotential(int whichWorld, int whichSampler);
     void useFixmanTorque(int whichWorld);
     bool isUsingFixmanTorque(int whichWorld);
+    void setFixmanTorqueScaleFactor(int whichWorld, double scaleFactor);
     //------------
 
     // --- Mixing parameters ---

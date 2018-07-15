@@ -146,6 +146,8 @@ public:
     // Get a writable sampler based on its position in the samplers vector
     HamiltonianMonteCarloSampler * updSampler(int which);
 
+    SimTK::Force::Custom * updFixmanTorque(void);
+
     //...............
   
     // -- Debugging / helper functions ---

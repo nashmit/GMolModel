@@ -31,12 +31,13 @@ class HamiltonianMonteCarloSampler : public MonteCarloSampler
 public:
 
     /** Constructor **/
-    HamiltonianMonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem,
-                                 SimTK::SimbodyMatterSubsystem *argMatter,
-                                 SimTK::Compound *argResidue,
-                                 SimTK::DuMMForceFieldSubsystem *argDumm,
-                                 SimTK::GeneralForceSubsystem *forces,
-                                 SimTK::TimeStepper *argTimeStepper);
+    HamiltonianMonteCarloSampler(SimTK::CompoundSystem *argCompoundSystem
+                                 ,SimTK::SimbodyMatterSubsystem *argMatter
+                                 ,SimTK::Compound *argResidue
+                                 ,SimTK::DuMMForceFieldSubsystem *argDumm
+                                 ,SimTK::GeneralForceSubsystem *forces
+                                 ,SimTK::TimeStepper *argTimeStepper
+                                 );
 
     /** Destructor **/
     virtual ~HamiltonianMonteCarloSampler();
@@ -116,6 +117,9 @@ protected:
 
     int sampleNumber; // counter for the number of MC trials 
     bool reproducible;
+
+    //SimTK::VerletIntegrator * integ ; //ninteg
+    //SimTK::TimeStepper * ts ; //ninteg
 
 };
 

@@ -453,6 +453,13 @@ bool Context::isUsingFixmanTorque(int whichWorld)
     return worlds[whichWorld]->isUsingFixmanTorque();
 }
 
+void Context::setFixmanTorqueScaleFactor(int whichWorld, double scaleFactor)
+{
+    std::cout << "Context::setFixmanTorqueScaleFactor: ( (FixmanTorque *) (worlds[" 
+    << whichWorld << "]->updFixmanTorque()) )->setScaleFactor(" << scaleFactor << ") "<< std::endl;
+    ( (FixmanTorque *) (worlds[whichWorld]->updFixmanTorque()) )->setScaleFactor(scaleFactor);
+}
+
 // Use Fixman potential
 void Context::useFixmanPotential(int whichWorld, int whichSampler)
 {
@@ -570,8 +577,8 @@ void Context::Run(SetupReader& setupReader)
             currentWorldIx = worldIndexes.front();
     
             // Transfer coordinates from last world to current
-            std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
-                << " at round " << round << std::endl;
+            //std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
+            //    << " at round " << round << std::endl;
             SimTK::State& lastAdvancedState = (updWorld(worldIndexes.back()))->integ->updAdvancedState();
             SimTK::State& currentAdvancedState = (updWorld(currentWorldIx))->integ->updAdvancedState();
     
@@ -595,7 +602,7 @@ void Context::Run(SetupReader& setupReader)
             }
     
             // Update
-            std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
+            //std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
             for(int k = 0; k < nofSamplesPerRound[currentWorldIx]; k++){
                 updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, nofMDStepsPerSample[currentWorldIx]);
             }

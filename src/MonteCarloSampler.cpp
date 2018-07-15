@@ -128,7 +128,7 @@ void MonteCarloSampler::setAlwaysAccept(bool argAlwaysAccept)
 }
 
 
-// Compute Fixman potential
+// Compute Fixman potential (should have been calcDetMInv ??)
 SimTK::Real MonteCarloSampler::calcFixman(SimTK::State& someState){
     int nu = someState.getNU();
     SimTK::Vector V(nu);
