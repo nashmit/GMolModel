@@ -254,10 +254,18 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
     //ts->initialize(compoundSystem->getDefaultState());
 
     //_useFixmanTorque = useFixmanTorqueOpt;
-    _useFixmanTorque = true;
-    if(_useFixmanTorque){
-        ExtForce = new SimTK::Force::Custom(*forces, new FixmanTorque(compoundSystem, *matter));
-    }
+//rr    _useFixmanTorque = true;
+//rr    if(_useFixmanTorque){
+//rr        ExtForce = new SimTK::Force::Custom(*forces, new FixmanTorque(compoundSystem, *matter));
+//rr    }
+   
+//r    _useFixmanTorque = true;
+//r    if(_useFixmanTorque){
+//r        FixmanTorqueImpl = new FixmanTorque(compoundSystem, *matter);
+//r        Force::Custom ExtForce(*forces, FixmanTorqueImpl);
+//r    }
+//r    FixmanTorqueImpl->setTemperature(450.0);
+    
 
     #ifdef TRY_TO_USE_OPENMM
         //forceField->setUseOpenMMAcceleration(true);
@@ -270,11 +278,12 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
     std::cout << "World::Init END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
 }//end of InitSimulation
 
-// Fixman torque
+// Fixman torque - doesn't work
 void World::useFixmanTorque(void)
 {
     _useFixmanTorque = true;
-    ExtForce = new SimTK::Force::Custom(*forces, new FixmanTorque(compoundSystem, *matter));
+    FixmanTorqueImpl = new FixmanTorque(compoundSystem, *matter);
+    Force::Custom ExtForce(*forces, FixmanTorqueImpl);
     compoundSystem->realizeTopology();
 }
 
@@ -283,9 +292,10 @@ bool World::isUsingFixmanTorque(void)
     return _useFixmanTorque;
 }
 
-SimTK::Force::Custom * World::updFixmanTorque(void)
+FixmanTorque * World::updFixmanTorque(void)
 {
-    return ExtForce;
+    //return ExtForce;
+    return FixmanTorqueImpl;
 }
 
 // --- Thermodynamics ---
@@ -301,6 +311,9 @@ void World::setTemperature(SimTK::Real argTemperature)
         samplers[samplerIx]->setTemperature(argTemperature);
     }
     this->temperature = argTemperature;
+  
+    FixmanTorqueImpl->setTemperature(this->temperature);
+
 }
 //...............
 

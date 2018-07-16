@@ -22,9 +22,9 @@ public:
     ~FixmanTorque();
 
     void calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
-        SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const;
+        SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const override;
 
-    SimTK::Real calcPotentialEnergy(const SimTK::State& state) const;
+    SimTK::Real calcPotentialEnergy(const SimTK::State& state) const override;
 
     bool dependsOnlyOnPositions() const;
 

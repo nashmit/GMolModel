@@ -76,6 +76,7 @@ public:
     void useFixmanTorque(int whichWorld);
     bool isUsingFixmanTorque(int whichWorld);
     void setFixmanTorqueScaleFactor(int whichWorld, double scaleFactor);
+    void setFixmanTorqueTemperature(int whichWorld, double temperature);
     //------------
 
     // --- Mixing parameters ---

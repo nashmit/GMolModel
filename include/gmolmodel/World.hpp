@@ -146,7 +146,7 @@ public:
     // Get a writable sampler based on its position in the samplers vector
     HamiltonianMonteCarloSampler * updSampler(int which);
 
-    SimTK::Force::Custom * updFixmanTorque(void);
+    FixmanTorque * updFixmanTorque(void);
 
     //...............
   
@@ -178,6 +178,7 @@ public:
     SimTK::GeneralForceSubsystem *forces;
 
     // Force::Custom
+    FixmanTorque * FixmanTorqueImpl;
     SimTK::Force::Custom *ExtForce;
 
     // Subsystem->ForceSubsystem->DuMMForceFieldSubsystem

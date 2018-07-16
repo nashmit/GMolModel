@@ -9,13 +9,13 @@ FixmanTorque::FixmanTorque(SimTK::CompoundSystem *compoundSystem, SimTK::Simbody
                     ) : matter(matter){
     this->compoundSystem = compoundSystem;
     scaleFactor = 1.0;
-    this->temperature = 300.0;
+    this->temperature = 0.0;
     this->RT = temperature * SimTK_BOLTZMANN_CONSTANT_MD;
     
 }
 
 void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::SpatialVec>& bodyForces,
-                           SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const
+                           SimTK::Vector_<SimTK::Vec3>& particleForces, SimTK::Vector& mobilityForces) const  
 {
     // Compute Fixman torque
     int nu = state.getNU();
@@ -35,6 +35,7 @@ void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Sp
             uslot++;
 
             //mobod.applyOneMobilityForce(state, k, scaleFactor * V4[uslot], mobilityForces);
+
             mobod.applyOneMobilityForce(state, k, (-1.0) * RT * V4[uslot], mobilityForces);
 
             //std::cout << std::setprecision(10) << std::fixed << V4[uslot] 

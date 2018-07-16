@@ -58,18 +58,12 @@ int main(int argc, char **argv)
         context->setGbsaGlobalScaleFactor(worldIx, std::stod(setupReader.getValues("GBSA")[worldIx]));
     }
 
-    /*
-    // Model topologies
+    // Do we use Fixman torque
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
-        // Do we use Fixman torque
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
-            //context->useFixmanTorque(worldIx);
-            context->updWorld(worldIx)->ModelTopologies(true);
-        }else{
-            context->updWorld(worldIx)->ModelTopologies(false);
+            context->useFixmanTorque(worldIx);
         }
     }
-    */
 
     // Model topologies
     context->modelTopologies();
@@ -77,7 +71,7 @@ int main(int argc, char **argv)
     // Set Fixman torques scale factors
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
-            std::cout << "main call context->setFixmanTorqueScaleFactor(" << worldIx << ", -1.0)" << std::endl;
+            std::cout << "main call context->setFixmanTorqueScaleFactor(" << worldIx << " -1 " << std::endl;
             context->setFixmanTorqueScaleFactor(worldIx, -1.0);
         }
     }

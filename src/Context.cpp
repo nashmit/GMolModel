@@ -460,6 +460,13 @@ void Context::setFixmanTorqueScaleFactor(int whichWorld, double scaleFactor)
     ( (FixmanTorque *) (worlds[whichWorld]->updFixmanTorque()) )->setScaleFactor(scaleFactor);
 }
 
+void Context::setFixmanTorqueTemperature(int whichWorld, double argTemperature)
+{
+    std::cout << "Context::setFixmanTemperature: ( (FixmanTorque *) (worlds[" 
+    << whichWorld << "]->updFixmanTorque()) )->setTemperature(" << argTemperature << ") "<< std::endl;
+    ( (FixmanTorque *) (worlds[whichWorld]->updFixmanTorque()) )->setTemperature(argTemperature);
+}
+
 // Use Fixman potential
 void Context::useFixmanPotential(int whichWorld, int whichSampler)
 {
