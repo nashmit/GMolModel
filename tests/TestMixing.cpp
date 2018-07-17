@@ -100,12 +100,12 @@ int main(int argc, char **argv)
         }
     }
 
-    // Add samplers to the worlds
-    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
-        for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
-            context->initializeSampler(worldIx, samplerIx);
-        }
-    }
+//r    // Add samplers to the worlds
+//r    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+//r        for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
+//r            context->initializeSampler(worldIx, samplerIx);
+//r        }
+//r    }
 
     // To be removed
     //context->LoadWorldsFromSetup(setupReader);
@@ -122,6 +122,13 @@ int main(int argc, char **argv)
         context->setTemperature(worldIx, std::stof(setupReader.getValues("TEMPERATURE")[worldIx]));
         context->setNofSamplesPerRound(worldIx, std::stoi(setupReader.getValues("SAMPLES_PER_ROUND")[worldIx]));
         context->setNofMDStepsPerSample(worldIx, std::stoi(setupReader.getValues("MDSTEPS")[worldIx]));
+    }
+
+    // Add samplers to the worlds
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
+            context->initializeSampler(worldIx, samplerIx);
+        }
     }
 
     context->Run(setupReader);
