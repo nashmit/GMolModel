@@ -49,6 +49,7 @@ World * Context::AddWorld(bool visual){
 }
 
 // Add another world and a sampler to the context
+/*
 World * Context::AddWorld(World *inp_p_world, bool visual){
     worlds.push_back(inp_p_world);
     worldIndexes.push_back(worldIndexes.size());
@@ -65,6 +66,7 @@ World * Context::AddWorld(World *inp_p_world, bool visual){
 
     return worlds.back();
 }
+*/
 
 // Destructor
 Context::~Context(){

@@ -461,7 +461,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
         setLastAcceptedKE(ke_n);
         this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
     }
-    else if( (!isnan(pe_n)) && 
+    else if( (!std::isnan(pe_n)) && 
     ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
 //    ((etot_n > etot_proposed) || (rand_no < exp((etot_n - etot_proposed)/RT))) ){ // Unfold
 //p        std::cout << " acc 1 " ;

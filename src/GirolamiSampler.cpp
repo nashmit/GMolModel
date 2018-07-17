@@ -288,8 +288,8 @@ void GirolamiSampler::update(SimTK::State& someState, SimTK::Real timestep, int 
 
     // Apply Metropolis criterion
 ////    if(1){ // Always accept // TODO
-    //assert(!isnan(pe_n));
-    if ( (!isnan(pe_n)) || (etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT)) ){ // Accept
+    //assert(!std::isnan(pe_n));
+    if ( (!std::isnan(pe_n)) || (etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT)) ){ // Accept
         std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM

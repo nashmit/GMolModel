@@ -471,7 +471,7 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
 
     // Apply Metropolis criterion
     SimTK::Real etot_o, etot_n;
-    assert(!isnan(pe_n));
+    assert(!std::isnan(pe_n));
     if(useFixman){
         etot_n = pe_n + ke_n + fix_n;
         etot_o = pe_o + ke_o + fix_o;
@@ -500,7 +500,7 @@ void TestHMCSOA::update(SimTK::State& someState, SimTK::Real timestep, int noste
 
     if(1){ // Always accept
     //if ((etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT))){ // Accept
-    //if ( (!isnan(pe_n)) && (etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT)) ){ // Accept
+    //if ( (!std::isnan(pe_n)) && (etot_n < etot_o) || (rand_no < exp(-(etot_n - etot_o)/RT)) ){ // Accept
         std::cout << " acc 1 " ;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM

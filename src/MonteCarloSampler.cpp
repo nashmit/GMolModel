@@ -423,7 +423,7 @@ void MonteCarloSampler::update(SimTK::State& someState){
 
     // Apply Metropolis criterion
 
-    assert(!isnan(pe_n));
+    assert(!std::isnan(pe_n));
     if ((pe_n < pe_o) or (rand_no < exp(-(pe_n - pe_o)/RT))){ // Accept
         setTVector(someState);
         setOldPE(pe_n);

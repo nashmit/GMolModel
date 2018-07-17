@@ -14,7 +14,7 @@ public:
     ~Context();
 
     World * AddWorld(bool visual);
-    World * AddWorld(World *, bool visual);
+    //World * AddWorld(World *, bool visual);
 
     World * getWorld(void) const;
     World * getWorld(int which) const;
