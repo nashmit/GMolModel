@@ -311,8 +311,10 @@ void World::setTemperature(SimTK::Real argTemperature)
         samplers[samplerIx]->setTemperature(argTemperature);
     }
     this->temperature = argTemperature;
-  
-    FixmanTorqueImpl->setTemperature(this->temperature);
+
+    if(_useFixmanTorque){ 
+        FixmanTorqueImpl->setTemperature(this->temperature);
+    }
 
 }
 //...............
