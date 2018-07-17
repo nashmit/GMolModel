@@ -1,0 +1,49 @@
+MOLECULES lin4 			# Molecules to load
+WORLDS IC TD 			# Regimen (IC, TD, MIX, RB, RBMIX)
+SAMPLER HMC HMC
+THERMOSTAT None None   	# Thermostat (HMC + Andersen = MD)
+ROUNDS 30 			# MC steps (Acception-rejection steps)
+TIMESTEPS 0.002	0.002 	# Timesteps to be used with regimens
+MDSTEPS  30 30 	# Number of MD trial steps
+MIXMCSTEPS 1 1 	# Number of MC trials within a mixing round
+TEMPERATURE  300 600 	# Temperature for constant temperature simulations
+FFSCALE AMBER AMBER 		# Force field scale factors
+GBSA 0.0 0.0 		# GBSA scale factor
+FIXMAN_POTENTIAL FALSE FALSE 	# Use Fixman potential 
+FIXMAN_TORQUE FALSE FALSE 		# Use Fixman torque
+#VISUAL TRUE TRUE 			# Use the visualizer
+VISUAL FALSE FALSE 			# Use the visualizer
+WRITEPDBS FALSE	FALSE 		# Write pdbs
+GEOMETRY FALSE FALSE 			# Calculate geometric features
+DIHEDRAL 1 0 2 3
+REPRODUCIBLE FALSE FALSE
+
+
+//setAllGlobalScaleFactors 	0.0
+
+setVdwGlobalScaleFactor 	0.0
+
+setVdw12ScaleFactor 0.0
+setVdw13ScaleFactor 0.0
+setVdw14ScaleFactor 0.0
+setVdw15ScaleFactor 0.0
+
+setCoulombGlobalScaleFactor	0.0
+
+setCoulomb12ScaleFactor 0.0
+setCoulomb13ScaleFactor 0.0
+setCoulomb14ScaleFactor 0.0
+setCoulomb15ScaleFactor 0.0
+
+setGbsaGlobalScaleFactor	0.0 
+
+setBondStretchGlobalScaleFactor 	1.0
+setBondBendGlobalScaleFactor	0.0
+setBondTorsionGlobalScaleFactor	0.0
+setAmberImproperTorsionGlobalScaleFactor	0.0
+
+//setCustomBondStretchGlobalScaleFactor 	0.0
+//setCustomBondBendGlobalScaleFactor	0.0
+//setCustomBondTorsionGlobalScaleFactor	0.0
+
+
