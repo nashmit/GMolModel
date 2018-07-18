@@ -442,18 +442,18 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     etot_n;
 
 
-    std::cout<<std::setprecision(5)<<std::fixed; //p
-    std::cout << "pe_o " << pe_o << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP() //p
-       << " pe_n " << pe_n  << " ke_n " << ke_n << " fix_n " << fix_n //p
+//p    std::cout<<std::setprecision(5)<<std::fixed; //p
+//p    std::cout << "pe_o " << pe_o << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP() //p
+//p       << " pe_n " << pe_n  << " ke_n " << ke_n << " fix_n " << fix_n //p
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
         //<< " etot_n " << etot_n  + getREP() << " etot_proposed " << etot_proposed + getREP()
-        ; //p
+//p        ; //p
 
 //     std::cout << std::setprecision(10) << std::fixed << fix_n << ' ';
 
     // Apply Metropolis criterion
     if ( getThermostat() == ANDERSEN ){ // MD with Andersen thermostat
-        std::cout << " acc 1 " ; //p
+//p        std::cout << " acc 1 " ; //p
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
         setSetPE(pe_n);
@@ -464,7 +464,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     else if( (!std::isnan(pe_n)) && 
     ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
 //    ((etot_n > etot_proposed) || (rand_no < exp((etot_n - etot_proposed)/RT))) ){ // Unfold
-        std::cout << " acc 1 " ; //p
+//p        std::cout << " acc 1 " ; //p
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
         setSetPE(pe_n);
@@ -473,13 +473,13 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
         this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
         ++acceptedSteps;
     }else{ // Reject
-        std::cout << " acc 0 " ; //p
+//p        std::cout << " acc 0 " ; //p
         assignConfFromSetTVector(someState);
     }
 
-    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman() //p
+//p    std::cout << " pe_os " << getSetPE() + getREP() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman() //p
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
-        << std:: endl; //p
+//p        << std:: endl; //p
 
     // Keep track of how many MC trials have been done 
     ++sampleNumber;
