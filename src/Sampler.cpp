@@ -66,6 +66,7 @@ Sampler::~Sampler(){
 // Set a thermostat 
 void Sampler::setThermostat(ThermostatName argThermostat){
     this->thermostat = argThermostat;
+    std::cout << "Sampler::setThermostat ThermostatName " << argThermostat << "|" << this->thermostat << std::endl;
 }
 
 // Set a thermostat 
@@ -94,6 +95,7 @@ void Sampler::setThermostat(std::string argThermostat){
     }catch(std::invalid_argument& ia){
         std::cerr << "Invalid argument: " << ia.what() << '\n';
     }
+    std::cout << "Sampler::setThermostat std::string |" << argThermostat << "|" << this->thermostat << std::endl;
 
 }
 
@@ -125,6 +127,7 @@ void Sampler::setThermostat(const char *argThermostat){
     }catch(std::invalid_argument& ia){
         std::cerr << "Invalid argument: " << ia.what() << '\n';
     }
+    std::cout << "Sampler::setThermostat const char |" << argThermostat << "|" << this->thermostat << std::endl;
 
 }
 

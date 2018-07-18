@@ -133,6 +133,9 @@ public:
     void insertAtom(bSpecificAtom *atom);
     void insertBond(int atom_no1, int atom_no2, int bondOrder);
 
+    // Get coordinates
+    void getCoordinates(std::vector<SimTK::Real> Xs, std::vector<SimTK::Real> Ys, std::vector<SimTK::Real> Zs);
+
 public:
 
     bool hasBuiltSystem;

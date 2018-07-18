@@ -97,6 +97,14 @@ public:
     // Molmodel Compound
     void updateAtomLists(const SimTK::State&);
 
+    // To be called before use of getXs, getYs or getZs
+    void updateCoordBuffers(void);
+
+    // Get the coordinates buffers
+    std::vector<SimTK::Real> getXs(void);
+    std::vector<SimTK::Real> getYs(void);
+    std::vector<SimTK::Real> getZs(void);
+
     // Access to molecule (Topology) objects 
     // Get a readble reference of one of the molecules 
     const Topology& getTopology(int moleculeNumber) const;
@@ -196,6 +204,10 @@ public:
     // Molecules (topologies<-Compounds) objects
     std::vector<bMoleculeReader *> moleculeReaders;
     std::vector<Topology *> topologies;
+
+    std::vector<SimTK::Real> Xs;
+    std::vector<SimTK::Real> Ys;
+    std::vector<SimTK::Real> Zs;
 
     // This vector stores a configuration if is needed for later use
     SimTK::Transform *TVector;

@@ -452,6 +452,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 //     std::cout << std::setprecision(10) << std::fixed << fix_n << ' ';
 
     // Apply Metropolis criterion
+    std::cout << "HMC Thermostat " << getThermostat() << std::endl; 
     if ( getThermostat() == ANDERSEN ){ // MD with Andersen thermostat
         std::cout << " 1 " ; //p
         setSetTVector(someState);

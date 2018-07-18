@@ -25,7 +25,7 @@ Topology::~Topology(){
 
 /** Get the number of atoms in the molecule **/
 int Topology::getNAtoms(void) const{
-    assert(!"Not implemented.");
+    return getNumAtoms();
 }
 
 /** Get the number of bonds in the molecule **/
@@ -527,9 +527,28 @@ void Topology::writePdb(std::string dirname, std::string prefix, std::string suf
 }
 
   // Not sure we need this
-  void Topology::insertAtom(bSpecificAtom *){}
-  void Topology::insertBond(int, int, int bondOrder){}
+void Topology::insertAtom(bSpecificAtom *)
+{
+    assert(!"Not implemented.");
+}
 
+void Topology::insertBond(int at1, int at2, int bondOrder)
+{
+    assert(!"Not implemented.");
+}
+
+// Get coordinates
+void Topology::getCoordinates(std::vector<SimTK::Real> Xs, std::vector<SimTK::Real> Ys, std::vector<SimTK::Real> Zs)
+{
+    assert(Xs.size() == getNumAtoms());
+    assert(Ys.size() == getNumAtoms());
+    assert(Zs.size() == getNumAtoms());
+    for(int ix = 0; ix < getNumAtoms(); ++ix){
+        Xs[ix] = bAtomList[ix].getX();
+        Ys[ix] = bAtomList[ix].getY();
+        Zs[ix] = bAtomList[ix].getZ();
+    }
+}
 
 // Not sure they belong here
 

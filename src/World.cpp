@@ -176,6 +176,11 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
   
     std::cout << "World::AddMolecule build Compound" << std::endl << std::flush;
     (topologies.back())->build(*forceField, (moleculeReaders.back())->natoms, (moleculeReaders.back())->bAtomList, (moleculeReaders.back())->nbonds, (moleculeReaders.back())->bonds, flexFN, ictdF);
+
+    // Allocate the vector of coordinates (DCD)
+    Xs.resize(Xs.size() + topologies.back()->getNAtoms());
+    Ys.resize(Ys.size() + topologies.back()->getNAtoms());
+    Zs.resize(Zs.size() + topologies.back()->getNAtoms());
   
     std::cout << "World::AddMolecule adopt Compound " << topologies.back() << std::endl << std::flush;
     compoundSystem->adoptCompound( *(topologies.back()) );
@@ -828,12 +833,36 @@ void World::PrintSimbodyStateCache(SimTK::State& someState){
     }
 }
 
+// To be called before use of getXs, getYs or getZs
+void World::updateCoordBuffers(void)
+{
+    int allAtIx = -1;
+    for(unsigned int tIx = 0; tIx < topologies.size(); tIx++){
+        for(unsigned int aIx = 0; aIx < topologies[tIx]->getNAtoms(); aIx++){
+            allAtIx++;
+            Xs[allAtIx] = (topologies[tIx]->bAtomList[aIx]).getX();
+            Ys[allAtIx] = (topologies[tIx]->bAtomList[aIx]).getY();
+            Zs[allAtIx] = (topologies[tIx]->bAtomList[aIx]).getZ();
+        }
+    }
 
+}
 
+// Get the coordinates buffers
+std::vector<SimTK::Real> World::getXs(void)
+{
+    return Xs;
+}
 
+std::vector<SimTK::Real> World::getYs(void)
+{
+    return Ys;
+}
 
-
-
+std::vector<SimTK::Real> World::getZs(void)
+{
+    return Zs;
+}
 
 // Advance
 void World::Advance(int nosteps){
@@ -879,7 +908,10 @@ World::~World(){
     for(unsigned int i = 0; i < samplers.size(); i++){
         delete samplers[i];
     }
-    //forceField->loadAmber99Parameters();
+
+    Xs.clear();
+    Ys.clear();
+    Zs.clear();
 }
 
 

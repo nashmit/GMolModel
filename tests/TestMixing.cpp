@@ -89,26 +89,16 @@ int main(int argc, char **argv)
 
             // Set thermostats
             context->updWorld()->updSampler(samplerIx)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
+            std::cout << "Thermostat of world " << worldIx << " sampler " << samplerIx << " set to " << setupReader.getValues("THERMOSTAT")[worldIx] << std::endl;
+            std::cout << "Thermostat of world " << worldIx << " sampler " << samplerIx << " get " << context->updWorld()->updSampler(samplerIx)->getThermostat() << std::endl;
 
             // Activate Fixman potential if needed
             if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
                  context->useFixmanPotential(worldIx, samplerIx);
             }
-
-            // Initialize samplers
-//r            context->initializeSampler(worldIx, samplerIx);
         }
     }
 
-//r    // Add samplers to the worlds
-//r    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
-//r        for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
-//r            context->initializeSampler(worldIx, samplerIx);
-//r        }
-//r    }
-
-    // To be removed
-    //context->LoadWorldsFromSetup(setupReader);
 
     // Make the simulation reproducible 
     if(setupReader.getValues("REPRODUCIBLE")[0] == "TRUE"){
@@ -132,8 +122,6 @@ int main(int argc, char **argv)
     }
 
     context->Run(setupReader);
-
-
 
     delete context;
 
