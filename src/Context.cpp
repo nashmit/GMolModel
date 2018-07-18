@@ -605,7 +605,7 @@ void Context::Run(SetupReader& setupReader)
                     int restIx = worldIndexes[i];
                     int backIx = worldIndexes.back();
                     SimTK::Real diffPE = (updWorld(backIx))->updSampler(0)->getSetPE() - (updWorld(restIx))->updSampler(0)->getSetPE();
-                    std::cout << "Setting sampler " << restIx << " REP to " << (updWorld(backIx))->updSampler(0)->getSetPE() << " - " << (updWorld(restIx))->updSampler(0)->getSetPE() << " = " << diffPE << std::endl;
+                    //std::cout << "Setting sampler " << restIx << " REP to " << (updWorld(backIx))->updSampler(0)->getSetPE() << " - " << (updWorld(restIx))->updSampler(0)->getSetPE() << " = " << diffPE << std::endl;
                     (updWorld(restIx))->updSampler(0)->setREP( diffPE );
                 }
             }
