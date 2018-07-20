@@ -89,8 +89,6 @@ int main(int argc, char **argv)
 
             // Set thermostats
             context->updWorld()->updSampler(samplerIx)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
-            std::cout << "Thermostat of world " << worldIx << " sampler " << samplerIx << " set to " << setupReader.getValues("THERMOSTAT")[worldIx] << std::endl;
-            std::cout << "Thermostat of world " << worldIx << " sampler " << samplerIx << " get " << context->updWorld()->updSampler(samplerIx)->getThermostat() << std::endl;
 
             // Activate Fixman potential if needed
             if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){

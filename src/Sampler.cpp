@@ -26,7 +26,8 @@ Sampler::Sampler(SimTK::CompoundSystem *argCompoundSystem,
     this->system = &(matter->getSystem());
 
     // Thermodynamics
-    thermostat = NONE;
+    //thermostat = NONE;
+    //std::cout << "Sampler::Sampler ThermostatName NONE = |" << this->thermostat << std::endl;
 
     // Harmonic oscillator constants
     for(int i = 0; i < HO_D; i++){HO_x[i] = 1;}
@@ -62,6 +63,7 @@ Sampler::~Sampler(){
     ;
 }
 
+/*
 
 // Set a thermostat 
 void Sampler::setThermostat(ThermostatName argThermostat){
@@ -135,7 +137,7 @@ void Sampler::setThermostat(const char *argThermostat){
 ThermostatName Sampler::getThermostat(void){
     return this->thermostat;
 }
-
+*/
 
 
 // Compute mass matrix determinant

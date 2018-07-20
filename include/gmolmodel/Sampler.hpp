@@ -35,6 +35,7 @@ public:
     virtual void initialize(void) {};
     virtual void reinitialize(void) {}
 
+    /*
     // Set a thermostat (even for MCMC)
     virtual void setThermostat(ThermostatName);
     virtual void setThermostat(std::string);
@@ -42,6 +43,7 @@ public:
 
     // Get the name of the thermostat
     virtual ThermostatName getThermostat(void);
+    */
 
     // Extract one or more samples
     virtual void update(SimTK::State&) = 0;

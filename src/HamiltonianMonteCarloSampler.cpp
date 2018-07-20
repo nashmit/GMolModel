@@ -452,20 +452,22 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 //     std::cout << std::setprecision(10) << std::fixed << fix_n << ' ';
 
     // Apply Metropolis criterion
-    //std::cout << "HMC Thermostat " << getThermostat() << std::endl; 
+    //std::cout << " Thermostat " << getThermostat() << std::endl; 
+    int accepted = 0;
     if ( getThermostat() == ANDERSEN ){ // MD with Andersen thermostat
-        std::cout << " 1 " ; //p
+        accepted = 1;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
         setSetPE(pe_n);
         setSetFixman(fix_n);
         setLastAcceptedKE(ke_n);
         this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
+        ++acceptedSteps;
     }
     else if( (!std::isnan(pe_n)) && 
     ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
 //    ((etot_n > etot_proposed) || (rand_no < exp((etot_n - etot_proposed)/RT))) ){ // Unfold
-        std::cout << " 1 " ; //p
+        accepted = 1;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
         setSetPE(pe_n);
@@ -474,12 +476,12 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
         this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
         ++acceptedSteps;
     }else{ // Reject
-        std::cout << " 0 " ; //p
+        accepted = 0;
         assignConfFromSetTVector(someState);
     }
 
 //p    std::cout << " pe_os " << getSetPE() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman() //p
-    std::cout << ' ' << getSetPE() << ' ' << getLastAcceptedKE() << ' ' << getSetFixman() //p
+    std::cout << accepted << ' ' << getSetPE() + getREP() << ' ' << getLastAcceptedKE() << ' ' << getSetFixman() //p
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
         << std:: endl; //p
 

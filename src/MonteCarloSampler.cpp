@@ -457,6 +457,78 @@ void MonteCarloSampler::setTemperature(SimTK::Real argTemperature)
     RT = this->temperature * SimTK_BOLTZMANN_CONSTANT_MD;
 }
 
+// Set a thermostat
+void MonteCarloSampler::setThermostat(ThermostatName argThermostat){
+    this->thermostat = argThermostat;
+}
+// Set a thermostat
+void MonteCarloSampler::setThermostat(std::string argThermostat){
+    std::string _thermostat;
+    _thermostat.resize(argThermostat.size());
+    std::transform(argThermostat.begin(), argThermostat.end(),
+        _thermostat.begin(), ::tolower);
+
+    try{
+
+        if(_thermostat == "none"){
+            this->thermostat = NONE;
+        }else if(_thermostat == "andersen"){
+            this->thermostat = ANDERSEN;
+        }else if(_thermostat == "berendsen"){
+            this->thermostat = BERENDSEN;
+        }else if(_thermostat == "langevin"){
+            this->thermostat = LANGEVIN;
+        }else if(_thermostat == "nose_hoover"){
+            this->thermostat = NOSE_HOOVER;
+        }else{
+            throw std::invalid_argument("Thermostat");
+        }
+
+    }catch(std::invalid_argument& ia){
+        std::cerr << "Invalid argument: " << ia.what() << '\n';
+    }
+
+}
+
+// Set a thermostat
+void MonteCarloSampler::setThermostat(const char *argThermostat){
+    std::string _sthermostat = argThermostat;
+    std::string _thermostat;
+    _thermostat.resize(_sthermostat.size());
+    std::transform(_sthermostat.begin(), _sthermostat.end(),
+        _thermostat.begin(), ::tolower);
+
+
+    try{
+
+        if(_thermostat == "none"){
+            this->thermostat = NONE;
+        }else if(_thermostat == "andersen"){
+            this->thermostat = ANDERSEN;
+        }else if(_thermostat == "berendsen"){
+            this->thermostat = BERENDSEN;
+        }else if(_thermostat == "langevin"){
+            this->thermostat = LANGEVIN;
+        }else if(_thermostat == "nose_hoover"){
+            this->thermostat = NOSE_HOOVER;
+        }else{
+            throw std::invalid_argument("Thermostat");
+        }
+
+    }catch(std::invalid_argument& ia){
+        std::cerr << "Invalid argument: " << ia.what() << '\n';
+    }
+
+}
+
+// Get the name of the thermostat
+ThermostatName MonteCarloSampler::getThermostat(void){
+    return this->thermostat;
+}
+
+
+
+
 // Send configuration to an external evaluator
 
 void MonteCarloSampler::sendConfToEvaluator(void){

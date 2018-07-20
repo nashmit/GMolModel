@@ -30,6 +30,13 @@ public:
     SimTK::Real getTemperature(void);
     void setTemperature(SimTK::Real);
 
+    // Set a thermostat (even for MCMC)
+    void setThermostat(ThermostatName);
+    void setThermostat(std::string);
+    void setThermostat(const char *);
+
+    // Get the name of the thermostat
+    virtual ThermostatName getThermostat(void);
     /** Seed the random number generator. Set simulation temperature,
     variables that store the configuration
     and variables that store the energies, both needed for the
