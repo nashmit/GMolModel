@@ -99,6 +99,7 @@ public:
 
     // --- Main ---
     void Run(SetupReader&);
+    void setNumThreadsRequested(int which, int howMany);
 
     /** Initialize the same velocities **/
     bool getReproducible(void);

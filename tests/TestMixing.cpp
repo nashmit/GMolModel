@@ -65,8 +65,18 @@ int main(int argc, char **argv)
         }
     }
 
+    // Set the number of threads
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        context->setNumThreadsRequested(worldIx, 1);
+    }
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        std::cout << "main context->updWorld(" << worldIx<< ")->getNumThreadsInUse() " 
+            << context->updWorld(worldIx)->updForceField()->getNumThreadsInUse() << std::endl;
+    }
+
     // Model topologies
     context->modelTopologies();
+
 
     // Set Fixman torques scale factors
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){

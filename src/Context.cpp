@@ -661,6 +661,10 @@ void Context::Run(SetupReader& setupReader)
 
 } // END of Run()
 
+void Context::setNumThreadsRequested(int which, int howMany)
+{
+    worlds[which]->updForceField()->setNumThreadsRequested(howMany);
+}
 
 /** Initialize the same velocities **/
 bool Context::getReproducible(void)
