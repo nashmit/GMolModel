@@ -329,6 +329,7 @@ void World::setTemperature(SimTK::Real argTemperature)
 // Amber like scale factors.
 void World::setAmberForceFieldScaleFactors(void)
 {
+
     forceField->setVdw12ScaleFactor(0.0);
     forceField->setVdw13ScaleFactor(0.0);
     forceField->setVdw14ScaleFactor(0.5);

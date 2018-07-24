@@ -67,9 +67,12 @@ int main(int argc, char **argv)
 
     // Set the number of threads
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
-        context->setNumThreadsRequested(worldIx, 1);
+        context->setNumThreadsRequested(worldIx, std::stod(setupReader.getValues("THREADS")[worldIx]));
     }
+
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        std::cout << "main context->updWorld(" << worldIx<< ")->getNumThreadsRequested() " 
+            << context->updWorld(worldIx)->updForceField()->getNumThreadsRequested() << std::endl;
         std::cout << "main context->updWorld(" << worldIx<< ")->getNumThreadsInUse() " 
             << context->updWorld(worldIx)->updForceField()->getNumThreadsInUse() << std::endl;
     }
