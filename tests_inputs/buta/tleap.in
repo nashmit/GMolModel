@@ -1,0 +1,8 @@
+source leaprc.ff99SB
+source leaprc.gaff
+BUT = loadmol2 ligand.mol2 
+check BUT
+loadamberparams ligand.frcmod
+saveoff BUT but.lib 
+saveamberparm BUT ligand.prmtop ligand.inpcrd
+quit 
