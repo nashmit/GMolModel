@@ -110,7 +110,6 @@ int main(int argc, char **argv)
         }
     }
 
-
     // Make the simulation reproducible 
     if(setupReader.getValues("REPRODUCIBLE")[0] == "TRUE"){
         context->setReproducible();
@@ -132,11 +131,153 @@ int main(int argc, char **argv)
         }
     }
 
-    context->Run(setupReader);
+    // Print thermodynamics
+    for(unsigned int worldIx = 0; worldIx < setupReader.getValues("WORLDS").size(); worldIx++){
+        std::cout << "MAIN World " << worldIx << " temperature = " << context->getWorld(worldIx)->getTemperature() << std::endl;
+        if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
+            std::cout << "MAIN World " << worldIx << " FixmanTorque temperature = " << context->updWorld(worldIx)->updFixmanTorque()->getTemperature() << std::endl;
+        }
+        for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
+            std::cout << "MAIN World " << worldIx << " Sampler " << samplerIx 
+                << " temperature = " << context->updWorld()->updSampler(samplerIx)->getTemperature()
+                << " initial const state PE: " << std::setprecision(20)
+                //<< (context->updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy((updWorld(worldIx))->integ->updAdvancedState())
+                << (context->updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy(context->updAdvancedState(worldIx, samplerIx))
+                << " useFixmanPotential = " << context->updWorld(worldIx)->updSampler(0)->isUsingFixmanPotential()
+                << std::endl;
+        }
+
+    }
+
+
+        
+    int currentWorldIx = 0;
+    int round_mcsteps = 0;
+
+    context->setNofRounds(std::stoi(setupReader.getValues("ROUNDS")[0]));
+
+    for(unsigned int worldIx = 0; worldIx < context->getNofWorlds(); worldIx++){    
+        //context->getNofSamplesPerRound(worldIx) = std::stoi(setupReader.getValues("MIXMCSTEPS")[worldIx]);
+        round_mcsteps += context->getNofSamplesPerRound(worldIx);
+        //nofMDStepsPerSample[worldIx] = std::stoi(setupReader.getValues("MDSTEPS")[worldIx]);
+        //timesteps[worldIx] = std::stod(setupReader.getValues("TIMESTEPS")[worldIx]);
+    }
+    int total_mcsteps = round_mcsteps * context->getNofRounds();
+
+    // Calculate geometric features
+    SimTK::Real dihedrals[setupReader.getValues("DIHEDRAL").size() / 4];
+    SimTK::Real dihMeans[setupReader.getValues("DIHEDRAL").size() / 4];
+    SimTK::Real dihVars[setupReader.getValues("DIHEDRAL").size() / 4];
+
+    const SimTK::Compound * p_compounds[context->getNofWorlds()];
+    if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
+        for(unsigned int worldIx = 0; worldIx < context->getNofWorlds(); worldIx++){
+            p_compounds[worldIx] = &((context->updWorld(worldIx))->getTopology(0));
+        }
+    }
+    //
+
+    // Simulate the two worlds
+    int mc_step = -1;
+
+    // Update one round for the first regimen
+    currentWorldIx = context->worldIndexes.front();
+    SimTK::State& advancedState = (context->updWorld(currentWorldIx))->integ->updAdvancedState();
+
+    // Update
+    //std::cout << "Sampler " << currentWorldIx << " updating initially" << std::endl;
+    for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){
+        ++mc_step; // Increment mc_step
+        context->updWorld(currentWorldIx)->updSampler(0)->update(advancedState, context->getNofMDStepsPerSample(currentWorldIx));
+    }
+
+    // Write pdb
+    if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
+        (context->updWorld(currentWorldIx))->updateAtomLists(advancedState);
+        std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
+        for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+            ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
+        }
+    }
+
+    for(int round = 0; round < context->getNofRounds(); round++){
+        for(unsigned int worldIx = 0; worldIx < context->getNofWorlds(); worldIx++){
+    
+            // Rotate worlds indeces (translate from right to left) 
+            std::rotate(context->worldIndexes.begin(), context->worldIndexes.begin() + 1, context->worldIndexes.end());
+
+            currentWorldIx = context->worldIndexes.front();
+    
+            // Transfer coordinates from last world to current
+            //std::cout << "main: Sending configuration from " << context->worldIndexes.back() << " to " << currentWorldIx 
+            //    << " at round " << round << std::endl;
+            SimTK::State& lastAdvancedState = (context->updWorld(context->worldIndexes.back()))->integ->updAdvancedState();
+            SimTK::State& currentAdvancedState = (context->updWorld(currentWorldIx))->integ->updAdvancedState();
+    
+            currentAdvancedState = (context->updWorld(currentWorldIx))->setAtomsLocationsInGround(
+                currentAdvancedState, (context->updWorld(context->worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
+    
+            // Reinitialize current sampler
+            context->updWorld(currentWorldIx)->updSampler(0)->reinitialize( currentAdvancedState
+//r                , SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) 
+            );
+    
+            // INCORRECT !!
+            if(setupReader.getValues("WORLDS")[context->worldIndexes.back()] == "IC"){
+                for(int i = 0; i < context->getNofWorlds() - 1; i++){
+                    int restIx = context->worldIndexes[i];
+                    int backIx = context->worldIndexes.back();
+                    SimTK::Real diffPE = (context->updWorld(backIx))->updSampler(0)->getSetPE() - (context->updWorld(restIx))->updSampler(0)->getSetPE();
+                    //std::cout << "Setting sampler " << restIx << " REP to " << (context->updWorld(backIx))->updSampler(0)->getSetPE() << " - " << (context->updWorld(restIx))->updSampler(0)->getSetPE() << " = " << diffPE << std::endl;
+                    (context->updWorld(restIx))->updSampler(0)->setREP( diffPE );
+                }
+            }
+    
+            // Update
+            //std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
+            for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){
+                context->updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, context->getNofMDStepsPerSample(currentWorldIx));
+            }
+    
+            // Write pdb
+            if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
+                //if(!((mc_step+1) % 20)){
+                if(1){
+                    (context->updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
+                    //std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
+                    for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+                        ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, round);
+                    }
+                }
+            }
+    
+            // Calculate geomtric features 
+            if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
+                int dihedralIx[setupReader.getValues("DIHEDRAL").size()];
+                for(unsigned int i = 0; i < setupReader.getValues("DIHEDRAL").size(); i++){
+                    dihedralIx[i] = atoi(setupReader.getValues("DIHEDRAL")[i].c_str());
+                }
+    
+                for(int ai = 0; ai < (setupReader.getValues("DIHEDRAL").size() / 4); ai++){
+                //for(int ai = 0; ai < setupReader.getValues("DIHEDRAL").size(); ai += 4){
+                    //dihedrals[ai / 4] = context->Dihedral(currentWorldIx, 0, 0, ai + 0, ai + 1, ai + 2, ai + 3);
+                    dihedrals[ai] = context->Dihedral(currentWorldIx, 0, 0, 4*ai + 0, 4*ai + 1, 4*ai + 2, 4*ai + 3);
+                    std::cout << dihedrals[ai] << " ";
+                }
+                std::cout << std::endl;
+            }
+    
+        } // for i in worlds
+    } // for i in rounds
+
 
     delete context;
 
 } // END MAIN ////////////
+
+
+
+
 
 
 
