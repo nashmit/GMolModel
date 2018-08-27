@@ -155,6 +155,7 @@ public:
     HamiltonianMonteCarloSampler * updSampler(int which);
 
     FixmanTorque * updFixmanTorque(void);
+    FixmanTorque * getFixmanTorque(void) const;
 
     //...............
   

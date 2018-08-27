@@ -331,6 +331,46 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     SqrtMInvV *= sqrtRT; // Set stddev according to temperature
     someState.updU() = SqrtMInvV;
 
+
+
+
+    ////////////// Verify equipartition theorem using SOAa////////////
+    /*
+    SimTK::Vector ThetaDot(nu);
+    SimTK::Vector MThetaDot(nu);
+    ThetaDot = SqrtMInvV;
+    matter->multiplyByM(someState, ThetaDot, MThetaDot);
+
+    // Print velocities and momenta
+    //std::cout << "ThetaDot " << ThetaDot << std::endl;
+    //std::cout << "MThetaDot " << MThetaDot << std::endl;
+    // Print generated random numbers
+    //for (int i=0; i < nu; ++i){
+    //    std::cout << V[i] << ' ';
+    //}
+    //std::cout << std::endl;
+
+    // Print pv matrix
+    for(int i = 0; i < nu; i++){
+        for(int j = 0; j < nu; j++){
+            std::cout << ThetaDot[i] * MThetaDot[j] << ' ';
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    // Print kinetic energy
+    //SimTK::Real KE2 = ThetaDot.transpose() * MThetaDot;
+    //std::cout << "ThetaDot * MThetaDot / 2 " << 0.5 * KE2 << std::endl;
+    //SimTK::Real ThetaDotMThetaDot = SimTK::dot(ThetaDot, MThetaDot);
+    //SimTK::Real ThetaDotMThetaDot = ThetaDot * MThetaDot;
+    //std::cout << "ThetaDotMThetaDot " << ThetaDotMThetaDot << " RT " << RT << std::endl;
+    */
+    ///////////////
+
+
+
+
     // TODEL
     // TODO: Implement this in a different function
 ////
@@ -364,6 +404,8 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     // Store the proposed kinetic energy
     system->realize(someState, SimTK::Stage::Velocity);
     setProposedKE(matter->calcKineticEnergy(someState));
+
+
 
     // Store the proposed total energy
     this->etot_proposed = getOldPE() + getProposedKE() + getOldFixman();
@@ -481,9 +523,9 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     }
 
 //p    std::cout << " pe_os " << getSetPE() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman() //p
-    std::cout << accepted << ' ' << getSetPE() + getREP() << ' ' << getLastAcceptedKE() << ' ' << getSetFixman() //p
+//pp    std::cout << accepted << ' ' << getSetPE() + getREP() << ' ' << getLastAcceptedKE() << ' ' << getSetFixman() //p
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
-        << std:: endl; //p
+//pp        << std:: endl; //p
 
     // Keep track of how many MC trials have been done 
     ++sampleNumber;

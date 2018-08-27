@@ -7,12 +7,12 @@
 
 // Default constructor
 Context::Context(void){
-    total_mcsteps = 0;
+    //total_mcsteps = 0;
 }
 
 // Constructor
 Context::Context(World *inp_p_world){
-    total_mcsteps = 0;
+    //total_mcsteps = 0;
     worlds.push_back(inp_p_world);
     worldIndexes.push_back(0);
 
@@ -484,9 +484,17 @@ bool Context::isUsingFixmanPotential(int whichWorld, int whichSampler)
 //------------
 
 // --- Mixing parameters ---
+
 // Another way to do it is setting the number of rounds
-int Context::getNofRounds(int nofRounds){assert(!"Not implemented");}
-void Context::setNofRounds(int nofRounds){assert(!"Not implemented");}
+int Context::getNofRounds(void)
+{
+    return nofRounds;
+}
+
+void Context::setNofRounds(int argNofRounds)
+{
+    nofRounds = argNofRounds;
+}
 
 // Get the number of samples returned by the sampler in one round
 int Context::getNofSamplesPerRound(int whichWorld)
@@ -517,21 +525,20 @@ void Context::RotateWorlds(void){assert(!"Not implemented");}
 // -- Main ---
 void Context::Run(SetupReader& setupReader)
 {
-    // 
+    /*
+    // Print intial state
     for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){    
         std::cout << "World " << worldIx << " initial const state PE: " << std::setprecision(20)
             << (updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy((updWorld(worldIx))->integ->updAdvancedState()) 
             << " useFixmanPotential = " << updWorld(worldIx)->updSampler(0)->isUsingFixmanPotential()
             << std::endl;
     }
+    */
 
     // Get simulation parameters
     //total_mcsteps = std::stoi(setupReader.getValues("STEPS")[0]);
 
-    //nofSamplesPerRound[worlds.size()];
-    //nofMDStepsPerSample[worlds.size()];
-    //timesteps[worlds.size()];
-
+/*
     int currentWorldIx = 0;
     int round_mcsteps = 0;
 
@@ -636,20 +643,11 @@ void Context::Run(SetupReader& setupReader)
                 }
     
                 for(int ai = 0; ai < setupReader.getValues("DIHEDRAL").size(); ai += 4){
-                    //std::cout << " atoms = " 
-                    //    << dihedralIx[ai + 0] << " " 
-                    //    << dihedralIx[ai + 1] << " " 
-                    //    << dihedralIx[ai + 2] << " " 
-                    //    << dihedralIx[ai + 3] << "; names = "
-                    //    << (p_compounds[currentWorldIx])->getAtomName(SimTK::Compound::AtomIndex(dihedralIx[ai + 0])) << " "
-                    //    << (p_compounds[currentWorldIx])->getAtomName(SimTK::Compound::AtomIndex(dihedralIx[ai + 1])) << " "
-                    //    << (p_compounds[currentWorldIx])->getAtomName(SimTK::Compound::AtomIndex(dihedralIx[ai + 2])) << " "
-                    //    << (p_compounds[currentWorldIx])->getAtomName(SimTK::Compound::AtomIndex(dihedralIx[ai + 3])) 
-                    //    << "; dihedral = " ;
-                    std::cout << bDihedral( (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 0])), 
-                                            (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 1])), 
-                                            (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 2])), 
-                                            (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 3])) )  << " ";
+                    //std::cout << bDihedral( (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 0])), 
+                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 1])), 
+                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 2])), 
+                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 3])) )  << " ";
+                    std::cout << Dihedral(currentWorldIx, 0, 0, ai + 0, ai + 1, ai + 2, ai + 3) << " ";
                 }
                 std::cout << std::endl;
             }
@@ -657,7 +655,7 @@ void Context::Run(SetupReader& setupReader)
     
         } // for i in worlds
     } // for i in rounds
-
+*/
 
 } // END of Run()
 
@@ -686,7 +684,31 @@ void Context::setReproducible(void)
 
 // --- Printing functions ---
 void Context::WritePdb(int whichWorld){assert(!"Not implemented");}
-void Context::Dihedral(int, int, int, int){assert(!"Not implemented");}
+
+SimTK::Real Context::Dihedral(int whichWorld, int whichCompound, int whichSampler, int a1, int a2, int a3, int a4){
+
+    //SimTK::State& currentAdvancedState = worlds[whichWorld]->integ->updAdvancedState();
+    SimTK::State& currentAdvancedState = (worlds[whichWorld]->updSampler(whichSampler)->updTimeStepper()->updIntegrator()).updAdvancedState();
+    const Topology& topology = worlds[whichWorld]->getTopology(whichCompound);
+    SimTK::Vec3 a1pos, a2pos, a3pos, a4pos;
+    a1pos = topology.calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a1)));
+    a2pos = topology.calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a2)));
+    a3pos = topology.calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a3)));
+    a4pos = topology.calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a4)));
+
+    return bDihedral(a1pos, a2pos, a3pos, a4pos);
+
+}
+
+// Writeble reference to a samplers advanced state
+SimTK::State& Context::updAdvancedState(int whichWorld, int whichSampler)
+{
+    return (worlds[whichWorld]->updSampler(whichSampler)->updTimeStepper()->updIntegrator()).updAdvancedState();
+}
+
+
+
+
 //------------
 
 

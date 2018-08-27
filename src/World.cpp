@@ -273,7 +273,7 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
     
 
     #ifdef TRY_TO_USE_OPENMM
-        //forceField->setUseOpenMMAcceleration(true);
+        forceField->setUseOpenMMAcceleration(true);
     #endif
     //forceField->setTracing(true); // log OpenMM info to console
     //forceField->setNumThreadsRequested(1); // don't use this unless
@@ -299,7 +299,11 @@ bool World::isUsingFixmanTorque(void)
 
 FixmanTorque * World::updFixmanTorque(void)
 {
-    //return ExtForce;
+    return FixmanTorqueImpl;
+}
+
+FixmanTorque * World::getFixmanTorque(void) const
+{
     return FixmanTorqueImpl;
 }
 

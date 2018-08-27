@@ -26,6 +26,9 @@ public:
 
     SimTK::DuMMForceFieldSubsystem * updForceField(int whichWorld);
 
+    // Writeble reference to a samplers advanced state
+    SimTK::State& updAdvancedState(int whichWorld, int whichSampler);
+
     // --- Use a SetupReader Object to read worlds information from a file ---
     bool loadTopologyFile(int whichWorld, int whichMolecule, std::string topologyFilename);
     bool loadCoordinatesFile(int whichWorld, int whichMolecule, std::string coordinatesFilename);
@@ -81,7 +84,7 @@ public:
 
     // --- Mixing parameters ---
     // Another way to do it is setting the number of rounds
-    int getNofRounds(int nofRounds);
+    int getNofRounds(void);
     void setNofRounds(int nofRounds);
 
     int getNofSamplesPerRound(int whichWorld);
@@ -108,12 +111,14 @@ public:
 
     // --- Printing functions ---
     void WritePdb(int whichWorld);
-    void Dihedral(int, int, int, int);
+    SimTK::Real Dihedral(int whichWorld, int whichCompound, int whichSampler, int a1, int a2, int a3, int a4);
     //------------
+
+public:
+    std::vector<int> worldIndexes;
 
 private:
     std::vector<World *> worlds;
-    std::vector<int> worldIndexes;
 
     // Molecules files
     std::vector<std::vector<std::string>> topFNs;
@@ -124,7 +129,7 @@ private:
 
     // Simulation parameters
     int nofRounds;
-    int total_mcsteps;
+    //int total_mcsteps;
     std::vector<int> nofSamplesPerRound;
     std::vector<int> nofMDStepsPerSample;
     std::vector<float> timesteps;
