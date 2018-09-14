@@ -16,6 +16,9 @@ int main(int argc, char **argv)
 {
     // Initialize setup reader
     SetupReader setupReader(argv[1]);
+    std::cout << "SETUP" << std::endl;
+    setupReader.dump();
+
     Context *context = new Context();
 
 
@@ -261,9 +264,18 @@ int main(int argc, char **argv)
                 for(int ai = 0; ai < (setupReader.getValues("DIHEDRAL").size() / 4); ai++){
                 //for(int ai = 0; ai < setupReader.getValues("DIHEDRAL").size(); ai += 4){
                     //dihedrals[ai / 4] = context->Dihedral(currentWorldIx, 0, 0, ai + 0, ai + 1, ai + 2, ai + 3);
-                    dihedrals[ai] = context->Dihedral(currentWorldIx, 0, 0, 4*ai + 0, 4*ai + 1, 4*ai + 2, 4*ai + 3);
-                    std::cout << dihedrals[ai] << " ";
+                    //std::cout << bDihedral( (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 0])),
+                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 1])),
+                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 2])),
+                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 3])) )  << " ";
+
+                    dihedrals[ai] = context->Dihedral(currentWorldIx, 0, 0, dihedralIx[4*ai + 0], dihedralIx[4*ai + 1], dihedralIx[4*ai + 2], dihedralIx[4*ai + 3]);
+                    std::cout 
+                        //<< dihedralIx[4*ai + 0] << ' ' << dihedralIx[4*ai + 1] << ' ' << dihedralIx[4*ai + 2] << ' ' << dihedralIx[4*ai + 3] << ' ' 
+                        << std::setprecision(4) << dihedrals[ai] << " ";
                 }
+                std::cout << std::endl;
+            }else{
                 std::cout << std::endl;
             }
     

@@ -687,14 +687,21 @@ void Context::WritePdb(int whichWorld){assert(!"Not implemented");}
 
 SimTK::Real Context::Dihedral(int whichWorld, int whichCompound, int whichSampler, int a1, int a2, int a3, int a4){
 
-    //SimTK::State& currentAdvancedState = worlds[whichWorld]->integ->updAdvancedState();
-    SimTK::State& currentAdvancedState = (worlds[whichWorld]->updSampler(whichSampler)->updTimeStepper()->updIntegrator()).updAdvancedState();
+    //SimTK::State& currentAdvancedState = (updWorld(whichWorld))->integ->updAdvancedState();
+
+    SimTK::State& currentAdvancedState = worlds[whichWorld]->integ->updAdvancedState();
+
+    //SimTK::State& currentAdvancedState = (worlds[whichWorld]->updSampler(whichSampler)->updTimeStepper()->updIntegrator()).updAdvancedState();
+
     const Topology& topology = worlds[whichWorld]->getTopology(whichCompound);
     SimTK::Vec3 a1pos, a2pos, a3pos, a4pos;
     a1pos = topology.calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a1)));
     a2pos = topology.calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a2)));
     a3pos = topology.calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a3)));
     a4pos = topology.calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a4)));
+
+    //std::cout << " poss: " << a1pos << ' ' << a2pos << ' ' << a3pos << ' ' << a4pos << ' ';
+    //std::cout << " dih: "  << bDihedral(a1pos, a2pos, a3pos, a4pos) << '|' ;
 
     return bDihedral(a1pos, a2pos, a3pos, a4pos);
 

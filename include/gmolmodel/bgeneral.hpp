@@ -225,7 +225,7 @@ void PrintSpatialMat(SimTK::SpatialMat M, int decimal_places, std::string header
 /*
  * Dihedral angle
  */
-SimTK::Real bDihedral(SimTK::Vec3 pos0, SimTK::Vec3 pos1, SimTK::Vec3 pos2, SimTK::Vec3 pos3);
+SimTK::Real bDihedral(SimTK::Vec3& pos0, SimTK::Vec3& pos1, SimTK::Vec3& pos2, SimTK::Vec3& pos3);
 
 /*
  * Thermodynamics

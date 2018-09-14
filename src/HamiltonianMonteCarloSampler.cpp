@@ -507,8 +507,9 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
         ++acceptedSteps;
     }
     else if( (!std::isnan(pe_n)) && 
-    ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Accept
-//    ((etot_n > etot_proposed) || (rand_no < exp((etot_n - etot_proposed)/RT))) ){ // Unfold
+    ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Correct Acceptance-Rejection 
+//    ((etot_n > etot_proposed) || (rand_no < exp((etot_n - etot_proposed)/RT))) ){ // Unfold trial
+    //((fix_n < fix_o) || (rand_no < exp(-(fix_n - fix_o)/RT))) ){ // Fixman Monte Carlo
         accepted = 1;
         setSetTVector(someState);
         //sendConfToEvaluator(); // OPENMM
@@ -523,7 +524,23 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     }
 
 //p    std::cout << " pe_os " << getSetPE() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman() //p
-//pp    std::cout << accepted << ' ' << getSetPE() + getREP() << ' ' << getLastAcceptedKE() << ' ' << getSetFixman() //p
+    //xstd::cout << " 0 ";
+    //xfor (SimTK::MobilizedBodyIndex mbx(2); mbx < matter->getNumBodies(); ++mbx){
+    //x    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+    //x    const SimTK::MobilizedBody *p_mobod = &mobod;
+    //x    std::cout<< std::setprecision(10) << std::fixed;
+    //x    std::cout << ((SimTK::MobilizedBody::Pin *)(p_mobod))->getAngle(someState)  << " " ;
+    //x}
+    //xstd::cout << getSetFixman()  << " " << calcNumFixman(someState) << " " ;
+    std::cout << accepted << ' ' << getSetPE() + getREP() << ' ' << getLastAcceptedKE() << ' ' << getSetFixman()  << ' ' ;
+//p    std::cout << accepted << ' ' << getPEFromEvaluator(someState) << ' ' << getLastAcceptedKE() << ' ' << getSetFixman()  << ' ' ;
+
+//                    std::cout << bDihedral( (argResidue)->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(10)),
+//                                            (argResidue)->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(0)),
+//                                            (argResidue)->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(3)),
+//                                            (argResidue)->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(6)) )  << " ";
+
+
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
 //pp        << std:: endl; //p
 
@@ -560,11 +577,11 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 
     // Calculate geometric features fast
     //std::cout << someState.getQ() << std::endl ;
-    //for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+    //for (SimTK::MobilizedBodyIndex mbx(2); mbx < matter->getNumBodies(); ++mbx){
     //    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-        //const SimTK::MobilizedBody *p_mobod = &mobod;
+    //    const SimTK::MobilizedBody *p_mobod = &mobod;
         //std::cout << SimTK::DuMM::Rad2Deg * ((SimTK::MobilizedBody::Pin *)(p_mobod))->getAngle(someState)  << " " ;
-        //std::cout << ((SimTK::MobilizedBody::Pin *)(p_mobod))->getAngle(someState)  << " " ;
+    //    std::cout << ((SimTK::MobilizedBody::Pin *)(p_mobod))->getAngle(someState)  << " " ;
         //std::cout << mobod.getAngle(someState) << " " ;
         //std::cout << "mobod " << int(mbx) << mobod.getQAsVector(someState) << "; ";
     //}

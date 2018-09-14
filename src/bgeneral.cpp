@@ -650,7 +650,10 @@ void PrintBigMat(SimTK::Vector V, int nrows, int decimal_places, std::string hea
 /*
  * Dihedral angle
  */
-SimTK::Real bDihedral(SimTK::Vec3 pos0, SimTK::Vec3 pos1, SimTK::Vec3 pos2, SimTK::Vec3 pos3){
+SimTK::Real bDihedral(SimTK::Vec3& pos0, SimTK::Vec3& pos1, SimTK::Vec3& pos2, SimTK::Vec3& pos3){
+ 
+  //std::cout << "bDihedral pos " << pos0 << ' ' << pos1 << ' ' << pos2 << ' ' << pos3 << std::endl;
+ 
   SimTK::Vec3 diffs[3];
   SimTK::Vec3 normals[2];
   double dots[2];
@@ -668,6 +671,12 @@ SimTK::Real bDihedral(SimTK::Vec3 pos0, SimTK::Vec3 pos1, SimTK::Vec3 pos2, SimT
 
   psin = dots[0] * std::sqrt(dots[1]);
   pcos = (normals[0][0] * normals[1][0]) + (normals[0][1] * normals[1][1]) + (normals[0][2] * normals[1][2]);
+
+  //std::cout << "bDihedral diffs " << diffs[0] << ' ' << diffs[1] << ' ' << diffs[2] << std::endl;
+  //std::cout << "bDihedral normals " << normals[0] << ' ' << normals[1] << std::endl;
+  //std::cout << "bDihedral dots " << dots[0] << ' ' << dots[1] << std::endl;
+  //std::cout << "bDihedral psin pcos " << psin << ' ' << pcos << std::endl;
+  //std::cout << " bDihedral return " << atan2(psin, pcos) << "  ==========" << std::endl; 
 
   return atan2(psin, pcos);
 }
