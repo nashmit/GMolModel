@@ -523,7 +523,7 @@ void MonteCarloSampler::setThermostat(const char *argThermostat){
 
 // Get the name of the thermostat
 ThermostatName MonteCarloSampler::getThermostat(void){
-    return this->thermostat;
+    return thermostat;
 }
 
 

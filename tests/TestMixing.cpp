@@ -104,7 +104,7 @@ int main(int argc, char **argv)
             context->setTimestep(worldIx, samplerIx, std::stod(setupReader.getValues("TIMESTEPS")[worldIx]) );
 
             // Set thermostats
-            context->updWorld()->updSampler(samplerIx)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
+            context->updWorld(worldIx)->updSampler(samplerIx)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
 
             // Activate Fixman potential if needed
             if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){
@@ -112,6 +112,16 @@ int main(int argc, char **argv)
             }
         }
     }
+
+    // This loop is just for check purposes (should be removed)
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
+            std::cout << "After setThermo world " << worldIx << " sampler " << samplerIx << "getThermostat: " ;
+            std::cout << context->updWorld(worldIx)->updSampler(samplerIx)->getThermostat() ;
+            std::cout << std::endl;
+        }
+    }
+
 
     // Make the simulation reproducible 
     if(setupReader.getValues("REPRODUCIBLE")[0] == "TRUE"){

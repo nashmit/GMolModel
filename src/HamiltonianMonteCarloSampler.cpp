@@ -332,8 +332,6 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     someState.updU() = SqrtMInvV;
 
 
-
-
     ////////////// Verify equipartition theorem using SOAa////////////
     /*
     SimTK::Vector ThetaDot(nu);
@@ -367,8 +365,6 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     //std::cout << "ThetaDotMThetaDot " << ThetaDotMThetaDot << " RT " << RT << std::endl;
     */
     ///////////////
-
-
 
 
     // TODEL
@@ -405,8 +401,6 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     system->realize(someState, SimTK::Stage::Velocity);
     setProposedKE(matter->calcKineticEnergy(someState));
 
-
-
     // Store the proposed total energy
     this->etot_proposed = getOldPE() + getProposedKE() + getOldFixman();
 
@@ -431,9 +425,22 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     //
     */
 
+
+    // START Guidance Hamiltonian with a boost temperature
+    //SimTK::Real boostT = 5000.0;
+    //SimTK::Real boostFactor = std::sqrt(boostT / this->getTemperature());
+    ////std::cout << "Boosting by " << boostFactor << " (" << boostT << " / " << this->getTemperature() << ")" << std::endl;
+    //someState.updU() *= boostFactor;
+    //system->realize(someState, SimTK::Stage::Velocity);
+    // END Guidance
+
     // Integrate (propagate trajectory)
 //pp    std::cout << sampleNumber << ' ';
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
+
+    // RESET Guidance Hamiltonian with a boost temperature
+    //someState.updU() *= (1.0 / boostFactor);
+    // END Guidance
 
     // TODEL
 ////    std::cout << "Qs and Us after stepTo:" << std::endl;
@@ -494,7 +501,6 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 //     std::cout << std::setprecision(10) << std::fixed << fix_n << ' ';
 
     // Apply Metropolis criterion
-    //std::cout << " Thermostat " << getThermostat() << std::endl; 
     int accepted = 0;
     if ( getThermostat() == ANDERSEN ){ // MD with Andersen thermostat
         accepted = 1;
@@ -523,7 +529,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
         assignConfFromSetTVector(someState);
     }
 
-//p    std::cout << " pe_os " << getSetPE() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman() //p
+    //std::cout << " pe_os " << getSetPE() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman() //p
     //xstd::cout << " 0 ";
     //xfor (SimTK::MobilizedBodyIndex mbx(2); mbx < matter->getNumBodies(); ++mbx){
     //x    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
@@ -532,7 +538,6 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     //x    std::cout << ((SimTK::MobilizedBody::Pin *)(p_mobod))->getAngle(someState)  << " " ;
     //x}
     //xstd::cout << getSetFixman()  << " " << calcNumFixman(someState) << " " ;
-    std::cout << accepted << ' ' << getSetPE() + getREP() << ' ' << getLastAcceptedKE() << ' ' << getSetFixman()  << ' ' ;
 //p    std::cout << accepted << ' ' << getPEFromEvaluator(someState) << ' ' << getLastAcceptedKE() << ' ' << getSetFixman()  << ' ' ;
 
 //                    std::cout << bDihedral( (argResidue)->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(10)),
@@ -541,8 +546,12 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 //                                            (argResidue)->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(6)) )  << " ";
 
 
-        //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n
-//pp        << std:: endl; //p
+        //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n << " rand " << rand_no
+        //<< std:: endl; //p
+
+    std::cout << someState.getNU() << ' ' << accepted << ' ' 
+      << getSetPE() + getREP() << ' ' << getLastAcceptedKE() 
+      << ' ' << getSetFixman() << ' ' << fix_o << ' ' << fix_n << ' ';
 
     // Keep track of how many MC trials have been done 
     ++sampleNumber;
