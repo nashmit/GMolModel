@@ -707,6 +707,19 @@ SimTK::Real Context::Dihedral(int whichWorld, int whichCompound, int whichSample
 
 }
 
+SimTK::Real Context::Distance(int whichWorld, int whichCompound, int whichSampler, int a1, int a2){
+
+    SimTK::State& currentAdvancedState = worlds[whichWorld]->integ->updAdvancedState();
+
+    const Topology& topology = worlds[whichWorld]->getTopology(whichCompound);
+    SimTK::Vec3 a1pos, a2pos;
+    a1pos = topology.calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a1)));
+    a2pos = topology.calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a2)));
+
+    return (a1pos - a2pos).norm();
+
+}
+
 // Writeble reference to a samplers advanced state
 SimTK::State& Context::updAdvancedState(int whichWorld, int whichSampler)
 {

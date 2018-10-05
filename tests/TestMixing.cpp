@@ -181,6 +181,7 @@ int main(int argc, char **argv)
     SimTK::Real dihedrals[setupReader.getValues("DIHEDRAL").size() / 4];
     SimTK::Real dihMeans[setupReader.getValues("DIHEDRAL").size() / 4];
     SimTK::Real dihVars[setupReader.getValues("DIHEDRAL").size() / 4];
+    SimTK::Real distances[setupReader.getValues("DISTANCE").size() / 2];
 
     const SimTK::Compound * p_compounds[context->getNofWorlds()];
     if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
@@ -266,22 +267,25 @@ int main(int argc, char **argv)
     
             // Calculate geomtric features 
             if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
+
+                int distanceIx[setupReader.getValues("DISTANCE").size()];
+                for(unsigned int i = 0; i < setupReader.getValues("DISTANCE").size(); i++){
+                    distanceIx[i] = atoi(setupReader.getValues("DISTANCE")[i].c_str());
+                }
+    
+                for(int ai = 0; ai < (setupReader.getValues("DISTANCE").size() / 2); ai++){
+                    distances[ai] = context->Distance(currentWorldIx, 0, 0, distanceIx[2*ai + 0], distanceIx[2*ai + 1]);
+                    std::cout << std::setprecision(4) << distances[ai] << " ";
+                }
+
                 int dihedralIx[setupReader.getValues("DIHEDRAL").size()];
                 for(unsigned int i = 0; i < setupReader.getValues("DIHEDRAL").size(); i++){
                     dihedralIx[i] = atoi(setupReader.getValues("DIHEDRAL")[i].c_str());
                 }
     
                 for(int ai = 0; ai < (setupReader.getValues("DIHEDRAL").size() / 4); ai++){
-                //for(int ai = 0; ai < setupReader.getValues("DIHEDRAL").size(); ai += 4){
-                    //dihedrals[ai / 4] = context->Dihedral(currentWorldIx, 0, 0, ai + 0, ai + 1, ai + 2, ai + 3);
-                    //std::cout << bDihedral( (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 0])),
-                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 1])),
-                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 2])),
-                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 3])) )  << " ";
-
                     dihedrals[ai] = context->Dihedral(currentWorldIx, 0, 0, dihedralIx[4*ai + 0], dihedralIx[4*ai + 1], dihedralIx[4*ai + 2], dihedralIx[4*ai + 3]);
                     std::cout 
-                        //<< dihedralIx[4*ai + 0] << ' ' << dihedralIx[4*ai + 1] << ' ' << dihedralIx[4*ai + 2] << ' ' << dihedralIx[4*ai + 3] << ' ' 
                         << std::setprecision(4) << dihedrals[ai] << " ";
                 }
                 std::cout << std::endl;
