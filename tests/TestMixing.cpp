@@ -296,6 +296,11 @@ int main(int argc, char **argv)
         } // for i in worlds
     } // for i in rounds
 
+    // Write final pdbs
+    for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
+        ((context->updWorld( context->worldIndexes.front() ))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, context->getNofRounds());
+    }
+    //
 
     delete context;
 
