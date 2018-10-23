@@ -138,7 +138,7 @@ and variables that store the energies, both needed for the
 acception-rejection step. Also realize velocities and initialize
 the timestepper. **/
 //r void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman) 
-void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState) //SimTK::Real argTemperature, bool argUseFixman) 
+void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool randomizeConformation ) //SimTK::Real argTemperature, bool argUseFixman) 
 {
     // Seed the random number generator
     if(reproducible){
@@ -154,6 +154,20 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState) //SimTK::
 
     // Set the simulation temperature
 //r    setTemperature(argTemperature); // Needed for Fixman
+
+    int nu = someState.getNU();
+
+    // Randomize configuration
+    //if(randomizeConformation == true){
+    //    system->realize(someState, SimTK::Stage::Position);
+    //    int nq = someState.getNQ();
+    //    SimTK::Vector QV(nq);
+    //    for (int j=7; j < nq; ++j){
+    //        QV[j] = uniformRealDistribution_mpi_pi(randomEngine);
+    //    }
+    //    someState.updQ() = QV;
+    //}
+    //
 
     // Store the configuration
     system->realize(someState, SimTK::Stage::Position);
@@ -182,7 +196,6 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState) //SimTK::
     }
 
     // Initialize velocities to temperature
-    int nu = someState.getNU();
     double sqrtRT = std::sqrt(RT);
     SimTK::Vector V(nu);
     SimTK::Vector SqrtMInvV(nu);

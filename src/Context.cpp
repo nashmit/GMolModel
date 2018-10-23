@@ -399,9 +399,9 @@ int Context::addSampler(int whichWorld, SamplerName whichSampler)
     worlds[whichWorld]->addSampler(whichSampler);
 }
 
-void Context::initializeSampler(int whichWorld, int whichSampler)
+void Context::initializeSampler(int whichWorld, int whichSampler, bool randomizeConformation )
 {
-    worlds[whichWorld]->updSampler(whichSampler)->initialize( worlds[whichWorld]->integ->updAdvancedState() );
+    worlds[whichWorld]->updSampler(whichSampler)->initialize( worlds[whichWorld]->integ->updAdvancedState(), randomizeConformation );
 }
 
 // Amber like scale factors.

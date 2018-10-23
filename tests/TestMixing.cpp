@@ -140,7 +140,13 @@ int main(int argc, char **argv)
     // Add samplers to the worlds
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
-            context->initializeSampler(worldIx, samplerIx);
+
+            //if(setupReader.getValues("WORLDS")[worldIx] == "TD"){
+            //    context->initializeSampler(worldIx, samplerIx, true);
+            //}else{
+                context->initializeSampler(worldIx, samplerIx);
+            //}
+
         }
     }
 
@@ -163,7 +169,9 @@ int main(int argc, char **argv)
     }
 
 
-        
+
+
+
     int currentWorldIx = 0;
     int round_mcsteps = 0;
 
@@ -204,6 +212,13 @@ int main(int argc, char **argv)
         ++mc_step; // Increment mc_step
         context->updWorld(currentWorldIx)->updSampler(0)->update(advancedState, context->getNofMDStepsPerSample(currentWorldIx));
     }
+
+    // Randomize structure
+    //unsigned int nq = advancedState.getNQ();
+    //SimTK::Vector V(nq);
+    //advancedState.updQ() = V;
+    //std::cout << "TestMixing updQ " << advancedState.getQ() << std::endl << std::flush;
+    //
 
     // Write pdb
     if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
@@ -251,6 +266,38 @@ int main(int argc, char **argv)
             //std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
             for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){
                 context->updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, context->getNofMDStepsPerSample(currentWorldIx));
+    
+            // Calculate geomtric features 
+            if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
+
+                // Distances
+                int distanceIx[setupReader.getValues("DISTANCE").size()];
+                for(unsigned int i = 0; i < setupReader.getValues("DISTANCE").size(); i++){
+                    distanceIx[i] = atoi(setupReader.getValues("DISTANCE")[i].c_str());
+                }
+    
+                for(int ai = 0; ai < (setupReader.getValues("DISTANCE").size() / 2); ai++){
+                    distances[ai] = context->Distance(currentWorldIx, 0, 0, distanceIx[2*ai + 0], distanceIx[2*ai + 1]);
+                    std::cout << std::setprecision(4) << distances[ai] << " ";
+                }
+
+                // Dihedrals
+                int dihedralIx[setupReader.getValues("DIHEDRAL").size()];
+                for(unsigned int i = 0; i < setupReader.getValues("DIHEDRAL").size(); i++){
+                    dihedralIx[i] = atoi(setupReader.getValues("DIHEDRAL")[i].c_str());
+                }
+    
+                for(int ai = 0; ai < (setupReader.getValues("DIHEDRAL").size() / 4); ai++){
+                    dihedrals[ai] = context->Dihedral(currentWorldIx, 0, 0, dihedralIx[4*ai + 0], dihedralIx[4*ai + 1], dihedralIx[4*ai + 2], dihedralIx[4*ai + 3]);
+                    std::cout 
+                        << std::setprecision(4) << dihedrals[ai] << " ";
+                    //std::cout << std::endl;
+                }
+                std::cout << std::endl;
+            }else{
+                std::cout << std::endl;
+            }
+    
             }
     
             // Write pdb
@@ -264,35 +311,6 @@ int main(int argc, char **argv)
                     }
                 }
             }
-    
-            // Calculate geomtric features 
-            if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
-
-                int distanceIx[setupReader.getValues("DISTANCE").size()];
-                for(unsigned int i = 0; i < setupReader.getValues("DISTANCE").size(); i++){
-                    distanceIx[i] = atoi(setupReader.getValues("DISTANCE")[i].c_str());
-                }
-    
-                for(int ai = 0; ai < (setupReader.getValues("DISTANCE").size() / 2); ai++){
-                    distances[ai] = context->Distance(currentWorldIx, 0, 0, distanceIx[2*ai + 0], distanceIx[2*ai + 1]);
-                    std::cout << std::setprecision(4) << distances[ai] << " ";
-                }
-
-                int dihedralIx[setupReader.getValues("DIHEDRAL").size()];
-                for(unsigned int i = 0; i < setupReader.getValues("DIHEDRAL").size(); i++){
-                    dihedralIx[i] = atoi(setupReader.getValues("DIHEDRAL")[i].c_str());
-                }
-    
-                for(int ai = 0; ai < (setupReader.getValues("DIHEDRAL").size() / 4); ai++){
-                    dihedrals[ai] = context->Dihedral(currentWorldIx, 0, 0, dihedralIx[4*ai + 0], dihedralIx[4*ai + 1], dihedralIx[4*ai + 2], dihedralIx[4*ai + 3]);
-                    std::cout 
-                        << std::setprecision(4) << dihedrals[ai] << " ";
-                }
-                std::cout << std::endl;
-            }else{
-                std::cout << std::endl;
-            }
-    
         } // for i in worlds
     } // for i in rounds
 
