@@ -70,6 +70,10 @@ World * Context::AddWorld(World *inp_p_world, bool visual){
 
 // Destructor
 Context::~Context(){
+    // Delete each world
+    for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){
+         delete worlds[worldIx];
+    }
     worlds.clear();
     worldIndexes.clear();
    

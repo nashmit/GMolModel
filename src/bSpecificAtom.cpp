@@ -48,7 +48,7 @@ void bSpecificAtom::Print(void)
         <<" number "<<number<<" atomIndex  "<<atomIndex<<" elem "<<elem<<" atomicNumber "<<atomicNumber<<" x "<<x<<" y "<< y<<" z "<<z
         <<" mass "<<mass<<" vdwRadius  "<<vdwRadius<<" LJWellDepth  "<<LJWellDepth<<" fftype "<<fftype
         <<" atomClassIndex  "<<atomClassIndex<<" biotype (useless) "<< biotype << " biotypeIndex " << biotypeIndex 
-        << " bAtomType "<< bAtomType 
+        //<< " bAtomType "<< bAtomType 
         <<" charge "<<charge<<" mobile "<<mobile<<" visited "<<visited<<std::endl;
 
     std::cout << "Neighbors:";
