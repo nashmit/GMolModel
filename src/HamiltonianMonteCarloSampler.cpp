@@ -486,7 +486,10 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     }else{
         fix_n = 0.0;
     }
-    SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
+
+    //SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
+    std::cout << "Multibody PE " << getPEFromEvaluator(someState) << std::endl; // OPENMM
+    SimTK::Real pe_n = dumm->CalcFullPotEnergyIncludingRigidBodies(someState); // ELIZA FULL
 
     system->realize(someState, SimTK::Stage::Velocity);
     SimTK::Real ke_n = matter->calcKineticEnergy(someState);
@@ -505,11 +508,11 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 
 
     std::cout<<std::setprecision(5)<<std::fixed; //p
-//p    std::cout << "pe_o " << pe_o << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP() //p
-//p       << " pe_n " << pe_n  << " ke_n " << ke_n << " fix_n " << fix_n //p
+    std::cout << "pe_o " << pe_o << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP() //p
+       << " pe_n " << pe_n  << " ke_n " << ke_n << " fix_n " << fix_n << " " //p
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
         //<< " etot_n " << etot_n  + getREP() << " etot_proposed " << etot_proposed + getREP()
-//p        ; //p
+        ; //p
 
 //     std::cout << std::setprecision(10) << std::fixed << fix_n << ' ';
 
@@ -563,7 +566,8 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
         //<< std:: endl; //p
 
     std::cout << someState.getNU() << ' ' << accepted << ' ' 
-      << getSetPE() + getREP() << ' ' << getLastAcceptedKE() 
+      //<< getSetPE() + getREP() << ' ' << getLastAcceptedKE() 
+      << getSetPE() << ' ' << getLastAcceptedKE() 
       << ' ' << getSetFixman() << ' ' << fix_o << ' ' << fix_n << ' ';
 
     // Keep track of how many MC trials have been done 

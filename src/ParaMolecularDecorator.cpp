@@ -89,6 +89,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         SimTK::Transform X_BD(Rotation(), p_GS);
 
         Real shrink = 0.25;
+        //Real shrink = 0.8;
         //Real shrink = 0.5;
         Real opacity = dumm->getAtomElement(daIx)==1?0.5:1;
         //Real opacity = 1;
