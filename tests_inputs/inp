@@ -1,21 +1,19 @@
-MOLECULES lin4			# Molecules to load
-WORLDS TD  			# Regimen (IC, TD, MIX, RB, RBMIX)
-SAMPLER HMC 
-THERMOSTAT None   	# Thermostat (HMC + Andersen = MD)
-ROUNDS 10 			# MC steps (Acception-rejection steps)
-TIMESTEPS 0.002	 	# Timesteps to be used with regimens
-MDSTEPS  30  	# Number of MD trial steps
-SAMPLES_PER_ROUND 1  	# Number of MC trials within a mixing round
-TEMPERATURE  300  	# Temperature for constant temperature simulations
-FFSCALE 0.0  		# Force field scale factors
-GBSA 0.0  		# GBSA scale factor
-FIXMAN_POTENTIAL TRUE 	# Use Fixman potential 
-#FIXMAN_POTENTIAL FALSE 	# Use Fixman potential 
-FIXMAN_TORQUE TRUE  		# Use Fixman torque
-#FIXMAN_TORQUE FALSE 		# Use Fixman torque
-#VISUAL TRUE  			# Use the visualizer
-VISUAL FALSE  			# Use the visualizer
-WRITEPDBS FALSE 		# Write pdbs
-GEOMETRY TRUE  			# Calculate geometric features
-DIHEDRAL 1 0 2 3
-REPRODUCIBLE FALSE
+MOLECULES buta                  # Molecules to load
+WORLDS IC TD                       # Regimen (IC, TD, MIX, RB, RBMIX)
+SAMPLER HMC HMC            # HMC or MC
+THERMOSTAT None None        # Thermostat (HMC + Andersen = MD)
+ROUNDS 300                    # Teodor: MC steps (Acception-rejection steps)
+TIMESTEPS 0.001 0.002                # Timesteps to be used with regimens
+MDSTEPS  10 4    # Teodor: Number of MD trial steps
+SAMPLES_PER_ROUND 1 3   # Teodor (plan secund): Number of MC trials within a mixing round
+TEMPERATURE  1000 1000      # Temperature for constant temperature simulations
+FFSCALE AMBER AMBER        # Force field scale factors
+GBSA 0.0 0.0              # GBSA scale factor
+FIXMAN_POTENTIAL FALSE TRUE # Use Fixman potential
+FIXMAN_TORQUE FALSE TRUE          # Use Fixman torque
+VISUAL FALSE FALSE                 # Use the visualizer
+WRITEPDBS FALSE FALSE      # Write pdbs
+GEOMETRY TRUE TRUE        # Calculate geometric features
+DIHEDRAL 10 0 3 6
+REPRODUCIBLE FALSE FALSE
+THREADS 1 1
