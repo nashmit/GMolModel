@@ -158,7 +158,7 @@ int main(int argc, char **argv)
         }
         for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
             std::cout << "MAIN World " << worldIx << " Sampler " << samplerIx 
-                << " temperature = " << context->updWorld()->updSampler(samplerIx)->getTemperature()
+                << " temperature = " << context->updWorld(worldIx)->updSampler(samplerIx)->getTemperature()
                 << " initial const state PE: " << std::setprecision(20)
                 //<< (context->updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy((updWorld(worldIx))->integ->updAdvancedState())
                 << (context->updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy(context->updAdvancedState(worldIx, samplerIx))
@@ -169,6 +169,9 @@ int main(int argc, char **argv)
     }
 
 
+    //for(unsigned int worldIx = 0; worldIx < setupReader.getValues("WORLDS").size(); worldIx++){
+    //    std::cout << "Addresses" << " World " << << "Samplers adress "<<  << std::endl;
+    //}
 
 
 
@@ -246,6 +249,9 @@ int main(int argc, char **argv)
             currentAdvancedState = (context->updWorld(currentWorldIx))->setAtomsLocationsInGround(
                 currentAdvancedState, (context->updWorld(context->worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
     
+            // Set old potential energy of the new world
+            (context->updWorld(currentWorldIx))->updSampler(0)->setOldPE( (context->updWorld(context->worldIndexes.back()))->updSampler(0)->getSetPE() );
+    
             // Reinitialize current sampler
             context->updWorld(currentWorldIx)->updSampler(0)->reinitialize( currentAdvancedState
 //r                , SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) 
@@ -261,7 +267,7 @@ int main(int argc, char **argv)
                     (context->updWorld(restIx))->updSampler(0)->setREP( diffPE );
                 }
             }
-    
+
             // Update
             //std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
             for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){

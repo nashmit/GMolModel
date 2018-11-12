@@ -245,7 +245,7 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState/*, SimTK
     }
 
     // Store potential energies
-    setOldPE(getPEFromEvaluator(someState));
+    //setOldPE(getPEFromEvaluator(someState));
     setSetPE(getOldPE());
 
     // Store Fixman potential
@@ -488,7 +488,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     }
 
     //SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
-    std::cout << "Multibody PE " << getPEFromEvaluator(someState) << std::endl; // OPENMM
+    //std::cout << "Multibody PE " << getPEFromEvaluator(someState) << std::endl; // OPENMM
     SimTK::Real pe_n = dumm->CalcFullPotEnergyIncludingRigidBodies(someState); // ELIZA FULL
 
     system->realize(someState, SimTK::Stage::Velocity);
@@ -507,12 +507,12 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     etot_n;
 
 
-    std::cout<<std::setprecision(5)<<std::fixed; //p
-    std::cout << "pe_o " << pe_o << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP() //p
-       << " pe_n " << pe_n  << " ke_n " << ke_n << " fix_n " << fix_n << " " //p
+//p    std::cout<<std::setprecision(5)<<std::fixed; //p
+//p    std::cout << "pe_o " << pe_o << " ke_o " << ke_proposed << " fix_o " << fix_o << " rep " << getREP() //p
+//p       << " pe_n " << pe_n  << " ke_n " << ke_n << " fix_n " << fix_n << " " //p
         //<< " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
         //<< " etot_n " << etot_n  + getREP() << " etot_proposed " << etot_proposed + getREP()
-        ; //p
+//p        ; //p
 
 //     std::cout << std::setprecision(10) << std::fixed << fix_n << ' ';
 
