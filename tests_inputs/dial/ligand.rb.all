@@ -1,0 +1,2 @@
+rings = []
+non_ring_pi_bonds = [Bond(C1, C2), Bond(C2, O9), Bond(C2, N7), Bond(C5, O10), Bond(C5, N8), Bond(N8, C6)]
