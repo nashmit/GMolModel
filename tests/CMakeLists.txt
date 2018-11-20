@@ -123,6 +123,7 @@ set(TESTS_SRCS
         TestMixing.cpp
         TestWriteDCD.cpp
         TestHMCSOA.cpp
+        Robosample.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})
