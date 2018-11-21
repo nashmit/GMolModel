@@ -354,6 +354,9 @@ int main(int argc, char **argv)
         } // for i in worlds
     } // for i in rounds
 
+    // Write final pdb
+    ((context->updWorld(0))->getTopology(0)).writePdb("pdbs", "final", ".pdb", 10, total_mcsteps);
+
     // Write final pdbs
     for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
         ((context->updWorld( context->worldIndexes.front() ))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, context->getNofRounds());
