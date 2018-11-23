@@ -205,6 +205,9 @@ int main(int argc, char **argv)
 
     // Simulate the two worlds
     int mc_step = -1;
+    int alt_mc_step = 0;
+    int restore_mc_step = 0;
+    SimTK::Real convFunc = 99.0;
 
     // Update one round for the first regimen
     currentWorldIx = context->worldIndexes.front();
@@ -236,12 +239,20 @@ int main(int argc, char **argv)
     // Adapt variables
     bool samplesAdapted = false;
     bool restored = false;
+    SimTK::Real cumU = 0.0;
+    SimTK::Real avgU = 0.0;
+    SimTK::Real prevAvgU = 0.0;
 
     if(setupReader.getValues("ADAPT_SAMPLE_RATIO")[0] == "TRUE"){
         std::cout << "Adaptive samples ratios ON." << std::endl;
     }
 
     for(int round = 0; round < context->getNofRounds(); round++){ // Iterate rounds
+
+        if(mc_step == total_mcsteps){
+            break;
+        }
+
         for(unsigned int worldIx = 0; worldIx < context->getNofWorlds(); worldIx++){ // Iterate worlds
     
             // Rotate worlds indeces (translate from right to left) 
@@ -282,6 +293,8 @@ int main(int argc, char **argv)
             //std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
             for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){ // Iterate through samples
                 context->updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, context->getNofMDStepsPerSample(currentWorldIx));
+                ++mc_step;
+                ++restore_mc_step;
     
                 // Calculate geomtric features 
                 if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
@@ -310,33 +323,72 @@ int main(int argc, char **argv)
                 }else{
                     std::cout << std::endl;
                 }
+
     
             } // END for samples
 
+            // Compute potential statistics
+            SimTK::Real U, dU;
+            U = context->updWorld(currentWorldIx)->updForceField()->CalcFullPotEnergyIncludingRigidBodies(context->updAdvancedState(currentWorldIx, 0)) ;
+            cumU += U ;
 
-            // Adaptive mixing
-            if(setupReader.getValues("ADAPT_SAMPLE_RATIO")[0] == "TRUE"){
+            if((!(mc_step % 100))){
+                prevAvgU = avgU;
+                avgU = cumU / mc_step;
+                dU = avgU - prevAvgU;
 
-                if( ((dihedrals[0] > -0.698) && (dihedrals[0] < 0.523)) && (samplesAdapted == false) ){
-                    //p std::cout << "Adapt samples ratio to " << 3 << ' ' << 1 << std::endl;
-                    context->setNofSamplesPerRound(0, 1);
-                    context->setNofSamplesPerRound(1, 5);
-                    samplesAdapted = true;
-                    restored = false;
-                    //context->setNofMDStepsPerSample(0, );
-                    //context->setNofMDStepsPerSample(1,);
-                }else if( restored == false ){
-                    //p std::cout << "Restore samples ratio to " ;
-                    for(int wIx = 0; wIx < setupReader.getValues("WORLDS").size(); wIx++){
-                        //p std::cout << std::stoi(setupReader.getValues("SAMPLES_PER_ROUND")[wIx]) << ' '  ;
-                        context->setNofSamplesPerRound(wIx, std::stoi(setupReader.getValues("SAMPLES_PER_ROUND")[wIx]));
-                        //context->setNofMDStepsPerSample(wIx, std::stoi(setupReader.getValues("MDSTEPS")[wIx]));
-                    }
-                    //p std::cout << std::endl;
-                    restored = true;
-                    samplesAdapted = false;
+                if(mc_step != 0 ){
+                    convFunc = std::abs( (avgU * std::log(mc_step)) - (prevAvgU * std::log(mc_step - 1)) );
                 }
-            }
+
+                // Adaptive mixing
+                if((setupReader.getValues("ADAPT_SAMPLE_RATIO")[0] == "TRUE")){
+                    std::cout << std::setprecision(4) << std::fixed;
+                    std::cout << "avgU " << avgU << ' ' << dU << ' ' << convFunc << ' ';
+                    if(samplesAdapted == true){ 
+                        ++alt_mc_step;
+                    }
+                    //if( ((dihedrals[0] > -0.698) && (dihedrals[0] < 0.523)) && (samplesAdapted == false) ){
+                    if(convFunc < 0.2){
+                        if(samplesAdapted == false){
+                            alt_mc_step = 0;
+                            //std::cout << "nan adapt samples ratio to " << 1 << ' ' << 5 << std::endl;
+                            std::cout << " (1.1.2) 2 " << std::endl;
+    
+                            context->setNofSamplesPerRound(0, 1);
+                            context->setNofSamplesPerRound(1, 1);
+                            samplesAdapted = true;
+                            restored = false;
+                            //context->setNofMDStepsPerSample(0, );
+                            context->setNofMDStepsPerSample(1, 150);
+                        }else{ // samples not adapted
+                            std::cout << " (1.1.1) 0 " << std::endl;
+                        }
+                    }else if(alt_mc_step > 10){ // if dU > 1.0
+                        if (restored == false){
+                            std::cout << " (1.2.1.2) 1 " << std::endl;
+                            restore_mc_step = 0;
+                            //std::cout << "nan restore samples ratio to " ;
+    
+                            for(int wIx = 0; wIx < setupReader.getValues("WORLDS").size(); wIx++){
+                                //std::cout << std::stoi(setupReader.getValues("SAMPLES_PER_ROUND")[wIx]) << ' '  ;
+                                context->setNofSamplesPerRound(wIx, std::stoi(setupReader.getValues("SAMPLES_PER_ROUND")[wIx]));
+                                context->setNofMDStepsPerSample(wIx, std::stoi(setupReader.getValues("MDSTEPS")[wIx]));
+                            }
+                            restored = true;
+                            samplesAdapted = false;
+                        }else{ // if restored already
+                            std::cout << " (1.2.1.1) 0" << std::endl;
+                        }
+                    }else{ // if dU > 1 and alt_mc_step < 100 
+                        std::cout << " (1.2.2) 0 " << std::endl;
+                    }
+
+                }else{ // if ADAPT false
+                    std::cout << "avgU " << avgU << ' ' << dU << ' ';
+                    std::cout << " (2) 0 " << std::endl;
+                }
+            } // END if mc_step 100
             // END Adaptive mixing
 
     
