@@ -105,7 +105,7 @@ public:
         int nbnds,
         bBond *bonds,
         std::string flexFN="ligand.flex",
-        std::string ictdF="IC"
+        std::string regimenSpec="IC"
     );
 
     void setRegimen(std::string argRegimen, std::string flexFN);
@@ -143,7 +143,7 @@ public:
     bSpecificAtom *bAtomList;
     int nbnds; // EU
     bBond *bonds; // EU
-    std::string ictdF;
+    std::string regimenSpec;
 
 private:
 

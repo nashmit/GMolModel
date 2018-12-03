@@ -78,11 +78,10 @@ public:
  
     /** Creates a topology object and based on amberReader forcefield 
      parameters - defines Biotypes; - adds BAT parameters to DuMM **/
-    void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string ictdF);
+    void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string regimenSpec);
  
-    /** Intializes simulation parameters.
-    Beside passing the integrator step and Fixman torque option,
-    it also initializes default scaling factors for Amber **/
+    /** Calls CompoundSystem.modelCompounds and realizes Topology 
+    To be called after loading all Compounds. **/
     void ModelTopologies(bool useFixmanTorque = false);
     //...............
 
@@ -206,7 +205,7 @@ public:
     std::string rbFN; // rigid bodies specifications
     std::string frcmodF; // to be removed
     std::string flexFN; // flexible bonds specifications
-    std::string ictdF; // regimen specification
+    std::string regimenSpec; // regimen specification
   
     /** Molecules (topologies<-Compounds) objects **/
     std::vector<bMoleculeReader *> moleculeReaders;

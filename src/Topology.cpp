@@ -222,7 +222,7 @@ void Topology::build(
     int nbonds,
     bBond *bonds, 
     std::string flexFN,
-    std::string ictdF
+    std::string regimenSpec
 )
 {
     std::cout << "TOPOLOGY BUILD" << std::endl;
@@ -231,7 +231,7 @@ void Topology::build(
     this->bAtomList = bAtomList;
     this->nbnds = nbonds;
     this->bonds = bonds;
-    this->ictdF = ictdF;
+    this->regimenSpec = regimenSpec;
 
     assert(bAtomList != NULL);
     this->setCompoundName((this->name));
@@ -353,7 +353,7 @@ void Topology::build(
     }
     ///////////////////////////
 
-    setRegimen(ictdF, flexFN);
+    setRegimen(regimenSpec, flexFN);
 
 }
 
