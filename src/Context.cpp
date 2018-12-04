@@ -449,9 +449,9 @@ void Context::setTimestep(int whichWorld, int whichSampler, float argTimestep)
 }
 
 // Use Fixman torque as an additional force subsystem
-void Context::useFixmanTorque(int whichWorld)
+void Context::useFixmanTorque(int whichWorld, SimTK::Real argTemperature)
 {
-    worlds[whichWorld]->useFixmanTorque();
+    worlds[whichWorld]->useFixmanTorque(argTemperature);
 }
 
 bool Context::isUsingFixmanTorque(int whichWorld)

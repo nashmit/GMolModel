@@ -20,7 +20,7 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
     this->useFixman = false;  
     this->fix_n = this->fix_o = 0.0;
     this->residualEmbeddedPotential = 0.0;
-    sampleNumber = 0;
+    nofSamples = 0;
     this->alwaysAccept = false;
     this->timestep = 0.002; // ps
     this->temperature = 300.0;
@@ -142,7 +142,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool rand
 {
     // Seed the random number generator
     if(reproducible){
-        randomEngine.seed( sampleNumber );
+        randomEngine.seed( nofSamples );
     }else{
         randomEngine.seed( std::time(0) );
     }
@@ -223,7 +223,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool rand
 void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState/*, SimTK::Real argTemperature*/) 
 {
     if(reproducible){
-        randomEngine.seed( sampleNumber );
+        randomEngine.seed( nofSamples );
     }
 
     // After an event handler has made a discontinuous change to the 
@@ -338,12 +338,18 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
 
     // TODO: Implement this in a different function
-    //SimTK::Real temperatureBoost = 2.58; // sqrt(2000/300) : brings temperature from 300 to 1000
-    //SqrtMInvV *= sqrtRT * temperatureBoost; // Set stddev according to temperature
+    SimTK::Real temperatureBoost = 1.000; // no temperature boost
+    //if(nu == 336){
+    //    SimTK::Real temperatureBoost = 1.000; // no temperature boost
+    //}else{
+    //    SimTK::Real temperatureBoost = 1.826; // sqrt(1000/300) : brings temperature from 300 to 2000
+    //    //SimTK::Real temperatureBoost = 2.582; // sqrt(2000/300) : brings temperature from 300 to 2000
+    //    //SimTK::Real temperatureBoost = 3.1623; // sqrt(3000/300) : brings temperature from 300 to 3000
+        SqrtMInvV *= (sqrtRT * temperatureBoost); // Set stddev according to temperature
+    //}
 
-    SqrtMInvV *= sqrtRT; // Set stddev according to temperature
+    // RESTORE when no boostSqrtMInvV *= sqrtRT; // Set stddev according to temperature
     someState.updU() = SqrtMInvV;
-
 
     ////////////// Verify equipartition theorem using SOAa////////////
     /*
@@ -428,7 +434,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     std::string prefix;
     prefix = std::string("pdbs/HMC");
     std::string FN;
-    FN = prefix + std::to_string(this->sampleNumber) + std::string("before.pdb");
+    FN = prefix + std::to_string(this->nofSamples) + std::string("before.pdb");
     std::cout << "Writing file " << FN << std::endl;
     std::filebuf fb;
     fb.open (FN, std::ios::out);
@@ -448,7 +454,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     // END Guidance
 
     // Integrate (propagate trajectory)
-//pp    std::cout << sampleNumber << ' ';
+//pp    std::cout << nofSamples << ' ';
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
 
     // RESET Guidance Hamiltonian with a boost temperature
@@ -571,14 +577,14 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
       << ' ' << getSetFixman() << ' ' << fix_o << ' ' << fix_n << ' ';
 
     // Keep track of how many MC trials have been done 
-    ++sampleNumber;
+    ++nofSamples;
 
     // Write a check file
     /*
     //std::string prefix;
     //prefix = std::string("pdbs/HMC");
     //std::string FN;
-    FN = prefix + std::to_string(this->sampleNumber) + std::string("after.pdb");
+    FN = prefix + std::to_string(this->nofSamples) + std::string("after.pdb");
     std::cout << "Writing file " << FN << std::endl;
     //std::filebuf fb;
     fb.open (FN, std::ios::out);
@@ -620,7 +626,54 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 
 }
 
+/** Modifies Q randomly
+ **/
+void HamiltonianMonteCarloSampler::perturbQ(SimTK::State& someState)
+{
+    // Perturb Q
+    //SimTK::Real rand_no = uniformRealDistribution(randomEngine);
+    //SimTK::Real rand_no = uniformRealDistribution_mpi_pi(randomEngine);
+    int nq = someState.getNQ();
+    //SimTK::Vector V(nq);
+    for (int i=7; i < nq; ++i){
+        //V[i] = uniformRealDistribution_mpi_pi(randomEngine);
+        someState.updQ()[i] = uniformRealDistribution_mpi_pi(randomEngine);
+    }
+    std::cout << "perturbQ " << someState.getQ() << std::endl;
+    system->realize(someState, SimTK::Stage::Position);
 
+    // Get needed energies
+    SimTK::Real pe_o  = getOldPE();
+    if(useFixman){
+        SimTK::Real fix_o = getOldFixman();
+    }
+    if(useFixman){
+        fix_n = calcFixman(someState);
+    }else{
+        fix_n = 0.0;
+    }
+
+    //SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
+    //std::cout << "Multibody PE " << getPEFromEvaluator(someState) << std::endl; // OPENMM
+    SimTK::Real pe_n = dumm->CalcFullPotEnergyIncludingRigidBodies(someState); // ELIZA FULL
+
+    int accepted = 0;
+
+    accepted = 1;
+    setSetTVector(someState);
+    setSetPE(pe_n);
+    setSetFixman(fix_n);
+    ++acceptedSteps;
+    assignConfFromSetTVector(someState);
+
+    std::cout << someState.getNU() << ' ' << 1 << ' ' 
+      //<< getSetPE() + getREP() << ' ' << getLastAcceptedKE() 
+      << getSetPE() << ' ' << 0 
+      << ' ' << getSetFixman() << ' ' << fix_o << ' ' << fix_n << ' ';
+
+    // Keep track of how many MC trials have been done 
+    ++nofSamples;
+}
 
 
 

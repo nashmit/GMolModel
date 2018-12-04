@@ -64,7 +64,7 @@ int main(int argc, char **argv)
     // Do we use Fixman torque
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
-            context->useFixmanTorque(worldIx);
+            context->useFixmanTorque(worldIx, std::stof(setupReader.getValues("TEMPERATURE")[worldIx]));
         }
     }
 

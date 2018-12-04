@@ -309,7 +309,7 @@ void GirolamiSampler::update(SimTK::State& someState, SimTK::Real timestep, int 
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
 
     // Keep track of how many MC trials have been done 
-    ++sampleNumber;
+    ++nofSamples;
 
 
 }

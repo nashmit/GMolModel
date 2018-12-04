@@ -151,7 +151,7 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
 
     // Statistics
     moleculeCount = -1;
-    sampleNumber = 0;
+    nofSamples = 0;
 
     // Thermodynamics
     this->temperature = -1; // this leads to unusal behaviour hopefully
@@ -232,9 +232,9 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
 To be called after loading all Compounds. **/
 void World::ModelTopologies(bool useFixmanTorqueOpt)
 {
-    // Model Compounds
     std::cout << "World::Init BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
-    std::cout << "World::Init model Compound" << std::endl << std::flush;
+
+    // Model Compounds
     compoundSystem->modelCompounds();
 
     // Load MobilizedBodyIndex vs Compound::AtomIndex maps 
@@ -257,54 +257,77 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
     std::cout << "World::Init END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
 }
 
-/** Set to use Fixman torque **/
-void World::useFixmanTorque(void)
+/** Set up Fixman torque **/
+void World::useFixmanTorque(SimTK::Real argTemperature)
 {
+    // Set flag
     _useFixmanTorque = true;
+
+    // Alloc memory for FixmanTorquw implementation and add to forces
     FixmanTorqueImpl = new FixmanTorque(compoundSystem, *matter);
     Force::Custom ExtForce(*forces, FixmanTorqueImpl);
+
+    // Set the temperature for the Fixman torque
+    FixmanTorqueImpl->setTemperature(argTemperature);
+
+    // Not sure if this is necessary
     compoundSystem->realizeTopology();
 }
 
+/** Check if the Fixman torque flag is set **/
 bool World::isUsingFixmanTorque(void)
 {
     return _useFixmanTorque;
 }
 
+/** Get writble pointer to FixmanTorque implementation **/
 FixmanTorque * World::updFixmanTorque(void)
 {
     return FixmanTorqueImpl;
 }
 
+/** Get pointer to FixmanTorque implementation **/
 FixmanTorque * World::getFixmanTorque(void) const
 {
     return FixmanTorqueImpl;
 }
 
+// ----------------------
 // --- Thermodynamics ---
+// ----------------------
+
+/** Get the World temperature **/
 SimTK::Real World::getTemperature(void)
 {
     return this->temperature;
 }
 
+/** Set this World temperature but also ths samplers and 
+Fixman torque temperature. **/
 void World::setTemperature(SimTK::Real argTemperature)
 {
+    // Set the temperature for the samplers
     for(unsigned int samplerIx = 0; samplerIx < samplers.size(); samplerIx++){
         std::cout << " World::setTemperature for sampler "<< samplerIx << " " << argTemperature << std::endl;
         samplers[samplerIx]->setTemperature(argTemperature);
     }
+
+    // Set the temperature for this World
     this->temperature = argTemperature;
 
+    // Set the temperature for the Fixman torque also
+    std::cout << " World::setTemperature for FixmanTorque " << argTemperature << std::endl;
     if(_useFixmanTorque){ 
         FixmanTorqueImpl->setTemperature(this->temperature);
     }
-
 }
 //...............
 
+//...................
 // --- Simulation ---
+//...................
 
-// Amber like scale factors.
+/** Amber like scale factors. **/
 void World::setAmberForceFieldScaleFactors(void)
 {
 
@@ -320,7 +343,7 @@ void World::setAmberForceFieldScaleFactors(void)
   
 }
 
-// Set a global scaling factor for the forcefield
+/** Set a global scaling factor for all the terms in the forcefield **/
 void World::setGlobalForceFieldScaleFactor(SimTK::Real scaleFactor)
 {
   
@@ -343,7 +366,7 @@ void World::setGlobalForceFieldScaleFactor(SimTK::Real scaleFactor)
 
 }
 
-// Set GBSA implicit solvent scale factor
+/** Set GBSA implicit solvent scale factor. **/
 void World::setGbsaGlobalScaleFactor(SimTK::Real scaleFactor)
 {
     forceField->setGbsaGlobalScaleFactor(scaleFactor);
@@ -351,26 +374,37 @@ void World::setGbsaGlobalScaleFactor(SimTK::Real scaleFactor)
     std::cout << "GBSA solute dielectric " << forceField->getSoluteDielectric() << std::endl;
 }
 
+/** Get a writeble pointer to the DuMM force field **/
 SimTK::DuMMForceFieldSubsystem * World::updForceField(void)
 {
     return forceField;
 }
 
-//...............
-
+//...................
 // --- Statistics ---
-int World::getSampleNumber(void)
+//...................
+
+/** How many samples do we have so far **/
+int World::getNofSamples(void)
 {
-    return this->sampleNumber;
+    // Zero it every time the user asks
+    nofSamples = 0;
+ 
+    // Gather samples from all the samplers
+    for( int i = 0; i < samplers.size(); i++){
+        nofSamples += (samplers[i])->getNofSamples();
+    }
+
+    return this->nofSamples;
 }
 
-// Sampler manipulation functions
-
+/** How many Samplers does this World have. **/
 int World::getNofSamplers(void)
 {
     return samplers.size();
 }
 
+/** Add a sampler to this World using a string identifier. **/
 int World::addSampler(std::string samplerName)
 {
     if((samplerName == "HamiltonianMonteCarlo") || (samplerName == "HMC")){
@@ -397,7 +431,8 @@ int World::addSampler(std::string samplerName)
     return samplers.size();
 }
 
-// Sampler manipulation functions
+/** Add a sampler to this World using the specialized struct
+for samplers names. **/
 int World::addSampler(SamplerName samplerName)
 {
     if(samplerName == HMC){
@@ -431,16 +466,15 @@ HamiltonianMonteCarloSampler * World::updSampler(int which)
 }
 
 
-
-//...............
-
-// Interface
+/** Get a const reference to a molecule **/
 const Topology& World::getTopology(int moleculeNumber) const{
     return *(topologies[moleculeNumber]);
 }
 
-Topology& World::updTopology(void){
-    return *(topologies.back());
+/** Get a writble reference to the last molecule. **/
+Topology& World::updTopology(int moleculeNumber){
+    //return *(topologies.back());
+    return *(topologies[moleculeNumber]);
 }
 
 // Returns: the inner vector represents the locations as a pair of bSpecificAtom
@@ -466,7 +500,7 @@ std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > World::get
     return returnVector;
 }
 
-// Put coordinates into bAtomLists
+/** Put coordinates into bAtomLists of Topologies. **/
 void World::updateAtomLists(const SimTK::State & state)
 {
     // Iterate through topologies
@@ -478,12 +512,12 @@ void World::updateAtomLists(const SimTK::State & state)
             topologies[i]->bAtomList[j].setX(location[0]);
             topologies[i]->bAtomList[j].setY(location[1]);
             topologies[i]->bAtomList[j].setZ(location[2]);
-            //std::cout << "updateAtomList atom " << j << " " << topologies[i]->bAtomList[j].getX() << std::endl;
         }
     }
 }
 
-// 
+/** Set Compound, MultibodySystem and DuMM configurations according to
+some other World's atoms **/ 
 SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations)
 {
     //PrintSimbodyStateCache(someState);
@@ -498,6 +532,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
         SimTK::Transform G_X_T = topologies[i]->getTopLevelTransform();
 
+        // Different regimens have different strategies
         if(topologies[i]->getRegimen() == "IC"){
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
@@ -521,8 +556,8 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
             // Checked if match is done correctly
             /*
-            this->sampleNumber += 1;
-            std::string FN(std::string("pdbs/ICmatch") + std::to_string(this->sampleNumber) + std::string("before.pdb"));
+            this->nofSamples += 1;
+            std::string FN(std::string("pdbs/ICmatch") + std::to_string(this->nofSamples) + std::string("before.pdb"));
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
             */
@@ -577,8 +612,8 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
             // Checked if match is done correctlya
             /*
-            this->sampleNumber += 1;
-            std::string FN(std::string("pdbs/RBmatch") + std::to_string(this->sampleNumber) + std::string("before.pdb"));
+            this->nofSamples += 1;
+            std::string FN(std::string("pdbs/RBmatch") + std::to_string(this->nofSamples) + std::string("before.pdb"));
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
             */
@@ -659,8 +694,8 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
             // Checked if match is done correctly
             /*
-            this->sampleNumber += 1;
-            std::string FN(std::string("pdbs/TDmatch") + std::to_string(this->sampleNumber) + std::string("before.pdb"));
+            this->nofSamples += 1;
+            std::string FN(std::string("pdbs/TDmatch") + std::to_string(this->nofSamples) + std::string("before.pdb"));
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
             */
@@ -756,7 +791,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
     /*
     std::string prefix;
     prefix = std::string("pdbs/") + std::string(topologies[0]->getRegimen()) + std::string("match") ;
-    std::string FN2(prefix + std::to_string(this->sampleNumber) + std::string("after.pdb"));
+    std::string FN2(prefix + std::to_string(this->nofSamples) + std::string("after.pdb"));
     std::cout << "Writing file " << FN2 << std::endl;
     std::filebuf fb;
     fb.open (FN2, std::ios::out);
@@ -827,6 +862,8 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
     return someState;
 }
 
+
+/** Print information about Simbody systems. For debugging purpose. **/
 void World::PrintSimbodyStateCache(SimTK::State& someState){
     std::cout << " System Stage: " << someState.getSystemStage() << std::endl;
     for(int i = 0; i < someState.getNumSubsystems(); i++){
@@ -836,7 +873,8 @@ void World::PrintSimbodyStateCache(SimTK::State& someState){
     }
 }
 
-// To be called before use of getXs, getYs or getZs
+/** Fill Worlds Cartesian coordinates buffers. 
+To be called before use of getXs, getYs or getZs **/
 void World::updateCoordBuffers(void)
 {
     int allAtIx = -1;
@@ -851,7 +889,7 @@ void World::updateCoordBuffers(void)
 
 }
 
-// Get the coordinates buffers
+/** Get the coordinates from buffers **/
 std::vector<SimTK::Real> World::getXs(void)
 {
     return Xs;
@@ -867,24 +905,7 @@ std::vector<SimTK::Real> World::getZs(void)
     return Zs;
 }
 
-// Advance
-void World::Advance(int nosteps){
-
-  TARGET_TYPE myrealtime=0;
-  myrealtime = (TARGET_TYPE)nosteps * (0.0015);
-  std::cout<<"myrealtime: "<<myrealtime<<std::endl;
-
-  SimTK::State& advanced = integ->updAdvancedState();
-  std::cout<<"Advance start: integ->updAdvancedState: "<< advanced.getQ() <<std::endl;
-
-  ts->stepTo(advanced.getTime() + nosteps*0.0015);
-
-
-  std::cout<<"Advance stop: integ->updAdvancedState: "<< advanced.getQ() <<std::endl;
-  
-}
-
-// Destructor
+/** Destructor **/
 World::~World(){
     if(this->visual == true){
         //delete paraMolecularDecorator;

@@ -164,8 +164,8 @@ SimTK::Real Sampler::calcMassDeterminant(const SimTK::State& state)
 }
 
 /** Returns the number of MC trials done by this integrator. **/
-int Sampler::getSampleNumber(void){
-    return sampleNumber;
+int Sampler::getNofSamples(void){
+    return nofSamples;
 }
 
 

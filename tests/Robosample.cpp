@@ -64,7 +64,7 @@ int main(int argc, char **argv)
     // Do we use Fixman torque
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
-            context->useFixmanTorque(worldIx);
+            context->useFixmanTorque(worldIx, std::stof(setupReader.getValues("TEMPERATURE")[worldIx]));
         }
     }
 
@@ -218,6 +218,7 @@ int main(int argc, char **argv)
     for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){
         ++mc_step; // Increment mc_step
         context->updWorld(currentWorldIx)->updSampler(0)->update(advancedState, context->getNofMDStepsPerSample(currentWorldIx));
+        //context->updWorld(currentWorldIx)->updSampler(0)->perturbQ(advancedState);
     }
 
     // Randomize structure
@@ -293,6 +294,7 @@ int main(int argc, char **argv)
             //std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
             for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){ // Iterate through samples
                 context->updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, context->getNofMDStepsPerSample(currentWorldIx));
+                //context->updWorld(currentWorldIx)->updSampler(0)->perturbQ(currentAdvancedState);
                 ++mc_step;
                 ++restore_mc_step;
     

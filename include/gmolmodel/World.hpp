@@ -110,16 +110,16 @@ public:
     const Topology& getTopology(int moleculeNumber) const;
 
     /** Get a writeble reference of one of the molecules **/
-    Topology& updTopology(void);  
+    Topology& updTopology(int moleculeNumber);  
     //...............
    
     //.......................
     // --- Thermodynamics ---
     //.......................
-    /** Get macro temperature **/
+    /** Get the World (macro) temperature **/
     SimTK::Real getTemperature(void);
 
-    /** Set macro temperature **/
+    /** Set the World (macro) temperature **/
     void setTemperature(SimTK::Real);
     //...............
 
@@ -127,16 +127,20 @@ public:
     /** Amber like scale factors. **/
     void setAmberForceFieldScaleFactors(void);
 
-    /** Set a global scaling factor for the forcefield **/
+    /** Set a global scaling factor for all the terms the forcefield **/
     void setGlobalForceFieldScaleFactor(SimTK::Real);
 
     /** Set GBSA implicit solvent scale factor **/
     void setGbsaGlobalScaleFactor(SimTK::Real);
 
+    /** Get a writeble pointer to the DuMM force field **/
     SimTK::DuMMForceFieldSubsystem * updForceField(void);
 
-    /** Use the Fixman torque as an additional force subsystem **/
-    void useFixmanTorque(void);
+    /** Use the Fixman torque as an additional force subsystem.
+    Careful not have different temperatures for World and Fixman Torque. **/
+    void useFixmanTorque(SimTK::Real argTemperature);
+
+    /** Check if the Fixman torque flag is set **/
     bool isUsingFixmanTorque(void);
     //...............
 
@@ -144,7 +148,7 @@ public:
     // --- Statistics ---
     //...................
     /** How many samples did we have so far **/
-    int getSampleNumber(void);
+    int getNofSamples(void);
 
     /** Sampler manipulation functions **/
     int getNofSamplers(void);
@@ -159,7 +163,10 @@ public:
     /** Get a writable sampler based on its position in the samplers vector **/
     HamiltonianMonteCarloSampler * updSampler(int which);
 
+    /** Get writble pointer to FixmanTorque implementation **/
     FixmanTorque * updFixmanTorque(void);
+
+    /** Get pointer to FixmanTorque implementation **/
     FixmanTorque * getFixmanTorque(void) const;
 
     //...............
@@ -170,10 +177,6 @@ public:
   
     /** Print Compound Cartesian coordinates **/
     void printPoss(const SimTK::Compound& c, SimTK::State& someState);
-    //...............
- 
-    // --- To be removed ---
-    void Advance(int nosteps);
     //...............
  
     // Destructor
@@ -237,7 +240,7 @@ public:
     //...............
 
     // --- Statistics ---
-    int sampleNumber;
+    int nofSamples;
     //...............
   
     // --- Graphics ---

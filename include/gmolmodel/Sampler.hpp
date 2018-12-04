@@ -44,12 +44,15 @@ public:
     // Get the name of the thermostat
     virtual ThermostatName getThermostat(void);
     */
+    
+    // Doc these later
+    virtual void setTemperature(SimTK::Real) = 0;
 
     // Extract one or more samples
     virtual void update(SimTK::State&) = 0;
 
     /** Returns the number of samples extracted so far. **/
-    int getSampleNumber(void);
+    int getNofSamples(void);
 
     // For debugging purposes
     void PrintSimbodyStateCache(SimTK::State& someState);
@@ -84,7 +87,7 @@ public:
     ThermostatName thermostat;
 
     // Sampling
-    int sampleNumber;
+    int nofSamples;
   
     // Harmonic oscillator constants
     static const int HO_D = 20; // Dimensionality

@@ -84,6 +84,10 @@ public:
     compound to the appropriate conformation wether it accepted or not. **/
     void update(SimTK::State& someState, int nosteps);
 
+    /** Modifies Q randomly
+     **/
+    void perturbQ(SimTK::State& someState);
+
     /** Get the proposed kinetic energy. This is set right  after velocities
     are initialized. **/
     SimTK::Real getProposedKE(void) { return this->ke_proposed; }
@@ -101,7 +105,7 @@ public:
     void setLastAcceptedKE(SimTK::Real);
 
     /** Returns the number of MC trials done by this integrator. **/
-    //int getSampleNumber(void);
+    //int getNofSamples(void);
 
     /** Initialize the same velocities **/
     bool getReproducible(void);
@@ -115,7 +119,7 @@ protected:
     SimTK::Real etot_set; // stored total energy
     SimTK::Real etot_proposed; // last accepted total energ (same with stored)
 
-    int sampleNumber; // counter for the number of MC trials 
+    int nofSamples; // counter for the number of MC trials 
     bool reproducible;
 
     //SimTK::VerletIntegrator * integ ; //ninteg
