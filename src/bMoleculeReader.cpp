@@ -88,48 +88,87 @@ std::string intriad::getString(void){
   return ret.str();
 }
 
-
-////////////////////
-// bMoleculeReader implementation
-////////////////////
-bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfilename)
+/** Reads informatin from a readAmberInput object. **/
+//bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfilename)
+bMoleculeReader::bMoleculeReader(readAmberInput *amberReader)
 {
-    std::cout << "BMOLECULEREADER" << std::endl;
+    std::cout << "bMoleculeReader::bMoleculeReader START" << std::endl;
 
+    // Alloc memory for atoms and bonds list
     natoms = 0;
-    bBond buffij;
     int noDummies = 0; 
-    std::string line;
-    char line_c[1000];
     natoms = amberReader->getNumberAtoms();
     nbonds = amberReader->getNumberBonds();
 
-    bAtomList = new bSpecificAtom[natoms]; /*Alloc - 1 for dummy*/
+    bAtomList = new bSpecificAtom[natoms];
     bonds = new bBond[nbonds];
-    // Read atoms READER
 
+    // Declare handy variables
     std::string str_buf;
     int a=65, b=65, c=65, d=65;
     int aRest=0, bRest=0, cRest=0;
+
+    int charpos[] = {65, 65, 65, 65};
     std::string aStr, bStr, cStr, dStr;
-    int nameCounter = 0;
-    SimTK::Real chargeMultiplier = 18.2223;
+    int nameCounter = 0; // same as i but clearer
+
+
+    // -----------------------------------------------------------------
+    // Assign atom properties. Take as much as possible from amberReader
+    // -----------------------------------------------------------------
+    // Make sure that variables in atoms are properly initialized
+    // Shouldnot be needed
     for(int i = 0; i < natoms; i++){
         bAtomList[i].Zero();
+    }
 
+    for(int i = 0; i < natoms; i++){
+
+        // Assign an index like in prmtop
         bAtomList[i].setNumber(i);
         //bAtomList[i].setNumber(amberReader->getAtomIndex); // not implemented
 
+        // Assign element
         str_buf = amberReader->getAtomsName(i);
-        boost::trim(str_buf);
-        bAtomList[i].setElem(str_buf.at(0));
+        unsigned int strix;
+        for (strix = 0; strix < str_buf.length(); strix++){
+            if(str_buf.at(strix) != ' '){
+                break;
+            }
+        }
+        bAtomList[i].setElem(str_buf.at(strix));
 
-        //bAtomList[i].setName(str_buf);
-        //std::string elemStr = std::string(1, bAtomList[i].getElem());
-        //bAtomList[i].setName(elemStr + std::to_string(bAtomList[i].getNumber()));
-
-        nameCounter++;
+        // Assign a unique name specific to Gmolmodel. There are 60 available
+        // ASCII readble characters: 0-9, A-Z and a-z. This gives a 12.960.000
+        // of possible 4 character combinations in a number of the form 
+        // a*60^3 + b*60^2 + c*60^1 + d. However the readble characters do not
+        // form a continuous interval in the ASCII table so they have to be 
+        // spread.
         std::string string_name;
+        nameCounter++;
+
+        /*
+        charpos[0] = int(nameCounter / 216000);
+        aRest = nameCounter % int(216000);
+        charpos[1] = int(aRest / 3600);
+        bRest = aRest % int(3600);
+        charpos[2] = int(bRest / 60);
+        cRest = bRest % int(60);
+        charpos[3] = int(cRest / 1);
+        // Spread the numbers so that the ASCII symbol will be readble
+        for (unsigned int charposIx = 0; charposIx < 4; charposIx++){
+            if(charpos[charposIx] > (10 + 25)){
+                charpos[charposIx] += (7 + 6);
+            }else if(charpos[charposIx] > (9)){
+                charpos[charposIx] += (7);
+            }
+            charpos[charposIx] += 48;
+        }
+        aStr = (char)(charpos[0]);
+        bStr = (char)(charpos[1]);
+        cStr = (char)(charpos[2]);
+        dStr = (char)(charpos[3]);
+        */
 
         a = int(nameCounter / std::pow(25, 3));
         aStr = (char)(a + 65);
@@ -147,6 +186,8 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
         dStr = (char)(d + 65);
 
         string_name = aStr + bStr + cStr + dStr;
+        
+
 
         /*
         assert(nameCounter < 65536);
@@ -166,40 +207,45 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader, const char *rbfile
             string_name = sstream.str();
         }
         */
-
         bAtomList[i].setName(string_name);
-        //bAtomList[i].setName(str_buf);
 
+        // Store the initial name from prmtop
         bAtomList[i].setInName(str_buf);
 
-
+        // Set atom type
         str_buf = amberReader->getAtomsNameAlias(i);
         boost::trim(str_buf);
         bAtomList[i].setFftype(str_buf);
 
+        // Set charge as it is used in Amber
+        SimTK::Real chargeMultiplier = 18.2223;
         bAtomList[i].setCharge(amberReader->getAtomsCharge(i) / chargeMultiplier);
 
+        // Set coordinates in nm
         bAtomList[i].setX(amberReader->getAtomsXcoord(i) / 10.0);
         bAtomList[i].setY(amberReader->getAtomsYcoord(i) / 10.0);
         bAtomList[i].setZ(amberReader->getAtomsZcoord(i) / 10.0);
-        //bAtomList[i].setX(amberReader->getAtomsXcoord(i));
-        //bAtomList[i].setY(amberReader->getAtomsYcoord(i));
-        //bAtomList[i].setZ(amberReader->getAtomsZcoord(i));
 
+        // Set mass
         bAtomList[i].setMass(amberReader->getAtomsMass(i));
 
+        // Set Lennard-Jones parameters
         bAtomList[i].setVdwRadius(amberReader->getAtomsRVdW(i));
         bAtomList[i].setLJWellDepth(amberReader->getAtomsEpsilon(i));
 
+        // Set residue name and index
         //bAtomList[i].setResidueName(amberReader->getResidueName(i));
         //bAtomList[i].setResidueIndex(amberReader->getResidueIndex(i));
         bAtomList[i].residueName = std::string("UNK");
         bAtomList[i].residueIndex = 1;
 
         //bAtomList[i].Print();
-    }
+    } // END atom properties
 
-    // READ BONDS
+
+    // -----------------------
+    // Assign bond properties
+    // -----------------------
     for(int i=0; i<nbonds; i++){
         bonds[i].setIndex(i);
         bonds[i].i = amberReader->getBondsAtomsIndex1(i);

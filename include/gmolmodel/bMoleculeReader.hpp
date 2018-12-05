@@ -76,30 +76,30 @@ class intriad{
   std::string getString(void);
 };
 
-//==============================================================================
+//============================================================================
 //                           CLASS MoleculeReader
-//==============================================================================
-/** 
- * Molecule Reader Class. Creates a list of gMolmodel specific atoms bAtomList
- * from a molecular structure file (mol2) which contain all the information needed
- * to create a Compound
-**/
+//============================================================================
+/** Molecule Reader Class. Creates a list (bAtomList) of gMolmodel specific 
+atoms of type bSpecificAtom by taking information from an object of type 
+readAmberInput (for now). Also contains a list of bonds (type bBond). **/
 class bMoleculeReader{
  public:
-  bSpecificAtom *bAtomList;
-  bBond *bonds;
-  int natoms;
-  int nbonds; 
-  unsigned int MAX_LINE_LENGTH;
-
-  bMoleculeReader(readAmberInput *amberReader, const char *);
-
-  bMoleculeReader(SimTK::DuMMForceFieldSubsystem& dumm,
-          const char *filename,
-          const char *filetype,
-          const char *rbfilename);
-
-  ~bMoleculeReader();
+    bSpecificAtom *bAtomList;
+    bBond *bonds;
+    int natoms;
+    int nbonds; 
+    unsigned int MAX_LINE_LENGTH;
+ 
+    /** Constructor reads data from a readAmberInput object **/ 
+    //bMoleculeReader(readAmberInput *amberReader, const char *);
+    bMoleculeReader(readAmberInput *amberReader);
+  
+    bMoleculeReader(SimTK::DuMMForceFieldSubsystem& dumm,
+            const char *filename,
+            const char *filetype,
+            const char *rbfilename);
+  
+    ~bMoleculeReader();
 };
 
 

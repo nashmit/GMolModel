@@ -174,7 +174,8 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
     this->regimenSpec = regimenSpec;
  
     // Add a MoleculeReader object to the vector of moleculeReaders
-    bMoleculeReader * molRead = new bMoleculeReader(amberReader, rbFN.c_str());
+    //bMoleculeReader * molRead = new bMoleculeReader(amberReader, rbFN.c_str());
+    bMoleculeReader * molRead = new bMoleculeReader(amberReader);
     moleculeReaders.push_back(molRead);
 
     // Add parameters from amberReader
