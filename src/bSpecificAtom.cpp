@@ -22,8 +22,10 @@ bSpecificAtom::bSpecificAtom(){
 
 // Incomplete
 bSpecificAtom::~bSpecificAtom(){
-    std::cout << "bSpecificAtom destructor neighbors vector clear" << std::endl;
-    neighbors.clear();
+    //std::cout << "bSpecificAtom destructor neighbors vector clear" << std::endl;
+    //std::cout << "bSpecificAtom destructor bondsInvolved vector clear" << std::endl;
+    //neighbors.clear();
+    //bondsInvolved.clear();
 }
 
 // Init function

@@ -117,7 +117,7 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader)
     // Assign atom properties. Take as much as possible from amberReader
     // -----------------------------------------------------------------
     // Make sure that variables in atoms are properly initialized
-    // Shouldnot be needed
+    // Shouldi not be needed
     for(int i = 0; i < natoms; i++){
         bAtomList[i].Zero();
     }
@@ -246,171 +246,183 @@ bMoleculeReader::bMoleculeReader(readAmberInput *amberReader)
     // -----------------------
     // Assign bond properties
     // -----------------------
+    //  
     for(int i=0; i<nbonds; i++){
         bonds[i].setIndex(i);
         bonds[i].i = amberReader->getBondsAtomsIndex1(i);
         bonds[i].j = amberReader->getBondsAtomsIndex2(i);
     }
 
-    // Assign atoms nbonds and freebonds
+    // Assign the number of bonds an atom has and sets the number of freebonds
+    // equal to the number of bonds for now
     for(int i=0; i<natoms ; i++){
-      bAtomList[i].nbonds = 0;
-      for(int j=0; j<nbonds; j++){ 
-        if((bAtomList[i].number == bonds[j].i) ||\
-           (bAtomList[i].number == bonds[j].j)){
-          ++bAtomList[i].nbonds;
-          ++bAtomList[i].freebonds;
+        bAtomList[i].nbonds = 0;
+        for(int j=0; j<nbonds; j++){ 
+            if((bAtomList[i].number == bonds[j].i) || \
+               (bAtomList[i].number == bonds[j].j)){
+                ++bAtomList[i].nbonds;
+                ++bAtomList[i].freebonds;
+            }
         }
-      }
     }
 
     // Assign neighbors and bonds involved for each atom
+    // which translates into pushing bSpecificAtom * and bBond *
+    // into their apropriate vectors
     for(int i=0; i<nbonds; i++){
-       (bAtomList[ bonds[i].i  ]).addNeighbor( &(bAtomList[ bonds[i].j  ]) );
-       (bAtomList[ bonds[i].i  ]).addBond( &(bonds[i]) );
+        (bAtomList[ bonds[i].i  ]).addNeighbor( &(bAtomList[ bonds[i].j  ]) );
+        (bAtomList[ bonds[i].i  ]).addBond( &(bonds[i]) );
 
-       (bAtomList[ bonds[i].j  ]).addNeighbor( &(bAtomList[ bonds[i].i  ]) );
-       (bAtomList[ bonds[i].j  ]).addBond( &(bonds[i]) );       
+        (bAtomList[ bonds[i].j  ]).addNeighbor( &(bAtomList[ bonds[i].i  ]) );
+        (bAtomList[ bonds[i].j  ]).addBond( &(bonds[i]) );       
     }
 
-    // Every *valentAtom is derived from SingleAtom in turn derived from Compound with one atom (AtomIndex 0)
-    for(int i=0; i<natoms+noDummies; i++){
+    // ---------------------------------------------
+    // Set every atom's (SimTK::Compound::SingleAtom *) to it's 
+    // appropriate element and assign it's Compound::AtomName to unique name
+    // Every atom is derived from SingleAtom in turn derived from 
+    // Compound with one atom (AtomIndex 0)
+    // TODO: Bromine and Clorine
+    // ---------------------------------------------
+    for(int i = 0; i < (natoms + noDummies); i++){
+        // Atoms with one bond
         if(bAtomList[i].nbonds == 1){
             if(toupper(bAtomList[i].elem) == 'H'){
                 bAtomList[i].bAtomType = new UnivalentAtom(bAtomList[i].name,
-                    SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() )); // Prmtop mass
+                    SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() ));
                 bAtomList[i].setAtomicNumber(1);
+            }
+            /*else if((toupper(bAtomList[i].name[0]) == 'C') && (toupper(bAtomList[i].name[0]) == 'L')){
+                bAtomList[i].bAtomType = new
+                UnivalentAtom(bAtomList[i].name, Element(17, "Chlorine", "Cl", bAtomList[i].getMass()));
+                bAtomList[i].setAtomicNumber(17);
+            }*/
+            else if(toupper(bAtomList[i].elem) == 'O'){
+                bAtomList[i].bAtomType = new UnivalentAtom(bAtomList[i].name,
+                    Element(8, "Oxygen", "O", bAtomList[i].getMass()));
+                bAtomList[i].setAtomicNumber(8);
+            }
+            else if(toupper(bAtomList[i].elem) == 'F'){
+              bAtomList[i].bAtomType = new
+                UnivalentAtom(bAtomList[i].name, Element(9, "Fluorine", "F", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(9);
+            }
+            /*
+            else if((toupper(bAtomList[i].name[0]) == 'B') && (toupper(bAtomList[i].name[0]) == 'R')){
+              bAtomList[i].bAtomType = new
+                UnivalentAtom(bAtomList[i].name, Element(35, "Bromine", "Br", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(35);
+            }
+            */
+            else if(toupper(bAtomList[i].elem) == 'I'){
+              bAtomList[i].bAtomType = new
+                UnivalentAtom(bAtomList[i].name, Element(53, "Iodine", "I", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(53);
+            }
+            else if(toupper(bAtomList[i].elem) == 'N'){
+              bAtomList[i].bAtomType = new
+                UnivalentAtom(bAtomList[i].name, Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(7);
+            }
+            bAtomList[i].bAtomType->setDefaultInboardBondLength(0.1112); // Just for initial construction
         }
-        /*
-        else if((toupper(bAtomList[i].name[0]) == 'C') && (toupper(bAtomList[i].name[0]) == 'L')){
-          bAtomList[i].bAtomType = new
-            UnivalentAtom(bAtomList[i].name, Element(17, "Chlorine", "Cl", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(17);
+        // Atoms with two bonds
+        else if (bAtomList[i].nbonds == 2){
+            if(toupper(bAtomList[i].elem) == 'H'){
+              bAtomList[i].bAtomType = new
+                BivalentAtom(bAtomList[i].name, Element(1, "Hydrogen", "H", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(1);
+            }
+            else if(toupper(bAtomList[i].elem) == 'C'){
+              bAtomList[i].bAtomType = new
+                BivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(6);
+            }
+            else if(toupper(bAtomList[i].elem) == 'O'){
+              bAtomList[i].bAtomType = new
+                BivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()),
+                109.47*Deg2Rad);
+              bAtomList[i].setAtomicNumber(8);
+            }
+            else if(toupper(bAtomList[i].elem) == 'N'){
+              bAtomList[i].bAtomType = new
+                BivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(7);
+            }
+            else if(toupper(bAtomList[i].elem) == 'S'){
+              bAtomList[i].bAtomType = new
+                BivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()),
+                109.47*Deg2Rad);
+              bAtomList[i].setAtomicNumber(16);
+            }
+            bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
         }
-        */
-        else if(toupper(bAtomList[i].elem) == 'O'){
-            bAtomList[i].bAtomType = new UnivalentAtom(bAtomList[i].name, 
-                Element(8, "Oxygen", "O", bAtomList[i].getMass()));
-            bAtomList[i].setAtomicNumber(8);
+        // Atoms with three bonds
+        else if (bAtomList[i].nbonds == 3){
+            if(toupper(bAtomList[i].elem) == 'C'){
+              bAtomList[i].bAtomType = new
+                TrivalentAtom(bAtomList[i].name, Element(6, "Carbon", "C", bAtomList[i].getMass()),
+                  120*Deg2Rad, 120*Deg2Rad
+                );
+              bAtomList[i].setAtomicNumber(6);
+            }
+            else if(toupper(bAtomList[i].elem) == 'O'){
+              bAtomList[i].bAtomType = new
+                TrivalentAtomTetra(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(8);
+            }
+            else if(toupper(bAtomList[i].elem) == 'N'){
+              bAtomList[i].bAtomType = new
+                TrivalentAtomTetra(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(7);
+            }
+            else if(toupper(bAtomList[i].elem) == 'S'){
+              bAtomList[i].bAtomType = new
+                TrivalentAtomTetra(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(16);
+            }
+            else if(toupper(bAtomList[i].elem) == 'P'){
+              bAtomList[i].bAtomType = new
+                TrivalentAtomTetra(bAtomList[i].name,  Element(15, "Phosphorus", "P", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(15);
+            }
+            bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
         }
-        else if(toupper(bAtomList[i].elem) == 'F'){
-          bAtomList[i].bAtomType = new
-            UnivalentAtom(bAtomList[i].name, Element(9, "Fluorine", "F", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(9);
+        // Atoms with four bonds
+        else if (bAtomList[i].nbonds == 4){
+            if(toupper(bAtomList[i].elem) == 'C'){
+              bAtomList[i].bAtomType = new
+                QuadrivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(6);
+            }
+            else if(toupper(bAtomList[i].elem) == 'O'){
+              bAtomList[i].bAtomType = new
+                QuadrivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(8);
+            }
+            else if(toupper(bAtomList[i].elem) == 'N'){
+              bAtomList[i].bAtomType = new
+                QuadrivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(7);
+            }
+            else if(toupper(bAtomList[i].elem) == 'S'){
+              bAtomList[i].bAtomType = new
+                QuadrivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(16);
+            }
+            else if(toupper(bAtomList[i].elem) == 'P'){
+              bAtomList[i].bAtomType = new
+                QuadrivalentAtom(bAtomList[i].name,  Element(15, "Phosphorus", "P", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(15);
+            }
+            bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
         }
-        /*
-        else if((toupper(bAtomList[i].name[0]) == 'B') && (toupper(bAtomList[i].name[0]) == 'R')){
-          bAtomList[i].bAtomType = new
-            UnivalentAtom(bAtomList[i].name, Element(35, "Bromine", "Br", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(35);
-        }
-        */
-        else if(toupper(bAtomList[i].elem) == 'I'){
-          bAtomList[i].bAtomType = new
-            UnivalentAtom(bAtomList[i].name, Element(53, "Iodine", "I", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(53);
-        }
-        else if(toupper(bAtomList[i].elem) == 'N'){
-          bAtomList[i].bAtomType = new
-            UnivalentAtom(bAtomList[i].name, Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(7);
-        }
-        bAtomList[i].bAtomType->setDefaultInboardBondLength(0.1112); // Just for initial construction
-      }
-      else if (bAtomList[i].nbonds == 2){
-        if(toupper(bAtomList[i].elem) == 'H'){
-          bAtomList[i].bAtomType = new
-            BivalentAtom(bAtomList[i].name, Element(1, "Hydrogen", "H", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(1);
-        }
-        else if(toupper(bAtomList[i].elem) == 'C'){
-          bAtomList[i].bAtomType = new
-            BivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(6);
-        }
-        else if(toupper(bAtomList[i].elem) == 'O'){
-          bAtomList[i].bAtomType = new
-            BivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()),
-            109.47*Deg2Rad);
-          bAtomList[i].setAtomicNumber(8);
-        }
-        else if(toupper(bAtomList[i].elem) == 'N'){
-          bAtomList[i].bAtomType = new
-            BivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(7);
-        }
-        else if(toupper(bAtomList[i].elem) == 'S'){
-          bAtomList[i].bAtomType = new
-            BivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()),
-            109.47*Deg2Rad);
-          bAtomList[i].setAtomicNumber(16);
-        }
-        bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
-      }
-      else if (bAtomList[i].nbonds == 3){
-        if(toupper(bAtomList[i].elem) == 'C'){
-          bAtomList[i].bAtomType = new
-            TrivalentAtom(bAtomList[i].name, Element(6, "Carbon", "C", bAtomList[i].getMass()),
-              120*Deg2Rad, 120*Deg2Rad
-            );
-          bAtomList[i].setAtomicNumber(6);
-        }
-        else if(toupper(bAtomList[i].elem) == 'O'){
-          bAtomList[i].bAtomType = new
-            TrivalentAtomTetra(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(8);
-        }
-        else if(toupper(bAtomList[i].elem) == 'N'){
-          bAtomList[i].bAtomType = new
-            TrivalentAtomTetra(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(7);
-        }
-        else if(toupper(bAtomList[i].elem) == 'S'){
-          bAtomList[i].bAtomType = new
-            TrivalentAtomTetra(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(16);
-        }
-        else if(toupper(bAtomList[i].elem) == 'P'){
-          bAtomList[i].bAtomType = new
-            TrivalentAtomTetra(bAtomList[i].name,  Element(15, "Phosphorus", "P", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(15);
-        }
-        bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
-      }
-      else if (bAtomList[i].nbonds == 4){
-        if(toupper(bAtomList[i].elem) == 'C'){
-          bAtomList[i].bAtomType = new
-            QuadrivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(6);
-        }
-        else if(toupper(bAtomList[i].elem) == 'O'){
-          bAtomList[i].bAtomType = new
-            QuadrivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(8);
-        }
-        else if(toupper(bAtomList[i].elem) == 'N'){
-          bAtomList[i].bAtomType = new
-            QuadrivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(7);
-        }
-        else if(toupper(bAtomList[i].elem) == 'S'){
-          bAtomList[i].bAtomType = new
-            QuadrivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(16);
-        }
-        else if(toupper(bAtomList[i].elem) == 'P'){
-          bAtomList[i].bAtomType = new
-            QuadrivalentAtom(bAtomList[i].name,  Element(15, "Phosphorus", "P", bAtomList[i].getMass()));
-          bAtomList[i].setAtomicNumber(15);
-        }
-        bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
-      }
+  
+        bZeroCharArray(bAtomList[i].biotype, 20);
+        sprintf(bAtomList[i].biotype, "%s_%s", \
+          bAtomList[i].name, bAtomList[i].fftype);
 
-      bZeroCharArray(bAtomList[i].biotype, 20);
-      sprintf(bAtomList[i].biotype, "%s_%s", \
-        bAtomList[i].name, bAtomList[i].fftype);
-
-    }
+    } // Finish assigning Compound::SingleAtom
 
     /* Just checking *////////
     std::cout<<"Checking after bMoleculeReader\n";
@@ -437,7 +449,7 @@ bMoleculeReader::~bMoleculeReader()
 {
     std::cout << "bMoleculeReader destructor called." << std::endl;
     int noDummies = 0; 
-    for(int i=0; i< natoms+noDummies; i++){
+    for(int i = 0; i < (natoms + noDummies); i++){
           delete bAtomList[i].bAtomType;
     }
     //for(int i=0; i < nbonds; i++){
