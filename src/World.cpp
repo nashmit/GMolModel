@@ -175,22 +175,34 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
  
     // Add a MoleculeReader object to the vector of moleculeReaders
     //bMoleculeReader * molRead = new bMoleculeReader(amberReader, rbFN.c_str());
-    bMoleculeReader * molRead = new bMoleculeReader(amberReader);
-    moleculeReaders.push_back(molRead);
+    //RE bMoleculeReader * molRead = new bMoleculeReader(amberReader);
+    //RE moleculeReaders.push_back(molRead);
 
-    // Add parameters from amberReader
-    bAddAllParams(std::string("lig") + std::to_string(moleculeCount)
-        , amberReader, *forceField, (moleculeReaders.back())->bAtomList
-        , (moleculeReaders.back())->bonds);
+    //RE // Add parameters from amberReader
+    //RE bAddAllParams(std::string("lig") + std::to_string(moleculeCount)
+    //RE    , amberReader, *forceField, (moleculeReaders.back())->bAtomList
+    //RE    , (moleculeReaders.back())->bonds);
   
     // Add a new molecule (Topology object which inherits Compound) 
     // to the vector of molecules and build its graph 
     Topology * top = new Topology(std::string("lig") 
         + std::to_string(moleculeCount));
     topologies.push_back(top);
-    (topologies.back())->build(*forceField, (moleculeReaders.back())->natoms
-        , (moleculeReaders.back())->bAtomList, (moleculeReaders.back())->nbonds
-        , (moleculeReaders.back())->bonds, flexFN, regimenSpec);
+
+    (topologies.back())->loadAtomAndBondInfoFromReader(amberReader); // RE
+
+    // Add parameters from amberReader //RE
+    bAddAllParams(std::string("lig") + std::to_string(moleculeCount) //RE
+       , amberReader, *forceField, (topologies.back())->bAtomList //RE
+       , (topologies.back())->bonds); //RE
+  
+    //RE (topologies.back())->build(*forceField, (moleculeReaders.back())->natoms
+    //RE     , (moleculeReaders.back())->bAtomList, (moleculeReaders.back())->nbonds
+    //RE    , (moleculeReaders.back())->bonds, flexFN, regimenSpec);
+
+    (topologies.back())->build(*forceField, (topologies.back())->natoms //RE
+        , (topologies.back())->bAtomList, (topologies.back())->nbonds //RE
+        , (topologies.back())->bonds, flexFN, regimenSpec); //RE
 
     // Allocate the vector of coordinates (DCD)
     Xs.resize(Xs.size() + topologies.back()->getNAtoms());
@@ -924,9 +936,9 @@ World::~World(){
     delete matter;
     delete forces;
     delete compoundSystem;
-    for(unsigned int i = 0; i < moleculeReaders.size(); i++){
-        delete moleculeReaders[i];
-    }
+    //RE for(unsigned int i = 0; i < moleculeReaders.size(); i++){
+    //RE     delete moleculeReaders[i];
+    //RE }
     for(unsigned int i = 0; i < topologies.size(); i++){
         delete topologies[i];
     }

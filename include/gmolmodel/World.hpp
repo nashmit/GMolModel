@@ -40,7 +40,7 @@
 //#define TRY_TO_USE_OPENMM
 //#endif
 
-#include "bMoleculeReader.hpp"
+//RE #include "bMoleculeReader.hpp"
 #include "bAddParams.hpp"
 #include "server.hpp"
 #include "Topology.hpp"
@@ -211,7 +211,7 @@ public:
     std::string regimenSpec; // regimen specification
   
     /** Molecules (topologies<-Compounds) objects **/
-    std::vector<bMoleculeReader *> moleculeReaders;
+    //std::vector<bMoleculeReader *> moleculeReaders;
     std::vector<Topology *> topologies;
 
     /** Vectors of Cartesian coordinates **/

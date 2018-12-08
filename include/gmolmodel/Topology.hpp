@@ -7,8 +7,10 @@
  * This is part of Robosampling                                               *
  */
 
-#include "bMoleculeReader.hpp"
+//RE #include "bMoleculeReader.hpp"
 #include "TrivalentAtomTetra.hpp"
+#include "bSpecificAtom.hpp"
+#include "bBond.hpp"
 #include "server.hpp"
 
 #ifndef MAIN_RESIDUE_DEBUG_SPECIFIC

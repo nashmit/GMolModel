@@ -10,7 +10,9 @@
 #include "bgeneral.hpp"
 //#include "Simbody.h"
 //#include "Molmodel.h"
-#include "bMoleculeReader.hpp"
+//RE #include "bMoleculeReader.hpp"
+#include "bSpecificAtom.hpp"
+#include "bBond.hpp"
 
 #ifndef DEBUG_PARAMS_LEVEL01
 #define DEBUG_PARAMS_LEVEL01

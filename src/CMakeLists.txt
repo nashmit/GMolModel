@@ -123,7 +123,7 @@ set(LIBGMOLMODEL_SRC
         HMCSOA.cpp # LAUR
 	      bAddParams.cpp
 	      Topology.cpp
-	      bMoleculeReader.cpp
+	      #bMoleculeReader.cpp
 	      World.cpp
               FixmanTorque.cpp
         ParaMolecularDecorator.cpp
