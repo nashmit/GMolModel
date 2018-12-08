@@ -19,6 +19,363 @@ Topology::Topology(std::string nameOfThisMolecule){
 Topology::~Topology(){
 }
 
+
+/** Reads informatin from a readAmberInput object. **/
+void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
+{
+    std::cout << "Topology::loadAtomAndBondInfoFromReader START" << std::endl;
+
+    // Alloc memory for atoms and bonds list
+    natoms = 0;
+    int noDummies = 0; 
+    natoms = amberReader->getNumberAtoms();
+    nbonds = amberReader->getNumberBonds();
+
+    bAtomList = new bSpecificAtom[natoms];
+    bonds = new bBond[nbonds];
+
+    // Declare handy variables
+    std::string str_buf;
+    int a=65, b=65, c=65, d=65;
+    int aRest=0, bRest=0, cRest=0;
+
+    int charpos[] = {65, 65, 65, 65};
+    std::string aStr, bStr, cStr, dStr;
+    int nameCounter = 0; // same as i but clearer
+
+
+    // -----------------------------------------------------------------
+    // Assign atom properties. Take as much as possible from amberReader
+    // -----------------------------------------------------------------
+    // Make sure that variables in atoms are properly initialized
+    // Shouldi not be needed
+    for(int i = 0; i < natoms; i++){
+        bAtomList[i].Zero();
+    }
+
+    for(int i = 0; i < natoms; i++){
+
+        // Assign an index like in prmtop
+        bAtomList[i].setNumber(i);
+        //bAtomList[i].setNumber(amberReader->getAtomIndex); // not implemented
+
+        // Assign element
+        str_buf = amberReader->getAtomsName(i);
+        unsigned int strix;
+        for (strix = 0; strix < str_buf.length(); strix++){
+            if(str_buf.at(strix) != ' '){
+                break;
+            }
+        }
+        bAtomList[i].setElem(str_buf.at(strix));
+
+        // Assign a unique name specific to Gmolmodel. There are 60 available
+        // ASCII readble characters: 0-9, A-Z and a-z. This gives a 12.960.000
+        // of possible 4 character combinations in a number of the form 
+        // a*60^3 + b*60^2 + c*60^1 + d. However the readble characters do not
+        // form a continuous interval in the ASCII table so they have to be 
+        // spread.
+        std::string string_name;
+        nameCounter++;
+
+        /*
+        charpos[0] = int(nameCounter / 216000);
+        aRest = nameCounter % int(216000);
+        charpos[1] = int(aRest / 3600);
+        bRest = aRest % int(3600);
+        charpos[2] = int(bRest / 60);
+        cRest = bRest % int(60);
+        charpos[3] = int(cRest / 1);
+        // Spread the numbers so that the ASCII symbol will be readble
+        for (unsigned int charposIx = 0; charposIx < 4; charposIx++){
+            if(charpos[charposIx] > (10 + 25)){
+                charpos[charposIx] += (7 + 6);
+            }else if(charpos[charposIx] > (9)){
+                charpos[charposIx] += (7);
+            }
+            charpos[charposIx] += 48;
+        }
+        aStr = (char)(charpos[0]);
+        bStr = (char)(charpos[1]);
+        cStr = (char)(charpos[2]);
+        dStr = (char)(charpos[3]);
+        */
+
+        a = int(nameCounter / std::pow(25, 3));
+        aStr = (char)(a + 65);
+        aRest = nameCounter % int(std::pow(25, 3));
+
+        b = int(aRest / std::pow(25, 2));
+        bStr = (char)(b + 65);
+        bRest = aRest % int(std::pow(25, 2));
+
+        c = int(bRest / std::pow(25, 1));
+        cStr = (char)(c + 65);
+        cRest = bRest % int(std::pow(25, 1));
+
+        d = int(cRest / std::pow(25, 0));
+        dStr = (char)(d + 65);
+
+        string_name = aStr + bStr + cStr + dStr;
+        
+
+
+        /*
+        assert(nameCounter < 65536);
+        std::stringstream sstream;
+        std::string string_name;
+        if(nameCounter < 16){
+            sstream << std::hex << nameCounter;
+            string_name = "000" + sstream.str();
+        }else if(nameCounter < 256){
+            sstream << std::hex << nameCounter;
+            string_name = "00" + sstream.str();
+        }else if(nameCounter < 4096){
+            sstream << std::hex << nameCounter;
+            string_name = "0" + sstream.str();
+        }else if(nameCounter < 65536){
+            sstream << std::hex << nameCounter;
+            string_name = sstream.str();
+        }
+        */
+        bAtomList[i].setName(string_name);
+
+        // Store the initial name from prmtop
+        bAtomList[i].setInName(str_buf);
+
+        // Set atom type
+        str_buf = amberReader->getAtomsNameAlias(i);
+        boost::trim(str_buf);
+        bAtomList[i].setFftype(str_buf);
+
+        // Set charge as it is used in Amber
+        SimTK::Real chargeMultiplier = 18.2223;
+        bAtomList[i].setCharge(amberReader->getAtomsCharge(i) / chargeMultiplier);
+
+        // Set coordinates in nm
+        bAtomList[i].setX(amberReader->getAtomsXcoord(i) / 10.0);
+        bAtomList[i].setY(amberReader->getAtomsYcoord(i) / 10.0);
+        bAtomList[i].setZ(amberReader->getAtomsZcoord(i) / 10.0);
+
+        // Set mass
+        bAtomList[i].setMass(amberReader->getAtomsMass(i));
+
+        // Set Lennard-Jones parameters
+        bAtomList[i].setVdwRadius(amberReader->getAtomsRVdW(i));
+        bAtomList[i].setLJWellDepth(amberReader->getAtomsEpsilon(i));
+
+        // Set residue name and index
+        //bAtomList[i].setResidueName(amberReader->getResidueName(i));
+        //bAtomList[i].setResidueIndex(amberReader->getResidueIndex(i));
+        bAtomList[i].residueName = std::string("UNK");
+        bAtomList[i].residueIndex = 1;
+
+        //bAtomList[i].Print();
+    } // END atom properties
+
+
+    // -----------------------
+    // Assign bond properties
+    // -----------------------
+    //  
+    for(int i=0; i<nbonds; i++){
+        bonds[i].setIndex(i);
+        bonds[i].i = amberReader->getBondsAtomsIndex1(i);
+        bonds[i].j = amberReader->getBondsAtomsIndex2(i);
+    }
+
+    // Assign the number of bonds an atom has and sets the number of freebonds
+    // equal to the number of bonds for now
+    for(int i=0; i<natoms ; i++){
+        bAtomList[i].nbonds = 0;
+        for(int j=0; j<nbonds; j++){ 
+            if((bAtomList[i].number == bonds[j].i) || \
+               (bAtomList[i].number == bonds[j].j)){
+                ++bAtomList[i].nbonds;
+                ++bAtomList[i].freebonds;
+            }
+        }
+    }
+
+    // Assign neighbors and bonds involved for each atom
+    // which translates into pushing bSpecificAtom * and bBond *
+    // into their apropriate vectors
+    for(int i=0; i<nbonds; i++){
+        (bAtomList[ bonds[i].i  ]).addNeighbor( &(bAtomList[ bonds[i].j  ]) );
+        (bAtomList[ bonds[i].i  ]).addBond( &(bonds[i]) );
+
+        (bAtomList[ bonds[i].j  ]).addNeighbor( &(bAtomList[ bonds[i].i  ]) );
+        (bAtomList[ bonds[i].j  ]).addBond( &(bonds[i]) );       
+    }
+
+    // ---------------------------------------------
+    // Set every atom's (SimTK::Compound::SingleAtom *) to it's 
+    // appropriate element and assign it's Compound::AtomName to unique name
+    // Every atom is derived from SingleAtom in turn derived from 
+    // Compound with one atom (AtomIndex 0)
+    // TODO: Bromine and Clorine
+    // ---------------------------------------------
+    for(int i = 0; i < (natoms + noDummies); i++){
+        // Atoms with one bond
+        if(bAtomList[i].nbonds == 1){
+            if(toupper(bAtomList[i].elem) == 'H'){
+                bAtomList[i].bAtomType = new UnivalentAtom(bAtomList[i].name,
+                    SimTK::Element( 1, "Hydrogen", "H", bAtomList[i].getMass() ));
+                bAtomList[i].setAtomicNumber(1);
+            }
+            /*else if((toupper(bAtomList[i].name[0]) == 'C') && (toupper(bAtomList[i].name[0]) == 'L')){
+                bAtomList[i].bAtomType = new
+                UnivalentAtom(bAtomList[i].name, Element(17, "Chlorine", "Cl", bAtomList[i].getMass()));
+                bAtomList[i].setAtomicNumber(17);
+            }*/
+            else if(toupper(bAtomList[i].elem) == 'O'){
+                bAtomList[i].bAtomType = new UnivalentAtom(bAtomList[i].name,
+                    Element(8, "Oxygen", "O", bAtomList[i].getMass()));
+                bAtomList[i].setAtomicNumber(8);
+            }
+            else if(toupper(bAtomList[i].elem) == 'F'){
+              bAtomList[i].bAtomType = new
+                UnivalentAtom(bAtomList[i].name, Element(9, "Fluorine", "F", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(9);
+            }
+            /*
+            else if((toupper(bAtomList[i].name[0]) == 'B') && (toupper(bAtomList[i].name[0]) == 'R')){
+              bAtomList[i].bAtomType = new
+                UnivalentAtom(bAtomList[i].name, Element(35, "Bromine", "Br", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(35);
+            }
+            */
+            else if(toupper(bAtomList[i].elem) == 'I'){
+              bAtomList[i].bAtomType = new
+                UnivalentAtom(bAtomList[i].name, Element(53, "Iodine", "I", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(53);
+            }
+            else if(toupper(bAtomList[i].elem) == 'N'){
+              bAtomList[i].bAtomType = new
+                UnivalentAtom(bAtomList[i].name, Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(7);
+            }
+            bAtomList[i].bAtomType->setDefaultInboardBondLength(0.1112); // Just for initial construction
+        }
+        // Atoms with two bonds
+        else if (bAtomList[i].nbonds == 2){
+            if(toupper(bAtomList[i].elem) == 'H'){
+              bAtomList[i].bAtomType = new
+                BivalentAtom(bAtomList[i].name, Element(1, "Hydrogen", "H", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(1);
+            }
+            else if(toupper(bAtomList[i].elem) == 'C'){
+              bAtomList[i].bAtomType = new
+                BivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(6);
+            }
+            else if(toupper(bAtomList[i].elem) == 'O'){
+              bAtomList[i].bAtomType = new
+                BivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()),
+                109.47*Deg2Rad);
+              bAtomList[i].setAtomicNumber(8);
+            }
+            else if(toupper(bAtomList[i].elem) == 'N'){
+              bAtomList[i].bAtomType = new
+                BivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(7);
+            }
+            else if(toupper(bAtomList[i].elem) == 'S'){
+              bAtomList[i].bAtomType = new
+                BivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()),
+                109.47*Deg2Rad);
+              bAtomList[i].setAtomicNumber(16);
+            }
+            bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
+        }
+        // Atoms with three bonds
+        else if (bAtomList[i].nbonds == 3){
+            if(toupper(bAtomList[i].elem) == 'C'){
+              bAtomList[i].bAtomType = new
+                TrivalentAtom(bAtomList[i].name, Element(6, "Carbon", "C", bAtomList[i].getMass()),
+                  120*Deg2Rad, 120*Deg2Rad
+                );
+              bAtomList[i].setAtomicNumber(6);
+            }
+            else if(toupper(bAtomList[i].elem) == 'O'){
+              bAtomList[i].bAtomType = new
+                TrivalentAtomTetra(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(8);
+            }
+            else if(toupper(bAtomList[i].elem) == 'N'){
+              bAtomList[i].bAtomType = new
+                TrivalentAtomTetra(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(7);
+            }
+            else if(toupper(bAtomList[i].elem) == 'S'){
+              bAtomList[i].bAtomType = new
+                TrivalentAtomTetra(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(16);
+            }
+            else if(toupper(bAtomList[i].elem) == 'P'){
+              bAtomList[i].bAtomType = new
+                TrivalentAtomTetra(bAtomList[i].name,  Element(15, "Phosphorus", "P", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(15);
+            }
+            bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
+        }
+        // Atoms with four bonds
+        else if (bAtomList[i].nbonds == 4){
+            if(toupper(bAtomList[i].elem) == 'C'){
+              bAtomList[i].bAtomType = new
+                QuadrivalentAtom(bAtomList[i].name,  Element(6, "Carbon", "C", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(6);
+            }
+            else if(toupper(bAtomList[i].elem) == 'O'){
+              bAtomList[i].bAtomType = new
+                QuadrivalentAtom(bAtomList[i].name,  Element(8, "Oxygen", "O", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(8);
+            }
+            else if(toupper(bAtomList[i].elem) == 'N'){
+              bAtomList[i].bAtomType = new
+                QuadrivalentAtom(bAtomList[i].name,  Element(7, "Nitrogen", "N", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(7);
+            }
+            else if(toupper(bAtomList[i].elem) == 'S'){
+              bAtomList[i].bAtomType = new
+                QuadrivalentAtom(bAtomList[i].name,  Element(16, "Sulfur", "S", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(16);
+            }
+            else if(toupper(bAtomList[i].elem) == 'P'){
+              bAtomList[i].bAtomType = new
+                QuadrivalentAtom(bAtomList[i].name,  Element(15, "Phosphorus", "P", bAtomList[i].getMass()));
+              bAtomList[i].setAtomicNumber(15);
+            }
+            bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
+        }
+  
+        bZeroCharArray(bAtomList[i].biotype, 20);
+        sprintf(bAtomList[i].biotype, "%s_%s", \
+          bAtomList[i].name, bAtomList[i].fftype);
+
+    } // Finish assigning Compound::SingleAtom
+
+    /* Just checking *////////
+    std::cout<<"Checking after bMoleculeReader\n";
+    for(int i=0; i<amberReader->getNumberAtoms();i++){
+        bAtomList[i].Print();
+    }
+    for(int i=0; i<amberReader->getNumberBonds(); i++){ // EU
+        std::cout<<"bond: "<<bonds[i].i<<" "<<bonds[i].j<<std::endl;
+        fflush(stdout);
+    }
+    ///////////////////////////
+
+    if (bAtomList == NULL){
+      std::cout<<"bMoleculeReader constructor exit: NULL bAtomList\n";fflush(stdout);
+    }
+    else{
+      std::cout<<"bMoleculeReader constructor: bAtomList not NULL\n";fflush(stdout);
+    }
+    
+}
+
+
 /**
  ** Interface **
  **/
@@ -227,9 +584,9 @@ void Topology::build(
 {
     std::cout << "TOPOLOGY BUILD" << std::endl;
 
-    this->natms = natoms;
+    this->natoms = natoms;
     this->bAtomList = bAtomList;
-    this->nbnds = nbonds;
+    this->nbonds = nbonds;
     this->bonds = bonds;
     this->regimenSpec = regimenSpec;
 

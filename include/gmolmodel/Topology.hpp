@@ -8,6 +8,7 @@
  */
 
 #include "bMoleculeReader.hpp"
+#include "TrivalentAtomTetra.hpp"
 #include "server.hpp"
 
 #ifndef MAIN_RESIDUE_DEBUG_SPECIFIC
@@ -55,6 +56,9 @@ public:
     /** Get the number of atoms. **/
     int getNAtoms(void) const;
 
+    /** Reads data from a specific reader (readAmberInput for now) object **/
+    void loadAtomAndBondInfoFromReader(readAmberInput *amberReader);
+
     /** Get the number of bonds. **/
     int getNBonds(void) const;
 
@@ -100,9 +104,9 @@ public:
     // Build Molmodel Compound
     void build(
         SimTK::DuMMForceFieldSubsystem &dumm,
-        int natms,
+        int natoms,
         bSpecificAtom *bAtomList,
-        int nbnds,
+        int nbonds,
         bBond *bonds,
         std::string flexFN="ligand.flex",
         std::string regimenSpec="IC"
@@ -139,11 +143,12 @@ public:
 public:
 
     bool hasBuiltSystem;
-    int natms;
+    int natoms;
     bSpecificAtom *bAtomList;
-    int nbnds; // EU
+    int nbonds; // EU
     bBond *bonds; // EU
     std::string regimenSpec;
+    unsigned int MAX_LINE_LENGTH;
 
 private:
 

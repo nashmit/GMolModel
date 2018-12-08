@@ -17,6 +17,7 @@ using namespace SimTK;
  *  Trivalent Atom Class with tetrahedral geometry.
  *  Bond centers are named "bond1", "bond2", and "bond3"
  ****/
+/*
 TrivalentAtomTetra::TrivalentAtomTetra(
         const Compound::AtomName& atomName,   ///< name for new atom
         const Element& element   ///< chemical element for new atom
@@ -33,7 +34,7 @@ TrivalentAtomTetra::TrivalentAtomTetra(
   setInboardBondCenter("bond1");
   setCompoundName("TrivalentAtomTetra"); // overridden
 }
-
+*/
 
 /****
  * bPDBReader

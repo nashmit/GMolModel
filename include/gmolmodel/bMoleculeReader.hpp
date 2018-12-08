@@ -17,6 +17,7 @@
 #include "bSpecificAtom.hpp"
 #include "bBond.hpp"
 #include "readAmberInput.hpp"
+#include "TrivalentAtomTetra.hpp"
 
 /*
 */
@@ -35,7 +36,7 @@
  * Trivalent Atom Class with tetrahedral geometry.
  * Bond centers are named "bond1", "bond2", and "bond3"
 **/
-
+/*
 class  TrivalentAtomTetra : public SimTK::Compound::SingleAtom {
  public:
   TrivalentAtomTetra(
@@ -43,7 +44,7 @@ class  TrivalentAtomTetra : public SimTK::Compound::SingleAtom {
     const SimTK::Element& element              /// element for new atom
   );
 };
-
+*/
 
 //==============================================================================
 //                           CLASS PDBReader

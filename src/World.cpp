@@ -206,7 +206,7 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
         << forceField->getNumNonbondAtoms() << std::endl << std::flush;
     std::cout << "getVdwGlobalScaleFactor() " 
         << forceField->getVdwGlobalScaleFactor() << std::endl << std::flush;
-    for(int i = 0; i < (topologies.back())->natms; i++){
+    for(int i = 0; i < (topologies.back())->natoms; i++){
         std::cout << " DuMM VdW Radius " 
             << forceField->getVdwRadius(((topologies.back())->bAtomList[i]).getAtomClassIndex())
             << " DuMM VdW Well Depth "
