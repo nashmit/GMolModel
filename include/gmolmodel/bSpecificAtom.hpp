@@ -47,6 +47,11 @@ public:
     float z;
     char biotype[20];
     SimTK::BiotypeIndex biotypeIndex;
+
+    // We need this to be a pointer because we don't know it's size at
+    // initializetion. It could be Univalent, Bivalent, TrivalentAtom.
+    // The size of this variable will be known  after Topology loads info
+    // from an inputReader
     SimTK::Compound::SingleAtom *bAtomType;
     SimTK::Compound::AtomIndex atomIndex;
     int mobile;
@@ -76,9 +81,9 @@ public:
     char getElem(void);
     SimTK::mdunits::Mass getMass(void);
     void setMass(SimTK::Real);
-    SimTK::Real getX(void);
-    SimTK::Real getY(void);
-    SimTK::Real getZ(void);
+    SimTK::Real getX(void) const;
+    SimTK::Real getY(void) const;
+    SimTK::Real getZ(void) const;
     std::string getFftype(void);
     SimTK::DuMM::AtomClassIndex getAtomClassIndex(void);
     void setAtomClassIndex(SimTK::DuMM::AtomClassIndex);

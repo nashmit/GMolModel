@@ -47,64 +47,28 @@ objects **/
 class Topology : public SimTK::Compound{
 public:
 
-    /** Default Constructor **/
+    /** Default Constructor. Sets the name of this molecule to 'no_name '.
+    The name has no particular function and is not guaranteed to be unique.**/
     Topology();
 
     /** Constructor that sets the name of the molecule. The name has no 
     particular function and is not guaranteed to be unique. **/
     Topology(std::string nameOfThisMolecule);
 
-    /** Default Destructor **/
+    /** Default Destructor. **/
     virtual ~Topology();
 
-    // Conveninet functions (Pointers have to be allocated first).
-    //SimTK::Real bDihedral(SimTK::Vec3, SimTK::Vec3, SimTK::Vec3, SimTK::Vec3);
+    /** Reads data from a specific reader (readAmberInput for now) object **/
+    void loadAtomAndBondInfoFromReader(readAmberInput *amberReader);
+
+    /** Adds force field parameters read by the inputReader to DuMM **/
     void bAddAllParams(
         std::string resName
         , readAmberInput *amberReader
         , SimTK::DuMMForceFieldSubsystem& dumm
-        //, bSpecificAtom *bAtomList
-        //, bBond *bonds
     );
-    void bAddBiotypes(
-        std::string resName
-        , readAmberInput *amberReader
-        , SimTK::DuMMForceFieldSubsystem& dumm
-        //, bSpecificAtom *bAtomList
-        //, bBond *bonds
-    );
-    void bAddAtomClasses(
-        std::string resName
-        , readAmberInput *amberReader
-        , SimTK::DuMMForceFieldSubsystem& dumm
-        //, bSpecificAtom *bAtomList
-        //, bBond *bonds
-    );
-    void bAddBondParams(
-        std::string resName
-        , readAmberInput *amberReader
-        , SimTK::DuMMForceFieldSubsystem& dumm
-        //, bSpecificAtom *bAtomList
-        //, bBond *bonds
-    );
-    void bAddAngleParams(
-        std::string resName
-        , readAmberInput *amberReader
-        , SimTK::DuMMForceFieldSubsystem& dumm
-        //, bSpecificAtom *bAtomList
-        //, bBond *bonds
-    );
-    void bAddTorsionParams(
-        std::string resName
-        , readAmberInput *amberReader
-        , SimTK::DuMMForceFieldSubsystem& dumm
-        //, bSpecificAtom *bAtomList
-        //, bBond *bonds
-    );
-
 
     // Interface:
-
     /** Get the name of this molecule **/
     std::string getname(void){return this->name;}
 
@@ -113,9 +77,6 @@ public:
 
     /** Get the number of atoms. **/
     int getNAtoms(void) const;
-
-    /** Reads data from a specific reader (readAmberInput for now) object **/
-    void loadAtomAndBondInfoFromReader(readAmberInput *amberReader);
 
     /** Get the number of bonds. **/
     int getNBonds(void) const;
@@ -151,23 +112,13 @@ public:
 
     void writePdb(std::string dirname, std::string prefix, std::string sufix, int maxNofDigits, int index) const;
 
-    // Graph building functions
-    // Process a graph node
-    //void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses, int baseAtomNumber);
-    void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode);
-
-    // Construct the molecule topology
-    void walkGraph(bSpecificAtom *root);
-
-    // Build Molmodel Compound
+    /** Builds the Compound's tree, closes the rings, matches the configuration
+    on the graph using using Molmodels matchDefaultConfiguration and sets the
+    general flexibility of the molecule. **/
     void build(
-        SimTK::DuMMForceFieldSubsystem &dumm,
-        int natoms,
-        bSpecificAtom *bAtomList,
-        int nbonds,
-        bBond *bonds,
-        std::string flexFN="ligand.flex",
-        std::string regimenSpec="IC"
+        SimTK::DuMMForceFieldSubsystem &dumm
+        , std::string flexFN="ligand.flex"
+        , std::string regimenSpec="IC"
     );
 
     void setRegimen(std::string argRegimen, std::string flexFN);
@@ -201,10 +152,15 @@ public:
 public:
 
     bool hasBuiltSystem;
+
     int natoms;
-    bSpecificAtom *bAtomList;
+    //RE bSpecificAtom *bAtomList;
+    std::vector<bSpecificAtom > bAtomList; // RE
+
     int nbonds;
-    bBond *bonds; 
+    //bBond *bonds; 
+    std::vector<bBond > bonds; // RE
+
     std::string regimenSpec;
     unsigned int MAX_LINE_LENGTH;
 
@@ -221,6 +177,54 @@ private:
     std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > aIx2mbx;
     //std::map< SimTK::Compound::AtomIndex, int > aIx2number;
     std::map< SimTK::Compound::BondIndex, int > bondIx2bond;
+
+    /** Biotype is a Molmodel hook that is usually used to look up molecular
+    force field specific parameters for an atom type. Gmolmodel defines a 
+    new Biotype for each atom. The only thing that is specified is the element
+    with info about name, atomic number, valence and mass. **/
+    void bAddBiotypes(
+        std::string resName
+        , readAmberInput *amberReader
+        , SimTK::DuMMForceFieldSubsystem& dumm
+    );
+
+    /** It calls DuMMs defineAtomClass, defineChargedAtomTye and
+    setBiotypeChargedAtomType for every atom. These Molmodel functions contain
+    information regarding the force field parameters. **/
+    void bAddAtomClasses(
+        std::string resName
+        , readAmberInput *amberReader
+        , SimTK::DuMMForceFieldSubsystem& dumm
+    );
+
+    /** Calls DuMM defineBondStretch. **/
+    void bAddBondParams(
+        std::string resName
+        , readAmberInput *amberReader
+        , SimTK::DuMMForceFieldSubsystem& dumm
+    );
+
+    /** Calls DuMM defineBondBend. **/
+    void bAddAngleParams(
+        std::string resName
+        , readAmberInput *amberReader
+        , SimTK::DuMMForceFieldSubsystem& dumm
+    );
+
+    /** Calls DuMM defineBondTorsion for 1, 2 and 3 periodicities **/
+    void bAddTorsionParams(
+        std::string resName
+        , readAmberInput *amberReader
+        , SimTK::DuMMForceFieldSubsystem& dumm
+    );
+
+    /** Graph building functions
+    // Process a graph node **/
+    //void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses, int baseAtomNumber);
+    void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode);
+
+    // Construct the molecule topology
+    void walkGraph(bSpecificAtom *root);
 
 };
 

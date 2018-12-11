@@ -20,12 +20,10 @@ bSpecificAtom::bSpecificAtom(){
     charge = 0.0;
 }
 
-// Incomplete
+/** We do not deallocate bAtomType here. We leave this task to the Topology
+class that owns this atom in order to allow the number of atoms connected to
+this to change (e.g. semi-grand canonical ensemble). **/
 bSpecificAtom::~bSpecificAtom(){
-    //std::cout << "bSpecificAtom destructor neighbors vector clear" << std::endl;
-    //std::cout << "bSpecificAtom destructor bondsInvolved vector clear" << std::endl;
-    //neighbors.clear();
-    //bondsInvolved.clear();
 }
 
 // Init function
@@ -114,19 +112,19 @@ char bSpecificAtom::getElem(void)
 }
 
 // Returns X Cartesian coordinate
-SimTK::Real bSpecificAtom::getX(void)
+SimTK::Real bSpecificAtom::getX(void) const
 {
     return this->x;
 }
 
 // Returns Y Cartesian coordinate
-SimTK::Real bSpecificAtom::getY(void)
+SimTK::Real bSpecificAtom::getY(void) const
 {
     return this->y;
 }
 
 // Returns Z Cartesian coordinate
-SimTK::Real bSpecificAtom::getZ(void)
+SimTK::Real bSpecificAtom::getZ(void) const
 {
     return this->z;
 }

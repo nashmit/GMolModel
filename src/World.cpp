@@ -203,9 +203,11 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
     //RE     , (moleculeReaders.back())->bAtomList, (moleculeReaders.back())->nbonds
     //RE    , (moleculeReaders.back())->bonds, flexFN, regimenSpec);
 
-    (topologies.back())->build(*forceField, (topologies.back())->natoms //RE
-        , (topologies.back())->bAtomList, (topologies.back())->nbonds //RE
-        , (topologies.back())->bonds, flexFN, regimenSpec); //RE
+    (topologies.back())->build(*forceField
+        //, (topologies.back())->natoms //RE
+        //, (topologies.back())->bAtomList, (topologies.back())->nbonds //RE
+        //, (topologies.back())->bonds
+        , flexFN, regimenSpec); //RE
 
     // Allocate the vector of coordinates (DCD)
     Xs.resize(Xs.size() + topologies.back()->getNAtoms());

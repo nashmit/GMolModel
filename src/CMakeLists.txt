@@ -121,7 +121,7 @@ set(LIBGMOLMODEL_SRC
         ConformationalSearch.cpp # LAUR
         GirolamiSampler.cpp # LAUR
         HMCSOA.cpp # LAUR
-	      bAddParams.cpp
+	      #bAddParams.cpp
 	      Topology.cpp
 	      #bMoleculeReader.cpp
 	      World.cpp
