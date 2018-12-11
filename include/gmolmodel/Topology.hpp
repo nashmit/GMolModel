@@ -24,16 +24,26 @@
 #define MAIN_RESIDUE_DEBUG_LEVEL02
 #endif
 
+#ifndef DEBUG_PARAMS_LEVEL01
+#define DEBUG_PARAMS_LEVEL01
+#endif
+
+#ifndef DEBUG_PARAMS_LEVEL02
+#define DEBUG_PARAMS_LEVEL02
+#endif
+
 /** Topological information (bonds graph) for one molecule.
- * It maps to one compound in Molmodel thus it is derived 
- * from Molmodel Compound class.
- * Has two main functionalities:
+It maps to one compound in Molmodel thus it is derived 
+from Molmodel Compound class.
+It does  things:
+   - loads information from input files such as Amber input prmtop / inpcrd
+   - adds parameters to a DuMM force field which belongs to the World class
+     because one DuMM class should be used for multiple molecules
    - contructs the graph based on a list of bSpecificAtom objects each of 
-     which already contains bonding information from the inmput files
-   - defines the rigid bodies.
- * Contains a list of atoms bAtomList which consists of bSpecificAtom 
- * objects 
- **/
+     which already contains bonding information from the input files
+   - defines the rigid bodies based on imput files provided by the users.
+Contains a list of atoms bAtomList which consists of bSpecificAtom 
+objects **/
 class Topology : public SimTK::Compound{
 public:
 
@@ -46,6 +56,52 @@ public:
 
     /** Default Destructor **/
     virtual ~Topology();
+
+    // Conveninet functions (Pointers have to be allocated first).
+    //SimTK::Real bDihedral(SimTK::Vec3, SimTK::Vec3, SimTK::Vec3, SimTK::Vec3);
+    void bAddAllParams(
+        std::string resName
+        , readAmberInput *amberReader
+        , SimTK::DuMMForceFieldSubsystem& dumm
+        //, bSpecificAtom *bAtomList
+        //, bBond *bonds
+    );
+    void bAddBiotypes(
+        std::string resName
+        , readAmberInput *amberReader
+        , SimTK::DuMMForceFieldSubsystem& dumm
+        //, bSpecificAtom *bAtomList
+        //, bBond *bonds
+    );
+    void bAddAtomClasses(
+        std::string resName
+        , readAmberInput *amberReader
+        , SimTK::DuMMForceFieldSubsystem& dumm
+        //, bSpecificAtom *bAtomList
+        //, bBond *bonds
+    );
+    void bAddBondParams(
+        std::string resName
+        , readAmberInput *amberReader
+        , SimTK::DuMMForceFieldSubsystem& dumm
+        //, bSpecificAtom *bAtomList
+        //, bBond *bonds
+    );
+    void bAddAngleParams(
+        std::string resName
+        , readAmberInput *amberReader
+        , SimTK::DuMMForceFieldSubsystem& dumm
+        //, bSpecificAtom *bAtomList
+        //, bBond *bonds
+    );
+    void bAddTorsionParams(
+        std::string resName
+        , readAmberInput *amberReader
+        , SimTK::DuMMForceFieldSubsystem& dumm
+        //, bSpecificAtom *bAtomList
+        //, bBond *bonds
+    );
+
 
     // Interface:
 
@@ -147,8 +203,8 @@ public:
     bool hasBuiltSystem;
     int natoms;
     bSpecificAtom *bAtomList;
-    int nbonds; // EU
-    bBond *bonds; // EU
+    int nbonds;
+    bBond *bonds; 
     std::string regimenSpec;
     unsigned int MAX_LINE_LENGTH;
 

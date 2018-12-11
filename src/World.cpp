@@ -192,9 +192,12 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
     (topologies.back())->loadAtomAndBondInfoFromReader(amberReader); // RE
 
     // Add parameters from amberReader //RE
-    bAddAllParams(std::string("lig") + std::to_string(moleculeCount) //RE
-       , amberReader, *forceField, (topologies.back())->bAtomList //RE
-       , (topologies.back())->bonds); //RE
+    //bAddAllParams(std::string("lig") + std::to_string(moleculeCount) //RE
+    //   , amberReader, *forceField, (topologies.back())->bAtomList //RE
+    //   , (topologies.back())->bonds); //RE
+  
+    (topologies.back())->bAddAllParams(std::string("lig") + std::to_string(moleculeCount) //RERE
+       , amberReader, *forceField); //RERE
   
     //RE (topologies.back())->build(*forceField, (moleculeReaders.back())->natoms
     //RE     , (moleculeReaders.back())->bAtomList, (moleculeReaders.back())->nbonds
