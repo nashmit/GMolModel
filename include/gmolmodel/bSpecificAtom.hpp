@@ -132,18 +132,6 @@ public:
 // Update Molmodel MolAtom dest with Gmolmodel bSpecificAtom src values
 int bAtomAssign(MolAtom *dest, const bSpecificAtom *src);
 
-
-/*
-// Process a graph node
-void process_node(bSpecificAtom *node, int CurrentGeneration);
-
-// Construct the molecule topology
-void walkGraph(bSpecificAtom *root);
-*/
-
-
-
-
 #endif  //__BSPECIFICATOM__
 
 

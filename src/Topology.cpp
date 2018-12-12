@@ -621,11 +621,12 @@ bBond * Topology::getBond(int, int) const{assert(!"Not implemented.");}
 int Topology::getBondOrder(int, int) const{assert(!"Not implemented.");}
 
 
-/**
- * Main functions *
- **/
+/** The following functions are used to build the molecular graph using bonding
+information from bonds list and bondsInvolved list of each atom in bAtomList.
+**/
 
-/** Process a graph node **/
+
+/** Recursive function **/
 void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode)
 {
     baseSetFlag = 0;
@@ -653,7 +654,6 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
                 if( baseSetFlag == 0 ){
                     std::cout << "Set base atom" << std::endl;
                     this->setBaseAtom( *(previousNode->bAtomType) );
-                    //this->setAtomBiotype(previousNode->name, (this->name), previousNode->biotype);
                     this->setAtomBiotype(previousNode->name, (this->name), previousNode->getName());
                     this->convertInboardBondCenterToOutboard();
                     baseSetFlag = 1;
@@ -749,7 +749,6 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
     std::cout << " start checking neighbors " << std::endl;
     unsigned int i;
     for(i = 0; i < (node->neighbors).size(); i++) {
-        //process_node( (node->neighbors)[i], CurrentGeneration, previousNode, nofProcesses, baseAtomNumber );
         process_node( (node->neighbors)[i], CurrentGeneration, previousNode);
     }
 
@@ -762,7 +761,6 @@ void Topology::process_node(bSpecificAtom *node, int CurrentGeneration, bSpecifi
 }
 
 // Construct the molecule topology
-//void Topology::walkGraph(bSpecificAtom *root, int baseAtomNumber)
 void Topology::walkGraph(bSpecificAtom *root)
 {
     nofProcesses = 0;

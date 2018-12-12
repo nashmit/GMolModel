@@ -376,51 +376,6 @@ int bAtomAssign(MolAtom *dest, const bSpecificAtom *src)
   return 0;
 }
 
-/*
-// Process a graph node
-void process_node(bSpecificAtom *node, int CurrentGeneration, int previousNode)
-{
-    std::cout << " switch to " << node->number << std::endl;
-
-    if (node->visited == CurrentGeneration) {
-        return;
-    }
-
-    std::cout << " update generation " << std::endl;
-    std::cout << " left bond " << previousNode << ' ' << node->number << std::endl;
-    // Mark bond
-    for(std::vector<bBond *>::iterator it = (node->bondsInvolved).begin();
-    it != (node->bondsInvolved).end(); ++it){
-        if ((*it)->isThisBond(node->number, previousNode) ){
-            (*it)->setVisited(CurrentGeneration);
-            break;
-        }
-    }
-    // ========
-    previousNode = node->number;
-
-    node->visited = CurrentGeneration;
-
-    std::cout << " start checking neighbors " << std::endl;
-    unsigned int i;
-    for(i = 0; i < (node->neighbors).size(); i++) {
-        process_node( (node->neighbors)[i], CurrentGeneration, previousNode );
-    }
-
-    std::cout << " end processing " << node->number << std::endl;
-}
-
-// Construct the molecule topology
-void walkGraph(bSpecificAtom *root)
-{
-    int CurrentGeneration = 0;
-    CurrentGeneration += 1;
-    static int previousNode = root->number;
-    process_node(root, CurrentGeneration, previousNode);
-    std::cout << std::endl;
-}
-*/
-
 
 
 

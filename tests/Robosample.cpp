@@ -387,8 +387,8 @@ int main(int argc, char **argv)
                     }
 
                 }else{ // if ADAPT false
-                    std::cout << "avgU " << avgU << ' ' << dU << ' ';
-                    std::cout << " (2) 0 " << std::endl;
+                    //std::cout << "avgU " << avgU << ' ' << dU << ' ';
+                    //std::cout << " (2) 0 " << std::endl;
                 }
             } // END if mc_step 100
             // END Adaptive mixing
