@@ -142,9 +142,13 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool rand
 {
     // Seed the random number generator
     if(reproducible){
+        long int seed = nofSamples;
         randomEngine.seed( nofSamples );
+        std::cout << "SEED: " << seed << std::endl;
     }else{
+        long int seed = std::time(0);
         randomEngine.seed( std::time(0) );
+        std::cout << "SEED: " << seed << std::endl;
     }
 
     // After an event handler has made a discontinuous change to the 
