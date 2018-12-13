@@ -2,18 +2,21 @@ MOLECULES buta                  # Molecules to load
 WORLDS IC TD                       # Regimen (IC, TD, MIX, RB, RBMIX)
 SAMPLER HMC HMC            # HMC or MC
 THERMOSTAT None None        # Thermostat (HMC + Andersen = MD)
-ROUNDS 300                    # Teodor: MC steps (Acception-rejection steps)
-TIMESTEPS 0.001 0.002                # Timesteps to be used with regimens
-MDSTEPS  10 4    # Teodor: Number of MD trial steps
-SAMPLES_PER_ROUND 1 3   # Teodor (plan secund): Number of MC trials within a mixing round
-TEMPERATURE  1000 1000      # Temperature for constant temperature simulations
+ROUNDS 50                   # MC steps (Acception-rejection steps)
+TIMESTEPS 0.002 0.004                # Timesteps to be used with regimens
+MDSTEPS  40 40   # Number of MD trial steps
+SAMPLES_PER_ROUND 1 1  # Number of MC trials within a mixing round
+TEMPERATURE  300 300       # Temperature for constant temperature simulations
 FFSCALE AMBER AMBER        # Force field scale factors
 GBSA 0.0 0.0              # GBSA scale factor
 FIXMAN_POTENTIAL FALSE TRUE # Use Fixman potential
 FIXMAN_TORQUE FALSE TRUE          # Use Fixman torque
+#VISUAL TRUE TRUE                 # Use the visualizer
 VISUAL FALSE FALSE                 # Use the visualizer
 WRITEPDBS FALSE FALSE      # Write pdbs
-GEOMETRY TRUE TRUE        # Calculate geometric features
-DIHEDRAL 10 0 3 6
+GEOMETRY FALSE FALSE                # Calculate geometric features
+DIHEDRAL 4 5 7 13 5 7 13 14
 REPRODUCIBLE FALSE FALSE
 THREADS 1 1
+
+ADAPT_SAMPLE_RATIO FALSE    # Adaptive sample ratio adjustment
