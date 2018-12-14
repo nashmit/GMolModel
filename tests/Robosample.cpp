@@ -395,16 +395,16 @@ int main(int argc, char **argv)
 
     
             // Write pdb
-            if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
-                //if(!((mc_step+1) % 20)){
-                if(1){
+            if( std::stoi(setupReader.getValues("WRITEPDBS")[0]) != 0){
+                if(((round) % std::stoi(setupReader.getValues("WRITEPDBS")[0])) == 0){
+                //if(1){
                     (context->updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
-                    //std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
                     for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
                         ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, round);
                     }
                 }
             } // if write pdbs
+
         } // for i in worlds
     } // for i in rounds
 

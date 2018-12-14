@@ -2,7 +2,7 @@ MOLECULES buta                  # Molecules to load
 WORLDS IC TD                       # Regimen (IC, TD, MIX, RB, RBMIX)
 SAMPLER HMC HMC            # HMC or MC
 THERMOSTAT None None        # Thermostat (HMC + Andersen = MD)
-ROUNDS 50                   # MC steps (Acception-rejection steps)
+ROUNDS 1000                   # MC steps (Acception-rejection steps)
 TIMESTEPS 0.002 0.004                # Timesteps to be used with regimens
 MDSTEPS  40 40   # Number of MD trial steps
 SAMPLES_PER_ROUND 1 1  # Number of MC trials within a mixing round
@@ -13,7 +13,7 @@ FIXMAN_POTENTIAL FALSE TRUE # Use Fixman potential
 FIXMAN_TORQUE FALSE TRUE          # Use Fixman torque
 #VISUAL TRUE TRUE                 # Use the visualizer
 VISUAL FALSE FALSE                 # Use the visualizer
-WRITEPDBS FALSE FALSE      # Write pdbs
+WRITEPDBS 100 100      # Write pdbs
 GEOMETRY FALSE FALSE                # Calculate geometric features
 DIHEDRAL 4 5 7 13 5 7 13 14
 REPRODUCIBLE FALSE FALSE
