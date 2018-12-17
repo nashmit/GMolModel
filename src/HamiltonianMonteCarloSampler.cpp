@@ -142,8 +142,8 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool rand
 {
     // Seed the random number generator
     if(reproducible){
-        long int seed = nofSamples;
-        randomEngine.seed( nofSamples );
+        long int seed = 1;
+        randomEngine.seed( seed );
         std::cout << "SEED: " << seed << std::endl;
     }else{
         long int seed = std::time(0);
@@ -577,7 +577,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 
     std::cout << someState.getNU() << ' ' << accepted << ' ' 
       //<< getSetPE() + getREP() << ' ' << getLastAcceptedKE() 
-      << getSetPE() << ' ' << getLastAcceptedKE() 
+      << pe_o << ' '<< getSetPE() << ' ' << getLastAcceptedKE() 
       << ' ' << getSetFixman() << ' ' << fix_o << ' ' << fix_n << ' ';
 
     // Keep track of how many MC trials have been done 

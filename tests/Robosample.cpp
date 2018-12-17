@@ -5,12 +5,17 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <chrono>
 #include "simmain.hpp"
 #include "Robo.hpp"
 
 #include "HamiltonianMonteCarloSampler.hpp"
 #include "readAmberInput.hpp"
 #include "SetupReader.hpp"
+
+//#ifndef ROBO_DEBUG_LEVEL01
+//#define ROBO_DEBUG_LEVEL01
+//#endif
 
 int main(int argc, char **argv)
 {
@@ -269,15 +274,13 @@ int main(int argc, char **argv)
             SimTK::State& currentAdvancedState = (context->updWorld(currentWorldIx))->integ->updAdvancedState();
     
             currentAdvancedState = (context->updWorld(currentWorldIx))->setAtomsLocationsInGround(
-                currentAdvancedState, (context->updWorld(context->worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
+               currentAdvancedState, (context->updWorld(context->worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
     
             // Set old potential energy of the new world
             (context->updWorld(currentWorldIx))->updSampler(0)->setOldPE( (context->updWorld(context->worldIndexes.back()))->updSampler(0)->getSetPE() );
     
             // Reinitialize current sampler
-            context->updWorld(currentWorldIx)->updSampler(0)->reinitialize( currentAdvancedState
-//r                , SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) 
-            );
+            context->updWorld(currentWorldIx)->updSampler(0)->reinitialize( currentAdvancedState);
     
             // INCORRECT !!
             if(setupReader.getValues("WORLDS")[context->worldIndexes.back()] == "IC"){
@@ -295,6 +298,12 @@ int main(int argc, char **argv)
             for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){ // Iterate through samples
                 context->updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, context->getNofMDStepsPerSample(currentWorldIx));
                 //context->updWorld(currentWorldIx)->updSampler(0)->perturbQ(currentAdvancedState);
+
+                
+                #ifdef ROBO_DEBUG_LEVEL01
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000)); 
+                #endif
+
                 ++mc_step;
                 ++restore_mc_step;
     
