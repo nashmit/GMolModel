@@ -405,11 +405,11 @@ int main(int argc, char **argv)
     
             // Write pdb
             if( std::stoi(setupReader.getValues("WRITEPDBS")[0]) != 0){
-                if(((round) % std::stoi(setupReader.getValues("WRITEPDBS")[0])) == 0){
+                if(((mc_step) % std::stoi(setupReader.getValues("WRITEPDBS")[0])) == 0){
                 //if(1){
                     (context->updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
                     for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                        ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, round);
+                        ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
                     }
                 }
             } // if write pdbs

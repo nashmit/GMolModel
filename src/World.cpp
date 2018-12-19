@@ -807,12 +807,20 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
                 SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
                     SimTK::DuMM::AtomIndex dAIx = topologies[i]->getDuMMAtomIndex(aIx);
+
+                    // Set station_B
                     forceField->bsetAtomStationOnBody( dAIx, locs[int(aIx)] );
+                    forceField->bsetAllAtomStationOnBody( dAIx, locs[int(aIx)] ); // full
+
+                    // Set included atom
                     forceField->updIncludedAtomStation(dAIx) = (locs[int(aIx)]);
+                    forceField->updAllAtomStation(dAIx) = (locs[int(aIx)]); // full
+
+                    // Atom placements in clusters
                     forceField->bsetAtomPlacementStation(dAIx, mbx, locs[int(aIx)] );
             }
         
-            // Set X_PF and Q - Bottleneck!
+            // Set X_PF and Q - Bottleneck! RESTORE RE
 /*
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
                 SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
@@ -829,6 +837,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 */
  
             // TRACE ----------------------------------------------------------
+/*
             this->compoundSystem->realize(someState, SimTK::Stage::Position);
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
                 SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
@@ -851,9 +860,11 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
                 std::cout << "mbx: " << int(mbx) << " BAt_X_M0:" // std::endl << ' ' 
                   << BAt_X_M0[int(mbx)] ; //<< std::endl;
             }
+*/
             // END TRACE -----------------------------------------------------
 
             // NEW
+///*
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
                 SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
 
@@ -863,7 +874,10 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
                 SimTK::Transform defaultP_X_F, defaultF_X_M;
                 if(int(mbx) == 1){ // This is dangerous TODO
+
                     defaultP_X_F = P_X_M[int(mbx)];
+
+                    //defaultF_X_M = SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::ZAxis);
 
                     SimTK::Transform neededF_X_M = invCurrentP_X_F * defaultP_X_F * defaultF_X_M;
                     (mobod).setQToFitTransform(someState, neededF_X_M);
@@ -877,6 +891,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
                 }
 
             }
+//*/
             // END NEW
 
         } // END TD regimen and all regimens
