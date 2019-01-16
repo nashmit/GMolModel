@@ -169,7 +169,7 @@ int main(int argc, char **argv)
                 << " initial const state PE: " << std::setprecision(20)
                 //<< (context->updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy((updWorld(worldIx))->integ->updAdvancedState())
                 << (context->updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy(context->updAdvancedState(worldIx, samplerIx))
-                << " useFixmanPotential = " << context->updWorld(worldIx)->updSampler(0)->isUsingFixmanPotential()
+                << " useFixmanPotential = " << context->updWorld(worldIx)->updSampler(samplerIx)->isUsingFixmanPotential()
                 << std::endl;
         }
 

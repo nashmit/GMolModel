@@ -552,6 +552,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
         // Different regimens have different strategies
         if(topologies[i]->getRegimen() == "IC"){
+            std::cout << std::endl << "World IC" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
             std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
@@ -720,6 +721,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
         // END RB regimen
         }else if(topologies[i]->getRegimen() == "TD"){
+            std::cout << std::endl << "World TD" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
             std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
@@ -855,6 +857,7 @@ END NEW */
                     forceField->bsetAllAtomStationOnBody( dAIx, locs[int(aIx)] ); // full
 
                     // Set included atom
+                    //std::cout << "World setAtomLocations: updIncludedAtomStation(" << dAIx << ")" << std::endl;
                     forceField->updIncludedAtomStation(dAIx) = (locs[int(aIx)]);
                     forceField->updAllAtomStation(dAIx) = (locs[int(aIx)]); // full
 
