@@ -498,7 +498,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     }
 
     //SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
-    std::cout << "Multibody PE " << getPEFromEvaluator(someState) << ' ' ; // OPENMM
+    //std::cout << "Multibody PE " << getPEFromEvaluator(someState) << ' ' ; // OPENMM
     SimTK::Real pe_n = dumm->CalcFullPotEnergyIncludingRigidBodies(someState); // ELIZA FULL
 
     system->realize(someState, SimTK::Stage::Velocity);

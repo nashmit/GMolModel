@@ -552,7 +552,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
         // Different regimens have different strategies
         if(topologies[i]->getRegimen() == "IC"){
-            std::cout << std::endl << "World IC" << std::endl << std::flush;
+            //std::cout << std::endl << "World IC" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
             std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
@@ -721,7 +721,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
         // END RB regimen
         }else if(topologies[i]->getRegimen() == "TD"){
-            std::cout << std::endl << "World TD" << std::endl << std::flush;
+            //std::cout << std::endl << "World TD" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
             std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
@@ -746,6 +746,11 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
             */
+
+            std::ostream objOstream (std::cout.rdbuf());
+            topologies[i]->writeDefaultPdb(objOstream);
+            
+
 
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();

@@ -19,8 +19,6 @@
 
 int main(int argc, char **argv)
 {
-    std::cout << "SimTK::InvalidIndex = |" << SimTK::InvalidIndex << "|" << std::endl;
-
     // Initialize setup reader
     SetupReader setupReader(argv[1]);
     std::cout << "SETUP" << std::endl;
