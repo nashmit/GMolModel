@@ -746,11 +746,10 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
             */
-
+            /*
             std::ostream objOstream (std::cout.rdbuf());
             topologies[i]->writeDefaultPdb(objOstream);
-            
-
+            */
 
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();
@@ -801,42 +800,6 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             }
 //END RESTORE RE */
         
-/* NEW        
-            // Iterate through atoms - get P_X_M for all the bodies
-            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
-                if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
-                    // Get body, parentBody, parentAtom
-                    SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
-                    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-                    const SimTK::MobilizedBody& parentMobod =  mobod.getParentMobilizedBody();
-                    SimTK::MobilizedBodyIndex parentMbx = parentMobod.getMobilizedBodyIndex();
-
-                    //std::cout << "atom " << aIx << " mobod (" << mbx  
-                    //    << " parent mobod  ("<< parentMbx << ")" << std::endl;
-
-                    if(parentMobod.getMobilizedBodyIndex() != 0){ // parent not Ground
-                        SimTK::Compound::AtomIndex parentAIx = (topologies[i]->getMbx2aIx()).at(parentMbx);
-                        T_X_PAt[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(parentAIx);
-                        // Get inboard dihedral angle and put in BAt_X_M0 !!!!!!!
-                        inboardBondDihedralAngles[int(mbx)] = topologies[i]->bgetDefaultInboardDihedralAngle(aIx);
-                        inboardBondLengths[int(mbx)] = topologies[i]->bgetDefaultInboardBondLength(aIx);
-                        BAt_X_M0[int(mbx)] = SimTK::Transform(
-                            SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis)
-                            , SimTK::Vec3(inboardBondLengths[int(mbx)], 0, 0)
-                        );
-
-                        // Get P_X_M
-                       T_X_atom[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
-                       SimTK::Transform T_X_M0 = T_X_atom[int(mbx)] * BAt_X_M0[int(mbx)];
-                       const SimTK::Transform& T_X_PAt = topologies[i]->calcDefaultAtomFrameInCompoundFrame(parentAIx);
-                       SimTK::Transform PAt_X_T = ~T_X_PAt;
-                       SimTK::Transform PAt_X_M0 = PAt_X_T * T_X_M0;
-                       P_X_M[int(mbx)] = PAt_X_M0;
-
-                    } //END if parent not Ground
-                }
-            }
-END NEW */
             // Set transforms inside the bodies = BAt_X_atom.p; Set locations for everyone
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
                 SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
@@ -871,7 +834,6 @@ END NEW */
             }
         
             // Set X_PF and Q - Bottleneck! RESTORE RE
-///*
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
                 SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
                 if(int(mbx) == 1){ // This is dangerous TODO
@@ -897,6 +859,7 @@ END NEW */
             this->compoundSystem->realizeTopology();
             someState = compoundSystem->updDefaultState();
 
+/* BEGIN CHECK
             // Check reconstruction
             this->compoundSystem->realize(someState, SimTK::Stage::Position);
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
@@ -913,7 +876,8 @@ END NEW */
 
                 }
             }
-//*/ 
+ END CHECK */ 
+
             // TRACE ----------------------------------------------------------
 /*            this->compoundSystem->realize(someState, SimTK::Stage::Position);
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
