@@ -881,9 +881,38 @@ END NEW */
                     ((SimTK::MobilizedBody::Pin&)mobod).setDefaultQ(inboardBondDihedralAngles[int(mbx)]);
                 }
             }
+
+
+///* BEGIN NEW
+            // Set mass properties for mobilized bodies
+            for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+                SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
+                DuMM::ClusterIndex clusterIx = forceField->bgetMobodClusterIndex(mbx);
+                SimTK::MassProperties massProperties = forceField->calcClusterMassProperties(clusterIx);
+                mobod.setDefaultMassProperties(massProperties);
+            }
+//END NEW */
+
     
             this->compoundSystem->realizeTopology();
             someState = compoundSystem->updDefaultState();
+
+            // Check reconstruction
+            this->compoundSystem->realize(someState, SimTK::Stage::Position);
+            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
+                if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is at body's origin
+                    // Get body, parentBody, parentAtom
+                    SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
+                    SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
+                    const SimTK::Vec3& p_GB = mobod.getBodyOriginLocation(someState);
+                    std::cout << "BodyOriginLocation for aIx " << aIx << " " 
+                    << p_GB[0] << " " << p_GB[1] << " " << p_GB[2] << " "
+                    << std::endl;
+                    
+                    
+
+                }
+            }
 //*/ 
             // TRACE ----------------------------------------------------------
 /*            this->compoundSystem->realize(someState, SimTK::Stage::Position);
