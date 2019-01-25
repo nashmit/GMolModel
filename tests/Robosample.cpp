@@ -242,6 +242,9 @@ int main(int argc, char **argv)
         }
     }
 
+    // Output option
+    unsigned long int printFreq = std::stoi(setupReader.getValues("PRINT_FREQ")[0]);
+
     // Adapt variables
     bool samplesAdapted = false;
     bool restored = false;
@@ -298,7 +301,6 @@ int main(int argc, char **argv)
             for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){ // Iterate through samples
                 context->updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, context->getNofMDStepsPerSample(currentWorldIx));
                 //context->updWorld(currentWorldIx)->updSampler(0)->perturbQ(currentAdvancedState);
-
                 
                 #ifdef ROBO_DEBUG_LEVEL01
                 std::this_thread::sleep_for(std::chrono::milliseconds(2000)); 
@@ -306,7 +308,19 @@ int main(int argc, char **argv)
 
                 ++mc_step;
                 ++restore_mc_step;
-    
+   
+            } // END for samples
+
+            if( !(round % printFreq) ){ 
+                std::cout << currentAdvancedState.getNU() << ' '
+                    << context->updWorld(currentWorldIx)->updSampler(0)->getAcceptedSteps() << ' '
+                    << context->updWorld(currentWorldIx)->updSampler(0)->getOldPE() << ' '
+                    << context->updWorld(currentWorldIx)->updSampler(0)->getSetPE() << ' '
+                    << context->updWorld(currentWorldIx)->updSampler(0)->getLastAcceptedKE() << ' '
+                    << context->updWorld(currentWorldIx)->updSampler(0)->getProposedKE() << ' '
+                    << context->updWorld(currentWorldIx)->updSampler(0)->getOldFixman() << ' '
+                    << context->updWorld(currentWorldIx)->updSampler(0)->getSetFixman() << ' ';
+
                 // Calculate geomtric features 
                 if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
                     // Get distances indeces
@@ -334,11 +348,10 @@ int main(int argc, char **argv)
                 }else{
                     std::cout << std::endl;
                 }
-
+            }
     
-            } // END for samples
-
             // Compute potential statistics
+            /*
             SimTK::Real U, dU;
             U = context->updWorld(currentWorldIx)->updForceField()->CalcFullPotEnergyIncludingRigidBodies(context->updAdvancedState(currentWorldIx, 0)) ;
             cumU += U ;
@@ -401,7 +414,7 @@ int main(int argc, char **argv)
                 }
             } // END if mc_step 100
             // END Adaptive mixing
-
+            */
     
             // Write pdb
             if( std::stoi(setupReader.getValues("WRITEPDBS")[0]) != 0){

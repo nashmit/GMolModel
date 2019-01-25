@@ -574,12 +574,12 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 
         //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n << " rand " << rand_no
         //<< std:: endl; //p
-
+/* RESTORE p
     std::cout << someState.getNU() << ' ' << accepted << ' ' 
-      //<< getSetPE() + getREP() << ' ' << getLastAcceptedKE() 
-      << pe_o << ' '<< getSetPE() << ' ' << getLastAcceptedKE() 
-      << ' ' << getSetFixman() << ' ' << fix_o << ' ' << fix_n << ' ';
-
+        //<< getSetPE() + getREP() << ' ' << getLastAcceptedKE() 
+        << pe_o << ' '<< getSetPE() << ' ' << getLastAcceptedKE() 
+        << ' ' << getSetFixman() << ' ' << fix_o << ' ' << fix_n << ' ';
+*/
     // Keep track of how many MC trials have been done 
     ++nofSamples;
 
