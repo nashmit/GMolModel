@@ -245,6 +245,12 @@ void MonteCarloSampler::setOldFixman(SimTK::Real argFixman)
     this->fix_o = argFixman;
 }
 
+// Set old Fixman potential
+void MonteCarloSampler::setProposedFixman(SimTK::Real argFixman)
+{
+    this->fix_n = argFixman;
+}
+
 // Get set Fixman potential
 SimTK::Real MonteCarloSampler::getSetFixman(void)
 {
@@ -255,6 +261,12 @@ SimTK::Real MonteCarloSampler::getSetFixman(void)
 SimTK::Real MonteCarloSampler::getOldFixman(void)
 {
     return this->fix_o;
+}
+
+// Get Fixman potential
+SimTK::Real MonteCarloSampler::getProposedFixman(void)
+{
+    return this->fix_n;
 }
 
 // Set/get Residual Embedded Potential

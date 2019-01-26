@@ -314,12 +314,15 @@ int main(int argc, char **argv)
             if( !(round % printFreq) ){ 
                 std::cout << currentAdvancedState.getNU() << ' '
                     << context->updWorld(currentWorldIx)->updSampler(0)->getAcceptedSteps() << ' '
+                    << std::setprecision(4) << std::fixed
                     << context->updWorld(currentWorldIx)->updSampler(0)->getOldPE() << ' '
                     << context->updWorld(currentWorldIx)->updSampler(0)->getSetPE() << ' '
                     << context->updWorld(currentWorldIx)->updSampler(0)->getLastAcceptedKE() << ' '
                     << context->updWorld(currentWorldIx)->updSampler(0)->getProposedKE() << ' '
                     << context->updWorld(currentWorldIx)->updSampler(0)->getOldFixman() << ' '
-                    << context->updWorld(currentWorldIx)->updSampler(0)->getSetFixman() << ' ';
+                    << context->updWorld(currentWorldIx)->updSampler(0)->getSetFixman() << ' '
+                    << context->updWorld(currentWorldIx)->updSampler(0)->getProposedFixman() << ' '
+                    ;
 
                 // Calculate geomtric features 
                 if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){

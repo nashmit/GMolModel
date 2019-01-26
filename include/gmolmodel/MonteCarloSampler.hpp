@@ -83,6 +83,10 @@ public:
     void setOldFixman(SimTK::Real);
     SimTK::Real getOldFixman(void);
 
+    // Set/get Fixman potential
+    void setProposedFixman(SimTK::Real);
+    SimTK::Real getProposedFixman(void);
+
     // Evaluate the potential energy at current state
     SimTK::Real getPEFromEvaluator(SimTK::State& someState); 
 
