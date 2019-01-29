@@ -1,22 +1,23 @@
-MOLECULES buta                  # Molecules to load
+MOLECULES heptacontan_new                  # Molecules to load
 WORLDS IC TD                       # Regimen (IC, TD, MIX, RB, RBMIX)
 SAMPLER HMC HMC            # HMC or MC
 THERMOSTAT None None        # Thermostat (HMC + Andersen = MD)
-ROUNDS 1000                   # MC steps (Acception-rejection steps)
-TIMESTEPS 0.002 0.004                # Timesteps to be used with regimens
-MDSTEPS  40 40   # Number of MD trial steps
+ROUNDS 1000000                   # MC steps (Acception-rejection steps)
+TIMESTEPS 0.002 0.003                # Timesteps to be used with regimens
+MDSTEPS  5 40   # Number of MD trial steps
 SAMPLES_PER_ROUND 1 1  # Number of MC trials within a mixing round
-TEMPERATURE  300 300       # Temperature for constant temperature simulations
+TEMPERATURE  1000 1000       # Temperature for constant temperature simulations
 FFSCALE AMBER AMBER        # Force field scale factors
 GBSA 0.0 0.0              # GBSA scale factor
 FIXMAN_POTENTIAL FALSE TRUE # Use Fixman potential
 FIXMAN_TORQUE FALSE TRUE          # Use Fixman torque
 #VISUAL TRUE TRUE                 # Use the visualizer
 VISUAL FALSE FALSE                 # Use the visualizer
-WRITEPDBS 100 100      # Write pdbs
-GEOMETRY FALSE FALSE                # Calculate geometric features
-DIHEDRAL 4 5 7 13 5 7 13 14
+WRITEPDBS 1000 1000      # Write pdbs
+GEOMETRY TRUE TRUE                # Calculate geometric features
+DIHEDRAL 100 103 106 109
 REPRODUCIBLE FALSE FALSE
 THREADS 1 1
+PRINT_FREQ 100
 
 ADAPT_SAMPLE_RATIO FALSE    # Adaptive sample ratio adjustment

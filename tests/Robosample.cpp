@@ -234,11 +234,14 @@ int main(int argc, char **argv)
     //
 
     // Write pdb
+    std::string pdbPrefix = setupReader.getValues("MOLECULES")[0] 
+        + std::to_string(context->updWorld(currentWorldIx)->updSampler(0)->getSeed());
+
     if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
         (context->updWorld(currentWorldIx))->updateAtomLists(advancedState);
         std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
         for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-            ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
+            ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb." + pdbPrefix + ".", ".pdb", 10, mc_step);
         }
     }
 
@@ -311,7 +314,8 @@ int main(int argc, char **argv)
    
             } // END for samples
 
-            if( !(round % printFreq) ){ 
+            if( !(round % printFreq) ){
+                // ndofs accs pe_o pe_set ke_o ke_n fix_o fix_set fix_n
                 std::cout << currentAdvancedState.getNU() << ' '
                     << context->updWorld(currentWorldIx)->updSampler(0)->getAcceptedSteps() << ' '
                     << std::setprecision(4) << std::fixed
@@ -425,7 +429,7 @@ int main(int argc, char **argv)
                 //if(1){
                     (context->updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
                     for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                        ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
+                        ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb." + pdbPrefix + ".", ".pdb", 10, mc_step);
                     }
                 }
             } // if write pdbs
@@ -434,11 +438,11 @@ int main(int argc, char **argv)
     } // for i in rounds
 
     // Write final pdb
-    ((context->updWorld(0))->getTopology(0)).writePdb("pdbs", "final", ".pdb", 10, total_mcsteps);
+    //((context->updWorld(0))->getTopology(0)).writePdb("pdbs", "final", ".pdb", 10, total_mcsteps);
 
     // Write final pdbs
     for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-        ((context->updWorld( context->worldIndexes.front() ))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, context->getNofRounds());
+        ((context->updWorld( context->worldIndexes.front() ))->getTopology(mol_i)).writePdb("pdbs", "final." + pdbPrefix + ".", ".pdb", 10, context->getNofRounds());
     }
     //
 

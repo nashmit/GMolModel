@@ -142,13 +142,13 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool rand
 {
     // Seed the random number generator
     if(reproducible){
-        long int seed = 1;
-        randomEngine.seed( seed );
-        std::cout << "SEED: " << seed << std::endl;
+        setSeed(1);
+        randomEngine.seed( getSeed() );
+        std::cout << "SEED: " << getSeed() << std::endl;
     }else{
-        long int seed = std::time(0);
-        randomEngine.seed( std::time(0) );
-        std::cout << "SEED: " << seed << std::endl;
+        setSeed( std::time(0) );
+        randomEngine.seed( getSeed() );
+        std::cout << "SEED: " << getSeed() << std::endl;
     }
 
     // After an event handler has made a discontinuous change to the 
@@ -227,7 +227,8 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool rand
 void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState/*, SimTK::Real argTemperature*/) 
 {
     if(reproducible){
-        randomEngine.seed( nofSamples );
+        //randomEngine.seed( nofSamples ); // TODO change to seed + nofSamples
+        randomEngine.seed( getSeed() + nofSamples ); // TODO change to seed + nofSamples
     }
 
     // After an event handler has made a discontinuous change to the 

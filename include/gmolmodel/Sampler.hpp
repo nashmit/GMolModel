@@ -54,6 +54,10 @@ public:
     /** Returns the number of samples extracted so far. **/
     int getNofSamples(void);
 
+    // Get set the seed
+    unsigned long long int getSeed(void);
+    void setSeed(unsigned long long int);
+
     // For debugging purposes
     void PrintSimbodyStateCache(SimTK::State& someState);
 
@@ -88,6 +92,7 @@ public:
 
     // Sampling
     int nofSamples;
+    unsigned long long int seed;
   
     // Harmonic oscillator constants
     static const int HO_D = 20; // Dimensionality

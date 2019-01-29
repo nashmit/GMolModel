@@ -63,6 +63,17 @@ Sampler::~Sampler(){
     ;
 }
 
+// Get set the seed
+unsigned long long int Sampler::getSeed(void)
+{
+    return this->seed;
+}
+
+void Sampler::setSeed(unsigned long long int argSeed)
+{
+    this->seed = argSeed;
+}
+
 /*
 
 // Set a thermostat 
