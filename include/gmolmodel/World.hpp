@@ -36,9 +36,9 @@
 
 //#include "/home/lspirido/Installers/armadillo-6.400.3/include/armadillo.hpp"
 
-//#ifndef TRY_TO_USE_OPENMM
-//#define TRY_TO_USE_OPENMM
-//#endif
+#ifndef TRY_TO_USE_OPENMM
+#define TRY_TO_USE_OPENMM
+#endif
 
 //RE #include "bMoleculeReader.hpp"
 #include "bAddParams.hpp"

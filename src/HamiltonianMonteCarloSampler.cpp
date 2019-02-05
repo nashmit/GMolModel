@@ -460,7 +460,32 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
 
     // Integrate (propagate trajectory)
 //pp    std::cout << nofSamples << ' ';
+
+
+/* DEBUG BEGIN
+for(int k = 0; k < nosteps; k++){
+    this->timeStepper->stepTo(someState.getTime() + (timestep));
+
+    SimTK::Real step1pe = dumm->CalcFullPotEnergyIncludingRigidBodies(someState);
+    system->realize(someState, SimTK::Stage::Velocity);
+    SimTK::Real step1matKe = matter->calcKineticEnergy(someState);
+    SimTK::Real step1mbsKe = forces->getMultibodySystem().calcKineticEnergy(someState);
+    SimTK::Real step1Etot = forces->getMultibodySystem().calcEnergy(someState);
+    SimTK::Real step1fix = calcFixman(someState);
+
+
+    std::cout << step1pe << ' '
+        << step1matKe << ' '
+        << step1mbsKe << ' '
+        << step1Etot << ' '
+        << step1fix
+        << std::endl;
+
+}
+ DEBUG END */
+
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
+
 
     // RESET Guidance Hamiltonian with a boost temperature
     //someState.updU() *= (1.0 / boostFactor);
