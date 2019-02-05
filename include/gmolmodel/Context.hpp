@@ -103,6 +103,7 @@ public:
     // --- Main ---
     void Run(SetupReader&);
     void setNumThreadsRequested(int which, int howMany);
+    void setUseOpenMMAcceleration(bool arg);
 
     /** Initialize the same velocities **/
     bool getReproducible(void);

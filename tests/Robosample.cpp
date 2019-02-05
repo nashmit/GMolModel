@@ -85,6 +85,11 @@ int main(int argc, char **argv)
             << context->updWorld(worldIx)->updForceField()->getNumThreadsInUse() << std::endl;
     }
 
+    // Use OpenMM
+    if(setupReader.getValues("OPENMM")[0] == "TRUE"){
+        context->setUseOpenMMAcceleration(true);
+    }
+
     // Model topologies
     context->modelTopologies();
 

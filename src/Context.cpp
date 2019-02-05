@@ -668,6 +668,13 @@ void Context::setNumThreadsRequested(int which, int howMany)
     worlds[which]->updForceField()->setNumThreadsRequested(howMany);
 }
 
+void Context::setUseOpenMMAcceleration(bool arg)
+{
+    for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){
+        worlds[worldIx]->updForceField()->setUseOpenMMAcceleration(arg);
+    }
+}
+
 /** Initialize the same velocities **/
 bool Context::getReproducible(void)
 {
