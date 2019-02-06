@@ -582,6 +582,39 @@ void Context::PrintSamplerData(unsigned int whichWorld)
         ;
 }
 
+// Print geometric parameters during simulation
+void Context::PrintGeometry(SetupReader& setupReader, unsigned int whichWorld)
+{
+    if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
+        // Get distances indeces
+        int distanceIx[setupReader.getValues("DISTANCE").size()];
+        for(unsigned int i = 0; i < setupReader.getValues("DISTANCE").size(); i++){
+            distanceIx[i] = atoi(setupReader.getValues("DISTANCE")[i].c_str());
+        }
+        // Get distances
+        for(int ai = 0; ai < (setupReader.getValues("DISTANCE").size() / 2); ai++){
+            std::cout << std::setprecision(4) 
+            << this->Distance(whichWorld, 0, 0, 
+                distanceIx[2*ai + 0], distanceIx[2*ai + 1]) << " ";
+        }
+
+        // Get dihedrals indeces
+        int dihedralIx[setupReader.getValues("DIHEDRAL").size()];
+        for(unsigned int i = 0; i < setupReader.getValues("DIHEDRAL").size(); i++){
+            dihedralIx[i] = atoi(setupReader.getValues("DIHEDRAL")[i].c_str());
+        }
+        // Get dihedrals
+        for(int ai = 0; ai < (setupReader.getValues("DIHEDRAL").size() / 4); ai++){
+            std::cout << std::setprecision(4) 
+            << this->Dihedral(whichWorld, 0, 0, 
+                dihedralIx[4*ai + 0], dihedralIx[4*ai + 1], 
+                dihedralIx[4*ai + 2], dihedralIx[4*ai + 3]) << " ";
+        }
+        std::cout << std::endl;
+    }else{
+        std::cout << std::endl;
+    }
+}
 
 void Context::WritePdb(int whichWorld){assert(!"Not implemented");}
 
