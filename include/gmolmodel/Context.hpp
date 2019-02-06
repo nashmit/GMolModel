@@ -111,6 +111,7 @@ public:
     //------------
 
     // --- Printing functions ---
+    void PrintSamplerData(unsigned int whichWorld);
     void WritePdb(int whichWorld);
     SimTK::Real Dihedral(int whichWorld, int whichCompound, int whichSampler, int a1, int a2, int a3, int a4);
     SimTK::Real Distance(int whichWorld, int whichCompound, int whichSampler, int a1, int a2);

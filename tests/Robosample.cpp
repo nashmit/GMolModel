@@ -276,6 +276,11 @@ int main(int argc, char **argv)
         std::cout << "Adaptive samples ratios ON." << std::endl;
     }
 
+    // Heating
+    //for(unsigned int round = 0; round < context->getNofHeatingRounds; round++){
+    //}
+
+    // Production
     for(int round = 0; round < context->getNofRounds(); round++){ // Iterate rounds
 
         if(mc_step == total_mcsteps){
@@ -333,17 +338,7 @@ int main(int argc, char **argv)
 
             if( !(round % printFreq) ){
                 // ndofs accs pe_o pe_set ke_o ke_n fix_o fix_set fix_n
-                std::cout << currentAdvancedState.getNU() << ' '
-                    << context->updWorld(currentWorldIx)->updSampler(0)->getAcceptedSteps() << ' '
-                    << std::setprecision(4) << std::fixed
-                    << context->updWorld(currentWorldIx)->updSampler(0)->getOldPE() << ' '
-                    << context->updWorld(currentWorldIx)->updSampler(0)->getSetPE() << ' '
-                    << context->updWorld(currentWorldIx)->updSampler(0)->getLastAcceptedKE() << ' '
-                    << context->updWorld(currentWorldIx)->updSampler(0)->getProposedKE() << ' '
-                    << context->updWorld(currentWorldIx)->updSampler(0)->getOldFixman() << ' '
-                    << context->updWorld(currentWorldIx)->updSampler(0)->getSetFixman() << ' '
-                    << context->updWorld(currentWorldIx)->updSampler(0)->getProposedFixman() << ' '
-                    ;
+                context->PrintSamplerData(currentWorldIx);
 
                 // Calculate geomtric features 
                 if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){

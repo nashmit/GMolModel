@@ -529,139 +529,8 @@ void Context::RotateWorlds(void){assert(!"Not implemented");}
 // -- Main ---
 void Context::Run(SetupReader& setupReader)
 {
-    /*
-    // Print intial state
-    for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){    
-        std::cout << "World " << worldIx << " initial const state PE: " << std::setprecision(20)
-            << (updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy((updWorld(worldIx))->integ->updAdvancedState()) 
-            << " useFixmanPotential = " << updWorld(worldIx)->updSampler(0)->isUsingFixmanPotential()
-            << std::endl;
-    }
-    */
-
-    // Get simulation parameters
-    //total_mcsteps = std::stoi(setupReader.getValues("STEPS")[0]);
-
-/*
-    int currentWorldIx = 0;
-    int round_mcsteps = 0;
-
-    nofRounds = std::stoi(setupReader.getValues("ROUNDS")[0]);
-
-    for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){    
-        //nofSamplesPerRound[worldIx] = std::stoi(setupReader.getValues("MIXMCSTEPS")[worldIx]);
-        round_mcsteps += nofSamplesPerRound[worldIx];
-        //nofMDStepsPerSample[worldIx] = std::stoi(setupReader.getValues("MDSTEPS")[worldIx]);
-        //timesteps[worldIx] = std::stod(setupReader.getValues("TIMESTEPS")[worldIx]);
-    }
-    total_mcsteps = round_mcsteps * nofRounds;
-
-    // Calculate geometric features fast
-    const SimTK::Compound * p_compounds[worlds.size()];
-    if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
-        for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){
-            p_compounds[worldIx] = &((updWorld(worldIx))->getTopology(0));
-        }
-    }
-    //
-
-    // Simulate the two worlds
-    int mc_step = -1;
-
-    // Update one round for the first regimen
-    currentWorldIx = worldIndexes.front();
-    SimTK::State& advancedState = (updWorld(currentWorldIx))->integ->updAdvancedState();
-
-    // Update
-    //std::cout << "Sampler " << currentWorldIx << " updating initially" << std::endl;
-    for(int k = 0; k < nofSamplesPerRound[currentWorldIx]; k++){
-        ++mc_step; // Increment mc_step
-        updWorld(currentWorldIx)->updSampler(0)->update(advancedState, nofMDStepsPerSample[currentWorldIx]);
-    }
-
-    // Write pdb
-    if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
-        (updWorld(currentWorldIx))->updateAtomLists(advancedState);
-        std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
-        for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-            ((updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, mc_step);
-        }
-    }
-
-    for(int round = 0; round < nofRounds; round++){
-        for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){
-    
-            // Rotate worlds indeces (translate from right to left) 
-            std::rotate(worldIndexes.begin(), worldIndexes.begin() + 1, worldIndexes.end());
-
-            currentWorldIx = worldIndexes.front();
-    
-            // Transfer coordinates from last world to current
-            //std::cout << "main: Sending configuration from " << worldIndexes.back() << " to " << currentWorldIx 
-            //    << " at round " << round << std::endl;
-            SimTK::State& lastAdvancedState = (updWorld(worldIndexes.back()))->integ->updAdvancedState();
-            SimTK::State& currentAdvancedState = (updWorld(currentWorldIx))->integ->updAdvancedState();
-    
-            currentAdvancedState = (updWorld(currentWorldIx))->setAtomsLocationsInGround(
-                currentAdvancedState, (updWorld(worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
-    
-            // Reinitialize current sampler
-            updWorld(currentWorldIx)->updSampler(0)->reinitialize( currentAdvancedState
-//r                , SimTK::Real( std::stod(setupReader.getValues("TEMPERATURE")[0]) ) 
-            );
-    
-            // INCORRECT !!
-            if(setupReader.getValues("WORLDS")[worldIndexes.back()] == "IC"){
-                for(int i = 0; i < worlds.size() - 1; i++){
-                    int restIx = worldIndexes[i];
-                    int backIx = worldIndexes.back();
-                    SimTK::Real diffPE = (updWorld(backIx))->updSampler(0)->getSetPE() - (updWorld(restIx))->updSampler(0)->getSetPE();
-                    //std::cout << "Setting sampler " << restIx << " REP to " << (updWorld(backIx))->updSampler(0)->getSetPE() << " - " << (updWorld(restIx))->updSampler(0)->getSetPE() << " = " << diffPE << std::endl;
-                    (updWorld(restIx))->updSampler(0)->setREP( diffPE );
-                }
-            }
-    
-            // Update
-            //std::cout << "Sampler " << currentWorldIx << " updating " << std::endl;
-            for(int k = 0; k < nofSamplesPerRound[currentWorldIx]; k++){
-                updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, nofMDStepsPerSample[currentWorldIx]);
-            }
-    
-            // Write pdb
-            if(setupReader.getValues("WRITEPDBS")[0] == "TRUE"){
-                //if(!((mc_step+1) % 20)){
-                if(1){
-                    (updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
-                    //std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
-                    for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                        ((updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb", ".pdb", 10, round);
-                    }
-                }
-            }
-    
-            // Calculate geomtric features fast
-            if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
-                int dihedralIx[setupReader.getValues("DIHEDRAL").size()];
-                for(unsigned int i = 0; i < setupReader.getValues("DIHEDRAL").size(); i++){
-                    dihedralIx[i] = atoi(setupReader.getValues("DIHEDRAL")[i].c_str());
-                }
-    
-                for(int ai = 0; ai < setupReader.getValues("DIHEDRAL").size(); ai += 4){
-                    //std::cout << bDihedral( (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 0])), 
-                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 1])), 
-                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 2])), 
-                    //                        (p_compounds[currentWorldIx])->calcAtomLocationInGroundFrame(currentAdvancedState, SimTK::Compound::AtomIndex(dihedralIx[ai + 3])) )  << " ";
-                    std::cout << Dihedral(currentWorldIx, 0, 0, ai + 0, ai + 1, ai + 2, ai + 3) << " ";
-                }
-                std::cout << std::endl;
-            }
-    
-    
-        } // for i in worlds
-    } // for i in rounds
-*/
-
-} // END of Run()
+    assert(!"Not implemented");
+} 
 
 void Context::setNumThreadsRequested(int which, int howMany)
 {
@@ -693,7 +562,27 @@ void Context::setReproducible(void)
     //------------
 //------------
 
-// --- Printing functions ---
+// --- Printing functions --
+
+// Print energy information
+void Context::PrintSamplerData(unsigned int whichWorld)
+{
+
+    SimTK::State& currentAdvancedState = worlds[whichWorld]->integ->updAdvancedState();
+    std::cout << currentAdvancedState.getNU() << ' '
+        << worlds[whichWorld]->updSampler(0)->getAcceptedSteps() << ' '
+        << std::setprecision(4) << std::fixed
+        << worlds[whichWorld]->updSampler(0)->getOldPE() << ' '
+        << worlds[whichWorld]->updSampler(0)->getSetPE() << ' '
+        << worlds[whichWorld]->updSampler(0)->getLastAcceptedKE() << ' '
+        << worlds[whichWorld]->updSampler(0)->getProposedKE() << ' '
+        << worlds[whichWorld]->updSampler(0)->getOldFixman() << ' '
+        << worlds[whichWorld]->updSampler(0)->getSetFixman() << ' '
+        << worlds[whichWorld]->updSampler(0)->getProposedFixman() << ' '
+        ;
+}
+
+
 void Context::WritePdb(int whichWorld){assert(!"Not implemented");}
 
 SimTK::Real Context::Dihedral(int whichWorld, int whichCompound, int whichSampler, int a1, int a2, int a3, int a4){
