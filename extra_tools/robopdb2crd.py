@@ -68,6 +68,8 @@ for ri in range(nroots):
             if (os.path.isfile(inpcrdsDir + "/" + inpcrdFN) ):
                 answer = raw_input(inpcrdsDir + "/" + inpcrdFN \
                     + "  already exists! Do you want to overwrite it? (y/n)")
+            else:
+                answer = 'y'
             if(answer == 'y'):
                 inpcrdF = open(inpcrdsDir + "/" + inpcrdFN, "w+")
                 inpcrdF.write( 'ACE\n')

@@ -41,13 +41,25 @@ int main(int argc, char **argv)
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         for(unsigned int molIx = 0; molIx < setupReader.getValues("MOLECULES").size(); molIx++){
             context->loadTopologyFile( worldIx, molIx,
-                setupReader.getValues("MOLECULES")[molIx] + std::string("/ligand.prmtop") );
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/")
+                + setupReader.getValues("PRMTOP")[molIx]
+            );
+
             context->loadCoordinatesFile( worldIx, molIx,
-                setupReader.getValues("MOLECULES")[molIx] + std::string("/ligand.inpcrd") );
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/")
+                + setupReader.getValues("INPCRD")[molIx]
+            );
+
             context->loadRigidBodiesSpecs( worldIx, molIx,
-                setupReader.getValues("MOLECULES")[molIx] + std::string("/ligand.rb") );
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/")
+                + setupReader.getValues("RBFILE")[molIx]
+            );
+
             context->loadFlexibleBondsSpecs( worldIx, molIx,
-                setupReader.getValues("MOLECULES")[molIx] + std::string("/ligand.flex") );
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/")
+                + setupReader.getValues("FLEXFILE")[molIx]
+            );
+
             context->setRegimen( worldIx, molIx,
                 setupReader.getValues("WORLDS")[worldIx] );
         }
