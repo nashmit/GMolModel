@@ -1,29 +1,30 @@
-MOLECULES ala71                  # Molecule directory 
+MOLECULES 2but                  # Molecules to load
 PRMTOP ligand.prmtop        # Parameter file
 INPCRD ligand.inpcrd        # Coordinate / Restart file
 RBFILE ligand.rb            # Rigid bodies definition file
 FLEXFILE ligand.flex        # Flexible bonds definition file
-WORLDS IC                       # Regimen (IC, TD, MIX, RB, RBMIX)
-SAMPLER HMC            # HMC or MC
-THERMOSTAT None        # Thermostat (HMC + Andersen = MD)
+WORLDS IC TD                       # Regimen (IC, TD, MIX, RB, RBMIX)
+SAMPLER HMC HMC            # HMC or MC
+THERMOSTAT None None        # Thermostat (HMC + Andersen = MD)
 ROUNDS 10                   # MC steps (Acception-rejection steps)
-TIMESTEPS 0.0020                # Timesteps to be used with regimens
-MDSTEPS  6   # Number of MD trial steps
-SAMPLES_PER_ROUND 1  # Number of MC trials within a mixing round
-TEMPERATURE  1000.00       # Temperature for constant temperature simulations
-FFSCALE AMBER        # Force field scale factors
+TIMESTEPS 0.001 0.002                # Timesteps to be used with regimens
+MDSTEPS  100 100   # Number of MD trial steps
+SAMPLES_PER_ROUND 1 1  # Number of MC trials within a mixing round
+TEMPERATURE_INI  1 1      # Temperature for constant temperature simulations
+TEMPERATURE_FIN  1000 1000      # Temperature for constant temperature simulations
+FFSCALE AMBER AMBER        # Force field scale factors
 GBSA 0.0 0.0              # GBSA scale factor
-FIXMAN_POTENTIAL TRUE # Use Fixman potential
-FIXMAN_TORQUE FALSE          # Use Fixman torque
-VISUAL FALSE                 # Use the visualizer
-#VISUAL TRUE                 # Use the visualizer
-WRITEPDBS 1000      # Write pdbs
-GEOMETRY FALSE                # Calculate geometric features
-DISTANCE
-DIHEDRAL 
-REPRODUCIBLE FALSE
+FIXMAN_POTENTIAL FALSE TRUE # Use Fixman potential
+FIXMAN_TORQUE FALSE FALSE          # Use Fixman torque
+VISUAL TRUE TRUE                 # Use the visualizer
+#VISUAL FALSE FALSE                 # Use the visualizer
+WRITEPDBS 0 0      # Write pdbs
+GEOMETRY TRUE TRUE                # Calculate geometric features
+DISTANCE 0 1
+DIHEDRAL 11 2 4 7
+REPRODUCIBLE TRUE
+THREADS 1 1
 OPENMM TRUE
-THREADS 1
 PRINT_FREQ 1
 
 ADAPT_SAMPLE_RATIO FALSE    # Adaptive sample ratio adjustment

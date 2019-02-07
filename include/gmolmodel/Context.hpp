@@ -39,6 +39,8 @@ public:
     void modelTopologies(void);
 
     void LoadWorldsFromSetup(SetupReader&);
+
+    int getNofMolecules(void);
     //------------
 
     // --- Thermodynamics ---a
@@ -102,6 +104,7 @@ public:
 
     // --- Main ---
     void Run(SetupReader&);
+    void Run(int howManyRounds, float Ti, float Tf);
     void setNumThreadsRequested(int which, int howMany);
     void setUseOpenMMAcceleration(bool arg);
 
@@ -124,6 +127,8 @@ public:
 
     int getPdbRestartFreq(void);
     void setPdbRestartFreq(int argFreq);
+    int getPrintFreq(void);
+    void setPrintFreq(int argFreq);
     //------------
 
 public:
@@ -149,6 +154,7 @@ private:
     //
     bool reproducible;
     int pdbRestartFreq;
+    int printFreq;
 
     // Geometric features analysis
     // First two integers specifiy the world and the Compound. The rest

@@ -246,6 +246,12 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
     std::cout << "World::AddMolecule END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
+int World::getNofMolecules(void)
+{
+    return (this->moleculeCount + 1);
+}
+
+
 /** Calls CompoundSystem.modelCompounds and realizes Topology.
 To be called after loading all Compounds. **/
 void World::ModelTopologies(bool useFixmanTorqueOpt)
@@ -326,7 +332,7 @@ void World::setTemperature(SimTK::Real argTemperature)
 {
     // Set the temperature for the samplers
     for(unsigned int samplerIx = 0; samplerIx < samplers.size(); samplerIx++){
-        std::cout << " World::setTemperature for sampler "<< samplerIx << " " << argTemperature << std::endl;
+        //std::cout << " World::setTemperature for sampler "<< samplerIx << " " << argTemperature << std::endl;
         samplers[samplerIx]->setTemperature(argTemperature);
     }
 
@@ -334,7 +340,7 @@ void World::setTemperature(SimTK::Real argTemperature)
     this->temperature = argTemperature;
 
     // Set the temperature for the Fixman torque also
-    std::cout << " World::setTemperature for FixmanTorque " << argTemperature << std::endl;
+    //std::cout << " World::setTemperature for FixmanTorque " << argTemperature << std::endl;
     if(_useFixmanTorque){ 
         FixmanTorqueImpl->setTemperature(this->temperature);
     }

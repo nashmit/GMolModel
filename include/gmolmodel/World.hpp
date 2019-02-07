@@ -79,6 +79,7 @@ public:
     /** Creates a topology object and based on amberReader forcefield 
      parameters - defines Biotypes; - adds BAT parameters to DuMM **/
     void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string regimenSpec);
+    int getNofMolecules(void);
  
     /** Calls CompoundSystem.modelCompounds and realizes Topology 
     To be called after loading all Compounds. **/

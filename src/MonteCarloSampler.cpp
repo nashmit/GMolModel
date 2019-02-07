@@ -461,7 +461,7 @@ SimTK::Real MonteCarloSampler::getTemperature(void){
 // the instant temperature
 void MonteCarloSampler::setTemperature(SimTK::Real argTemperature)
 {
-    std::cout << " MonteCarloSampler::setTemperature " << argTemperature << std::endl;
+    //std::cout << " MonteCarloSampler::setTemperature " << argTemperature << std::endl;
     this->temperature = argTemperature;
     if(this->temperature < 0){
         std::cerr << "Temperature set to " << this->temperature << std::endl;

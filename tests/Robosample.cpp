@@ -28,7 +28,6 @@ int main(int argc, char **argv)
 
 
     // Variables
-    unsigned long int printFreq = std::stoi(setupReader.getValues("PRINT_FREQ")[0]);
 
     int currentWorldIx = 0;
     int lastWorldIx = 0;
@@ -91,7 +90,7 @@ int main(int argc, char **argv)
     // Do we use Fixman torque
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
-            context->useFixmanTorque(worldIx, std::stof(setupReader.getValues("TEMPERATURE")[worldIx]));
+            context->useFixmanTorque(worldIx, std::stof(setupReader.getValues("TEMPERATURE_INI")[worldIx]));
         }
     }
 
@@ -164,7 +163,7 @@ int main(int argc, char **argv)
     }
 
     for(int worldIx = 0; worldIx < setupReader.getValues("WORLDS").size(); worldIx++){
-        context->setTemperature(worldIx, std::stof(setupReader.getValues("TEMPERATURE")[worldIx]));
+        context->setTemperature(worldIx, std::stof(setupReader.getValues("TEMPERATURE_INI")[worldIx]));
         context->setNofSamplesPerRound(worldIx, std::stoi(setupReader.getValues("SAMPLES_PER_ROUND")[worldIx]));
         context->setNofMDStepsPerSample(worldIx, std::stoi(setupReader.getValues("MDSTEPS")[worldIx]));
     }
@@ -285,7 +284,13 @@ int main(int argc, char **argv)
     //for(unsigned int round = 0; round < context->getNofHeatingRounds; round++){
     //}
 
+    context->setPrintFreq( std::stoi(setupReader.getValues("PRINT_FREQ")[0]) );
+
     // Production
+    context->Run(context->getNofRounds(), 
+        std::stof(setupReader.getValues("TEMPERATURE_INI")[0]),
+        std::stof(setupReader.getValues("TEMPERATURE_FIN")[0]));
+/*
     for(int round = 0; round < context->getNofRounds(); round++){ // Iterate rounds
 
         for(unsigned int worldIx = 0; worldIx < context->getNofWorlds(); worldIx++){ // Iterate worlds
@@ -324,26 +329,31 @@ int main(int argc, char **argv)
             } // END for samples
 
             // Print energy and geometric features
-            if( !(round % printFreq) ){
+            if( !(round % context->getPrintFreq()) ){
                 // ndofs accs pe_o pe_set ke_o ke_n fix_o fix_set fix_n
                 context->PrintSamplerData(currentWorldIx);
                 context->PrintGeometry(currentWorldIx);
             }
     
-            // Write pdb
-            if( std::stoi(setupReader.getValues("WRITEPDBS")[0]) != 0){
-                if(((mc_step) % std::stoi(setupReader.getValues("WRITEPDBS")[0])) == 0){
-                    (context->updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
-                    for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-                        ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb("pdbs", "sb." + pdbPrefix + ".", ".pdb", 10, mc_step);
-                    }
-                }
-            } // if write pdbs
-
         } // for i in worlds
 
+        // Write pdb
+        SimTK::State& pdbState = (context->updWorld(context->worldIndexes.front()))->integ->updAdvancedState();
+        if( context->getPdbRestartFreq() != 0){
+            if(((round) % context->getPdbRestartFreq()) == 0){
+                (context->updWorld(context->worldIndexes.front()))->updateAtomLists(pdbState);
+                for(int mol_i = 0; mol_i < context->getNofMolecules(); mol_i++){
+                    ((context->updWorld(context->worldIndexes.front()))
+                    ->getTopology(mol_i)).writePdb(
+                        "pdbs", "sb." + pdbPrefix + ".", ".pdb", 10, round
+                    );
+
+                }
+            }
+        } // if write pdbs
 
     } // for i in rounds
+*/
 
     // Write final pdbs
     for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
