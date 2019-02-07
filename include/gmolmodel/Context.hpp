@@ -129,6 +129,11 @@ public:
     void setPdbRestartFreq(int argFreq);
     int getPrintFreq(void);
     void setPrintFreq(int argFreq);
+
+    std::string getOutputDir(void);
+    void setOutputDir(std::string arg);
+    std::string getPdbPrefix(void);
+    void setPdbPrefix(std::string arg);
     //------------
 
 public:
@@ -155,6 +160,10 @@ private:
     bool reproducible;
     int pdbRestartFreq;
     int printFreq;
+
+    // 
+    std::string outputDir;
+    std::string pdbPrefix;
 
     // Geometric features analysis
     // First two integers specifiy the world and the Compound. The rest

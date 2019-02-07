@@ -27,6 +27,8 @@ Context::Context(World *inp_p_world){
     timesteps.push_back(0.002); // ps
 
     pdbRestartFreq = 0;
+    outputDir = "pdbs";
+    pdbPrefix = "x";
 }
 
 // Add another world and a sampler to the context
@@ -544,7 +546,6 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
 {
     int currentWorldIx = worldIndexes.front();
     int lastWorldIx = 0;
-    std::string pdbPrefix = "x";
 
     if( std::abs(Tf - Ti) < SimTK::TinyReal){
         for(int round = 0; round < getNofRounds(); round++){ // Iterate rounds
@@ -592,7 +593,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 if(((round) % getPdbRestartFreq()) == 0){
                     (updWorld(worldIndexes.front()))->updateAtomLists(pdbState);
                     for(int mol_i = 0; mol_i < getNofMolecules(); mol_i++){
-                        ((updWorld(worldIndexes.front()))->getTopology(mol_i)).writePdb("pdbs", "sb." + pdbPrefix + ".", ".pdb", 10, round);
+                        ((updWorld(worldIndexes.front()))->getTopology(mol_i)).writePdb(getOutputDir(), "sb." + getPdbPrefix() + ".", ".pdb", 10, round);
                     }
                 }
             } // if write pdbs
@@ -605,7 +606,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
 
             // Set current temperature
             currT += Tincr;
-            std::cout << "Current temperature set to " << currT << std::endl;
+            std::cout << "T= " << currT << std::endl;
 
 
             for(unsigned int worldIx = 0; worldIx < getNofWorlds(); worldIx++){ // Iterate worlds
@@ -654,7 +655,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 if(((round) % getPdbRestartFreq()) == 0){
                     (updWorld(worldIndexes.front()))->updateAtomLists(pdbState);
                     for(int mol_i = 0; mol_i < getNofMolecules(); mol_i++){
-                        ((updWorld(worldIndexes.front()))->getTopology(mol_i)).writePdb("pdbs", "sb." + pdbPrefix + ".", ".pdb", 10, round);
+                        ((updWorld(worldIndexes.front()))->getTopology(mol_i)).writePdb(getOutputDir(), "sb." + getPdbPrefix() + ".", ".pdb", 10, round);
                     }
                 }
             } // if write pdbs
@@ -826,6 +827,25 @@ void Context::setPrintFreq(int argFreq)
     this->printFreq = argFreq;
 }
 
+std::string Context::getOutputDir(void)
+{
+    return this->outputDir;
+}
+
+void Context::setOutputDir(std::string arg)
+{
+    this->outputDir = arg;
+}
+
+std::string Context::getPdbPrefix(void)
+{
+    return this->pdbPrefix;
+}
+
+void Context::setPdbPrefix(std::string arg)
+{
+    this->pdbPrefix = arg;
+}
 
 
 SimTK::Real Context::Dihedral(int whichWorld, int whichCompound, int whichSampler, int a1, int a2, int a3, int a4){
