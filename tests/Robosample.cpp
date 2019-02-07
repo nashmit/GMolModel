@@ -200,7 +200,7 @@ int main(int argc, char **argv)
 
     }
 
-
+    // Simulation parameters
     currentWorldIx = 0;
     lastWorldIx = 0;
     round_mcsteps = 0;
@@ -213,12 +213,36 @@ int main(int argc, char **argv)
 
     total_mcsteps = round_mcsteps * context->getNofRounds();
 
-    // Calculate geometric features
-    SimTK::Real dihedrals[setupReader.getValues("DIHEDRAL").size() / 4];
-    SimTK::Real dihMeans[setupReader.getValues("DIHEDRAL").size() / 4];
-    SimTK::Real dihVars[setupReader.getValues("DIHEDRAL").size() / 4];
-    SimTK::Real distances[setupReader.getValues("DISTANCE").size() / 2];
+    // Set pdb writing frequency
+    context->setPdbRestartFreq( std::stoi(setupReader.getValues("WRITEPDBS")[0]) );
 
+    // Get atom indeces for geometry calculations
+    if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
+        for(unsigned int worldIx = 0; worldIx < context->getNofWorlds(); worldIx++){
+            int distanceIx[setupReader.getValues("DISTANCE").size()];
+            for(unsigned int i = 0; i < setupReader.getValues("DISTANCE").size(); i++){
+                distanceIx[i] = atoi(setupReader.getValues("DISTANCE")[i].c_str());
+            }
+            // Get distances
+            for(int ai = 0; ai < (setupReader.getValues("DISTANCE").size() / 2); ai++){
+                context->addDistance(worldIx, 0, distanceIx[2*ai + 0], distanceIx[2*ai + 1]);
+            }
+    
+            // Get dihedrals indeces
+            int dihedralIx[setupReader.getValues("DIHEDRAL").size()];
+            for(unsigned int i = 0; i < setupReader.getValues("DIHEDRAL").size(); i++){
+                dihedralIx[i] = atoi(setupReader.getValues("DIHEDRAL")[i].c_str());
+            }
+            // Get dihedrals
+            for(int ai = 0; ai < (setupReader.getValues("DIHEDRAL").size() / 4); ai++){
+                context->addDihedral(worldIx, 0,
+                    dihedralIx[4*ai + 0], dihedralIx[4*ai + 1],
+                    dihedralIx[4*ai + 2], dihedralIx[4*ai + 3]);
+            }
+        }
+    }
+
+    // wth is this?
     const SimTK::Compound * p_compounds[context->getNofWorlds()];
     if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
         for(unsigned int worldIx = 0; worldIx < context->getNofWorlds(); worldIx++){
@@ -303,7 +327,7 @@ int main(int argc, char **argv)
             if( !(round % printFreq) ){
                 // ndofs accs pe_o pe_set ke_o ke_n fix_o fix_set fix_n
                 context->PrintSamplerData(currentWorldIx);
-                context->PrintGeometry(setupReader, currentWorldIx);
+                context->PrintGeometry(currentWorldIx);
             }
     
             // Write pdb
@@ -317,6 +341,8 @@ int main(int argc, char **argv)
             } // if write pdbs
 
         } // for i in worlds
+
+
     } // for i in rounds
 
     // Write final pdbs

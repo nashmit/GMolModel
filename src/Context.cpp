@@ -25,6 +25,8 @@ Context::Context(World *inp_p_world){
     nofSamplesPerRound.push_back(1);
     nofMDStepsPerSample.push_back(1);
     timesteps.push_back(0.002); // ps
+
+    pdbRestartFreq = 0;
 }
 
 // Add another world and a sampler to the context
@@ -562,6 +564,33 @@ void Context::setReproducible(void)
     //------------
 //------------
 
+
+/** Analysis related functions **/
+void Context::addDistance(int whichWorld, int whichCompound, int aIx1, int aIx2)
+{
+    std::vector<int> tempV;
+    tempV.push_back(whichWorld);
+    tempV.push_back(whichCompound);
+    tempV.push_back(aIx1);
+    tempV.push_back(aIx2);
+
+    distanceIxs.push_back(tempV);
+}
+
+void Context::addDihedral(int whichWorld, int whichCompound, int aIx1, int aIx2, int aIx3, int aIx4)
+{
+    std::vector<int> tempV;
+    tempV.push_back(whichWorld);
+    tempV.push_back(whichCompound);
+    tempV.push_back(aIx1);
+    tempV.push_back(aIx2);
+    tempV.push_back(aIx3);
+    tempV.push_back(aIx4);
+
+    dihedralIxs.push_back(tempV);
+}
+
+
 // --- Printing functions --
 
 // Print energy information
@@ -583,7 +612,7 @@ void Context::PrintSamplerData(unsigned int whichWorld)
 }
 
 // Print geometric parameters during simulation
-void Context::PrintGeometry(SetupReader& setupReader, unsigned int whichWorld)
+void Context::PrintGeometry(SetupReader& setupReader, int whichWorld)
 {
     if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
         // Get distances indeces
@@ -616,7 +645,45 @@ void Context::PrintGeometry(SetupReader& setupReader, unsigned int whichWorld)
     }
 }
 
+void Context::PrintGeometry(int whichWorld)
+{
+
+    for ( unsigned int i = 0; i < distanceIxs.size(); i++){
+        if( distanceIxs[i][0] == whichWorld){
+            std::cout << std::setprecision(4) 
+            << this->Distance(distanceIxs[i][0], distanceIxs[i][1], 0, 
+                distanceIxs[i][2], distanceIxs[i][3]) << " ";
+        }
+    }
+
+    for ( unsigned int i = 0; i < dihedralIxs.size(); i++){
+        if( dihedralIxs[i][0] == whichWorld){
+            std::cout << std::setprecision(4) 
+            << this->Dihedral(dihedralIxs[i][0], dihedralIxs[i][1], 0, 
+                dihedralIxs[i][2], dihedralIxs[i][3], 
+                dihedralIxs[i][4], dihedralIxs[i][5]) << " ";
+        }
+    }
+    std::cout << std::endl;
+}
+
+// Get / set pdb files writing frequency
+int Context::getPdbRestartFreq(void)
+{
+    return this->pdbRestartFreq;
+}
+
+// 
+void Context::setPdbRestartFreq(int argFreq)
+{
+    this->pdbRestartFreq = argFreq;
+}
+
+// Write pdb
 void Context::WritePdb(int whichWorld){assert(!"Not implemented");}
+
+
+
 
 SimTK::Real Context::Dihedral(int whichWorld, int whichCompound, int whichSampler, int a1, int a2, int a3, int a4){
 

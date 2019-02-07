@@ -110,12 +110,20 @@ public:
     void setReproducible(void);
     //------------
 
+    /** Analysis related functions **/
+    void addDistance(int whichWorld, int whichCompound, int aIx1, int aIx2);
+    void addDihedral(int whichWorld, int whichCompound, int aIx1, int aIx2, int aIx3, int aIx4);
+
     // --- Printing functions ---
     void PrintSamplerData(unsigned int whichWorld);
-    void PrintGeometry(SetupReader&, unsigned int whichWorld);
+    void PrintGeometry(SetupReader&, int whichWorld);
+    void PrintGeometry(int whichWorld);
     void WritePdb(int whichWorld);
     SimTK::Real Dihedral(int whichWorld, int whichCompound, int whichSampler, int a1, int a2, int a3, int a4);
     SimTK::Real Distance(int whichWorld, int whichCompound, int whichSampler, int a1, int a2);
+
+    int getPdbRestartFreq(void);
+    void setPdbRestartFreq(int argFreq);
     //------------
 
 public:
@@ -140,6 +148,19 @@ private:
 
     //
     bool reproducible;
+    int pdbRestartFreq;
+
+    // Geometric features analysis
+    // First two integers specifiy the world and the Compound. The rest
+    // specifies atom indeces
+    std::vector< std::vector<int> > distanceIxs;
+    std::vector< std::vector<int> > dihedralIxs;
+
 };
 
 #endif //__CONTEXT_HPP__
+
+
+
+
+
