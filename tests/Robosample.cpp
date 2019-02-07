@@ -28,7 +28,6 @@ int main(int argc, char **argv)
 
 
     // Variables
-    // Output option
     unsigned long int printFreq = std::stoi(setupReader.getValues("PRINT_FREQ")[0]);
 
     int currentWorldIx = 0;
@@ -37,9 +36,6 @@ int main(int argc, char **argv)
     int total_mcsteps = 0;
 
     int mc_step = -1;
-    int alt_mc_step = 0;
-    int restore_mc_step = 0;
-    SimTK::Real convFunc = 99.0;
 
     // Add Worlds
     unsigned int nofWorlds = setupReader.getValues("WORLDS").size();
@@ -233,20 +229,15 @@ int main(int argc, char **argv)
 
     // Helper variables for step arithmetic
     mc_step = -1;
-    alt_mc_step = 0;
-    restore_mc_step = 0;
-    convFunc = 99.0;
 
     // Update one round for the first regimen
     currentWorldIx = context->worldIndexes.front();
     SimTK::State& advancedState = (context->updWorld(currentWorldIx))->integ->updAdvancedState();
 
     // Update
-    //std::cout << "Sampler " << currentWorldIx << " updating initially" << std::endl;
     for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){
         ++mc_step; // Increment mc_step
         context->updWorld(currentWorldIx)->updSampler(0)->update(advancedState, context->getNofMDStepsPerSample(currentWorldIx));
-        //context->updWorld(currentWorldIx)->updSampler(0)->perturbQ(advancedState);
     }
 
     // Write pdb
@@ -261,16 +252,7 @@ int main(int argc, char **argv)
         }
     }
 
-    // Output option
-    //unsigned long int printFreq = std::stoi(setupReader.getValues("PRINT_FREQ")[0]);
-
     // Adapt variables
-    bool samplesAdapted = false;
-    bool restored = false;
-    SimTK::Real cumU = 0.0;
-    SimTK::Real avgU = 0.0;
-    SimTK::Real prevAvgU = 0.0;
-
     if(setupReader.getValues("ADAPT_SAMPLE_RATIO")[0] == "TRUE"){
         std::cout << "Adaptive samples ratios ON." << std::endl;
     }
@@ -304,7 +286,7 @@ int main(int argc, char **argv)
                 ->updSampler(0)->getSetPE() );
     
             // Reinitialize current sampler
-            context->updWorld(currentWorldIx)->updSampler(0)->reinitialize( currentAdvancedState);
+            context->updWorld(currentWorldIx)->updSampler(0)->reinitialize(currentAdvancedState);
     
             // Update
             for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){ // Iterate through samples
@@ -315,8 +297,6 @@ int main(int argc, char **argv)
                 #endif
 
                 ++mc_step;
-                ++restore_mc_step;
-   
             } // END for samples
 
             // Print energy and geometric features
