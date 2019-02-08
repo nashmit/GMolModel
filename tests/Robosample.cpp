@@ -6,6 +6,8 @@
 #include <iostream>
 #include <sstream>
 #include <chrono>
+#include <cassert>
+#include <sys/stat.h>
 #include "simmain.hpp"
 #include "Robo.hpp"
 
@@ -21,14 +23,44 @@ int main(int argc, char **argv)
 {
     // Initialize setup reader
     SetupReader setupReader(argv[1]);
+    unsigned int nofWorlds = setupReader.getValues("WORLDS").size();
     std::cout << "SETUP" << std::endl;
     setupReader.dump();
 
-    Context *context = new Context();
+    // Assert minimal requirements
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
+        for(unsigned int molIx = 0; molIx < setupReader.getValues("MOLECULES").size(); molIx++){
+            assert(SimTK::Pathname::fileExists(
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/")
+                + setupReader.getValues("PRMTOP")[molIx]) );
+            assert(SimTK::Pathname::fileExists(
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/")
+                + setupReader.getValues("INPCRD")[molIx]) );
+            assert(SimTK::Pathname::fileExists(
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/")
+                + setupReader.getValues("RBFILE")[molIx]) );
+            assert(SimTK::Pathname::fileExists(
+                setupReader.getValues("MOLECULES")[molIx] + std::string("/")
+                + setupReader.getValues("FLEXFILE")[molIx]) );
 
+        }
+    }
+    assert(SimTK::Pathname::fileExists(setupReader.getValues("OUTPUT_DIR")[0]));
+
+    // Create pdbs directory if necessary
+    if( !(SimTK::Pathname::fileExists(setupReader.getValues("OUTPUT_DIR")[0] + "/pdbs")) ){
+
+        const int dir_err = mkdir(
+            (setupReader.getValues("OUTPUT_DIR")[0] + "/pdbs").c_str(),
+            S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
+        if (-1 == dir_err){
+            std::cout << "Error creating " << setupReader.getValues("OUTPUT_DIR")[0] + "/pdbs" << std::endl;
+            exit(1);
+        }
+    }
 
     // Variables
-
     int currentWorldIx = 0;
     int lastWorldIx = 0;
     int round_mcsteps = 0;
@@ -36,8 +68,10 @@ int main(int argc, char **argv)
 
     int mc_step = -1;
 
+    // Create context
+    Context *context = new Context();
+
     // Add Worlds
-    unsigned int nofWorlds = setupReader.getValues("WORLDS").size();
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         if(setupReader.getValues("VISUAL")[worldIx] == "TRUE"){
             context->AddWorld(true);
@@ -49,6 +83,7 @@ int main(int argc, char **argv)
     // Add molecules to worlds
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         for(unsigned int molIx = 0; molIx < setupReader.getValues("MOLECULES").size(); molIx++){
+
             context->loadTopologyFile( worldIx, molIx,
                 setupReader.getValues("MOLECULES")[molIx] + std::string("/")
                 + setupReader.getValues("PRMTOP")[molIx]
@@ -178,7 +213,7 @@ int main(int argc, char **argv)
         }
     }
 
-    // Add samplers to the worlds
+    // Initialize samplers
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
             context->initializeSampler(worldIx, samplerIx);
@@ -277,8 +312,16 @@ int main(int argc, char **argv)
         (context->updWorld(currentWorldIx))->updateAtomLists(advancedState);
         std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
         for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-            ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb(context->getOutputDir(), "sb." + context->getPdbPrefix() + ".", ".pdb", 10, mc_step);
+            ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb(context->getOutputDir(), "/pdbs/sb." + context->getPdbPrefix() + ".", ".pdb", 10, mc_step);
         }
+    }
+
+
+    if(SimTK::Pathname::getEnvironmentVariable("CUDA_ROOT") == ""){
+        std::cout << "CUDA_ROOT not set." << std::endl;
+    }else{
+        std::cout << "CUDA_ROOT set to " 
+            << SimTK::Pathname::getEnvironmentVariable("CUDA_ROOT") << std::endl;
     }
 
     // Get output printing frequency
@@ -291,7 +334,7 @@ int main(int argc, char **argv)
 
     // Write final pdbs
     for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-        ((context->updWorld( context->worldIndexes.front() ))->getTopology(mol_i)).writePdb(context->getOutputDir(), "final." + context->getPdbPrefix() + ".", ".pdb", 10, context->getNofRounds());
+        ((context->updWorld( context->worldIndexes.front() ))->getTopology(mol_i)).writePdb(context->getOutputDir(), "/pdbs/final." + context->getPdbPrefix() + ".", ".pdb", 10, context->getNofRounds());
     }
     //
 
