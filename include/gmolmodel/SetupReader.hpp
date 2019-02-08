@@ -23,6 +23,8 @@ public:
     void dump(void);
 
     // Access values by key
+    bool find( std::string argKey );
+
     std::vector<std::string> getValues(const char *argKey);
     std::vector<std::string> getValues(std::string argKey);
 

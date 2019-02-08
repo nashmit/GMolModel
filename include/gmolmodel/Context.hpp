@@ -111,6 +111,11 @@ public:
     /** Initialize the same velocities **/
     bool getReproducible(void);
     void setReproducible(void);
+
+    /** Get/Set seed for reproducibility. **/
+    void setSeed(int whichWorld, int whichSampler, unsigned long long int);
+    unsigned long long int getSeed(int whichWorld, int whichSampler);
+
     //------------
 
     /** Analysis related functions **/

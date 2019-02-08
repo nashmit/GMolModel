@@ -66,6 +66,18 @@ void SetupReader::dump(void)
     }
 }
 
+/** Check if key exists **/
+bool SetupReader::find( std::string argKey )
+{
+
+    if( Args.find( argKey ) == Args.end() ){
+        return false;
+    }else{
+        return true;
+    }
+
+}
+
 // Access values by key
 std::vector<std::string> SetupReader::getValues(const char *cArgKey)
 {

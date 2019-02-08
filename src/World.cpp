@@ -351,6 +351,18 @@ void World::setTemperature(SimTK::Real argTemperature)
 // --- Simulation ---
 //...................
 
+/** Get/Set seed for reproducibility. **/
+void World::setSeed(int whichSampler, unsigned long long int argSeed)
+{
+    samplers[whichSampler]->setSeed(argSeed);
+}
+
+unsigned long long int World::getSeed(int whichSampler)
+{
+    return samplers[whichSampler]->getSeed();
+}
+
+
 /** Amber like scale factors. **/
 void World::setAmberForceFieldScaleFactors(void)
 {

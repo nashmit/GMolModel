@@ -142,7 +142,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool rand
 {
     // Seed the random number generator
     if(reproducible){
-        setSeed(1);
+        //setSeed(1);
         randomEngine.seed( getSeed() );
         std::cout << "SEED: " << getSeed() << std::endl;
     }else{

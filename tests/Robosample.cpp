@@ -162,22 +162,26 @@ int main(int argc, char **argv)
         srand (time(NULL));
     }
 
+    // Set thermodynamics
     for(int worldIx = 0; worldIx < setupReader.getValues("WORLDS").size(); worldIx++){
         context->setTemperature(worldIx, std::stof(setupReader.getValues("TEMPERATURE_INI")[worldIx]));
         context->setNofSamplesPerRound(worldIx, std::stoi(setupReader.getValues("SAMPLES_PER_ROUND")[worldIx]));
         context->setNofMDStepsPerSample(worldIx, std::stoi(setupReader.getValues("MDSTEPS")[worldIx]));
     }
 
+    // Set the seeds for reproducibility
+    if( setupReader.find("SEED") ){
+        if( !(setupReader.getValues("SEED").empty()) ){
+            for(unsigned int worldIx = 0; worldIx < context->getNofWorlds(); worldIx++){
+                context->setSeed(worldIx, 0, std::stoi( setupReader.getValues("SEED")[worldIx] ));
+            }
+        }
+    }
+
     // Add samplers to the worlds
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
-
-            //if(setupReader.getValues("WORLDS")[worldIx] == "TD"){
-            //    context->initializeSampler(worldIx, samplerIx, true);
-            //}else{
-                context->initializeSampler(worldIx, samplerIx);
-            //}
-
+            context->initializeSampler(worldIx, samplerIx);
         }
     }
 
@@ -277,85 +281,13 @@ int main(int argc, char **argv)
         }
     }
 
-    // Adapt variables
-    if(setupReader.getValues("ADAPT_SAMPLE_RATIO")[0] == "TRUE"){
-        std::cout << "Adaptive samples ratios ON." << std::endl;
-    }
-
-    // Heating
-    //for(unsigned int round = 0; round < context->getNofHeatingRounds; round++){
-    //}
-
+    // Get output printing frequency
     context->setPrintFreq( std::stoi(setupReader.getValues("PRINT_FREQ")[0]) );
 
-    // Production
+    // -- Run --
     context->Run(context->getNofRounds(), 
         std::stof(setupReader.getValues("TEMPERATURE_INI")[0]),
         std::stof(setupReader.getValues("TEMPERATURE_FIN")[0]));
-/*
-    for(int round = 0; round < context->getNofRounds(); round++){ // Iterate rounds
-
-        for(unsigned int worldIx = 0; worldIx < context->getNofWorlds(); worldIx++){ // Iterate worlds
-    
-            // Rotate worlds indeces (translate from right to left) 
-            std::rotate(context->worldIndexes.begin(), context->worldIndexes.begin() + 1, context->worldIndexes.end());
-
-            // Get indeces
-            currentWorldIx = context->worldIndexes.front();
-            lastWorldIx = context->worldIndexes.back();
-    
-            // Transfer coordinates from last world to current
-            SimTK::State& lastAdvancedState = (context->updWorld(context->worldIndexes.back()))->integ->updAdvancedState();
-            SimTK::State& currentAdvancedState = (context->updWorld(currentWorldIx))->integ->updAdvancedState();
-    
-            currentAdvancedState = (context->updWorld(currentWorldIx))->setAtomsLocationsInGround(
-               currentAdvancedState, (context->updWorld(context->worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
-    
-            // Set old potential energy of the new world
-            (context->updWorld(currentWorldIx))->updSampler(0)->setOldPE(
-                (context->updWorld(context->worldIndexes.back()))
-                ->updSampler(0)->getSetPE() );
-    
-            // Reinitialize current sampler
-            context->updWorld(currentWorldIx)->updSampler(0)->reinitialize(currentAdvancedState);
-    
-            // Update
-            for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){ // Iterate through samples
-                context->updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, context->getNofMDStepsPerSample(currentWorldIx));
-                
-                #ifdef ROBO_DEBUG_LEVEL01
-                std::this_thread::sleep_for(std::chrono::milliseconds(2000)); 
-                #endif
-
-                ++mc_step;
-            } // END for samples
-
-            // Print energy and geometric features
-            if( !(round % context->getPrintFreq()) ){
-                // ndofs accs pe_o pe_set ke_o ke_n fix_o fix_set fix_n
-                context->PrintSamplerData(currentWorldIx);
-                context->PrintGeometry(currentWorldIx);
-            }
-    
-        } // for i in worlds
-
-        // Write pdb
-        SimTK::State& pdbState = (context->updWorld(context->worldIndexes.front()))->integ->updAdvancedState();
-        if( context->getPdbRestartFreq() != 0){
-            if(((round) % context->getPdbRestartFreq()) == 0){
-                (context->updWorld(context->worldIndexes.front()))->updateAtomLists(pdbState);
-                for(int mol_i = 0; mol_i < context->getNofMolecules(); mol_i++){
-                    ((context->updWorld(context->worldIndexes.front()))
-                    ->getTopology(mol_i)).writePdb(
-                        "pdbs", "sb." + pdbPrefix + ".", ".pdb", 10, round
-                    );
-
-                }
-            }
-        } // if write pdbs
-
-    } // for i in rounds
-*/
 
     // Write final pdbs
     for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){

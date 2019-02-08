@@ -125,6 +125,10 @@ public:
     //...............
 
     // --- Simulation ---
+    /** Get/Set seed for reproducibility. **/
+    void setSeed(int whichSampler, unsigned long long int);
+    unsigned long long int getSeed(int whichSampler);
+
     /** Amber like scale factors. **/
     void setAmberForceFieldScaleFactors(void);
 

@@ -693,6 +693,21 @@ void Context::setReproducible(void)
         }
     }
 }
+
+
+/** Get/Set seed for reproducibility. **/
+void Context::setSeed(int whichWorld, int whichSampler, unsigned long long int argSeed)
+{
+    worlds[whichWorld]->updSampler(whichSampler)->setSeed(argSeed);
+}
+
+unsigned long long int Context::getSeed(int whichWorld, int whichSampler)
+{
+    return worlds[whichWorld]->updSampler(whichSampler)->getSeed();
+}
+
+
+
     //------------
 //------------
 

@@ -1,33 +1,44 @@
+# Molecule information
 MOLECULES 2but                  # Molecules to load
 PRMTOP ligand.prmtop        # Parameter file
 INPCRD ligand.inpcrd        # Coordinate / Restart file
 RBFILE ligand.rb            # Rigid bodies definition file
 FLEXFILE ligand.flex        # Flexible bonds definition file
 OUTPUT_DIR heating
+
+# Simulation
 WORLDS IC TD                       # Regimen (IC, TD, MIX, RB, RBMIX)
 SAMPLER HMC HMC            # HMC or MC
-THERMOSTAT None None        # Thermostat (HMC + Andersen = MD)
 ROUNDS 20                   # MC steps (Acception-rejection steps)
 TIMESTEPS 0.001 0.002                # Timesteps to be used with regimens
 MDSTEPS  5 6   # Number of MD trial steps
 SAMPLES_PER_ROUND 1 1  # Number of MC trials within a mixing round
+REPRODUCIBLE TRUE
+SEED 1000 2000
+
+# Thermodynamics
+THERMOSTAT None None        # Thermostat (HMC + Andersen = MD)
 TEMPERATURE_INI  1000 1000      # Temperature for constant temperature simulations
 TEMPERATURE_FIN  1000 1000      # Temperature for constant temperature simulations
 FFSCALE AMBER AMBER        # Force field scale factors
 GBSA 0.0 0.0              # GBSA scale factor
+
+# Generalized coordinates related
 FIXMAN_POTENTIAL FALSE TRUE # Use Fixman potential
 FIXMAN_TORQUE FALSE FALSE          # Use Fixman torque
+
+# Output
 VISUAL TRUE TRUE                 # Use the visualizer
 #VISUAL FALSE FALSE                 # Use the visualizer
+PRINT_FREQ 1
 WRITEPDBS 2 2      # Write pdbs
 GEOMETRY TRUE TRUE                # Calculate geometric features
 DISTANCE 0 1
 DIHEDRAL 11 2 4 7
 #DIHEDRAL 204 206 208 214 206 208 214 216
 #DISTANCE 0 418
-REPRODUCIBLE TRUE
+
+# Software specs
 THREADS 1 1
 OPENMM TRUE
-PRINT_FREQ 1
 
-ADAPT_SAMPLE_RATIO FALSE    # Adaptive sample ratio adjustment
