@@ -135,7 +135,7 @@ for li in range(nfiles):
     
     # Input files content
     for repeat in range(args.nsims):
-        #print "Generate input file", inpFilenames[repeat], "...",
+        print "Generate input file", inpFilenames[repeat], "...",
         inpFile = open(args.inputDir + "/" + inpFilenames[repeat], "w+")
         fpotential = ''
         ftorque = ''
@@ -149,7 +149,7 @@ for li in range(nfiles):
         else:
             ftorque = 'FALSE'
     
-    content = """# Molecule information
+        content = """# Molecule information
 MOLECULES %s                  # Molecules to load
 PRMTOP ligand.prmtop        # Parameter file
 INPCRD %s        # Coordinate / Restart file
@@ -203,9 +203,9 @@ OPENMM TRUE
         , args.printFreq \
         , args.pdbFreq, args.pdbFreq \
         )
-    inpFile.write(content)
-    inpFile.close()
-        #print "Done."
+        inpFile.write(content)
+        inpFile.close()
+        print "Done."
     
     if args.dry:
         for repeat in range(args.nsims):
