@@ -745,6 +745,7 @@ void Context::PrintSamplerData(unsigned int whichWorld)
 {
 
     SimTK::State& currentAdvancedState = worlds[whichWorld]->integ->updAdvancedState();
+/*
     std::cout << currentAdvancedState.getNU() << ' '
         << worlds[whichWorld]->updSampler(0)->getAcceptedSteps() << ' '
         << std::setprecision(4) << std::fixed
@@ -756,6 +757,20 @@ void Context::PrintSamplerData(unsigned int whichWorld)
         << worlds[whichWorld]->updSampler(0)->getSetFixman() << ' '
         << worlds[whichWorld]->updSampler(0)->getProposedFixman() << ' '
         ;
+*/
+    // Use printf for faster output
+    printf("%d %d %.2f %.2f %.2f %.2f %.2f %.2f %.2f "
+        , currentAdvancedState.getNU() 
+        , worlds[whichWorld]->updSampler(0)->getAcceptedSteps() 
+        , worlds[whichWorld]->updSampler(0)->getOldPE() 
+        , worlds[whichWorld]->updSampler(0)->getSetPE() 
+        , worlds[whichWorld]->updSampler(0)->getLastAcceptedKE() 
+        , worlds[whichWorld]->updSampler(0)->getProposedKE() 
+        , worlds[whichWorld]->updSampler(0)->getOldFixman() 
+        , worlds[whichWorld]->updSampler(0)->getSetFixman() 
+        , worlds[whichWorld]->updSampler(0)->getProposedFixman() 
+    );
+
 }
 
 // Print geometric parameters during simulation
@@ -769,9 +784,15 @@ void Context::PrintGeometry(SetupReader& setupReader, int whichWorld)
         }
         // Get distances
         for(int ai = 0; ai < (setupReader.getValues("DISTANCE").size() / 2); ai++){
+            /*
             std::cout << std::setprecision(4) 
             << this->Distance(whichWorld, 0, 0, 
                 distanceIx[2*ai + 0], distanceIx[2*ai + 1]) << " ";
+            */
+            
+            printf("%.2f ", this->Distance(whichWorld, 0, 0,
+                 distanceIx[2*ai + 0], distanceIx[2*ai + 1]));
+
         }
 
         // Get dihedrals indeces
@@ -781,14 +802,23 @@ void Context::PrintGeometry(SetupReader& setupReader, int whichWorld)
         }
         // Get dihedrals
         for(int ai = 0; ai < (setupReader.getValues("DIHEDRAL").size() / 4); ai++){
+            /*
             std::cout << std::setprecision(4) 
             << this->Dihedral(whichWorld, 0, 0, 
                 dihedralIx[4*ai + 0], dihedralIx[4*ai + 1], 
                 dihedralIx[4*ai + 2], dihedralIx[4*ai + 3]) << " ";
+            */
+
+            printf("%.2f ", this->Dihedral(whichWorld, 0, 0,
+                dihedralIx[4*ai + 0], dihedralIx[4*ai + 1],
+                dihedralIx[4*ai + 2], dihedralIx[4*ai + 3]));
+
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
+        printf("\n");
     }else{
-        std::cout << std::endl;
+        //std::cout << std::endl;
+        printf("\n");
     }
 }
 
@@ -797,21 +827,35 @@ void Context::PrintGeometry(int whichWorld)
 
     for ( unsigned int i = 0; i < distanceIxs.size(); i++){
         if( distanceIxs[i][0] == whichWorld){
+            /*
             std::cout << std::setprecision(4) 
             << this->Distance(distanceIxs[i][0], distanceIxs[i][1], 0, 
                 distanceIxs[i][2], distanceIxs[i][3]) << " ";
+            */
+            printf("%.3f ", 
+                this->Distance(distanceIxs[i][0], distanceIxs[i][1], 0, 
+                   distanceIxs[i][2], distanceIxs[i][3]) );
+
         }
     }
 
     for ( unsigned int i = 0; i < dihedralIxs.size(); i++){
         if( dihedralIxs[i][0] == whichWorld){
+            /*
             std::cout << std::setprecision(4) 
             << this->Dihedral(dihedralIxs[i][0], dihedralIxs[i][1], 0, 
                 dihedralIxs[i][2], dihedralIxs[i][3], 
                 dihedralIxs[i][4], dihedralIxs[i][5]) << " ";
+            */
+
+            printf("%.3f ", this->Dihedral(dihedralIxs[i][0], dihedralIxs[i][1], 0,
+                dihedralIxs[i][2], dihedralIxs[i][3], 
+                dihedralIxs[i][4], dihedralIxs[i][5]) );
+
         }
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
+    printf("\n");
 }
 
 // Get / set pdb files writing frequency
