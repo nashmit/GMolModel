@@ -83,10 +83,12 @@ parser.add_argument('--usecols', default=0, type=int, nargs='+',
   help='Columns to be read by numpy.loadtxt')
 parser.add_argument('--nbins', default=50, type=int,
   help='Number of bins for histograms. Default for 7.2 spacing')
+parser.add_argument('--Ms', default=[100], type=int, nargs='+', 
+  help='Number of steps to sum the correlation function on. One M per column')
 parser.add_argument('--nofAddMethods', default=0, type=int,
   help='Number of additional methods wrote by James on StackOverflow.')
-parser.add_argument('--makeplot', action='store_true', default=False,
-  help='Make histogram plot')
+parser.add_argument('--makeplots', default='all', nargs='+', 
+  help='Make plots')
 parser.add_argument('--savefig', action='store_true', default=False,
   help='Save the plot into a file')
 args = parser.parse_args()
@@ -94,7 +96,7 @@ args = parser.parse_args()
 import genfuncs
 
 # General plot parameters
-if args.makeplot:
+if args.makeplots:
   matplotlib.rc('font',**{\
     'family':'serif',\
     'serif':['Computer Modern Roman'], \
@@ -111,6 +113,8 @@ ncols = len(args.usecols)
 variances = np.zeros((ncols))
 stds = np.zeros((ncols))
 means = np.zeros((ncols))
+
+tiny = 0.0000001
 
 for ri in range(len(args.inFNRoots)): # Iterate through roots
   FNlist = glob.glob(os.path.join(args.dir, args.inFNRoots[ri] + '*'))
@@ -139,7 +143,6 @@ for ri in range(len(args.inFNRoots)): # Iterate through roots
       # Do statistics on each columns
       for coli in range(ncols):
           print "Column", coli
-
           # Moments 
           means[coli] = np.mean(cols[coli])
           variances[coli] = np.var(cols[coli])
@@ -147,35 +150,44 @@ for ri in range(len(args.inFNRoots)): # Iterate through roots
           #print 'mean', means[coli]
           #print 'variance', variances[coli]
 
-          # Autocorrelation time estimate
-          n = cols[coli].size # sample size
-          corr = np.zeros((7, n))
-          lags = np.arange(0, n)
+          # Autocorrelation time estimate (2009 Grossfield)
+          # Compute correlation function vor M values or until it reaches 0
+          n = cols[coli].size # Sample size
+          M = args.Ms[coli]
+          if M == 0: M = n
 
-          CestGrossfield = np.zeros((n))
+          corr = np.zeros((7, M))
+          lags = np.arange(0, M)
+        
+          cut = 0
+
+          CestGrossfield = np.zeros((M))
           for lag in lags:
               CestGrossfield[lag] = .0
-              for i in np.arange(0, n - lag):
+              # Take the product (f(t))(f(t+lag)) and average over (n - lag) points
+
+              for i in np.arange(0, n - lag): 
                   hi  = cols[coli][i]
                   hit = cols[coli][i + lag]
                   CestGrossfield[lag] = CestGrossfield[lag] + (((hi - means[coli]) * (hit - means[coli])))
-              CestGrossfield[lag] = CestGrossfield[lag] / n
+              CestGrossfield[lag] = CestGrossfield[lag] / (n - lag)
+
+              # Normalize. The variance is also the correlation at time 0 and
+              # should be highest
               CestGrossfield[lag] = CestGrossfield[lag] / variances[coli]
+
+              # If the correlation function reaches 0 the rest is considered noise
+              if CestGrossfield[lag] < tiny:
+                  cut = lag 
+                  break
+
               #print CestGrossfield[lag]
 
           corr[0] = CestGrossfield
 
           # Fit to an exponential Aexp(Bx)
-          y = CestGrossfield / CestGrossfield[0]
-          noise_thres = 0.01
+          y = CestGrossfield 
           x = np.arange(0,n)
-          cut = 0
-          for i in range(y.size):
-              if y[i] <= noise_thres:
-                  y[i] = noise_thres
-                  cut = i
-                  break
-
           if cut > 1:
               AB = np.polyfit( x[1:cut], np.log(y[1:cut]), 1, w=(y[1:cut]**2) )
               corr[1][1:] = np.exp(AB[1]) * np.exp(AB[0] * x[1:])
@@ -235,59 +247,68 @@ for ri in range(len(args.inFNRoots)): # Iterate through roots
           AIac = n / AESS
           print 'Asymptotic autocorrelation time', AIac
 
-          # Plot
-          if args.makeplot:
-           
-            fig1 = plt.figure(1)
-            fig1.suptitle("Autocorrelation time function") 
-            labels = ['Grossfield fit', 'Grossfield', 'np.corrcoef, partial', 'manual, non-partial',
-            'fft, pad 0s, non-partial', 'fft, no padding, non-partial',
-            'np.correlate, non-partial']
-            colors = ['red', 'orange', 'blue', 'magenta', 'cyan', 'black', 'green']
-            ax = plt.subplot(ncols, 1, coli+1)
-            line, = ax.plot(corr[0], label='Col ' +  str(coli) + ' ' + ' real', color='black')
-            line.set_dashes([2,2,10,2])
-            ax.plot(corr[1], label='Col ' +  str(coli) + ' ' + ' fitted', color='red')
-            ax.legend()
+          # Plots
+          if(('acf' in args.makeplots) or ('all' in args.makeplots)):
+              fig1 = plt.figure(1)
+              fig1.suptitle("Autocorrelation time function") 
+              labels = ['Grossfield fit', 'Grossfield', 'np.corrcoef, partial', 'manual, non-partial',
+              'fft, pad 0s, non-partial', 'fft, no padding, non-partial',
+              'np.correlate, non-partial']
+              colors = ['red', 'orange', 'blue', 'magenta', 'cyan', 'black', 'green']
+              ax = plt.subplot(ncols, 1, coli+1)
+              line, = ax.plot(corr[0], label='Col ' +  str(coli) + ' ' + ' real', color='black')
+              line.set_dashes([2,2,10,2])
+              ax.plot(corr[1], label='Col ' +  str(coli) + ' ' + ' fitted', color='red')
+              ax.legend()
+  
+              ax.set_xlabel(r'$\mathrm{\tau}$', fontsize=8)
+              ax.set_ylabel(r'$\mathrm{C(\tau)}$', fontsize=8)
+        
+              plt.setp(ax.get_xticklabels(), rotation='vertical', fontsize=8)
+              plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=8)
+        
+              textrelhpos = 0.5
+              textrelvpos = 0.9
+              ax.text(textrelhpos, textrelvpos, FNlist[li], transform=ax.transAxes, \
+                  horizontalalignment='center', verticalalignment='top', \
+                  fontsize=8)
 
-            ax.set_xlabel(r'$\mathrm{\tau}$', fontsize=8)
-            ax.set_ylabel(r'$\mathrm{C(\tau)}$', fontsize=8)
-      
-            plt.setp(ax.get_xticklabels(), rotation='vertical', fontsize=8)
-            plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=8)
-      
-            textrelhpos = 0.5
-            textrelvpos = 0.9
-            ax.text(textrelhpos, textrelvpos, FNlist[li], transform=ax.transAxes, \
-                horizontalalignment='center', verticalalignment='top', \
-                fontsize=8)
+              if args.savefig:
+                    figFN = 'temp.acf.pdf'
+                    plt.savefig(figFN, dpi=600, format='pdf')
+  
+          if(('bse' in args.makeplots) or ('all' in args.makeplots)):
+              fig2 = plt.figure(2)
+              fig2.suptitle("BSE")
+              ax = plt.subplot(ncols, 1, coli+1)
+              ax.plot(BSEOfN, label='Col ' +  str(coli) + ' real', color='black')
+              line, = ax.plot(BSEOfNFit, label='Col ' +  str(coli) + ' fit', color = 'red')
+              line.set_dashes([2,2,10,2])
+              ax.legend()
+  
+              ax.set_xlabel(r'$\mathrm{n(block size)}$', fontsize=8)
+              ax.set_ylabel(r'$\mathrm{BSE(n)}$', fontsize=8)
+   
+              if args.savefig:
+                    figFN = 'temp.bse.pdf'
+                    plt.savefig(figFN, dpi=600, format='pdf')
+  
+          if(('data' in args.makeplots) or ('all' in args.makeplots)):
+              fig3 = plt.figure(3)
+              fig3.suptitle("Raw data")
+              ax = plt.subplot(ncols, 1, coli+1)
+              ax.plot(cols[coli], label='Col ' +  str(coli) + ' real', color='black')
+              ax.legend()
+  
+              ax.set_xlabel(r'$\mathrm{t}$', fontsize=8)
+              ax.set_ylabel(r'$\mathrm{f(t)}$', fontsize=8)
 
-            fig2 = plt.figure(2)
-            fig2.suptitle("BSE")
-            ax = plt.subplot(ncols, 1, coli+1)
-            ax.plot(BSEOfN, label='Col ' +  str(coli) + ' real', color='black')
-            line, = ax.plot(BSEOfNFit, label='Col ' +  str(coli) + ' fit', color = 'red')
-            line.set_dashes([2,2,10,2])
-            ax.legend()
-
-            ax.set_xlabel(r'$\mathrm{n(block size)}$', fontsize=8)
-            ax.set_ylabel(r'$\mathrm{BSE(n)}$', fontsize=8)
-      
-            fig3 = plt.figure(3)
-            fig3.suptitle("Raw data")
-            ax = plt.subplot(ncols, 1, coli+1)
-            ax.plot(cols[coli], label='Col ' +  str(coli) + ' real', color='black')
-            ax.legend()
-
-            ax.set_xlabel(r'$\mathrm{n}$', fontsize=8)
-            ax.set_ylabel(r'$\mathrm{f(n)}$', fontsize=8)
-
-
-if args.makeplot:
-  if args.savefig:
-    figFN = 'temp.pdf'
-    plt.savefig(figFN, dpi=600, format='pdf')
-  plt.show()
+              if args.savefig:
+                    figFN = 'temp.data.pdf'
+                    plt.savefig(figFN, dpi=600, format='pdf')
+  
+if args.makeplots[0] != '' :
+    plt.show()
   
   
   
