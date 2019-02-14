@@ -782,7 +782,7 @@ void Context::PrintSamplerData(unsigned int whichWorld)
 */
 
     // Write to a file instead of stdout
-    fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f"
+    fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f "
         , currentAdvancedState.getNU()
         , (worlds[whichWorld]->samplers[0])->acceptedSteps
         , (worlds[whichWorld]->samplers[0])->pe_o
