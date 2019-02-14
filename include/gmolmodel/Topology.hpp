@@ -13,6 +13,7 @@
 #include "bBond.hpp"
 #include "server.hpp"
 
+/*
 #ifndef MAIN_RESIDUE_DEBUG_SPECIFIC
 #define MAIN_RESIDUE_DEBUG_SPECIFIC 1
 #endif
@@ -31,6 +32,7 @@
 #ifndef DEBUG_PARAMS_LEVEL02
 #define DEBUG_PARAMS_LEVEL02
 #endif
+*/
 
 /** Topological information (bonds graph) for one molecule.
 It maps to one compound in Molmodel thus it is derived 

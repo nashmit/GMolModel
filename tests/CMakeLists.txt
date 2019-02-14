@@ -116,11 +116,11 @@ set(TESTS_SRCS
               TestMolmodelBuildCompound.cpp
         TestMassSqrtAndDet.cpp
         TestOpenMMBasic.cpp
-        TestPrmCrdPeptide.cpp
+        #TestPrmCrdPeptide.cpp
 	      TestPDBReaderMolModel.cpp
         TestParallelExecutor.cpp
 	      TestAmberInput.cpp
-        TestMixing.cpp
+        #TestMixing.cpp
         TestWriteDCD.cpp
         TestHMCSOA.cpp
         Robosample.cpp

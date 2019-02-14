@@ -13,6 +13,7 @@ class IState;
 
 class MonteCarloSampler : public Sampler
 {
+    friend class Context;
 public:
 
     // Constructor
@@ -123,7 +124,7 @@ public:
 protected:
     SimTK::Transform *SetTVector; // Transform matrices
     SimTK::Transform *TVector; // Transform matrices
-    SimTK::Real pe_set, pe_o;
+    SimTK::Real pe_set, pe_o, pe_n;
     SimTK::Real temperature;
     SimTK::Real RT;
 

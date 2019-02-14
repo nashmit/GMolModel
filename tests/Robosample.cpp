@@ -69,7 +69,15 @@ int main(int argc, char **argv)
     int mc_step = -1;
 
     // Create context
-    Context *context = new Context();
+    std::string logFilename;
+    if( setupReader.find("SEED") ){
+        if( !(setupReader.getValues("SEED").empty()) ){
+            logFilename = std::string("log.") + setupReader.getValues("SEED")[0];
+        }
+    }else{
+        logFilename = "x";
+    }
+    Context *context = new Context(logFilename);
 
     // Add Worlds
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){

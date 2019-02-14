@@ -344,14 +344,10 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
 
     // TODO: Implement this in a different function
     SimTK::Real temperatureBoost = 1.000; // no temperature boost
-    //if(nu == 336){
-    //    SimTK::Real temperatureBoost = 1.000; // no temperature boost
-    //}else{
     //    SimTK::Real temperatureBoost = 1.826; // sqrt(1000/300) : brings temperature from 300 to 2000
     //    //SimTK::Real temperatureBoost = 2.582; // sqrt(2000/300) : brings temperature from 300 to 2000
     //    //SimTK::Real temperatureBoost = 3.1623; // sqrt(3000/300) : brings temperature from 300 to 3000
         SqrtMInvV *= (sqrtRT * temperatureBoost); // Set stddev according to temperature
-    //}
 
     // RESTORE when no boostSqrtMInvV *= sqrtRT; // Set stddev according to temperature
     someState.updU() = SqrtMInvV;
@@ -525,10 +521,10 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 
     //SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
     //std::cout << "Multibody PE " << getPEFromEvaluator(someState) << ' ' ; // OPENMM
-    SimTK::Real pe_n = dumm->CalcFullPotEnergyIncludingRigidBodies(someState); // ELIZA FULL
+    pe_n = dumm->CalcFullPotEnergyIncludingRigidBodies(someState); // ELIZA FULL
 
     system->realize(someState, SimTK::Stage::Velocity);
-    SimTK::Real ke_n = matter->calcKineticEnergy(someState);
+    ke_n = matter->calcKineticEnergy(someState);
 
     SimTK::Real etot_proposed, etot_n;
     if(useFixman){
@@ -685,7 +681,7 @@ void HamiltonianMonteCarloSampler::perturbQ(SimTK::State& someState)
 
     //SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
     //std::cout << "Multibody PE " << getPEFromEvaluator(someState) << std::endl; // OPENMM
-    SimTK::Real pe_n = dumm->CalcFullPotEnergyIncludingRigidBodies(someState); // ELIZA FULL
+    pe_n = dumm->CalcFullPotEnergyIncludingRigidBodies(someState); // ELIZA FULL
 
     int accepted = 0;
 

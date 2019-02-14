@@ -14,6 +14,7 @@
 #include "bSpecificAtom.hpp"
 #include "bBond.hpp"
 
+/*
 #ifndef DEBUG_PARAMS_LEVEL01
 #define DEBUG_PARAMS_LEVEL01
 #endif
@@ -21,7 +22,6 @@
 #ifndef DEBUG_PARAMS_LEVEL02
 #define DEBUG_PARAMS_LEVEL02
 #endif
-/*
 */
 
 // Conveninet functions (Pointers have to be allocated first).

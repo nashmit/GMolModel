@@ -19,7 +19,18 @@ int main(int argc, char **argv)
     // Initialize setup reader
     SetupReader setupReader(argv[1]);
     TRACE("NEW ALLOC\n");
-    Context *context = new Context();
+
+    // Create context
+    std::string logFilename;
+    if( setupReader.find("SEED") ){
+        if( !(setupReader.getValues("SEED").empty()) ){
+            logFilename = std::string("log.") + setupReader.getValues("SEED")[0];
+        }
+    }else{
+        logFilename = "x";
+    }
+
+    Context *context = new Context(logFilename);
     srand (time(NULL));
 
     // Build Gmolmodel simulation worlds

@@ -6,12 +6,17 @@
 #include "Sampler.hpp"
 
 // Default constructor
-Context::Context(void){
-    //total_mcsteps = 0;
+Context::Context(std::string logFilename){
+    BUFSIZE = 1048576;
+    buffer = new char[BUFSIZE];
+    logFile = fopen(logFilename.c_str(), "w+");
+    if ( setvbuf(logFile, buffer, _IOFBF, BUFSIZE) != 0){
+       perror("setvbuf()");
+    }
 }
 
 // Constructor
-Context::Context(World *inp_p_world){
+Context::Context(World *inp_p_world, std::string logFilename){
     //total_mcsteps = 0;
     worlds.push_back(inp_p_world);
     worldIndexes.push_back(0);
@@ -29,6 +34,14 @@ Context::Context(World *inp_p_world){
     pdbRestartFreq = 0;
     outputDir = "pdbs";
     pdbPrefix = "x";
+
+    BUFSIZE = 1048576;
+    buffer = new char[BUFSIZE];
+    logFile = fopen(logFilename.c_str(), "w+");
+    if ( setvbuf(logFile, buffer, _IOFBF, BUFSIZE) != 0){
+       perror("setvbuf()");
+    }
+
 }
 
 // Add another world and a sampler to the context
@@ -51,26 +64,6 @@ World * Context::AddWorld(bool visual){
 
     return worlds.back();
 }
-
-// Add another world and a sampler to the context
-/*
-World * Context::AddWorld(World *inp_p_world, bool visual){
-    worlds.push_back(inp_p_world);
-    worldIndexes.push_back(worldIndexes.size());
-
-    topFNs.push_back(std::vector<std::string>());
-    crdFNs.push_back(std::vector<std::string>());
-    rbSpecsFNs.push_back(std::vector<std::string>());
-    flexSpecsFNs.push_back(std::vector<std::string>());
-    regimens.push_back(std::vector<std::string>());
-
-    nofSamplesPerRound.push_back(1);
-    nofMDStepsPerSample.push_back(1);
-    timesteps.push_back(0.002); // ps
-
-    return worlds.back();
-}
-*/
 
 // Destructor
 Context::~Context(){
@@ -96,7 +89,11 @@ Context::~Context(){
  
     nofSamplesPerRound.clear();
     nofMDStepsPerSample.clear();
-    timesteps.clear(); 
+    timesteps.clear();
+
+    fclose(logFile);
+    delete buffer;
+ 
 }
 
 // Get world
@@ -745,8 +742,7 @@ void Context::PrintSamplerData(unsigned int whichWorld)
 {
 
     SimTK::State& currentAdvancedState = worlds[whichWorld]->integ->updAdvancedState();
-/*
-    std::cout << currentAdvancedState.getNU() << ' '
+/*    std::cout << currentAdvancedState.getNU() << ' '
         << worlds[whichWorld]->updSampler(0)->getAcceptedSteps() << ' '
         << std::setprecision(4) << std::fixed
         << worlds[whichWorld]->updSampler(0)->getOldPE() << ' '
@@ -758,7 +754,7 @@ void Context::PrintSamplerData(unsigned int whichWorld)
         << worlds[whichWorld]->updSampler(0)->getProposedFixman() << ' '
         ;
 */
-    // Use printf for faster output
+/*    // Use printf for faster output
     printf("%d %d %.2f %.2f %.2f %.2f %.2f %.2f %.2f "
         , currentAdvancedState.getNU() 
         , worlds[whichWorld]->updSampler(0)->getAcceptedSteps() 
@@ -769,6 +765,32 @@ void Context::PrintSamplerData(unsigned int whichWorld)
         , worlds[whichWorld]->updSampler(0)->getOldFixman() 
         , worlds[whichWorld]->updSampler(0)->getSetFixman() 
         , worlds[whichWorld]->updSampler(0)->getProposedFixman() 
+    );
+*/
+
+/*    // Avoid get function calls
+    printf("%d %d %.2f %.2f %.2f %.2f %.2f %.2f"
+        , currentAdvancedState.getNU()
+        , (worlds[whichWorld]->samplers[0])->acceptedSteps
+        , (worlds[whichWorld]->samplers[0])->pe_o
+        , (worlds[whichWorld]->samplers[0])->pe_set
+        , (worlds[whichWorld]->samplers[0])->ke_proposed
+        , (worlds[whichWorld]->samplers[0])->ke_n
+        , (worlds[whichWorld]->samplers[0])->fix_o
+        , (worlds[whichWorld]->samplers[0])->fix_set
+    );
+*/
+
+    // Write to a file instead of stdout
+    fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f"
+        , currentAdvancedState.getNU()
+        , (worlds[whichWorld]->samplers[0])->acceptedSteps
+        , (worlds[whichWorld]->samplers[0])->pe_o
+        , (worlds[whichWorld]->samplers[0])->pe_set
+        , (worlds[whichWorld]->samplers[0])->ke_proposed
+        , (worlds[whichWorld]->samplers[0])->ke_n
+        , (worlds[whichWorld]->samplers[0])->fix_o
+        , (worlds[whichWorld]->samplers[0])->fix_set
     );
 
 }
@@ -832,7 +854,7 @@ void Context::PrintGeometry(int whichWorld)
             << this->Distance(distanceIxs[i][0], distanceIxs[i][1], 0, 
                 distanceIxs[i][2], distanceIxs[i][3]) << " ";
             */
-            printf("%.3f ", 
+            fprintf(logFile, "%.3f ", 
                 this->Distance(distanceIxs[i][0], distanceIxs[i][1], 0, 
                    distanceIxs[i][2], distanceIxs[i][3]) );
 
@@ -848,14 +870,14 @@ void Context::PrintGeometry(int whichWorld)
                 dihedralIxs[i][4], dihedralIxs[i][5]) << " ";
             */
 
-            printf("%.3f ", this->Dihedral(dihedralIxs[i][0], dihedralIxs[i][1], 0,
+            fprintf(logFile, "%.3f ", this->Dihedral(dihedralIxs[i][0], dihedralIxs[i][1], 0,
                 dihedralIxs[i][2], dihedralIxs[i][3], 
                 dihedralIxs[i][4], dihedralIxs[i][5]) );
 
         }
     }
     //std::cout << std::endl;
-    printf("\n");
+    fprintf(logFile, "\n");
 }
 
 // Get / set pdb files writing frequency

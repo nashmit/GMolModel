@@ -9,8 +9,8 @@ class World;
 class Context{
 
 public:
-    Context(World *);
-    Context();
+    Context(World *, std::string logFilenameArg);
+    Context(std::string logFilenameArg);
     ~Context();
 
     World * AddWorld(bool visual);
@@ -175,6 +175,11 @@ private:
     // specifies atom indeces
     std::vector< std::vector<int> > distanceIxs;
     std::vector< std::vector<int> > dihedralIxs;
+
+    // Output
+    unsigned int BUFSIZE;
+    char *buffer;
+    FILE *logFile;
 
 };
 

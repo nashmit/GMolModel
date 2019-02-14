@@ -28,6 +28,7 @@ in the function update.
 **/
 class HamiltonianMonteCarloSampler : public MonteCarloSampler
 {
+friend class Context;
 public:
 
     /** Constructor **/
@@ -116,6 +117,7 @@ protected:
     float timestep;
     SimTK::Real ke_lastAccepted; // last accepted kinetic energy
     SimTK::Real ke_proposed; // proposed kinetic energy
+    SimTK::Real ke_n; // new kinetic energy
     SimTK::Real etot_set; // stored total energy
     SimTK::Real etot_proposed; // last accepted total energ (same with stored)
 
