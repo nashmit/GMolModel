@@ -8,8 +8,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
-import numpy
-import matplotlib.pyplot as plt
+from extractLabels import *
 
 # Functions from https://stackoverflow.com/users/2005415/jason
 def autocorr1(x,lags):
@@ -125,6 +124,7 @@ means = np.zeros((ncols))
 tiny = 0.0000001
 
 for ri in range(len(args.inFNRoots)): # Iterate through roots
+  currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
   FNlist = glob.glob(os.path.join(args.dir, args.inFNRoots[ri] + '*'))
   nfiles = len(FNlist)
   hists = np.zeros((nfiles, 2, args.nbins))
@@ -238,9 +238,9 @@ for ri in range(len(args.inFNRoots)): # Iterate through roots
                   'np.correlate, non-partial']
                   colors = ['red', 'orange', 'blue', 'magenta', 'cyan', 'black', 'green']
                   ax = plt.subplot(ncols, 1, coli+1)
-                  line, = ax.plot(corr[0], label='Col ' +  str(coli) + ' ' + ' real', color='black')
+                  line, = ax.plot(corr[0], label = currLabel, color='black')
                   line.set_dashes([2,2,10,2])
-                  ax.plot(corr[1], label='Col ' +  str(coli) + ' ' + ' fitted', color='red')
+                  ax.plot(corr[1], label = currLabel + ' fit', color='red')
                   ax.legend()
       
                   ax.set_xlabel(r'$\mathrm{\tau}$', fontsize=8)
@@ -301,8 +301,8 @@ for ri in range(len(args.inFNRoots)): # Iterate through roots
                   fig2 = plt.figure(2)
                   fig2.suptitle("BSE")
                   ax = plt.subplot(ncols, 1, coli+1)
-                  ax.plot(BSEOfN, label='Col ' +  str(coli) + ' real', color='black')
-                  line, = ax.plot(BSEOfNFit, label='Col ' +  str(coli) + ' fit', color = 'red')
+                  ax.plot(BSEOfN, label = currLabel, color='black')
+                  line, = ax.plot(BSEOfNFit, label = currLabel + ' fit', color = 'red')
                   line.set_dashes([2,2,10,2])
                   ax.legend()
       
