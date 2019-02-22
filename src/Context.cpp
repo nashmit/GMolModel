@@ -576,13 +576,28 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 } // END for samples
     
                 // Print energy and geometric features
-                if( !(round % getPrintFreq()) ){
-                    // ndofs accs pe_o pe_set ke_o ke_n fix_o fix_set fix_n
-                    PrintSamplerData(currentWorldIx);
-                    PrintGeometry(currentWorldIx);
-                }
+                //if( !(round % getPrintFreq()) ){
+                //    PrintSamplerData(currentWorldIx);
+                //    PrintGeometry(currentWorldIx);
+                //}
     
             } // for i in worlds
+    
+            // Print energy and geometric features
+            if( !(round % PRINT_BUFFER_SIZE) ){
+                for(unsigned int p = 0; p < PRINT_BUFFER_SIZE; p++){
+                    fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f "
+                        , (worlds[worldIndexes.front()])->integ->updAdvancedState().getNU()
+                        , (worlds[worldIndexes.front()]->samplers[0])->acceptedSteps
+                        , (worlds[worldIndexes.front()]->samplers[0])->pe_oBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->pe_setBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->ke_proposedBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->ke_nBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->fix_oBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
+                    );
+                }
+            }
     
             // Write pdb
             SimTK::State& pdbState = (updWorld(worldIndexes.front()))->integ->updAdvancedState();
@@ -639,7 +654,6 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
     
                 // Print energy and geometric features
                 if( !(round % getPrintFreq()) ){
-                    // ndofs accs pe_o pe_set ke_o ke_n fix_o fix_set fix_n
                     PrintSamplerData(currentWorldIx);
                     PrintGeometry(currentWorldIx);
                 }

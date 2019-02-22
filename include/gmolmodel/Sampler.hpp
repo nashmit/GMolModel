@@ -10,6 +10,10 @@
 //#define HARMONICOSCILLATOR // for testing purposes
 //#endif
 
+#ifndef PRINT_BUFFER_SIZE
+#define PRINT_BUFFER_SIZE 4096
+#endif 
+
 class Topology;
 
 class Sampler

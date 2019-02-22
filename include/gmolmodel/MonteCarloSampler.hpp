@@ -125,6 +125,16 @@ protected:
     SimTK::Transform *SetTVector; // Transform matrices
     SimTK::Transform *TVector; // Transform matrices
     SimTK::Real pe_set, pe_o, pe_n;
+
+    // Print buffers
+    SimTK::Real pe_setBuff[PRINT_BUFFER_SIZE];
+    SimTK::Real pe_oBuff[PRINT_BUFFER_SIZE];
+    SimTK::Real pe_nBuff[PRINT_BUFFER_SIZE];
+    SimTK::Real fix_setBuff[PRINT_BUFFER_SIZE];
+    SimTK::Real fix_oBuff[PRINT_BUFFER_SIZE];
+    SimTK::Real fix_nBuff[PRINT_BUFFER_SIZE];
+
+    // Thermodynammics
     SimTK::Real temperature;
     SimTK::Real RT;
 

@@ -2,6 +2,7 @@
 #define __CONTEXT_HPP__
 
 #include "Robo.hpp"
+#include "Sampler.hpp"
 
 class Sampler;
 class World;
@@ -175,6 +176,10 @@ private:
     // specifies atom indeces
     std::vector< std::vector<int> > distanceIxs;
     std::vector< std::vector<int> > dihedralIxs;
+
+    SimTK::Real geom1[PRINT_BUFFER_SIZE];
+    SimTK::Real geom2[PRINT_BUFFER_SIZE];
+    SimTK::Real geom3[PRINT_BUFFER_SIZE];
 
     // Output
     unsigned int BUFSIZE;
