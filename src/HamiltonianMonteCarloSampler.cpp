@@ -21,6 +21,7 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
     this->fix_n = this->fix_o = 0.0;
     this->residualEmbeddedPotential = 0.0;
     nofSamples = 0;
+    //printBuffIx = 0;
     this->alwaysAccept = false;
     this->timestep = 0.002; // ps
     this->temperature = 300.0;
@@ -577,6 +578,22 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
         assignConfFromSetTVector(someState);
     }
 
+    // Add to print bufers
+/*
+    pe_setBuff[printBuffIx] = pe_set;
+    pe_oBuff[printBuffIx] = pe_o;
+    pe_nBuff[printBuffIx] = pe_n;
+    fix_setBuff[printBuffIx] = pe_set;
+    fix_oBuff[printBuffIx] = pe_o;
+    fix_nBuff[printBuffIx] = pe_n;
+    ke_proposedBuff[printBuffIx] = ke_proposed;
+    ke_nBuff[printBuffIx] = ke_n;
+    ke_lastBuff[printBuffIx] = ke_lastAccepted;
+    printBuffIx++;
+    if (printBuffIx > PRINT_BUFFER_SIZE){
+        printBuffIx = 0;
+    }
+*/
     //std::cout << " pe_os " << getSetPE() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman() //p
     //xstd::cout << " 0 ";
     //xfor (SimTK::MobilizedBodyIndex mbx(2); mbx < matter->getNumBodies(); ++mbx){

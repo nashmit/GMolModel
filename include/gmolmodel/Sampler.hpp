@@ -96,6 +96,7 @@ public:
 
     // Sampling
     int nofSamples;
+    //int printBuffIx;
     unsigned long long int seed;
   
     // Harmonic oscillator constants

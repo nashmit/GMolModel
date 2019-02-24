@@ -305,10 +305,10 @@ int main(int argc, char **argv)
     SimTK::State& advancedState = (context->updWorld(currentWorldIx))->integ->updAdvancedState();
 
     // Update
-    for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){
-        ++mc_step; // Increment mc_step
-        context->updWorld(currentWorldIx)->updSampler(0)->update(advancedState, context->getNofMDStepsPerSample(currentWorldIx));
-    }
+//    for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){
+//        ++mc_step; // Increment mc_step
+//        context->updWorld(currentWorldIx)->updSampler(0)->update(advancedState, context->getNofMDStepsPerSample(currentWorldIx));
+//    }
 
     // Write pdb
     context->setOutputDir( setupReader.getValues("OUTPUT_DIR")[0] );

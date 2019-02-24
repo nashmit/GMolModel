@@ -122,9 +122,9 @@ protected:
     SimTK::Real etot_proposed; // last accepted total energ (same with stored)
 
     // Print buffers
-    SimTK::Real ke_lastBuff[PRINT_BUFFER_SIZE];
-    SimTK::Real ke_proposedBuff[PRINT_BUFFER_SIZE];
-    SimTK::Real ke_nBuff[PRINT_BUFFER_SIZE];
+    //SimTK::Real ke_lastBuff[PRINT_BUFFER_SIZE];
+    //SimTK::Real ke_proposedBuff[PRINT_BUFFER_SIZE];
+    //SimTK::Real ke_nBuff[PRINT_BUFFER_SIZE];
 
 
     int nofSamples; // counter for the number of MC trials 

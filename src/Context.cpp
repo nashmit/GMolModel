@@ -545,7 +545,26 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
     int lastWorldIx = 0;
 
     if( std::abs(Tf - Ti) < SimTK::TinyReal){
-        for(int round = 0; round < getNofRounds(); round++){ // Iterate rounds
+        for(int round = 0; round < nofRounds; round++){ // Iterate rounds
+    
+/* Try fast IO
+            // Print energy and geometric features
+            if( (!(round % PRINT_BUFFER_SIZE)) && (round != 0) ){
+                for(unsigned int p = 0; p < PRINT_BUFFER_SIZE; p++){
+                    fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f \n"
+                        , (worlds[worldIndexes.front()])->integ->updAdvancedState().getNU()
+                        , (worlds[worldIndexes.front()]->samplers[0])->acceptedSteps
+                        , (worlds[worldIndexes.front()]->samplers[0])->pe_oBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->pe_setBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->ke_proposedBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->ke_nBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->fix_oBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
+                    );
+                }
+            }
+ Try fast IO */
+    
             for(unsigned int worldIx = 0; worldIx < getNofWorlds(); worldIx++){ // Iterate worlds
     
                 // Rotate worlds indeces (translate from right to left)
@@ -575,28 +594,14 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                     updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, getNofMDStepsPerSample(currentWorldIx));
                 } // END for samples
     
-                // Print energy and geometric features
-                //if( !(round % getPrintFreq()) ){
-                //    PrintSamplerData(currentWorldIx);
-                //    PrintGeometry(currentWorldIx);
-                //}
-    
             } // for i in worlds
-    
+
             // Print energy and geometric features
-            if( !(round % PRINT_BUFFER_SIZE) ){
-                for(unsigned int p = 0; p < PRINT_BUFFER_SIZE; p++){
-                    fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f "
-                        , (worlds[worldIndexes.front()])->integ->updAdvancedState().getNU()
-                        , (worlds[worldIndexes.front()]->samplers[0])->acceptedSteps
-                        , (worlds[worldIndexes.front()]->samplers[0])->pe_oBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->pe_setBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->ke_proposedBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->ke_nBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->fix_oBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
-                    );
-                }
+            if( !(round % getPrintFreq()) ){
+                PrintSamplerData(worldIndexes.back());
+                PrintDistances(worldIndexes.front());
+                PrintDihedralsQs(worldIndexes.back());
+                fprintf(logFile, "\n");
             }
     
             // Write pdb
@@ -611,10 +616,29 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
             } // if write pdbs
     
         } // for i in rounds
+
     }else{// if Ti != Tf heating protocol
-        SimTK::Real Tincr = (Tf - Ti) / getNofRounds();
+        SimTK::Real Tincr = (Tf - Ti) / nofRounds;
         SimTK::Real currT = Ti;
-        for(int round = 0; round < getNofRounds(); round++){ // Iterate rounds
+        for(int round = 0; round < nofRounds; round++){ // Iterate rounds
+    
+/* Try fast IO
+            // Print energy and geometric features
+            if( (!(round % PRINT_BUFFER_SIZE)) && (round != 0) ){
+                for(unsigned int p = 0; p < PRINT_BUFFER_SIZE; p++){
+                    fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f \n"
+                        , (worlds[worldIndexes.front()])->integ->updAdvancedState().getNU()
+                        , (worlds[worldIndexes.front()]->samplers[0])->acceptedSteps
+                        , (worlds[worldIndexes.front()]->samplers[0])->pe_oBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->pe_setBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->ke_proposedBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->ke_nBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->fix_oBuff[p]
+                        , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
+                    );
+                }
+            } 
+ Try fast IO */
 
             // Set current temperature
             currT += Tincr;
@@ -652,13 +676,15 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                     updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, getNofMDStepsPerSample(currentWorldIx));
                 } // END for samples
     
-                // Print energy and geometric features
-                if( !(round % getPrintFreq()) ){
-                    PrintSamplerData(currentWorldIx);
-                    PrintGeometry(currentWorldIx);
-                }
-    
             } // for i in worlds
+    
+            // Print energy and geometric features
+            if( !(round % getPrintFreq()) ){
+                PrintSamplerData(worldIndexes.back());
+                PrintDistances(worldIndexes.front());
+                PrintDihedralsQs(worldIndexes.back());
+                fprintf(logFile, "\n");
+            }
     
             // Write pdb
             SimTK::State& pdbState = (updWorld(worldIndexes.front()))->integ->updAdvancedState();
@@ -672,7 +698,24 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
             } // if write pdbs
     
         } // for i in rounds
+
+    } // if heating protocol
+
+/* Try fast IO
+    // Print remaining buffer values
+    for(unsigned int p = 0; p < (nofRounds % PRINT_BUFFER_SIZE); p++){
+        fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f \n"
+            , (worlds[worldIndexes.front()])->integ->updAdvancedState().getNU()
+            , (worlds[worldIndexes.front()]->samplers[0])->acceptedSteps
+            , (worlds[worldIndexes.front()]->samplers[0])->pe_oBuff[p]
+            , (worlds[worldIndexes.front()]->samplers[0])->pe_setBuff[p]
+            , (worlds[worldIndexes.front()]->samplers[0])->ke_proposedBuff[p]
+            , (worlds[worldIndexes.front()]->samplers[0])->ke_nBuff[p]
+            , (worlds[worldIndexes.front()]->samplers[0])->fix_oBuff[p]
+            , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
+        );
     }
+Try fast IO*/
 
 }
 
@@ -804,6 +847,7 @@ void Context::PrintSamplerData(unsigned int whichWorld)
         , (worlds[whichWorld]->samplers[0])->ke_proposed
         , (worlds[whichWorld]->samplers[0])->ke_n
         , (worlds[whichWorld]->samplers[0])->fix_o
+        , (worlds[whichWorld]->samplers[0])->fix_n
         , (worlds[whichWorld]->samplers[0])->fix_set
     );
 
@@ -863,35 +907,113 @@ void Context::PrintGeometry(int whichWorld)
 
     for ( unsigned int i = 0; i < distanceIxs.size(); i++){
         if( distanceIxs[i][0] == whichWorld){
-            /*
-            std::cout << std::setprecision(4) 
-            << this->Distance(distanceIxs[i][0], distanceIxs[i][1], 0, 
-                distanceIxs[i][2], distanceIxs[i][3]) << " ";
-            */
             fprintf(logFile, "%.3f ", 
                 this->Distance(distanceIxs[i][0], distanceIxs[i][1], 0, 
                    distanceIxs[i][2], distanceIxs[i][3]) );
-
         }
     }
 
     for ( unsigned int i = 0; i < dihedralIxs.size(); i++){
         if( dihedralIxs[i][0] == whichWorld){
-            /*
-            std::cout << std::setprecision(4) 
-            << this->Dihedral(dihedralIxs[i][0], dihedralIxs[i][1], 0, 
-                dihedralIxs[i][2], dihedralIxs[i][3], 
-                dihedralIxs[i][4], dihedralIxs[i][5]) << " ";
-            */
-
             fprintf(logFile, "%.3f ", this->Dihedral(dihedralIxs[i][0], dihedralIxs[i][1], 0,
                 dihedralIxs[i][2], dihedralIxs[i][3], 
                 dihedralIxs[i][4], dihedralIxs[i][5]) );
+        }
+    }
+}
+
+void Context::PrintDistances(int whichWorld)
+{
+
+    for ( unsigned int i = 0; i < distanceIxs.size(); i++){
+        if( distanceIxs[i][0] == whichWorld){
+            fprintf(logFile, "%.3f ", 
+                this->Distance(distanceIxs[i][0], distanceIxs[i][1], 0, 
+                   distanceIxs[i][2], distanceIxs[i][3]) );
+        }
+    }
+}
+
+void Context::PrintDihedrals(int whichWorld)
+{
+    for ( unsigned int i = 0; i < dihedralIxs.size(); i++){
+        if( dihedralIxs[i][0] == whichWorld){
+            fprintf(logFile, "%.3f ", this->Dihedral(dihedralIxs[i][0], dihedralIxs[i][1], 0,
+                dihedralIxs[i][2], dihedralIxs[i][3], 
+                dihedralIxs[i][4], dihedralIxs[i][5]) );
+        }
+    }
+}
+
+void Context::PrintDihedralsQs(int whichWorld)
+{
+    for ( unsigned int i = 0; i < dihedralIxs.size(); i++){
+        if( dihedralIxs[i][0] == whichWorld){
+            //fprintf(logFile, "%.3f ", this->Dihedral(dihedralIxs[i][0], dihedralIxs[i][1], 0,
+            //    dihedralIxs[i][2], dihedralIxs[i][3], 
+            //    dihedralIxs[i][4], dihedralIxs[i][5]) );
+
+            const Topology& topology = worlds[whichWorld]->getTopology(dihedralIxs[i][1]);
+            SimTK::State& currentAdvancedState = worlds[whichWorld]->integ->updAdvancedState();
+
+            SimTK::MobilizedBodyIndex mbx3 = topology.getAtomMobilizedBodyIndex(
+                SimTK::Compound::AtomIndex(dihedralIxs[i][4]) );
+            SimTK::MobilizedBody::Pin& mobod3 = (SimTK::MobilizedBody::Pin&) (worlds[whichWorld]->matter->updMobilizedBody(mbx3));
+           
+            //std::cout << mbx3 << std::endl ;
+            //std::cout << currentAdvancedState.getQ() << std::endl; 
+            //fprintf(logFile, "%.3f ", currentAdvancedState.getQ()[mbx3] );
+            fprintf(logFile, "%.3f ", mobod3.getQ(currentAdvancedState) );
 
         }
     }
-    //std::cout << std::endl;
-    fprintf(logFile, "\n");
+}
+
+void Context::PrintFreeE2EDist(int whichWorld, int whichCompound)
+{
+    const Topology& topology = worlds[whichWorld]->getTopology(whichCompound);
+    SimTK::State& currentAdvancedState = worlds[whichWorld]->integ->updAdvancedState();
+
+    for ( unsigned int i = 0; i < distanceIxs.size(); i++){
+        if( distanceIxs[i][0] == whichWorld){
+
+            fprintf(logFile, "%.3f ", 
+                this->Distance(distanceIxs[i][0], distanceIxs[i][1], 0, 
+                   distanceIxs[i][2], distanceIxs[i][3]) );
+
+            SimTK::MobilizedBodyIndex mbx1 = topology.getAtomMobilizedBodyIndex(
+                SimTK::Compound::AtomIndex(distanceIxs[i][2]) );
+            SimTK::MobilizedBodyIndex mbx2 = topology.getAtomMobilizedBodyIndex(
+                SimTK::Compound::AtomIndex(distanceIxs[i][3]) );
+            SimTK::MobilizedBody& mobod1 = worlds[whichWorld]->matter->updMobilizedBody(mbx1);
+            SimTK::MobilizedBody& mobod2 = worlds[whichWorld]->matter->updMobilizedBody(mbx2);
+            SimTK::Transform X_PF1 = mobod1.getInboardFrame(currentAdvancedState);
+            SimTK::Transform X_PF2 = mobod2.getInboardFrame(currentAdvancedState);
+            SimTK::Transform X_BM1 = mobod1.getOutboardFrame(currentAdvancedState);
+            SimTK::Transform X_BM2 = mobod2.getOutboardFrame(currentAdvancedState);
+            SimTK::Transform X_FM1 = mobod1.getMobilizerTransform(currentAdvancedState);
+            SimTK::Transform X_FM2 = mobod2.getMobilizerTransform(currentAdvancedState);
+
+            SimTK::Transform deltaX_PF = X_PF2.p() - X_PF1.p();
+            fprintf(logFile, "%.3f ", 
+                ((-1 * X_FM1.p()) + deltaX_PF.p() + X_FM2.p()).norm() );
+
+            //std::cout << "X_PF1:" << std::endl << X_PF1 << std::endl;
+            //std::cout << "X_FM1:" << std::endl << X_FM1 << std::endl;
+            //std::cout << "X_BM1:" << std::endl << X_BM1 << std::endl;
+            //std::cout << "X_PF2:" << std::endl << X_PF2 << std::endl;
+            //std::cout << "X_FM2:" << std::endl << X_FM2 << std::endl;
+            //std::cout << "X_BM2:" << std::endl << X_BM2 << std::endl;
+
+            //SimTK::Vec3 a1pos = X_PF1.R() * X_FM1.p();
+            //SimTK::Vec3 a2pos = X_PF2.R() * X_FM2.p();
+            //fprintf(logFile, "%.3f ", 
+            //    (a1pos - a2pos).norm() );
+   
+        }
+    }
+
+
 }
 
 // Get / set pdb files writing frequency

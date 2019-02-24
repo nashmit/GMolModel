@@ -127,6 +127,10 @@ public:
     void PrintSamplerData(unsigned int whichWorld);
     void PrintGeometry(SetupReader&, int whichWorld);
     void PrintGeometry(int whichWorld);
+    void PrintDistances(int whichWorld);
+    void PrintDihedrals(int whichWorld);
+    void PrintDihedralsQs(int whichWorld);
+    void PrintFreeE2EDist(int whichWorld, int whichCompound);
     void WritePdb(int whichWorld);
     SimTK::Real Dihedral(int whichWorld, int whichCompound, int whichSampler, int a1, int a2, int a3, int a4);
     SimTK::Real Distance(int whichWorld, int whichCompound, int whichSampler, int a1, int a2);
