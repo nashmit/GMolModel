@@ -72,7 +72,7 @@ int main(int argc, char **argv)
     std::string logFilename;
     if( setupReader.find("SEED") ){
         if( !(setupReader.getValues("SEED").empty()) ){
-            logFilename = std::string("log.") + setupReader.getValues("SEED")[0];
+            logFilename = setupReader.getValues("OUTPUT_DIR")[0] + std::string("/log.") + setupReader.getValues("SEED")[0];
         }
     }else{
         logFilename = "x";
