@@ -226,8 +226,8 @@ VISUAL FALSE FALSE                 # Use the visualizer
 PRINT_FREQ %d
 WRITEPDBS %d %d      # Write pdbs
 GEOMETRY TRUE TRUE                # Calculate geometric features
-DIHEDRAL 44 46 48 54 46 48 54 56
-DISTANCE 0 98
+DIHEDRAL 354 356 358 364 356 358 364 366
+DISTANCE 0 718
 
 # Software specs
 THREADS 1 1
