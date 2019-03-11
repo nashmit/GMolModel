@@ -651,7 +651,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             // END TRACE -----------------------------------------------------
 
         // END IC regimen
-
+/*
         }else if(topologies[i]->getRegimen() == "RB"){ // TD and RB
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
@@ -671,12 +671,12 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
             // Checked if match is done correctlya
-            /*
+            / *
             this->nofSamples += 1;
             std::string FN(std::string("pdbs/RBmatch") + std::to_string(this->nofSamples) + std::string("before.pdb"));
             std::cout << "Writing file " << FN << std::endl;
             topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
-            */
+            * /
 
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();
@@ -738,7 +738,8 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             someState = compoundSystem->updDefaultState();
 
         // END RB regimen
-        }else if(topologies[i]->getRegimen() == "TD"){
+*/
+        }else if((topologies[i]->getRegimen() == "TD") || (topologies[i]->getRegimen() == "RB")){
             //std::cout << std::endl << "World TD" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;

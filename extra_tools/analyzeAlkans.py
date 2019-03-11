@@ -174,7 +174,7 @@ for ri in range(nroots):
     Psyms = nfiles * [None]
 
     # ndofs accs pe_o pe_set ke_o ke_n fix_o fix_set fix_n geometry
-    printFreq = 100
+    printFreq = 50
     for li in range(nfiles):
         with open(FNlist[li], 'r') as in_FN1:
             print 'Reading', FNlist[li]
@@ -182,6 +182,11 @@ for ri in range(nroots):
                 alldata = np.genfromtxt(in_FN1, skip_header=args.skip_header, skip_footer=args.skip_footer)
             else:
                 alldata = np.genfromtxt(in_FN1, skip_header=args.skip_header, skip_footer=args.skip_footer, usecols=args.usecols)
+
+            # Formats:
+            # 0    1        2    3      4       5       6     7       8       9 10  11
+            # dofs accsteps pe_o pe_set ke_last ke_prop fix_o fix_set fix_n   d phi psi
+            # dofs accsteps pe_o pe_set ke_prop ke_n    fix_o fix_n   fix_set d phi psi
 
             # Get constrained dynamics # of DOFs
             minndofs = np.minimum(alldata[0][0], alldata[1][0])
@@ -194,9 +199,9 @@ for ri in range(nroots):
             print "Stdev Potential Energy", np.std(PEs[li])
 
             # Get Fixman potentials
-            FixPs[li] = np.array([a[7] for a in alldata if a[0] == minndofs])
+            FixPs[li] = np.array([a[8] for a in alldata if a[0] == minndofs])
             accFixPs[li] = np.array([a[7] for a in alldata if ((a[0] == minndofs) and (a[3] != a[2]))])
-            rejFixPs[li] = np.array([a[8] for a in alldata if ((a[0] == minndofs) and (a[3] == a[2]))])
+            rejFixPs[li] = np.array([a[7] for a in alldata if ((a[0] == minndofs) and (a[3] == a[2]))])
            
             meanFixPs[li] = np.mean(FixPs[li])
             meanAccFixPs[li] = np.mean(accFixPs[li])
@@ -632,7 +637,7 @@ for ri in range(nroots):
                 figFN = "temp." + "PFixP" + ".pdf"
                 plt.savefig(figFN, dpi=600, format='pdf')
 
-    if ('Fixtimeseries' in args.makeplots) or ('all' in args.makeplots):
+    if ('FixmanTimeseries' in args.makeplots) or ('all' in args.makeplots):
             figno = figno + 1
             figs.append(plt.figure(figno))
             figs[-1].suptitle("Fixman Potential Timeseries", fontsize=16) 
@@ -652,6 +657,27 @@ for ri in range(nroots):
 
             if args.savefigs:
                 figFN = "temp." + "Fixtime" + ".pdf"
+                plt.savefig(figFN, dpi=600, format='pdf')
+
+    if ('PETimeseries' in args.makeplots) or ('all' in args.makeplots):
+            figno = figno + 1
+            figs.append(plt.figure(figno))
+            figs[-1].suptitle("Potential Energy Timeseries", fontsize=16) 
+            currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
+
+            for li in range(nfiles):
+                ax = plt.subplot(nfiles, 1, li + 1)         
+                ax.plot(PEsTD[li], label = currLabel, color = BasicColors[ri])
+
+            plt.xticks(np.arange(0, PEsTD[li].size, 100))
+            ax.legend()
+            ax.set_xlabel(r'$\mathrm{t}$', fontsize=14)
+            ax.set_ylabel(r'$\mathrm{U_f}$', fontsize=14)
+            plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=12)
+            plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=12)
+
+            if args.savefigs:
+                figFN = "temp." + "PEtime" + ".pdf"
                 plt.savefig(figFN, dpi=600, format='pdf')
 
 

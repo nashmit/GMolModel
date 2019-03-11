@@ -74,6 +74,10 @@ public:
     virtual float getTimestep(void);
     virtual void setTimestep(float);
 
+    /** Get/Set boost temperature **/
+    SimTK::Real getBoostTemperature(void);
+    void setBoostTemperature(SimTK::Real);
+
     /** It implements the proposal move in the Hamiltonian Monte Carlo
     algorithm. It essentially propagates the trajectory after it stores
     the configuration and energies. TODO: break in two functions:
@@ -120,6 +124,9 @@ protected:
     SimTK::Real ke_n; // new kinetic energy
     SimTK::Real etot_set; // stored total energy
     SimTK::Real etot_proposed; // last accepted total energ (same with stored)
+
+    SimTK::Real boostT;
+    SimTK::Real boostFactor;
 
     // Print buffers
     //SimTK::Real ke_lastBuff[PRINT_BUFFER_SIZE];

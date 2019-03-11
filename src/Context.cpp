@@ -592,6 +592,12 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 // Update
                 for(int k = 0; k < getNofSamplesPerRound(currentWorldIx); k++){ // Iterate through samples
                     updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, getNofMDStepsPerSample(currentWorldIx));
+
+                    std::cout << ""
+                        << ' ' << currentAdvancedState.getNU()
+                        << ' ' << updWorld(currentWorldIx)->updSampler(0)->getAcceptedSteps()
+                        << std::endl;
+
                 } // END for samples
     
             } // for i in worlds
@@ -657,6 +663,10 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 // Set temperatures
                 updWorld(lastWorldIx)->setTemperature(currT);
                 updWorld(currentWorldIx)->setTemperature(currT);
+
+                if(isUsingFixmanTorque(worldIx)){
+                    setFixmanTorqueTemperature(worldIx, currT);
+                }
     
                 // Transfer coordinates from last world to current
                 SimTK::State& lastAdvancedState = (updWorld(worldIndexes.back()))->integ->updAdvancedState();
