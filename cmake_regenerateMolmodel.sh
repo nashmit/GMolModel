@@ -13,7 +13,7 @@ cd ../molmodel_legacy # EU
 mkdir build-debug
 cd build-debug
 cmake ..
-make -j4
+make -j12
 sudo make install
 
 #cd ../../openmm
@@ -27,4 +27,4 @@ cd ../../build-debug/
 
 
 cmake ..
-make -j4
+make -j12

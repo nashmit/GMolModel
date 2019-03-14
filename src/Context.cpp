@@ -541,13 +541,18 @@ void Context::Run(SetupReader& setupReader)
 // Main
 void Context::Run(int howManyRounds, float Ti, float Tf)
 {
+
     int currentWorldIx = worldIndexes.front();
     int lastWorldIx = 0;
 
     if( std::abs(Tf - Ti) < SimTK::TinyReal){
         for(int round = 0; round < nofRounds; round++){ // Iterate rounds
-    
-/* Try fast IO
+
+// TIME START -----------------
+//std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
+// TIME START
+
+            /* Try fast IO
             // Print energy and geometric features
             if( (!(round % PRINT_BUFFER_SIZE)) && (round != 0) ){
                 for(unsigned int p = 0; p < PRINT_BUFFER_SIZE; p++){
@@ -563,7 +568,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                     );
                 }
             }
- Try fast IO */
+            Try fast IO */
     
             for(unsigned int worldIx = 0; worldIx < getNofWorlds(); worldIx++){ // Iterate worlds
     
@@ -578,9 +583,23 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 SimTK::State& lastAdvancedState = (updWorld(worldIndexes.back()))->integ->updAdvancedState();
                 SimTK::State& currentAdvancedState = (updWorld(currentWorldIx))->integ->updAdvancedState();
     
+// TIME STOP
+//std::chrono::steady_clock::time_point end0 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end0 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end0 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
+
                 currentAdvancedState = (updWorld(currentWorldIx))->setAtomsLocationsInGround(
                    currentAdvancedState, (updWorld(worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
     
+// TIME STOP
+//std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end1 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end1 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
+
                 // Set old potential energy of the new world
                 (updWorld(currentWorldIx))->updSampler(0)->setOldPE(
                     (updWorld(worldIndexes.back()))
@@ -593,10 +612,12 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 for(int k = 0; k < getNofSamplesPerRound(currentWorldIx); k++){ // Iterate through samples
                     updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, getNofMDStepsPerSample(currentWorldIx));
 
-                    std::cout << ""
-                        << ' ' << currentAdvancedState.getNU()
-                        << ' ' << updWorld(currentWorldIx)->updSampler(0)->getAcceptedSteps()
-                        << std::endl;
+// TIME STOP
+//std::chrono::steady_clock::time_point end2 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end2 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end2 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
 
                 } // END for samples
     
@@ -610,6 +631,13 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 fprintf(logFile, "\n");
             }
     
+// TIME STOP
+//std::chrono::steady_clock::time_point end3 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end3 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end3 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
+
             // Write pdb
             SimTK::State& pdbState = (updWorld(worldIndexes.front()))->integ->updAdvancedState();
             if( getPdbRestartFreq() != 0){
@@ -621,6 +649,13 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 }
             } // if write pdbs
     
+// TIME STOP
+//std::chrono::steady_clock::time_point end4 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end4 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end4 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
+
         } // for i in rounds
 
     }else{// if Ti != Tf heating protocol
@@ -711,7 +746,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
 
     } // if heating protocol
 
-/* Try fast IO
+    /* Try fast IO
     // Print remaining buffer values
     for(unsigned int p = 0; p < (nofRounds % PRINT_BUFFER_SIZE); p++){
         fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f \n"
@@ -725,7 +760,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
             , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
         );
     }
-Try fast IO*/
+    Try fast IO*/
 
 }
 
