@@ -552,24 +552,6 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
 //std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
 // TIME START
 
-            /* Try fast IO
-            // Print energy and geometric features
-            if( (!(round % PRINT_BUFFER_SIZE)) && (round != 0) ){
-                for(unsigned int p = 0; p < PRINT_BUFFER_SIZE; p++){
-                    fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f \n"
-                        , (worlds[worldIndexes.front()])->integ->updAdvancedState().getNU()
-                        , (worlds[worldIndexes.front()]->samplers[0])->acceptedSteps
-                        , (worlds[worldIndexes.front()]->samplers[0])->pe_oBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->pe_setBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->ke_proposedBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->ke_nBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->fix_oBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
-                    );
-                }
-            }
-            Try fast IO */
-    
             for(unsigned int worldIx = 0; worldIx < getNofWorlds(); worldIx++){ // Iterate worlds
     
                 // Rotate worlds indeces (translate from right to left)
@@ -663,24 +645,6 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
         SimTK::Real currT = Ti;
         for(int round = 0; round < nofRounds; round++){ // Iterate rounds
     
-/* Try fast IO
-            // Print energy and geometric features
-            if( (!(round % PRINT_BUFFER_SIZE)) && (round != 0) ){
-                for(unsigned int p = 0; p < PRINT_BUFFER_SIZE; p++){
-                    fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f \n"
-                        , (worlds[worldIndexes.front()])->integ->updAdvancedState().getNU()
-                        , (worlds[worldIndexes.front()]->samplers[0])->acceptedSteps
-                        , (worlds[worldIndexes.front()]->samplers[0])->pe_oBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->pe_setBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->ke_proposedBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->ke_nBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->fix_oBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
-                    );
-                }
-            } 
- Try fast IO */
-
             // Set current temperature
             currT += Tincr;
             std::cout << "T= " << currT << std::endl;
@@ -746,21 +710,6 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
 
     } // if heating protocol
 
-    /* Try fast IO
-    // Print remaining buffer values
-    for(unsigned int p = 0; p < (nofRounds % PRINT_BUFFER_SIZE); p++){
-        fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f \n"
-            , (worlds[worldIndexes.front()])->integ->updAdvancedState().getNU()
-            , (worlds[worldIndexes.front()]->samplers[0])->acceptedSteps
-            , (worlds[worldIndexes.front()]->samplers[0])->pe_oBuff[p]
-            , (worlds[worldIndexes.front()]->samplers[0])->pe_setBuff[p]
-            , (worlds[worldIndexes.front()]->samplers[0])->ke_proposedBuff[p]
-            , (worlds[worldIndexes.front()]->samplers[0])->ke_nBuff[p]
-            , (worlds[worldIndexes.front()]->samplers[0])->fix_oBuff[p]
-            , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
-        );
-    }
-    Try fast IO*/
 
 }
 

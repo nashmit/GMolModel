@@ -570,6 +570,11 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
         // Different regimens have different strategies
         if(topologies[i]->getRegimen() == "IC"){
+
+// TIME START -----------------
+std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
+// TIME START
+
             //std::cout << std::endl << "World IC" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
@@ -580,8 +585,14 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
                 atomTargets.insert(std::pair<SimTK::Compound::AtomIndex, SimTK::Vec3>(atomIndex, location));
             }
 
+// TIME STOP
+std::chrono::steady_clock::time_point end0 = std::chrono::steady_clock::now();
+std::cout << "setAtomsLocations end0 - start0 "
+              << std::chrono::duration_cast<std::chrono::microseconds>(end0 - start0).count()
+              << " us.\n";
+// TIME STOP ===================
+
             // Match - only matchDefaultConfiguration should be necessary
-            // TOBE checked later
             topologies[i]->matchDefaultAtomChirality(atomTargets, 0.01, false);
             topologies[i]->matchDefaultBondLengths(atomTargets);
             topologies[i]->matchDefaultBondAngles(atomTargets);
@@ -589,30 +600,43 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             topologies[i]->matchDefaultTopLevelTransform(atomTargets);
             topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
+// TIME STOP
+std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
+std::cout << "setAtomsLocations end1 - start0 "
+              << std::chrono::duration_cast<std::chrono::microseconds>(end1 - start0).count()
+              << " us.\n";
+// TIME STOP ===================
+
             // Get transforms and locations: P_X_M, BAt_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();
             SimTK::Transform P_X_M[matter->getNumBodies()]; // related to X_PFs
+            // First body (atom)
             P_X_M[1] = G_X_T * topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
-            T_X_atom[1] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            T_X_atom[1] =      topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
         
             // Iterate through atoms - get P_X_M for all the bodies
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
                 if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
-                    // Get body, parentBody, parentAtom
+                    // Get body 
                     SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
                     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         
                     // Get P_X_M
                     T_X_atom[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
-
-                    P_X_M[int(mbx)] = G_X_T * T_X_atom[int(mbx)]; // MODIFIED
+                    P_X_M[int(mbx)] = G_X_T * T_X_atom[int(mbx)];
                 }
             }
-            // Set X_PF and Q - Bottleneck!
+
+// TIME STOP
+std::chrono::steady_clock::time_point end2 = std::chrono::steady_clock::now();
+std::cout << "setAtomsLocations end2 - start0 "
+              << std::chrono::duration_cast<std::chrono::microseconds>(end2 - start0).count()
+              << " us.\n";
+// TIME STOP ===================
+
+            // Set X_FM and Q 
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
                 SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
-                // RESTORE ((SimTK::MobilizedBody::Free&)mobod).setDefaultInboardFrame(P_X_M[int(mbx)]);
-                // RESTORE RE (mobod).setDefaultInboardFrame(P_X_M[int(mbx)]);
 
                 SimTK::Transform currentP_X_F = mobod.getInboardFrame(someState);
                 SimTK::Transform invCurrentP_X_F = ~currentP_X_F;
@@ -620,35 +644,14 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
                 (mobod).setQToFitTransform(someState, neededF_X_M);
 
-                //std::cout << "matter->getNumBodies() " << matter->getNumBodies() << std::endl;
-                //std::cout << "P_X_M[" << int(mbx) << "]" << std::endl
-                //    << P_X_M[int(mbx)] << std::endl;
-
-                //(mobod).setQToFitTransform(someState, T_X_atom[int(mbx)]); // DEL
-                //(mobod).setQ(someState, (P_X_M[int(mbx)]).p()); // DEL
-                //(mobod).setQ(someState, (P_X_M[int(mbx)]).p()); // DEL
-                //std::cout << ((SimTK::MobilizedBody::Free&)mobod).getQ(someState) << std::endl;
-
             }
 
-            // RESTORE RE this->compoundSystem->realizeTopology();
-            // RESTORE RE someState = compoundSystem->updDefaultState();
-
-            // TRACE ----------------------------------------------------------
-            /*
-            this->compoundSystem->realize(someState, SimTK::Stage::Position);
-            for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-                SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
-
-                std::cout << "mbx: " << int(mbx) << " P_X_F:" << std::endl << ' ' <<
-                  mobod.getInboardFrame(someState) << std::endl;
-                std::cout << "mbx: " << int(mbx) << " B_X_M:" << std::endl << ' ' <<
-                  mobod.getOutboardFrame(someState) << std::endl;
-                std::cout << "mbx: " << int(mbx) << " Q:" << std::endl << ' ' <<
-                  ((SimTK::MobilizedBody::Free&)mobod).getQ(someState) << std::endl;
-            }
-            */
-            // END TRACE -----------------------------------------------------
+// TIME STOP
+std::chrono::steady_clock::time_point end3 = std::chrono::steady_clock::now();
+std::cout << "setAtomsLocations end3 - start0 "
+              << std::chrono::duration_cast<std::chrono::microseconds>(end3 - start0).count()
+              << " us.\n";
+// TIME STOP ===================
 
         // END IC regimen
 /*
