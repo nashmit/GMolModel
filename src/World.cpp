@@ -598,6 +598,7 @@ std::cout << "setAtomsLocations end0 - start0 "
             topologies[i]->matchDefaultBondAngles(atomTargets);
             topologies[i]->matchDefaultDihedralAngles(atomTargets, SimTK::Compound::DistortPlanarBonds);
             topologies[i]->matchDefaultTopLevelTransform(atomTargets);
+            // Check if redundant:
             topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
 // TIME STOP
@@ -611,8 +612,8 @@ std::cout << "setAtomsLocations end1 - start0 "
             G_X_T = topologies[i]->getTopLevelTransform();
             SimTK::Transform P_X_M[matter->getNumBodies()]; // related to X_PFs
             // First body (atom)
-            P_X_M[1] = G_X_T * topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
             T_X_atom[1] =      topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            P_X_M[1] = G_X_T * T_X_atom[1];
         
             // Iterate through atoms - get P_X_M for all the bodies
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){

@@ -574,7 +574,19 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
 
                 currentAdvancedState = (updWorld(currentWorldIx))->setAtomsLocationsInGround(
                    currentAdvancedState, (updWorld(worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
-    
+
+                // Check if coordinates are correct
+                (updWorld(worldIndexes.back()))->updateAtomLists(lastAdvancedState);
+                ((updWorld(worldIndexes.back()))->getTopology(0)).writePdb(
+                    getOutputDir(), std::string("/pdbs/sb.") 
+                    + std::string("b") + std::string("."), ".pdb", 10, round);
+
+                (updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
+                ((updWorld(currentWorldIx))->getTopology(0)).writePdb(
+                    getOutputDir(), std::string("/pdbs/sb.") 
+                    + std::string("a") + std::string("."), ".pdb", 10, round);
+                //
+
 // TIME STOP
 //std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
 //std::cout << "Context::Run end1 - start0 "
