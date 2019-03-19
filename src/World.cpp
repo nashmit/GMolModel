@@ -575,13 +575,13 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
 // TIME START
 
-            //std::cout << std::endl << "World IC" << std::endl << std::flush;
+            std::cout << std::endl << "World IC" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
-            std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
-            for(unsigned int j = 0; j < currentTopology.size(); j++){
-                SimTK::Compound::AtomIndex atomIndex = ((currentTopology[j]).first)->atomIndex;
-                SimTK::Vec3 location = ((currentTopology[j]).second);
+            //std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
+            for(unsigned int j = 0; j < otherWorldsAtomsLocations[i].size(); j++){
+                SimTK::Compound::AtomIndex atomIndex = ((otherWorldsAtomsLocations[i][j]).first)->atomIndex;
+                SimTK::Vec3 location = ((otherWorldsAtomsLocations[i][j]).second);
                 atomTargets.insert(std::pair<SimTK::Compound::AtomIndex, SimTK::Vec3>(atomIndex, location));
             }
 
@@ -592,14 +592,15 @@ std::cout << "setAtomsLocations end0 - start0 "
               << " us.\n";
 // TIME STOP ===================
 
+            // As an alternative we can pool BAT from otherWorlds Qs
             // Match - only matchDefaultConfiguration should be necessary
             topologies[i]->matchDefaultAtomChirality(atomTargets, 0.01, false);
             topologies[i]->matchDefaultBondLengths(atomTargets);
             topologies[i]->matchDefaultBondAngles(atomTargets);
             topologies[i]->matchDefaultDihedralAngles(atomTargets, SimTK::Compound::DistortPlanarBonds);
             topologies[i]->matchDefaultTopLevelTransform(atomTargets);
-            // Check if redundant:
-            topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
+            // Seems to be redundant:
+            //topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
 // TIME STOP
 std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
@@ -612,12 +613,12 @@ std::cout << "setAtomsLocations end1 - start0 "
             G_X_T = topologies[i]->getTopLevelTransform();
             SimTK::Transform P_X_M[matter->getNumBodies()]; // related to X_PFs
             // First body (atom)
-            T_X_atom[1] =      topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            T_X_atom[1] =  topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
             P_X_M[1] = G_X_T * T_X_atom[1];
         
             // Iterate through atoms - get P_X_M for all the bodies
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
-                if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
+                //if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
                     // Get body 
                     SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
                     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
@@ -625,7 +626,8 @@ std::cout << "setAtomsLocations end1 - start0 "
                     // Get P_X_M
                     T_X_atom[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
                     P_X_M[int(mbx)] = G_X_T * T_X_atom[int(mbx)];
-                }
+                    //P_X_M[int(mbx)] = Transform(atomTargets[aIx]);
+                //}
             }
 
 // TIME STOP
@@ -902,31 +904,60 @@ std::cout << "setAtomsLocations end3 - start0 "
  END CHECK */ 
 
             // TRACE ----------------------------------------------------------
-/*            this->compoundSystem->realize(someState, SimTK::Stage::Position);
-            for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-                SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
+///*            
+            this->compoundSystem->realize(someState, SimTK::Stage::Position);
+            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
+                SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
+                const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
 
-                std::cout << "mbx: " << int(mbx) << " P_X_F:" 
-                  << mobod.getInboardFrame(someState); 
-                std::cout << "mbx: " << int(mbx) << " F_X_M:" 
-                  << mobod.getMobilizerTransform(someState); 
-                std::cout << "mbx: " << int(mbx) << " B_X_M:"
-                  << mobod.getOutboardFrame(someState);
+                std::cout << "atomTargets location " << atomTargets[aIx] << std::endl;
+                std::cout << "p_GB" << mobod.getBodyOriginLocation(someState) << std::endl;
+
+                //std::cout << "mbx: " << int(mbx) << " P_X_F:" 
+                //  << mobod.getInboardFrame(someState); 
+                //std::cout << "mbx: " << int(mbx) << " F_X_M:" 
+                //  << mobod.getMobilizerTransform(someState); 
+                //std::cout << "mbx: " << int(mbx) << " B_X_M:"
+                //  << mobod.getOutboardFrame(someState);
                 //std::cout << "mbx: " << int(mbx) << " M_X_pin:" 
                 //  << M_X_pin; 
                 //std::cout << "mbx: " << int(mbx) << " Q:" // << std::endl << ' ' 
                 //  << ((SimTK::MobilizedBody::Free&)mobod).getQ(someState); // << std::endl;
 
-                std::cout << "mbx: " << int(mbx) << " T_X_atom:" 
-                  << T_X_atom[int(mbx)] ; 
-                std::cout << "mbx: " << int(mbx) << " P_X_M:" 
-                  << P_X_M[int(mbx)] ; 
-                std::cout << "mbx: " << int(mbx) << " P_X_M * M_X_pin:" 
-                  << P_X_M[int(mbx)] * M_X_pin; 
-                std::cout << "mbx: " << int(mbx) << " BAt_X_M0:"  
-                  << BAt_X_M0[int(mbx)] ; 
+                //std::cout << "mbx: " << int(mbx) << " T_X_atom:" 
+                //  << T_X_atom[int(mbx)] ; 
+                //std::cout << "mbx: " << int(mbx) << " P_X_M:" 
+                //  << P_X_M[int(mbx)] ; 
+                //std::cout << "mbx: " << int(mbx) << " P_X_M * M_X_pin:" 
+                //  << P_X_M[int(mbx)] * M_X_pin; 
+                //std::cout << "mbx: " << int(mbx) << " BAt_X_M0:"  
+                //  << BAt_X_M0[int(mbx)] ; 
             }
-*/            // END TRACE -----------------------------------------------------
+
+            for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+                SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
+
+                //std::cout << "mbx: " << int(mbx) << " P_X_F:" 
+                //  << mobod.getInboardFrame(someState); 
+                //std::cout << "mbx: " << int(mbx) << " F_X_M:" 
+                //  << mobod.getMobilizerTransform(someState); 
+                //std::cout << "mbx: " << int(mbx) << " B_X_M:"
+                //  << mobod.getOutboardFrame(someState);
+                //std::cout << "mbx: " << int(mbx) << " M_X_pin:" 
+                //  << M_X_pin; 
+                //std::cout << "mbx: " << int(mbx) << " Q:" // << std::endl << ' ' 
+                //  << ((SimTK::MobilizedBody::Free&)mobod).getQ(someState); // << std::endl;
+
+                //std::cout << "mbx: " << int(mbx) << " T_X_atom:" 
+                //  << T_X_atom[int(mbx)] ; 
+                //std::cout << "mbx: " << int(mbx) << " P_X_M:" 
+                //  << P_X_M[int(mbx)] ; 
+                //std::cout << "mbx: " << int(mbx) << " P_X_M * M_X_pin:" 
+                //  << P_X_M[int(mbx)] * M_X_pin; 
+                //std::cout << "mbx: " << int(mbx) << " BAt_X_M0:"  
+                //  << BAt_X_M0[int(mbx)] ; 
+            }
+//*/            // END TRACE -----------------------------------------------------
 
             // NEW
 /*

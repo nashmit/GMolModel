@@ -526,6 +526,21 @@ for(int k = 0; k < nosteps; k++){
     // Integrate (propagate trajectory)
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
 
+/*    // Configuration
+    std::cout << "HMC conf: ";
+    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
+        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+        std::cout << " mobod " << int(mbx) << " = ";
+        std::cout << "Q " << mobod.getQAsVector(someState) << std::endl ;
+        std::cout << " P_X_F " << mobod.getInboardFrame(someState) << " ";
+        std::cout << " F_X_M " << mobod.getMobilizerTransform(someState) << " ";
+        std::cout << " B_X_M " << mobod.getOutboardFrame(someState) << " ";
+        //std::cout << " P_X_F * F_X_M " << mobod.getInboardFrame(someState) * mobod.getMobilizerTransform(someState) << " ";
+        std::cout << "; ";
+    }
+    std::cout << std::endl;
+*/
+
 /* DEBOOST BEGIN
     // RESET Guidance Hamiltonian with a boost temperature
     someState.updU() *= (1.0 / boostFactor);
@@ -644,22 +659,6 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
         assignConfFromSetTVector(someState);
     }
 
-    // Add to print bufers
-/*
-    pe_setBuff[printBuffIx] = pe_set;
-    pe_oBuff[printBuffIx] = pe_o;
-    pe_nBuff[printBuffIx] = pe_n;
-    fix_setBuff[printBuffIx] = pe_set;
-    fix_oBuff[printBuffIx] = pe_o;
-    fix_nBuff[printBuffIx] = pe_n;
-    ke_proposedBuff[printBuffIx] = ke_proposed;
-    ke_nBuff[printBuffIx] = ke_n;
-    ke_lastBuff[printBuffIx] = ke_lastAccepted;
-    printBuffIx++;
-    if (printBuffIx > PRINT_BUFFER_SIZE){
-        printBuffIx = 0;
-    }
-*/
     //std::cout << " pe_os " << getSetPE() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman() //p
     //xstd::cout << " 0 ";
     //xfor (SimTK::MobilizedBodyIndex mbx(2); mbx < matter->getNumBodies(); ++mbx){
