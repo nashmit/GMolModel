@@ -8,6 +8,7 @@
  */
 
 #include "Robo.hpp"
+#include "Topology.hpp"
 
 using namespace SimTK;
 
@@ -15,7 +16,7 @@ class ParaMolecularDecorator : public DecorationGenerator {
 public:
     ParaMolecularDecorator(SimTK::CompoundSystem *argCompoundSystem,
         SimTK::SimbodyMatterSubsystem *argMatter,
-        SimTK::Compound *argResidue,
+        Topology *argResidue,
         SimTK::DuMMForceFieldSubsystem *argDumm,
         SimTK::GeneralForceSubsystem *argForces);
 
@@ -35,7 +36,7 @@ public:
 private:
     SimTK::CompoundSystem *compoundSystem;
     SimTK::SimbodyMatterSubsystem *matter;
-    SimTK::Compound *residue;
+    Topology *residue;
     SimTK::DuMMForceFieldSubsystem *dumm;
     SimTK::GeneralForceSubsystem *forces; 
 
