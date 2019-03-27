@@ -81,7 +81,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         }
     }
     */
-/*
+///*
     // DuMM
     for (DuMM::AtomIndex daIx(0); daIx < dumm->getNumAtoms(); ++daIx) {
         const SimTK::MobilizedBodyIndex mbx = dumm->getAtomBody(daIx);
@@ -96,9 +96,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         //Real opacity = dumm->getAtomElement(daIx)==1?0.5:1;
         Real opacity = 0.5;
         Real r = dumm->getAtomRadius(daIx);
-        std::cout << "Visualizer " << r << std::endl;
         if (r < 0.01){
-            std::cout << "Visualizer There is a small atom" << std::endl;
             r = 0.1; //nm
         }
 
@@ -123,11 +121,13 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         geometry.push_back(decorativeText1);
 
     }
-*/
+//*/
 
-    // Compound
-    // Get transforms and locations: P_X_M, root_X_atom.p()
+
     SimTK::Transform G_X_T = residue->getTopLevelTransform();
+/*
+    // Draw Compound transforms
+    // Get transforms and locations: P_X_M, root_X_atom.p()
     SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
     SimTK::Transform P_X_M[matter->getNumBodies()]; // related to X_PFs
     SimTK::Transform T_X_root[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
@@ -159,10 +159,10 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
                     SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis)
                 );
 
-                // Get P_X_M
+                // Draw G_X_root
                T_X_root[int(mbx)] = residue->calcDefaultAtomFrameInCompoundFrame(aIx);
-
                SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)];
+
                DecorativeFrame decorativeFrameRoot;
                decorativeFrameRoot.setTransform(G_X_root);
                decorativeFrameRoot.setScaleFactors(SimTK::Vec3(0.06, 0.06, 0.06));
@@ -175,16 +175,20 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
                streamObj << "R" << int(aIx);
                std::string text1 = streamObj.str();
                DecorativeText decorativeTextRoot(text1);
-               decorativeTextRoot.setTransform(G_X_root);
-               decorativeTextRoot.setScaleFactors(SimTK::Vec3(0.01, 0.01, 0.01));
+               
+               SimTK::Transform textOffsetR(SimTK::Rotation(), SimTK::Vec3(0.01, 0.0, 0.0));
+               decorativeTextRoot.setTransform(SimTK::Transform(G_X_root * textOffsetR));
+               decorativeTextRoot.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
                decorativeTextRoot.setColor(SimTK::Vec3(0, 255, 0));
                geometry.push_back(decorativeTextRoot);
         
+               // Draw G_X_M0
                SimTK::Transform T_X_M0 = T_X_root[int(mbx)] * root_X_M0[int(mbx)];
-
                SimTK::Transform G_X_M0 = G_X_T * T_X_M0;
+               SimTK::Transform G_X_Mr = G_X_M0 * M_X_pin;
+
                DecorativeFrame decorativeFrameM0;
-               decorativeFrameM0.setTransform(G_X_M0);
+               decorativeFrameM0.setTransform(G_X_Mr);
                decorativeFrameM0.setScaleFactors(SimTK::Vec3(0.07, 0.07, 0.07));
                decorativeFrameM0.setLineThickness(4);
                decorativeFrameM0.setColor(SimTK::Vec3(255, 0, 255)); 
@@ -192,11 +196,12 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
                // Text
                std::ostringstream streamObjM0;
-               streamObjM0 << "M0" << int(aIx);
+               streamObjM0 << "m" << int(aIx);
                text1 = streamObjM0.str();
                DecorativeText decorativeTextM0(text1);
-               decorativeTextM0.setTransform(G_X_M0);
-               decorativeTextM0.setScaleFactors(SimTK::Vec3(0.01, 0.01, 0.01));
+               SimTK::Transform textOffsetM0(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
+               decorativeTextM0.setTransform(G_X_Mr * textOffsetM0);
+               decorativeTextM0.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
                decorativeTextM0.setColor(SimTK::Vec3(255, 0, 255));
                geometry.push_back(decorativeTextM0);
         
@@ -225,8 +230,10 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             locs[int(aIx)] = SimTK::Vec3(0);
         }
     }
+*/
 
-/*
+
+///*
     // Draw Compound 
     //DecorativeBrick topDecorativeBrick;
     //topDecorativeBrick.setTransform(G_X_T);
@@ -260,8 +267,9 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         
 
     }
-*/
+//*/
 
+/*
     // Draw Rigid bodies
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
@@ -275,6 +283,16 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         //decorativeBrick.setColor(SimTK::Vec3(10, 0, 0));
         decorativeBrick.setOpacity(0.5);
         geometry.push_back( decorativeBrick );
+
+        std::ostringstream streamObjB;
+        streamObjB << std::string("B") + std::to_string(int(mbx)); 
+        std::string textB = streamObjB.str();
+        DecorativeText decorativeTextB(textB);
+        SimTK::Transform textOffsetB(SimTK::Rotation(), SimTK::Vec3(0.0, 0.0, -0.01));
+        decorativeTextB.setTransform(G_X_B * textOffsetB);
+        decorativeTextB.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+        decorativeTextB.setColor(SimTK::Vec3(0, 0, 0));
+        geometry.push_back(decorativeTextB);
 
         DecorativeFrame decorativeFrame;
         decorativeFrame.setTransform(G_X_B);
@@ -312,8 +330,9 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             streamObjF << std::string("F") + std::to_string(int(mbx)); 
             std::string textF = streamObjF.str();
             DecorativeText decorativeTextF(textF);
-            decorativeTextF.setTransform(G_X_F);
-            decorativeTextF.setScaleFactors(SimTK::Vec3(0.01, 0.01, 0.01));
+            SimTK::Transform textOffsetF(SimTK::Rotation(), SimTK::Vec3(-0.01, 0.0, 0.0));
+            decorativeTextF.setTransform(G_X_F * textOffsetF);
+            decorativeTextF.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
             decorativeTextF.setColor(SimTK::Vec3(0, 0, 255));
             geometry.push_back(decorativeTextF);
 
@@ -340,8 +359,9 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             streamObjM << std::string("M") + std::to_string(int(mbx)); 
             std::string textM = streamObjM.str();
             DecorativeText decorativeTextM(textM);
-            decorativeTextM.setTransform(G_X_M);
-            decorativeTextM.setScaleFactors(SimTK::Vec3(0.01, 0.01, 0.01));
+            SimTK::Transform textOffsetM(SimTK::Rotation(), SimTK::Vec3(0.0, -0.01, 0.0));
+            decorativeTextM.setTransform(G_X_M * textOffsetM);
+            decorativeTextM.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
             decorativeTextM.setColor(SimTK::Vec3(255, 0, 0));
             geometry.push_back(decorativeTextM);
 
@@ -354,6 +374,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
         }
     }
+*/
 
 }
 
