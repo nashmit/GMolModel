@@ -779,6 +779,7 @@ std::cout << "setAtomsLocations end4 - start0 "
 // TIME STOP ===================
 
             // Get transforms and locations: P_X_F and root_X_atom.p()
+            // M0 and Mr are actually used for F
             G_X_T = topologies[i]->getTopLevelTransform();
             SimTK::Transform invG_X_T;
             invG_X_T = ~G_X_T;
@@ -828,6 +829,15 @@ std::cout << "setAtomsLocations end4 - start0 "
                        SimTK::Transform Proot_X_M0 = Proot_X_T * T_X_M0;
                        // RE P_X_F[int(mbx)] = Proot_X_M0;
                        P_X_F[int(mbx)] = Proot_X_M0 * M_X_pin; // NEW
+              
+                       //SimTK::Transform G_X_Proot = G_X_T * T_X_Proot[int(mbx)];
+                       //SimTK::Transform proposalF_X_M(SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::ZAxis), Vec3(0, 0, 0));
+                       //SimTK::Transform proposal = proposalF_X_M;
+
+                       //std::cout << "P_X_F[" << int(mbx)<< "]" << std::endl;
+                       //PrintTransform(P_X_F[int(mbx)], 5);
+                       //std::cout << "proposal " << int(mbx)<< std::endl;
+                       //PrintTransform(proposal, 5);
 
                     } //END if parent not Ground
                 }
@@ -976,14 +986,17 @@ std::cout << "setAtomsLocations end9 - start0 "
                 //std::cout << "mbx: " << int(mbx) << " BAt_X_M0:"  
                 //  << BAt_X_M0[int(mbx)] ; 
             }
+// */            // END TRACE -----------------------------------------------------
 
+/*            
+            this->compoundSystem->realize(someState, SimTK::Stage::Position);
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
                 SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
 
                 //std::cout << "mbx: " << int(mbx) << " P_X_F:" 
                 //  << mobod.getInboardFrame(someState); 
-                //std::cout << "mbx: " << int(mbx) << " F_X_M:" 
-                //  << mobod.getMobilizerTransform(someState); 
+                std::cout << "mbx: " << int(mbx) << " F_X_M:" 
+                  << mobod.getMobilizerTransform(someState); 
                 //std::cout << "mbx: " << int(mbx) << " B_X_M:"
                 //  << mobod.getOutboardFrame(someState);
                 //std::cout << "mbx: " << int(mbx) << " M_X_pin:" 
@@ -1001,42 +1014,6 @@ std::cout << "setAtomsLocations end9 - start0 "
                 //  << BAt_X_M0[int(mbx)] ; 
             }
 // */            // END TRACE -----------------------------------------------------
-
-            // NEW
-/*
-            for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-                SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
-
-                SimTK::Transform currentP_X_F = mobod.getInboardFrame(someState);
-                SimTK::Transform invCurrentP_X_F = ~currentP_X_F;
-                SimTK::Transform currentM_X_B = mobod.getOutboardFrame(someState);
-                SimTK::Transform invCurrentM_X_B = ~currentM_X_B;
-
-                SimTK::Transform defaultP_X_F, defaultF_X_M;
-                if(int(mbx) == 1){ // This is dangerous TODO
-
-                    defaultP_X_F = P_X_M[int(mbx)];
-
-                    //defaultF_X_M = SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::ZAxis);
-
-                    SimTK::Transform neededF_X_M = invCurrentP_X_F * defaultP_X_F * defaultF_X_M;
-                    (mobod).setQToFitTransform(someState, neededF_X_M);
-                }else{
-                    //defaultP_X_F = P_X_M[int(mbx)] * M_X_pin;
-                    //defaultF_X_M = ~(BAt_X_M0[int(mbx)]);
-                    //defaultF_X_M = SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::ZAxis);
-                    //defaultF_X_M = ~BAt_X_M0[int(mbx)];
-
-                    //SimTK::Transform neededF_X_M = invCurrentP_X_F * defaultP_X_F * defaultF_X_M;
-
-                    //SimTK::Transform neededF_X_M = invCurrentP_X_F * P_X_M[int(mbx)] * M_X_pin;
-                    SimTK::Transform neededF_X_M = invCurrentP_X_F * P_X_M[int(mbx)] * invCurrentM_X_B;
-                    (mobod).setQToFitTransform(someState, neededF_X_M);
-                }
-
-            }
-*/
-            // END NEW
 
         } // END TD regimen and all regimens
 

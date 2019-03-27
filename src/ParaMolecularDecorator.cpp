@@ -81,7 +81,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         }
     }
     */
-///*
+/*
     // DuMM
     for (DuMM::AtomIndex daIx(0); daIx < dumm->getNumAtoms(); ++daIx) {
         const SimTK::MobilizedBodyIndex mbx = dumm->getAtomBody(daIx);
@@ -121,7 +121,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         geometry.push_back(decorativeText1);
 
     }
-//*/
+// */
 
 
     SimTK::Transform G_X_T = residue->getTopLevelTransform();
@@ -230,10 +230,10 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             locs[int(aIx)] = SimTK::Vec3(0);
         }
     }
-*/
+// */
 
 
-///*
+/*
     // Draw Compound 
     //DecorativeBrick topDecorativeBrick;
     //topDecorativeBrick.setTransform(G_X_T);
@@ -267,9 +267,9 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         
 
     }
-//*/
+// */
 
-/*
+///*
     // Draw Rigid bodies
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
@@ -374,7 +374,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
         }
     }
-*/
+// */
 
 }
 

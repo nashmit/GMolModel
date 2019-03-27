@@ -648,6 +648,22 @@ void PrintBigMat(SimTK::Vector V, int nrows, int decimal_places, std::string hea
 }
 
 /*
+ * Print Transform
+ */
+void PrintTransform(SimTK::Transform T, int decimal_places)
+{
+    const SimTK::Mat44 M = T.toMat44();
+    std::cout << std::setprecision(decimal_places) << std::fixed;
+    for(int i = 0; i < 4; i++){
+        for(int k = 0; k < 4; k++){
+            std::cout << M(i, k) << " ";
+        }
+        std::cout << std::endl;
+    }
+
+}
+
+/*
  * Dihedral angle
  */
 SimTK::Real bDihedral(SimTK::Vec3& pos0, SimTK::Vec3& pos1, SimTK::Vec3& pos2, SimTK::Vec3& pos3){
