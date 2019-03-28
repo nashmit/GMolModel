@@ -561,7 +561,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
     
     SimTK::Transform G_X_T;
     SimTK::Transform T_X_root[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
-    SimTK::Transform T_X_Proot[matter->getNumBodies()];
+    // RE SimTK::Transform T_X_Proot[matter->getNumBodies()];
 
     // Iterate through molecules/topologies
     for(unsigned int i = 0; i < otherWorldsAtomsLocations.size(); i++){
@@ -612,24 +612,15 @@ std::cout << "setAtomsLocations end1 - start0 "
             // Get transforms and locations: P_X_M, root_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();
             SimTK::Transform P_X_M[matter->getNumBodies()]; // related to X_PFs
-            // First body (atom)
-            //RE T_X_root[1] =  topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
-            //RE P_X_M[1] = G_X_T * T_X_root[1];
-            //P_X_M[1] = G_X_T * Transform(Rotation(), atomTargets[SimTK::Compound::AtomIndex(0)]); // NEW
         
             // Iterate through atoms - get P_X_M for all the bodies
-            //for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
             for (SimTK::Compound::AtomIndex aIx(0); aIx < topologies[i]->getNumAtoms(); ++aIx){
-                //if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
-                    // Get body 
-                    SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
-                    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+                // Get body 
+                SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
+                const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         
-                    // Get P_X_M
-                    //RE T_X_root[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
-                    //RE P_X_M[int(mbx)] = G_X_T * T_X_root[int(mbx)];
-                    P_X_M[int(mbx)] = Transform(Rotation(), atomTargets[aIx]); // NEW
-                //}
+                // Get P_X_M
+                P_X_M[int(mbx)] = Transform(Rotation(), atomTargets[aIx]); // NEW
             }
 
 // TIME STOP
@@ -787,13 +778,27 @@ std::cout << "setAtomsLocations end4 - start0 "
             SimTK::Transform P_X_F[matter->getNumBodies()]; // related to X_PFs
             // SimTK::Transform T_X_root[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
             // RE SimTK::Transform T_X_Proot[matter->getNumBodies()];
+            SimTK::Transform T_X_Proot; // NEW
             SimTK::Transform root_X_M0[matter->getNumBodies()];
             SimTK::Angle inboardBondDihedralAngles[matter->getNumBodies()]; // related to X_FMs
             SimTK::Real inboardBondLengths[matter->getNumBodies()]; // related to X_FMs
             SimTK::Vec3 locs[topologies[i]->getNumAtoms()];
-            P_X_F[1] = G_X_T * topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
-            T_X_root[1] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
 
+            // RE T_X_root[1] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            // RE P_X_F[1] = G_X_T * topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            //T_X_root[1] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0)); // NEW
+            //P_X_F[1] = G_X_T * T_X_root[1]; // NEW
+
+            // Iterate through atoms - get T_X_roots for all the bodies
+            for (SimTK::Compound::AtomIndex aIx(0); aIx < topologies[i]->getNumAtoms(); ++aIx){
+                if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
+                    // Get body
+                    SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
+                    T_X_root[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
+                }
+            }
+
+            P_X_F[1] = G_X_T * T_X_root[1]; // NEW
             // Iterate through atoms - get P_X_F for all the bodies
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
                 if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
@@ -807,8 +812,8 @@ std::cout << "setAtomsLocations end4 - start0 "
                     if(parentMobod.getMobilizedBodyIndex() != 0){ // parent not Ground
                         SimTK::Compound::AtomIndex parentAIx = (topologies[i]->getMbx2aIx()).at(parentMbx);
 
-                        T_X_Proot[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(parentAIx);
-                        // T_X_Proot[int(mbx)] = invG_X_T * Transform(Rotation(), atomTargets[parentAIx]); // NEW
+                        // RE T_X_Proot[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(parentAIx);
+                        T_X_Proot = T_X_root[parentMbx]; // NEW
 
                         // Get inboard dihedral angle and put in root_X_M0 !!!!!!!
                         inboardBondDihedralAngles[int(mbx)] = topologies[i]->bgetDefaultInboardDihedralAngle(aIx);
@@ -817,27 +822,23 @@ std::cout << "setAtomsLocations end4 - start0 "
                             SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis)
                         );
 
-                       // Get Proot_X_M0
-                       T_X_root[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
-                       SimTK::Transform T_X_M0 = T_X_root[int(mbx)] * root_X_M0[int(mbx)];
-
-                       // RE const SimTK::Transform& T_X_Proot = topologies[i]->calcDefaultAtomFrameInCompoundFrame(parentAIx);
-                       // RE SimTK::Transform Proot_X_T = ~T_X_Proot;
-                       SimTK::Transform Proot_X_T = ~(T_X_Proot[int(mbx)]); // NEW
-
-
-                       SimTK::Transform Proot_X_M0 = Proot_X_T * T_X_M0;
-                       // RE P_X_F[int(mbx)] = Proot_X_M0;
-                       P_X_F[int(mbx)] = Proot_X_M0 * M_X_pin; // NEW
-              
-                       //SimTK::Transform G_X_Proot = G_X_T * T_X_Proot[int(mbx)];
-                       //SimTK::Transform proposalF_X_M(SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::ZAxis), Vec3(0, 0, 0));
-                       //SimTK::Transform proposal = proposalF_X_M;
-
-                       //std::cout << "P_X_F[" << int(mbx)<< "]" << std::endl;
-                       //PrintTransform(P_X_F[int(mbx)], 5);
-                       //std::cout << "proposal " << int(mbx)<< std::endl;
-                       //PrintTransform(proposal, 5);
+                        // Get Proot_X_M0
+                        // RE RE T_X_root[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
+                        SimTK::Transform T_X_M0 = T_X_root[int(mbx)] * root_X_M0[int(mbx)];
+ 
+                        // RE const SimTK::Transform& T_X_Proot = topologies[i]->calcDefaultAtomFrameInCompoundFrame(parentAIx);
+                        // RE SimTK::Transform Proot_X_T = ~T_X_Proot;
+                        SimTK::Transform Proot_X_T = ~T_X_Proot; // NEW
+ 
+ 
+                        SimTK::Transform Proot_X_M0 = Proot_X_T * T_X_M0;
+                        // RE P_X_F[int(mbx)] = Proot_X_M0;
+                        P_X_F[int(mbx)] = Proot_X_M0 * M_X_pin; // NEW
+               
+                        //SimTK::Transform proposalF_X_M(SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::ZAxis), Vec3(0, 0, 0));
+                        //SimTK::Transform proposal = proposalF_X_M;
+                        //std::cout << "proposal " << int(mbx)<< std::endl;
+                        //PrintTransform(proposal, 5);
 
                     } //END if parent not Ground
                 }
@@ -854,11 +855,32 @@ std::cout << "setAtomsLocations end5 - start0 "
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
                 SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
                 if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is not at body's origin
-                    SimTK::Transform root_X_T = ~(T_X_root[int(mbx)]);
-                    SimTK::Transform T_X_child =  topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
-                    SimTK::Transform root_X_child = root_X_T * T_X_child;
+
+                    // RE SimTK::Transform root_X_T = ~(T_X_root[int(mbx)]);
+                    // RE SimTK::Transform T_X_child =  topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
+                    // RE SimTK::Transform root_X_child = root_X_T * T_X_child;
+                    // RE topologies[i]->bsetFrameInMobilizedBodyFrame(aIx, root_X_child);
+                    // RE locs[int(aIx)] = root_X_child.p();
+                    
+                    SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)]; // NEW
+                    SimTK::Vec3 G_vchild = atomTargets[aIx]; //NEW 
+                    SimTK::Vec3 G_vroot = G_X_root.p(); // NEW
+                    SimTK::Vec3 G_v = G_vchild - G_vroot; // NEW
+                    SimTK::Vec3 root_v = (~G_X_root).R() * G_v; //NEW 
+
+                    SimTK::Real Cx = root_v[0];
+                    SimTK::Real Cy = root_v[1];
+                    SimTK::Real Cz = root_v[2];
+                    SimTK::Real theta1 = atan2(Cz, Cx);
+                    SimTK::Real theta2 = atan2(Cy, Cx);
+                    SimTK::Rotation rot1(-theta1, SimTK::YAxis);
+                    SimTK::Rotation rot2(-theta2, SimTK::ZAxis);
+                    SimTK::Rotation rot_total = rot1 * rot2;
+                    SimTK::Transform root_X_child(rot_total, root_v);
+
                     topologies[i]->bsetFrameInMobilizedBodyFrame(aIx, root_X_child);
-                    locs[int(aIx)] = root_X_child.p();
+                    locs[int(aIx)] = root_v; // NEW
+
                 }
                 else{
                     locs[int(aIx)] = SimTK::Vec3(0);

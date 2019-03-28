@@ -81,7 +81,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         }
     }
     */
-/*
+///*
     // DuMM
     for (DuMM::AtomIndex daIx(0); daIx < dumm->getNumAtoms(); ++daIx) {
         const SimTK::MobilizedBodyIndex mbx = dumm->getAtomBody(daIx);
@@ -151,89 +151,117 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
             if(parentMobod.getMobilizedBodyIndex() != 0){ // parent not Ground
                 SimTK::Compound::AtomIndex parentAIx = (residue->getMbx2aIx()).at(parentMbx);
-                T_X_Proot[int(mbx)] = residue->calcDefaultAtomFrameInCompoundFrame(parentAIx);
-                // Get inboard dihedral angle and put in root_X_M0 !!!!!!!
-                inboardBondDihedralAngles[int(mbx)] = residue->bgetDefaultInboardDihedralAngle(aIx);
-                inboardBondLengths[int(mbx)] = residue->bgetDefaultInboardBondLength(aIx);
-                root_X_M0[int(mbx)] = SimTK::Transform(
-                    SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis)
-                );
+                //T_X_Proot[int(mbx)] = residue->calcDefaultAtomFrameInCompoundFrame(parentAIx);
+                //const SimTK::Transform& T_X_Proot = residue->calcDefaultAtomFrameInCompoundFrame(parentAIx);
+                //SimTK::Transform Proot_X_T = ~T_X_Proot;
+                //SimTK::Transform Proot_X_M0 = Proot_X_T * T_X_M0;
+                //P_X_M[int(mbx)] = Proot_X_M0;
+            }
 
-                // Draw G_X_root
-               T_X_root[int(mbx)] = residue->calcDefaultAtomFrameInCompoundFrame(aIx);
-               SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)];
+            // Get inboard dihedral angle and put in root_X_M0 !!!!!!!
+            inboardBondDihedralAngles[int(mbx)] = residue->bgetDefaultInboardDihedralAngle(aIx);
+            inboardBondLengths[int(mbx)] = residue->bgetDefaultInboardBondLength(aIx);
+            root_X_M0[int(mbx)] = SimTK::Transform(
+                SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis)
+            );
 
-               DecorativeFrame decorativeFrameRoot;
-               decorativeFrameRoot.setTransform(G_X_root);
-               decorativeFrameRoot.setScaleFactors(SimTK::Vec3(0.06, 0.06, 0.06));
-               decorativeFrameRoot.setLineThickness(4);
-               decorativeFrameRoot.setColor(SimTK::Vec3(0, 255, 0)); 
-               geometry.push_back( decorativeFrameRoot );
+            // Draw G_X_root
+           T_X_root[int(mbx)] = residue->calcDefaultAtomFrameInCompoundFrame(aIx);
+           SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)];
 
-               // Text
-               std::ostringstream streamObj;
-               streamObj << "R" << int(aIx);
-               std::string text1 = streamObj.str();
-               DecorativeText decorativeTextRoot(text1);
-               
-               SimTK::Transform textOffsetR(SimTK::Rotation(), SimTK::Vec3(0.01, 0.0, 0.0));
-               decorativeTextRoot.setTransform(SimTK::Transform(G_X_root * textOffsetR));
-               decorativeTextRoot.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
-               decorativeTextRoot.setColor(SimTK::Vec3(0, 255, 0));
-               geometry.push_back(decorativeTextRoot);
-        
-               // Draw G_X_M0
-               SimTK::Transform T_X_M0 = T_X_root[int(mbx)] * root_X_M0[int(mbx)];
-               SimTK::Transform G_X_M0 = G_X_T * T_X_M0;
-               SimTK::Transform G_X_Mr = G_X_M0 * M_X_pin;
+           DecorativeFrame decorativeFrameRoot;
+           decorativeFrameRoot.setTransform(G_X_root);
+           decorativeFrameRoot.setScaleFactors(SimTK::Vec3(0.06, 0.06, 0.06));
+           decorativeFrameRoot.setLineThickness(4);
+           decorativeFrameRoot.setColor(SimTK::Vec3(0, 255, 0)); 
+           geometry.push_back( decorativeFrameRoot );
 
-               DecorativeFrame decorativeFrameM0;
-               decorativeFrameM0.setTransform(G_X_Mr);
-               decorativeFrameM0.setScaleFactors(SimTK::Vec3(0.07, 0.07, 0.07));
-               decorativeFrameM0.setLineThickness(4);
-               decorativeFrameM0.setColor(SimTK::Vec3(255, 0, 255)); 
-               geometry.push_back( decorativeFrameM0 );
+           // Text
+           std::ostringstream streamObj;
+           streamObj << "R" << int(aIx);
+           std::string text1 = streamObj.str();
+           DecorativeText decorativeTextRoot(text1);
+           
+           SimTK::Transform textOffsetR(SimTK::Rotation(), SimTK::Vec3(0.01, 0.0, 0.0));
+           decorativeTextRoot.setTransform(SimTK::Transform(G_X_root * textOffsetR));
+           decorativeTextRoot.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+           decorativeTextRoot.setColor(SimTK::Vec3(0, 255, 0));
+           geometry.push_back(decorativeTextRoot);
+    
+           // Draw G_X_M0
+           SimTK::Transform T_X_M0 = T_X_root[int(mbx)] * root_X_M0[int(mbx)];
+           SimTK::Transform G_X_M0 = G_X_T * T_X_M0;
+           SimTK::Transform G_X_Mr = G_X_M0 * M_X_pin;
 
-               // Text
-               std::ostringstream streamObjM0;
-               streamObjM0 << "m" << int(aIx);
-               text1 = streamObjM0.str();
-               DecorativeText decorativeTextM0(text1);
-               SimTK::Transform textOffsetM0(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
-               decorativeTextM0.setTransform(G_X_Mr * textOffsetM0);
-               decorativeTextM0.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
-               decorativeTextM0.setColor(SimTK::Vec3(255, 0, 255));
-               geometry.push_back(decorativeTextM0);
-        
+           DecorativeFrame decorativeFrameM0;
+           decorativeFrameM0.setTransform(G_X_Mr);
+           decorativeFrameM0.setScaleFactors(SimTK::Vec3(0.07, 0.07, 0.07));
+           decorativeFrameM0.setLineThickness(4);
+           decorativeFrameM0.setColor(SimTK::Vec3(255, 0, 255)); 
+           geometry.push_back( decorativeFrameM0 );
 
+           // Text
+           std::ostringstream streamObjM0;
+           streamObjM0 << "m" << int(aIx);
+           text1 = streamObjM0.str();
+           DecorativeText decorativeTextM0(text1);
+           SimTK::Transform textOffsetM0(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
+           decorativeTextM0.setTransform(G_X_Mr * textOffsetM0);
+           decorativeTextM0.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+           decorativeTextM0.setColor(SimTK::Vec3(255, 0, 255));
+           geometry.push_back(decorativeTextM0);
 
-               const SimTK::Transform& T_X_Proot = residue->calcDefaultAtomFrameInCompoundFrame(parentAIx);
-               SimTK::Transform Proot_X_T = ~T_X_Proot;
-               SimTK::Transform Proot_X_M0 = Proot_X_T * T_X_M0;
-               P_X_M[int(mbx)] = Proot_X_M0;
-
-            } //END if parent not Ground
         }
     }
 
     // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
-    for (SimTK::Compound::AtomIndex aIx(1); aIx < residue->getNumAtoms(); ++aIx){
+    for(SimTK::Compound::AtomIndex aIx(0); aIx < residue->getNumAtoms(); ++aIx){
         SimTK::MobilizedBodyIndex mbx = residue->getAtomMobilizedBodyIndex(aIx);
         if(residue->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is not at body's origin
-            SimTK::Transform root_X_T = ~(T_X_root[int(mbx)]);
-            SimTK::Transform T_X_child =  residue->calcDefaultAtomFrameInCompoundFrame(aIx);
-            SimTK::Transform root_X_child = root_X_T * T_X_child;
-            residue->bsetFrameInMobilizedBodyFrame(aIx, root_X_child);
-            locs[int(aIx)] = root_X_child.p();
-        }
-        else{
-            locs[int(aIx)] = SimTK::Vec3(0);
+
+            const SimTK::Compound::AtomPathName aPathName = residue->getAtomName(aIx);
+
+                    SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)]; // NEW
+                    SimTK::Vec3 G_vchild = atomTargets[aIx]; //NEW
+                    SimTK::Vec3 G_vroot = G_X_root.p(); // NEW
+                    SimTK::Vec3 G_v = G_vchild - G_vroot; // NEW
+                    SimTK::Vec3 root_v = (~G_X_root).R() * G_v; //NEW
+
+                    SimTK::Real Cx = root_v[0];
+                    SimTK::Real Cy = root_v[1];
+                    SimTK::Real Cz = root_v[2];
+                    SimTK::Real theta1 = atan2(Cz, Cx);
+                    SimTK::Real theta2 = atan2(Cy, Cx);
+                    SimTK::Rotation rot1(-theta1, SimTK::YAxis);
+                    SimTK::Rotation rot2(-theta2, SimTK::ZAxis);
+                    SimTK::Rotation rot_total = rot1 * rot2;
+                    SimTK::Transform root_X_child(rot_total, root_v);
+
+            SimTK::Transform G_X_child = G_X_root * root_X_child;
+
+            DecorativeFrame decorativeFrameChi;
+            decorativeFrameChi.setTransform(G_X_child);
+            decorativeFrameChi.setScaleFactors(SimTK::Vec3(0.07, 0.07, 0.07));
+            decorativeFrameChi.setLineThickness(4);
+            decorativeFrameChi.setColor(SimTK::Vec3(255, 0, 255)); 
+            geometry.push_back( decorativeFrameChi );
+
+            // Text
+            std::ostringstream streamObjChi;
+            streamObjChi << "C" << int(aIx);
+            std::string textChi = streamObjChi.str();
+            DecorativeText decorativeTextChi(textChi);
+            SimTK::Transform textOffsetChi(SimTK::Rotation(), SimTK::Vec3(0.0, 0.0, 0.01));
+            decorativeTextChi.setTransform(G_X_child * textOffsetChi);
+            decorativeTextChi.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+            decorativeTextChi.setColor(SimTK::Vec3(255, 0, 255));
+            geometry.push_back(decorativeTextChi);
         }
     }
 // */
 
 
-/*
+///*
     // Draw Compound 
     //DecorativeBrick topDecorativeBrick;
     //topDecorativeBrick.setTransform(G_X_T);
@@ -269,7 +297,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     }
 // */
 
-///*
+/*
     // Draw Rigid bodies
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
