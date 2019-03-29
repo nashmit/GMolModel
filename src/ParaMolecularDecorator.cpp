@@ -436,7 +436,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     geometry.push_back(decorativeLine_rotAxis);
 
     // Transform 2
-    SimTK::Transform F1_X_F2( SimTK::Rotation(-1.0 * rotAngle, F1_rotAxis)) ;
+    SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_bond) ;
     SimTK::Transform G_X_F2 = G_X_F1 * F1_X_F2;
     DecorativeFrame decorativeFrame_F2;
     decorativeFrame_F2.setTransform(G_X_F2);

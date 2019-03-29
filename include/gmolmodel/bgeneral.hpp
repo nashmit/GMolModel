@@ -177,6 +177,12 @@ string decimal_prefix(double inp_no, long int limit);
 bool AreSame(double a, double b, double EPSILON);
 
 /*
+ * Having Frame B expressed in A, return Transform X_BC having its XAxis aligned with v_B expressed in B
+ */
+SimTK::Transform alignFrameXAxis(SimTK::Transform A_X_B, SimTK::UnitVec3 v_B);
+
+
+/*
  * Convert spatial maatrix (Mat< 2, 2, Mat33 >) to 6x6 matrix (Mat<6,6>)
  * Replaces inf and nan with zeros
  */
