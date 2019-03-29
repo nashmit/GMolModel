@@ -39,6 +39,17 @@ void ParaMolecularDecorator::clearLines(void)
     lines.clear();
 }
 
+// Gmolmodel specific
+void ParaMolecularDecorator::setAtomTargets(std::vector<std::pair<bSpecificAtom *, SimTK::Vec3>> residueAtomLocations)
+{
+    atomTargets.clear();
+    for(unsigned int j = 0; j < residueAtomLocations.size(); j++){
+        SimTK::Compound::AtomIndex atomIndex = ((residueAtomLocations[j]).first)->atomIndex;
+        SimTK::Vec3 location = ((residueAtomLocations[j]).second);
+        atomTargets.insert(std::pair<SimTK::Compound::AtomIndex, SimTK::Vec3>(atomIndex, location));
+    }
+}
+
 void ParaMolecularDecorator::generateDecorations(const State& someState,
         Array_<DecorativeGeometry>& geometry) 
 {
@@ -81,7 +92,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         }
     }
     */
-///*
+/*
     // DuMM
     for (DuMM::AtomIndex daIx(0); daIx < dumm->getNumAtoms(); ++daIx) {
         const SimTK::MobilizedBodyIndex mbx = dumm->getAtomBody(daIx);
@@ -126,143 +137,383 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
     SimTK::Transform G_X_T = residue->getTopLevelTransform();
 /*
-    // Draw Compound transforms
+    // Draw Compound transforms for root atoms OLD WAY
     // Get transforms and locations: P_X_M, root_X_atom.p()
-    SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
-    SimTK::Transform P_X_M[matter->getNumBodies()]; // related to X_PFs
-    SimTK::Transform T_X_root[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
-    SimTK::Transform T_X_Proot[matter->getNumBodies()];
-    SimTK::Transform root_X_M0[matter->getNumBodies()];
-    SimTK::Angle inboardBondDihedralAngles[matter->getNumBodies()]; // related to X_FMs
-    SimTK::Real inboardBondLengths[matter->getNumBodies()]; // related to X_FMs
-    SimTK::Vec3 locs[residue->getNumAtoms()];
-    P_X_M[1] = G_X_T * residue->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
-    T_X_root[1] = residue->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            SimTK::Transform invG_X_T;
+            invG_X_T = ~G_X_T;
+            SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
+            SimTK::Transform P_X_F[matter->getNumBodies()]; // related to X_PFs
+            SimTK::Transform T_X_root[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
+            SimTK::Transform T_X_Proot[matter->getNumBodies()];
+            SimTK::Transform root_X_M0[matter->getNumBodies()];
+            SimTK::Angle inboardBondDihedralAngles[matter->getNumBodies()]; // related to X_FMs
+            SimTK::Real inboardBondLengths[matter->getNumBodies()]; // related to X_FMs
+            SimTK::Vec3 locs[residue->getNumAtoms()];
 
-    // Iterate through atoms - get P_X_M for all the bodies
-    for (SimTK::Compound::AtomIndex aIx(1); aIx < residue->getNumAtoms(); ++aIx){
-        if(residue->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
+            T_X_root[1] = residue->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            P_X_F[1] = G_X_T * residue->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
+            // Iterate through atoms - get P_X_F for all the bodies
+            for (SimTK::Compound::AtomIndex aIx(1); aIx < residue->getNumAtoms(); ++aIx){
+                if(residue->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
 
-            // Get body, parentBody, parentAtom
-            SimTK::MobilizedBodyIndex mbx = residue->getAtomMobilizedBodyIndex(aIx);
-            const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-            const SimTK::MobilizedBody& parentMobod =  mobod.getParentMobilizedBody();
-            SimTK::MobilizedBodyIndex parentMbx = parentMobod.getMobilizedBodyIndex();
+                    // Get body, parentBody, parentAtom
+                    SimTK::MobilizedBodyIndex mbx = residue->getAtomMobilizedBodyIndex(aIx);
+                    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+                    const SimTK::MobilizedBody& parentMobod =  mobod.getParentMobilizedBody();
+                    SimTK::MobilizedBodyIndex parentMbx = parentMobod.getMobilizedBodyIndex();
 
-            if(parentMobod.getMobilizedBodyIndex() != 0){ // parent not Ground
-                SimTK::Compound::AtomIndex parentAIx = (residue->getMbx2aIx()).at(parentMbx);
-                //T_X_Proot[int(mbx)] = residue->calcDefaultAtomFrameInCompoundFrame(parentAIx);
-                //const SimTK::Transform& T_X_Proot = residue->calcDefaultAtomFrameInCompoundFrame(parentAIx);
-                //SimTK::Transform Proot_X_T = ~T_X_Proot;
-                //SimTK::Transform Proot_X_M0 = Proot_X_T * T_X_M0;
-                //P_X_M[int(mbx)] = Proot_X_M0;
+                    if(parentMobod.getMobilizedBodyIndex() != 0){ // parent not Ground
+                        SimTK::Compound::AtomIndex parentAIx = (residue->getMbx2aIx()).at(parentMbx);
+
+                        T_X_Proot[int(mbx)] = residue->calcDefaultAtomFrameInCompoundFrame(parentAIx);
+
+                        // Get inboard dihedral angle and put in root_X_M0 !!!!!!!
+                        inboardBondDihedralAngles[int(mbx)] = residue->bgetDefaultInboardDihedralAngle(aIx);
+                        inboardBondLengths[int(mbx)] = residue->bgetDefaultInboardBondLength(aIx);
+                        root_X_M0[int(mbx)] = SimTK::Transform(
+                            SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis)
+                        );
+
+                        // Get Proot_X_M0
+                        T_X_root[int(mbx)] = residue->calcDefaultAtomFrameInCompoundFrame(aIx);
+                        SimTK::Transform T_X_M0 = T_X_root[int(mbx)] * root_X_M0[int(mbx)];
+
+                        SimTK::Transform Proot_X_T = ~(T_X_Proot[int(mbx)]);
+
+                        SimTK::Transform Proot_X_M0 = Proot_X_T * T_X_M0;
+                        P_X_F[int(mbx)] = Proot_X_M0 * M_X_pin; // NEW
+
+                        // Draw F (Proot_X_Mr in this case) in Ground recovered from P_X_F
+                        SimTK::Transform G_X_Proot = G_X_T * T_X_Proot[int(mbx)];
+                        SimTK::Transform G_X_F = G_X_Proot * P_X_F[int(mbx)];
+
+                        std::ostringstream streamObjf;
+                        streamObjf << std::string("f") + std::to_string(int(mbx));
+                        std::string textf = streamObjf.str();
+                        DecorativeText decorativeTextf(textf);
+                        SimTK::Transform textOffsetf(SimTK::Rotation(), SimTK::Vec3(0.01, 0.0, 0.0));
+                        decorativeTextf.setTransform(G_X_F * textOffsetf);
+                        decorativeTextf.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+                        decorativeTextf.setColor(SimTK::Vec3(0, 0, 255));
+                        geometry.push_back(decorativeTextf);
+            
+                        DecorativeFrame decorativeFramef;
+                        decorativeFramef.setTransform(G_X_F * textOffsetf);
+                        decorativeFramef.setScaleFactors(SimTK::Vec3(0.04, 0.04, 0.04));
+                        decorativeFramef.setLineThickness(4);
+                        decorativeFramef.setColor(SimTK::Vec3(0, 0, 255));
+                        geometry.push_back( decorativeFramef );
+            
+                        // Line between P and F in Ground
+                        DecorativeLine decorativeLinepf(G_X_Proot.p() + textOffsetf.p(), G_X_F.p() + textOffsetf.p());
+                        decorativeLinepf.setLineThickness(3);
+                        geometry.push_back(decorativeLinepf);
+
+                    } //END if parent not Ground
+                }
+            }
+// */
+
+/*
+    // Draw Compound transforms for root atoms NEW WAY
+            SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
+            SimTK::Transform P_X_F[matter->getNumBodies()]; // related to X_PFs
+            SimTK::Transform T_X_root[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
+            SimTK::Transform T_X_Proot; // NEW
+            SimTK::Transform root_X_M0[matter->getNumBodies()];
+            SimTK::Angle inboardBondDihedralAngles[matter->getNumBodies()]; // related to X_FMs
+            SimTK::Real inboardBondLengths[matter->getNumBodies()]; // related to X_FMs
+            SimTK::Vec3 locs[residue->getNumAtoms()];
+
+            // Iterate through atoms - get T_X_roots for all the bodies
+            for (SimTK::Compound::AtomIndex aIx(0); aIx < residue->getNumAtoms(); ++aIx){
+                if(residue->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
+                    // Get body
+                    SimTK::MobilizedBodyIndex mbx = residue->getAtomMobilizedBodyIndex(aIx);
+                    T_X_root[int(mbx)] = residue->calcDefaultAtomFrameInCompoundFrame(aIx);
+                }
             }
 
-            // Get inboard dihedral angle and put in root_X_M0 !!!!!!!
-            inboardBondDihedralAngles[int(mbx)] = residue->bgetDefaultInboardDihedralAngle(aIx);
-            inboardBondLengths[int(mbx)] = residue->bgetDefaultInboardBondLength(aIx);
-            root_X_M0[int(mbx)] = SimTK::Transform(
-                SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis)
-            );
+            P_X_F[1] = G_X_T * T_X_root[1]; // NEW
+            // Iterate through atoms - get P_X_F for all the bodies
+            for (SimTK::Compound::AtomIndex aIx(1); aIx < residue->getNumAtoms(); ++aIx){
+                if(residue->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
 
-            // Draw G_X_root
-           T_X_root[int(mbx)] = residue->calcDefaultAtomFrameInCompoundFrame(aIx);
-           SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)];
+                    // Get body, parentBody, parentAtom
+                    SimTK::MobilizedBodyIndex mbx = residue->getAtomMobilizedBodyIndex(aIx);
+                    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
+                    const SimTK::MobilizedBody& parentMobod =  mobod.getParentMobilizedBody();
+                    SimTK::MobilizedBodyIndex parentMbx = parentMobod.getMobilizedBodyIndex();
 
-           DecorativeFrame decorativeFrameRoot;
-           decorativeFrameRoot.setTransform(G_X_root);
-           decorativeFrameRoot.setScaleFactors(SimTK::Vec3(0.06, 0.06, 0.06));
-           decorativeFrameRoot.setLineThickness(4);
-           decorativeFrameRoot.setColor(SimTK::Vec3(0, 255, 0)); 
-           geometry.push_back( decorativeFrameRoot );
+                    if(parentMobod.getMobilizedBodyIndex() != 0){ // parent not Ground
+                        SimTK::Compound::AtomIndex parentAIx = (residue->getMbx2aIx()).at(parentMbx);
 
-           // Text
-           std::ostringstream streamObj;
-           streamObj << "R" << int(aIx);
-           std::string text1 = streamObj.str();
-           DecorativeText decorativeTextRoot(text1);
-           
-           SimTK::Transform textOffsetR(SimTK::Rotation(), SimTK::Vec3(0.01, 0.0, 0.0));
-           decorativeTextRoot.setTransform(SimTK::Transform(G_X_root * textOffsetR));
-           decorativeTextRoot.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
-           decorativeTextRoot.setColor(SimTK::Vec3(0, 255, 0));
-           geometry.push_back(decorativeTextRoot);
-    
-           // Draw G_X_M0
-           SimTK::Transform T_X_M0 = T_X_root[int(mbx)] * root_X_M0[int(mbx)];
-           SimTK::Transform G_X_M0 = G_X_T * T_X_M0;
-           SimTK::Transform G_X_Mr = G_X_M0 * M_X_pin;
+                        T_X_Proot = T_X_root[parentMbx]; // NEW
 
-           DecorativeFrame decorativeFrameM0;
-           decorativeFrameM0.setTransform(G_X_Mr);
-           decorativeFrameM0.setScaleFactors(SimTK::Vec3(0.07, 0.07, 0.07));
-           decorativeFrameM0.setLineThickness(4);
-           decorativeFrameM0.setColor(SimTK::Vec3(255, 0, 255)); 
-           geometry.push_back( decorativeFrameM0 );
+                        // Get inboard dihedral angle and put in root_X_M0 !!!!!!!
+                        inboardBondDihedralAngles[int(mbx)] = residue->bgetDefaultInboardDihedralAngle(aIx);
+                        inboardBondLengths[int(mbx)] = residue->bgetDefaultInboardBondLength(aIx);
+                        root_X_M0[int(mbx)] = SimTK::Transform(
+                            SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis)
+                        );
 
-           // Text
-           std::ostringstream streamObjM0;
-           streamObjM0 << "m" << int(aIx);
-           text1 = streamObjM0.str();
-           DecorativeText decorativeTextM0(text1);
-           SimTK::Transform textOffsetM0(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
-           decorativeTextM0.setTransform(G_X_Mr * textOffsetM0);
-           decorativeTextM0.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
-           decorativeTextM0.setColor(SimTK::Vec3(255, 0, 255));
-           geometry.push_back(decorativeTextM0);
+                        // Get Proot_X_M0
+                        SimTK::Transform T_X_M0 = T_X_root[int(mbx)] * root_X_M0[int(mbx)];
+                        SimTK::Transform Proot_X_T = ~T_X_Proot; // NEW
+                        SimTK::Transform Proot_X_M0 = Proot_X_T * T_X_M0;
+                        P_X_F[int(mbx)] = Proot_X_M0 * M_X_pin; // NEW
+
+                        // Draw root 
+                        SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)];
+                        std::ostringstream streamObj_r;
+                        streamObj_r << std::string("r") + std::to_string(int(mbx));
+                        std::string text_r = streamObj_r.str();
+                        DecorativeText decorativeText_r(text_r);
+                        SimTK::Transform textOffset_r(SimTK::Rotation(), SimTK::Vec3(0.01, 0.0, 0.0));
+                        decorativeText_r.setTransform(G_X_root * textOffset_r);
+                        decorativeText_r.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+                        decorativeText_r.setColor(SimTK::Vec3(0, 255, 0));
+                        geometry.push_back(decorativeText_r);
+            
+                        DecorativeFrame decorativeFrame_r;
+                        //decorativeFrame_r.setTransform(G_X_root * textOffset_r);
+                        decorativeFrame_r.setTransform(G_X_root);
+                        decorativeFrame_r.setScaleFactors(SimTK::Vec3(0.04, 0.04, 0.04));
+                        decorativeFrame_r.setLineThickness(4);
+                        decorativeFrame_r.setColor(SimTK::Vec3(0, 255, 0));
+                        geometry.push_back( decorativeFrame_r );
+
+//                        // Draw F (Proot_X_Mr in this case) in Ground recovered from P_X_F
+//                        SimTK::Transform G_X_Proot = G_X_T * T_X_Proot;
+//                        SimTK::Transform G_X_F = G_X_Proot * P_X_F[int(mbx)];
+//
+//                        std::ostringstream streamObjf;
+//                        streamObjf << std::string("f") + std::to_string(int(mbx));
+//                        std::string textf = streamObjf.str();
+//                        DecorativeText decorativeTextf(textf);
+//                        SimTK::Transform textOffsetf(SimTK::Rotation(), SimTK::Vec3(0.01, 0.0, 0.0));
+//                        decorativeTextf.setTransform(G_X_F * textOffsetf);
+//                        decorativeTextf.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+//                        decorativeTextf.setColor(SimTK::Vec3(0, 0, 255));
+//                        geometry.push_back(decorativeTextf);
+//            
+//                        DecorativeFrame decorativeFramef;
+//                        //decorativeFramef.setTransform(G_X_F * textOffsetf);
+//                        decorativeFramef.setTransform(G_X_F);
+//                        decorativeFramef.setScaleFactors(SimTK::Vec3(0.04, 0.04, 0.04));
+//                        decorativeFramef.setLineThickness(4);
+//                        decorativeFramef.setColor(SimTK::Vec3(0, 0, 255));
+//                        geometry.push_back( decorativeFramef );
+//            
+//                        // Line between P and F in Ground
+//                        //DecorativeLine decorativeLinepf(G_X_Proot.p() + textOffsetf.p(), G_X_F.p() + textOffsetf.p());
+//                        DecorativeLine decorativeLinepf(G_X_Proot.p(), G_X_F.p());
+//                        decorativeLinepf.setLineThickness(3);
+//                        geometry.push_back(decorativeLinepf);
+
+                    } //END if parent not Ground
+                }
+            }
+// */
+
+ /*
+    // Draw Compound transforms for periferic atoms OLD WAY
+    // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
+    for (SimTK::Compound::AtomIndex aIx(1); aIx < residue->getNumAtoms(); ++aIx){
+        SimTK::MobilizedBodyIndex mbx = residue->getAtomMobilizedBodyIndex(aIx);
+        if(residue->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is not at body's origin
+            SimTK::Transform root_X_T = ~(T_X_root[int(mbx)]);
+            SimTK::Transform T_X_child =  residue->calcDefaultAtomFrameInCompoundFrame(aIx);
+            SimTK::Transform root_X_child = root_X_T * T_X_child;
+
+            // Draw F (Proot_X_Mr in this case) in Ground recovered from P_X_F
+            SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)];
+            SimTK::Transform G_X_child = G_X_T * T_X_child;
+
+            std::ostringstream streamObj_c;
+            streamObj_c << std::string("c") + std::to_string(int(aIx));
+            std::string text_c = streamObj_c.str();
+            DecorativeText decorativeText_c(text_c);
+            SimTK::Transform textOffset_c(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
+            decorativeText_c.setTransform(G_X_child * textOffset_c);
+            decorativeText_c.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+            decorativeText_c.setColor(SimTK::Vec3(255, 0, 255));
+            geometry.push_back(decorativeText_c);
+
+            DecorativeFrame decorativeFrame_c;
+            decorativeFrame_c.setTransform(G_X_child * textOffset_c);
+            decorativeFrame_c.setScaleFactors(SimTK::Vec3(0.04, 0.04, 0.04));
+            decorativeFrame_c.setLineThickness(4);
+            decorativeFrame_c.setColor(SimTK::Vec3(255, 0, 255));
+            geometry.push_back( decorativeFrame_c );
+
+            // Line between P and F in Ground
+            DecorativeLine decorativeLine_rc(G_X_root.p() + textOffset_c.p(), G_X_child.p() + textOffset_c.p());
+            decorativeLine_rc.setLineThickness(3);
+            decorativeLine_rc.setColor(SimTK::Vec3(255, 0, 255));
+            geometry.push_back(decorativeLine_rc);
 
         }
     }
+// */
 
+// /*
+    // Ground
+    SimTK::Transform offset(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
+    SimTK::Transform G_X_G;
+    DecorativeFrame decorativeFrame_G;
+    decorativeFrame_G.setTransform(G_X_G);
+    decorativeFrame_G.setScaleFactors(SimTK::Vec3(1, 1, 1));
+    decorativeFrame_G.setColor(SimTK::Vec3(0, 0, 0));
+    geometry.push_back( decorativeFrame_G );
+
+    // v1
+    SimTK::Vec3 G_v1(0.5, -1.31, 1.1);
+    DecorativeLine decorativeLine_v1(G_X_G.p() , G_v1);
+    decorativeLine_v1.setLineThickness(2);
+    decorativeLine_v1.setColor(SimTK::Vec3(0, 0, 0));
+    geometry.push_back(decorativeLine_v1);
+
+    // Compute alignment of Ground X of F0 around v1
+    //SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(G_v1), SimTK::Vec3(1, 0, 0));
+    //assert(cosAngle < 1.1);
+    //assert(cosAngle > -1.1);
+    //if (cosAngle > 1.0) cosAngle = 1.0;
+    //if (cosAngle < -1.0) cosAngle = -1.0;
+    //SimTK::Angle rotAngle = std::acos( cosAngle );
+    //SimTK::UnitVec3 rotAxis(SimTK::cross(SimTK::UnitVec3(G_v1), SimTK::Vec3(1, 0, 0)));
+    //SimTK::Transform G_X_F0( SimTK::Rotation(-1.0 * rotAngle, rotAxis)) ;
+
+    // Draw rotation axis
+    //DecorativeLine decorativeLine_rotAxis(G_X_G.p() , rotAxis);
+    //decorativeLine_rotAxis.setLineThickness(2);
+    //decorativeLine_rotAxis.setColor(SimTK::Vec3(255, 0, 255));
+    //geometry.push_back(decorativeLine_rotAxis);
+
+    // Draw F0
+    //DecorativeFrame decorativeFrame_F0;
+    //decorativeFrame_F0.setTransform(G_X_F0);
+    //decorativeFrame_F0.setScaleFactors(SimTK::Vec3(1, 1, 1));
+    //decorativeFrame_F0.setColor(SimTK::Vec3(255, 0, 255));
+    //geometry.push_back( decorativeFrame_F0 );
+
+    // F1
+    SimTK::Transform G_X_F1( SimTK::Rotation(1.2, SimTK::UnitVec3(2.3, 4.1, -0.9)), SimTK::Vec3(1, 1, 1) );
+    DecorativeFrame decorativeFrame_F1;
+    decorativeFrame_F1.setTransform(G_X_F1);
+    decorativeFrame_F1.setScaleFactors(SimTK::Vec3(1, 1, 1));
+    decorativeFrame_F1.setColor(SimTK::Vec3(0, 0, 255));
+    geometry.push_back( decorativeFrame_F1 );
+  
+    // Check v1 in F1
+    SimTK::Vec3 F1_v1 = ~(G_X_F1.R()) * G_v1;
+    SimTK::Vec3 checkG_v1 = G_X_F1.R() * F1_v1;
+    DecorativeLine decorativeLine_checkG_v1(G_X_G.p() + offset.p(), checkG_v1 + offset.p());
+    decorativeLine_checkG_v1.setLineThickness(2);
+    decorativeLine_checkG_v1.setColor(SimTK::Vec3(0, 255, 0));
+    geometry.push_back(decorativeLine_checkG_v1);
+  
+    // v1 F1 Bond
+    DecorativeLine decorativeLine_v1F1(checkG_v1, G_X_F1.p());
+    decorativeLine_v1F1.setLineThickness(2);
+    decorativeLine_v1F1.setColor(SimTK::Vec3(0, 0, 255));
+    geometry.push_back(decorativeLine_v1F1);
+  
+    // Compute Rotation of F1 around bond
+    SimTK::Vec3 G_bond = (G_v1 - G_X_F1.p());
+    SimTK::Vec3 F1_bond = ~(G_X_F1.R()) * G_bond;
+    SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(F1_bond), SimTK::UnitVec3(1, 0, 0));
+    assert(cosAngle < 1.1); assert(cosAngle > -1.1);
+    if (cosAngle > 1.0) cosAngle = 1.0; if (cosAngle < -1.0) cosAngle = -1.0;
+    SimTK::Angle rotAngle = std::acos( cosAngle );
+    SimTK::UnitVec3 F1_rotAxis(SimTK::cross(SimTK::UnitVec3(F1_bond), SimTK::UnitVec3(1, 0, 0)));
+  
+    // Draw rotation axis
+    SimTK::Vec3 G_rotAxis = G_X_F1.R() * F1_rotAxis;
+    DecorativeLine decorativeLine_rotAxis(G_X_G.p() + G_X_F1.p(), G_rotAxis + G_X_F1.p());
+    decorativeLine_rotAxis.setLineThickness(2);
+    decorativeLine_rotAxis.setColor(SimTK::Vec3(255, 0, 0));
+    geometry.push_back(decorativeLine_rotAxis);
+
+    // Transform 2
+    SimTK::Transform F1_X_F2( SimTK::Rotation(-1.0 * rotAngle, F1_rotAxis)) ;
+    SimTK::Transform G_X_F2 = G_X_F1 * F1_X_F2;
+    DecorativeFrame decorativeFrame_F2;
+    decorativeFrame_F2.setTransform(G_X_F2);
+    decorativeFrame_F2.setScaleFactors(SimTK::Vec3(1, 1, 1));
+    decorativeFrame_F2.setColor(SimTK::Vec3(255, 0, 255));
+    geometry.push_back( decorativeFrame_F2 );
+
+// */
+
+ /*
+    // Draw Compound transforms for periferic atoms NEW WAY
     // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
-    for(SimTK::Compound::AtomIndex aIx(0); aIx < residue->getNumAtoms(); ++aIx){
+
+    for (SimTK::Compound::AtomIndex aIx(1); aIx < residue->getNumAtoms(); ++aIx){
         SimTK::MobilizedBodyIndex mbx = residue->getAtomMobilizedBodyIndex(aIx);
         if(residue->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is not at body's origin
+            SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)]; // NEW
+            SimTK::Vec3 G_vchild = atomTargets[aIx]; //NEW
+            SimTK::Vec3 G_vroot = G_X_root.p(); // NEW
+            SimTK::Vec3 G_v = G_vchild - G_vroot; // NEW
+            SimTK::Vec3 root_v = ~(G_X_root.R()) * G_v; //NEW
+            SimTK::Vec3 mroot_v = -1 * root_v;
+            SimTK::UnitVec3 G_XAxis(1,0,0);
+            SimTK::UnitVec3 root_XAxis = ~(G_X_root.R()) * G_XAxis;
 
-            const SimTK::Compound::AtomPathName aPathName = residue->getAtomName(aIx);
-
-                    SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)]; // NEW
-                    SimTK::Vec3 G_vchild = atomTargets[aIx]; //NEW
-                    SimTK::Vec3 G_vroot = G_X_root.p(); // NEW
-                    SimTK::Vec3 G_v = G_vchild - G_vroot; // NEW
-                    SimTK::Vec3 root_v = (~G_X_root).R() * G_v; //NEW
-
-                    SimTK::Real Cx = root_v[0];
-                    SimTK::Real Cy = root_v[1];
-                    SimTK::Real Cz = root_v[2];
-                    SimTK::Real theta1 = atan2(Cz, Cx);
-                    SimTK::Real theta2 = atan2(Cy, Cx);
-                    SimTK::Rotation rot1(-theta1, SimTK::YAxis);
-                    SimTK::Rotation rot2(-theta2, SimTK::ZAxis);
-                    SimTK::Rotation rot_total = rot1 * rot2;
-                    SimTK::Transform root_X_child(rot_total, root_v);
-
+            SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(root_v), root_XAxis);
+            assert(cosAngle < 1.1);
+            assert(cosAngle > -1.1);
+            if (cosAngle > 1.0) cosAngle = 1.0;
+            if (cosAngle < -1.0) cosAngle = -1.0;
+            SimTK::Angle rotAngle = std::acos( cosAngle );
+            SimTK::UnitVec3 rotAxis(SimTK::cross(SimTK::UnitVec3(root_v), root_XAxis));
+   
+            SimTK::Transform root_X_child( SimTK::Rotation(rotAngle, rotAxis), root_v ) ;
             SimTK::Transform G_X_child = G_X_root * root_X_child;
 
-            DecorativeFrame decorativeFrameChi;
-            decorativeFrameChi.setTransform(G_X_child);
-            decorativeFrameChi.setScaleFactors(SimTK::Vec3(0.07, 0.07, 0.07));
-            decorativeFrameChi.setLineThickness(4);
-            decorativeFrameChi.setColor(SimTK::Vec3(255, 0, 255)); 
-            geometry.push_back( decorativeFrameChi );
+            // Draw F (Proot_X_Mr in this case) in Ground recovered from P_X_F
 
-            // Text
-            std::ostringstream streamObjChi;
-            streamObjChi << "C" << int(aIx);
-            std::string textChi = streamObjChi.str();
-            DecorativeText decorativeTextChi(textChi);
-            SimTK::Transform textOffsetChi(SimTK::Rotation(), SimTK::Vec3(0.0, 0.0, 0.01));
-            decorativeTextChi.setTransform(G_X_child * textOffsetChi);
-            decorativeTextChi.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
-            decorativeTextChi.setColor(SimTK::Vec3(255, 0, 255));
-            geometry.push_back(decorativeTextChi);
+            std::ostringstream streamObj_c;
+            streamObj_c << std::string("c") + std::to_string(int(aIx));
+            std::string text_c = streamObj_c.str();
+            DecorativeText decorativeText_c(text_c);
+            SimTK::Transform textOffset_c(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
+            //decorativeText_c.setTransform(G_X_child * textOffset_c);
+            decorativeText_c.setTransform(G_X_child);
+            decorativeText_c.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+            decorativeText_c.setColor(SimTK::Vec3(255, 0, 255));
+            geometry.push_back(decorativeText_c);
+
+            DecorativeFrame decorativeFrame_c;
+            //decorativeFrame_c.setTransform(G_X_child * textOffset_c);
+            decorativeFrame_c.setTransform(G_X_child);
+            decorativeFrame_c.setScaleFactors(SimTK::Vec3(0.04, 0.04, 0.04));
+            decorativeFrame_c.setLineThickness(4);
+            decorativeFrame_c.setColor(SimTK::Vec3(255, 0, 255));
+            geometry.push_back( decorativeFrame_c );
+
+            // Line between root and child in Ground
+            ////DecorativeLine decorativeLine_rc(G_X_root.p() + textOffset_c.p(), G_X_child.p() + textOffset_c.p());
+            //DecorativeLine decorativeLine_rc(G_X_root.p() , G_X_child.p() );
+            //decorativeLine_rc.setLineThickness(2);
+            //decorativeLine_rc.setColor(SimTK::Vec3(255, 0, 255));
+            //geometry.push_back(decorativeLine_rc);
+
+            //DecorativeLine decorativeLine_rc2(G_vroot + textOffset_c.p(), G_vchild + textOffset_c.p());
+            DecorativeLine decorativeLine_rc2(G_vroot , G_vchild);
+            decorativeLine_rc2.setLineThickness(2);
+            decorativeLine_rc2.setColor(SimTK::Vec3(0, 255, 255));
+            geometry.push_back(decorativeLine_rc2);
+
         }
     }
 // */
 
 
-///*
-    // Draw Compound 
+/*
+    // Draw Default Compound 
     //DecorativeBrick topDecorativeBrick;
     //topDecorativeBrick.setTransform(G_X_T);
     //topDecorativeBrick.setScaleFactors(SimTK::Vec3(0.03, 0.03, 0.03));

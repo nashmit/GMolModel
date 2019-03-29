@@ -566,6 +566,10 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
     // Iterate through molecules/topologies
     for(unsigned int i = 0; i < otherWorldsAtomsLocations.size(); i++){
 
+        // When in Debug mode
+        paraMolecularDecorator->setAtomTargets(otherWorldsAtomsLocations[i]);
+        // 
+
         SimTK::Transform G_X_T = topologies[i]->getTopLevelTransform();
 
         // Different regimens have different strategies

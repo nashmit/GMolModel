@@ -33,6 +33,9 @@ public:
 
     ~ParaMolecularDecorator(void);
 
+    // Gmolmodel specific
+    void setAtomTargets(std::vector<std::pair<bSpecificAtom *, SimTK::Vec3>> residueAtomLocations);
+
 private:
     SimTK::CompoundSystem *compoundSystem;
     SimTK::SimbodyMatterSubsystem *matter;
@@ -42,6 +45,10 @@ private:
 
     Array_< Vec3 >  points;
     Array_< std::pair< Vec3, Vec3 > > lines;
+
+    // Gmolmodel specific
+    std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
+
 };
 
 #endif // __PARAMOLECULARDECORATOR_HPP__
