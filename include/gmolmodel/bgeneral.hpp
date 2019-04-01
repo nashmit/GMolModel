@@ -179,7 +179,7 @@ bool AreSame(double a, double b, double EPSILON);
 /*
  * Having Frame B expressed in A, return Transform X_BC having its XAxis aligned with v_B expressed in B
  */
-SimTK::Transform alignFrameXAxis(SimTK::Transform A_X_B, SimTK::UnitVec3 v_B);
+SimTK::Transform alignFlipiAndTranslateFrameAlongXAxis(SimTK::Transform A_X_B, SimTK::UnitVec3 v_B);
 
 
 /*

@@ -357,7 +357,7 @@ bool AreSame(double a, double b, double EPSILON)
 /*
  * Given Frame B expressed in A, return Transform X_BC having its XAxis aligned with v_A expressed in A
  */
-SimTK::Transform alignFrameXAxis(SimTK::Transform G_X_F1, SimTK::UnitVec3 G_v1)
+SimTK::Transform alignFlipiAndTranslateFrameAlongXAxis(SimTK::Transform G_X_F1, SimTK::UnitVec3 G_v1)
 {
     // Compute Rotation of F1 around bond
     SimTK::Vec3 G_bond = (G_v1 - G_X_F1.p());
