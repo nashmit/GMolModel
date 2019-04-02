@@ -576,10 +576,10 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
         if(topologies[i]->getRegimen() == "IC"){
 
 // TIME START -----------------
-std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
+//std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
 // TIME START
 
-            std::cout << std::endl << "World IC" << std::endl << std::flush;
+            //std::cout << std::endl << "World IC" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
             //std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
@@ -590,10 +590,10 @@ std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
             }
 
 // TIME STOP
-std::chrono::steady_clock::time_point end0 = std::chrono::steady_clock::now();
-std::cout << "setAtomsLocations end0 - start0 "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end0 - start0).count()
-              << " us.\n";
+//std::chrono::steady_clock::time_point end0 = std::chrono::steady_clock::now();
+//std::cout << "setAtomsLocations end0 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end0 - start0).count()
+//              << " us.\n";
 // TIME STOP ===================
 
             // As an alternative we can pool BAT from otherWorlds Qs
@@ -607,10 +607,10 @@ std::cout << "setAtomsLocations end0 - start0 "
             //topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
 // TIME STOP
-std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
-std::cout << "setAtomsLocations end1 - start0 "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end1 - start0).count()
-              << " us.\n";
+//std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
+//std::cout << "setAtomsLocations end1 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end1 - start0).count()
+//              << " us.\n";
 // TIME STOP ===================
 
             // Get transforms and locations: P_X_M, root_X_atom.p()
@@ -628,10 +628,10 @@ std::cout << "setAtomsLocations end1 - start0 "
             }
 
 // TIME STOP
-std::chrono::steady_clock::time_point end2 = std::chrono::steady_clock::now();
-std::cout << "setAtomsLocations end2 - start0 "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end2 - start0).count()
-              << " us.\n";
+//std::chrono::steady_clock::time_point end2 = std::chrono::steady_clock::now();
+//std::cout << "setAtomsLocations end2 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end2 - start0).count()
+//              << " us.\n";
 // TIME STOP ===================
 
             // Set X_FM and Q 
@@ -647,10 +647,10 @@ std::cout << "setAtomsLocations end2 - start0 "
             }
 
 // TIME STOP
-std::chrono::steady_clock::time_point end3 = std::chrono::steady_clock::now();
-std::cout << "setAtomsLocations end3 - start0 "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end3 - start0).count()
-              << " us.\n";
+//std::chrono::steady_clock::time_point end3 = std::chrono::steady_clock::now();
+//std::cout << "setAtomsLocations end3 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end3 - start0).count()
+//              << " us.\n";
 // TIME STOP ===================
 
         // END IC regimen
@@ -745,7 +745,7 @@ std::cout << "setAtomsLocations end3 - start0 "
         }else if((topologies[i]->getRegimen() == "TD") || (topologies[i]->getRegimen() == "RB")){
 
 // TIME START -----------------
-std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
+//std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
 // TIME START
 
             //std::cout << std::endl << "World TD" << std::endl << std::flush;
@@ -767,10 +767,10 @@ std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
             topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
 // TIME STOP
-std::chrono::steady_clock::time_point end4 = std::chrono::steady_clock::now();
-std::cout << "setAtomsLocations end4 - start0 "
-<< std::chrono::duration_cast<std::chrono::microseconds>(end4 - start0).count()
-<< " us.\n";
+//std::chrono::steady_clock::time_point end4 = std::chrono::steady_clock::now();
+//std::cout << "setAtomsLocations end4 - start0 "
+//<< std::chrono::duration_cast<std::chrono::microseconds>(end4 - start0).count()
+//<< " us.\n";
 // TIME STOP ===================
 
             // Get transforms and locations: P_X_F and root_X_atom.p()
@@ -849,10 +849,10 @@ std::cout << "setAtomsLocations end4 - start0 "
             }
         
 // TIME STOP
-std::chrono::steady_clock::time_point end5 = std::chrono::steady_clock::now();
-std::cout << "setAtomsLocations end5 - start0 "
-<< std::chrono::duration_cast<std::chrono::microseconds>(end5 - start0).count()
-<< " us.\n";
+//std::chrono::steady_clock::time_point end5 = std::chrono::steady_clock::now();
+//std::cout << "setAtomsLocations end5 - start0 "
+//<< std::chrono::duration_cast<std::chrono::microseconds>(end5 - start0).count()
+//<< " us.\n";
 // TIME STOP ===================
 
  /*
@@ -911,10 +911,10 @@ std::cout << "setAtomsLocations end5 - start0 "
 // */
         
 // TIME STOP
-std::chrono::steady_clock::time_point end6 = std::chrono::steady_clock::now();
-std::cout << "setAtomsLocations end6 - start0 "
-<< std::chrono::duration_cast<std::chrono::microseconds>(end6 - start0).count()
-<< " us.\n";
+//std::chrono::steady_clock::time_point end6 = std::chrono::steady_clock::now();
+//std::cout << "setAtomsLocations end6 - start0 "
+//<< std::chrono::duration_cast<std::chrono::microseconds>(end6 - start0).count()
+//<< " us.\n";
 // TIME STOP ===================
 
             // Set stations and AtomPLacements for atoms in DuMM
@@ -936,10 +936,10 @@ std::cout << "setAtomsLocations end6 - start0 "
             }
         
 // TIME STOP
-std::chrono::steady_clock::time_point end7 = std::chrono::steady_clock::now();
-std::cout << "setAtomsLocations end7 - start0 "
-<< std::chrono::duration_cast<std::chrono::microseconds>(end7 - start0).count()
-<< " us.\n";
+//std::chrono::steady_clock::time_point end7 = std::chrono::steady_clock::now();
+//std::cout << "setAtomsLocations end7 - start0 "
+//<< std::chrono::duration_cast<std::chrono::microseconds>(end7 - start0).count()
+//<< " us.\n";
 // TIME STOP ===================
 
             // Set X_PF and Q - Bottleneck! RESTORE RE
@@ -955,10 +955,10 @@ std::cout << "setAtomsLocations end7 - start0 "
             }
 
 // TIME STOP
-std::chrono::steady_clock::time_point end8 = std::chrono::steady_clock::now();
-std::cout << "setAtomsLocations end8 - start0 "
-<< std::chrono::duration_cast<std::chrono::microseconds>(end8 - start0).count()
-<< " us.\n";
+//std::chrono::steady_clock::time_point end8 = std::chrono::steady_clock::now();
+//std::cout << "setAtomsLocations end8 - start0 "
+//<< std::chrono::duration_cast<std::chrono::microseconds>(end8 - start0).count()
+//<< " us.\n";
 // TIME STOP ===================
 
 
@@ -971,10 +971,10 @@ std::cout << "setAtomsLocations end8 - start0 "
             }
     
 // TIME STOP
-std::chrono::steady_clock::time_point end9 = std::chrono::steady_clock::now();
-std::cout << "setAtomsLocations end9 - start0 "
-<< std::chrono::duration_cast<std::chrono::microseconds>(end9 - start0).count()
-<< " us.\n";
+//std::chrono::steady_clock::time_point end9 = std::chrono::steady_clock::now();
+//std::cout << "setAtomsLocations end9 - start0 "
+//<< std::chrono::duration_cast<std::chrono::microseconds>(end9 - start0).count()
+//<< " us.\n";
 // TIME STOP ===================
 
             this->compoundSystem->realizeTopology();
