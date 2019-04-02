@@ -361,9 +361,14 @@ bool AreSame(double a, double b, double EPSILON)
  */
 SimTK::Transform alignFlipAndTranslateFrameAlongXAxis(SimTK::Transform G_X_F1, SimTK::Vec3 G_v1)
 {
-    // Compute Rotation of F1 around F1v1 bond
+
+    // Get F1v1 vector
     SimTK::Vec3 G_F1v1 = (G_v1 - G_X_F1.p());
+
+    // Re-express F1v1 in F1
     SimTK::Vec3 F1_F1v1 = ~(G_X_F1.R()) * G_F1v1;
+
+    // Get rotation axis and angle with dot and cross products
     SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(F1_F1v1), SimTK::UnitVec3(1, 0, 0));
     assert(cosAngle < 1.1); 
     assert(cosAngle > -1.1);
@@ -372,20 +377,9 @@ SimTK::Transform alignFlipAndTranslateFrameAlongXAxis(SimTK::Transform G_X_F1, S
     SimTK::Angle rotAngle = std::acos( cosAngle );
     SimTK::UnitVec3 F1_rotAxis(SimTK::cross(SimTK::UnitVec3(F1_F1v1), SimTK::UnitVec3(1, 0, 0)));
 
+    // Put results into a new Transform
     SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_F1v1) ;
     return F1_X_F2;
-
-    //SimTK::Vec3 G_F1v1 = (G_v1 - G_X_F1.p());
-    //SimTK::Vec3 F1_F1v1 = ~(G_X_F1.R()) * G_F1v1;
-    //SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(F1_F1v1), SimTK::UnitVec3(1, 0, 0));
-    //assert(cosAngle < 1.1); 
-    //assert(cosAngle > -1.1);
-    //if (cosAngle > 1.0) cosAngle = 1.0;
-    //if (cosAngle < -1.0) cosAngle = -1.0;
-    //SimTK::Angle rotAngle = std::acos( cosAngle );
-    //SimTK::UnitVec3 F1_rotAxis(SimTK::cross(SimTK::UnitVec3(F1_F1v1), SimTK::UnitVec3(1, 0, 0)));
-
-    //SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_F1v1) ;
 
 }
 

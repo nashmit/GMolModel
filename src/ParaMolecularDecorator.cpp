@@ -214,7 +214,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             }
 // */
 
-/*
+// /*
     // Draw Compound transforms for root atoms NEW WAY
             SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
             SimTK::Transform P_X_F[matter->getNumBodies()]; // related to X_PFs
@@ -357,7 +357,8 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     }
 // */
 
-// /*
+ /*
+    // Test Transforms operations
     // Ground
     SimTK::Transform offset(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
     SimTK::Transform G_X_G;
@@ -373,29 +374,6 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     decorativeLine_v1.setLineThickness(2);
     decorativeLine_v1.setColor(SimTK::Vec3(0, 0, 0));
     geometry.push_back(decorativeLine_v1);
-
-    // Compute alignment of Ground X of F0 around v1
-    //SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(G_v1), SimTK::Vec3(1, 0, 0));
-    //assert(cosAngle < 1.1);
-    //assert(cosAngle > -1.1);
-    //if (cosAngle > 1.0) cosAngle = 1.0;
-    //if (cosAngle < -1.0) cosAngle = -1.0;
-    //SimTK::Angle rotAngle = std::acos( cosAngle );
-    //SimTK::UnitVec3 rotAxis(SimTK::cross(SimTK::UnitVec3(G_v1), SimTK::Vec3(1, 0, 0)));
-    //SimTK::Transform G_X_F0( SimTK::Rotation(-1.0 * rotAngle, rotAxis)) ;
-
-    // Draw rotation axis
-    //DecorativeLine decorativeLine_rotAxis(G_X_G.p() , rotAxis);
-    //decorativeLine_rotAxis.setLineThickness(2);
-    //decorativeLine_rotAxis.setColor(SimTK::Vec3(255, 0, 255));
-    //geometry.push_back(decorativeLine_rotAxis);
-
-    // Draw F0
-    //DecorativeFrame decorativeFrame_F0;
-    //decorativeFrame_F0.setTransform(G_X_F0);
-    //decorativeFrame_F0.setScaleFactors(SimTK::Vec3(1, 1, 1));
-    //decorativeFrame_F0.setColor(SimTK::Vec3(255, 0, 255));
-    //geometry.push_back( decorativeFrame_F0 );
 
     // F1
     SimTK::Transform G_X_F1( SimTK::Rotation(1.2, SimTK::UnitVec3(2.3, 4.1, -0.9)), SimTK::Vec3(1, 1, 1) );
@@ -419,22 +397,6 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     decorativeLine_v1F1.setColor(SimTK::Vec3(0, 0, 255));
     geometry.push_back(decorativeLine_v1F1);
   
-    // Compute Rotation of F1 around bond
-    //SimTK::Vec3 G_bond = (G_v1 - G_X_F1.p());
-    //SimTK::Vec3 F1_bond = ~(G_X_F1.R()) * G_bond;
-    //SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(F1_bond), SimTK::UnitVec3(1, 0, 0));
-    //assert(cosAngle < 1.1); assert(cosAngle > -1.1);
-    //if (cosAngle > 1.0) cosAngle = 1.0; if (cosAngle < -1.0) cosAngle = -1.0;
-    //SimTK::Angle rotAngle = std::acos( cosAngle );
-    //SimTK::UnitVec3 F1_rotAxis(SimTK::cross(SimTK::UnitVec3(F1_bond), SimTK::UnitVec3(1, 0, 0)));
-  
-    // Draw rotation axis
-    //SimTK::Vec3 G_rotAxis = G_X_F1.R() * F1_rotAxis;
-    //DecorativeLine decorativeLine_rotAxis(G_X_G.p() + G_X_F1.p(), G_rotAxis + G_X_F1.p());
-    //decorativeLine_rotAxis.setLineThickness(2);
-    //decorativeLine_rotAxis.setColor(SimTK::Vec3(255, 0, 0));
-    //geometry.push_back(decorativeLine_rotAxis);
-
     // Transform 2
     //SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_bond) ;
     SimTK::Transform F1_X_F2 = alignFlipAndTranslateFrameAlongXAxis(G_X_F1, G_v1);
@@ -447,7 +409,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
 // */
 
- /*
+// /*
     // Draw Compound transforms for periferic atoms NEW WAY
     // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
 
@@ -463,15 +425,16 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             SimTK::UnitVec3 G_XAxis(1,0,0);
             SimTK::UnitVec3 root_XAxis = ~(G_X_root.R()) * G_XAxis;
 
-            SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(root_v), root_XAxis);
-            assert(cosAngle < 1.1);
-            assert(cosAngle > -1.1);
-            if (cosAngle > 1.0) cosAngle = 1.0;
-            if (cosAngle < -1.0) cosAngle = -1.0;
-            SimTK::Angle rotAngle = std::acos( cosAngle );
-            SimTK::UnitVec3 rotAxis(SimTK::cross(SimTK::UnitVec3(root_v), root_XAxis));
+            //SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(root_v), root_XAxis);
+            //assert(cosAngle < 1.1);
+            //assert(cosAngle > -1.1);
+            //if (cosAngle > 1.0) cosAngle = 1.0;
+            //if (cosAngle < -1.0) cosAngle = -1.0;
+            //SimTK::Angle rotAngle = std::acos( cosAngle );
+            //SimTK::UnitVec3 rotAxis(SimTK::cross(SimTK::UnitVec3(root_v), root_XAxis));
    
-            SimTK::Transform root_X_child( SimTK::Rotation(rotAngle, rotAxis), root_v ) ;
+            SimTK::Transform root_X_child = alignFlipAndTranslateFrameAlongXAxis(G_X_root, G_vchild);
+            // SimTK::Transform root_X_child( SimTK::Rotation(rotAngle, rotAxis), root_v ) ;
             SimTK::Transform G_X_child = G_X_root * root_X_child;
 
             // Draw F (Proot_X_Mr in this case) in Ground recovered from P_X_F
