@@ -379,7 +379,20 @@ SimTK::Transform alignFlipAndTranslateFrameAlongXAxis(SimTK::Transform G_X_F1, S
 
     // Put results into a new Transform
     SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_F1v1) ;
-    return F1_X_F2;
+
+    // ALign YAxis with XAxis
+    // Express everything in F2
+    SimTK::Transform F2_X_F1 = ~F1_X_F2;
+    SimTK::Vec3 F2_F2YAxis = SimTK::Vec3(0, 1, 0);
+    SimTK::Vec3 F2_F2Orig = SimTK::Vec3(0, 0, 0);
+    SimTK::Vec3 F2_F1F2 = F2_X_F1.p();
+    SimTK::Vec3 F2_F1XAxis = F2_X_F1.R() * SimTK::Vec3(1, 0, 0);
+    rotAngle = bDihedral(F2_F2YAxis, F2_F2Orig, F2_F1F2, F2_F1XAxis);
+    SimTK::Transform F2_X_F3 = SimTK::Rotation(rotAngle, SimTK::UnitVec3(1, 0, 0));
+    // SimTK::Transform G_X_F3 = G_X_F2 * F2_X_F3;
+    SimTK::Transform F1_X_F3 = F1_X_F2 * F2_X_F3;
+
+    return F1_X_F3;
 
 }
 

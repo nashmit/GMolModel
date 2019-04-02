@@ -316,7 +316,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             }
 // */
 
- /*
+// /*
     // Draw Compound transforms for periferic atoms OLD WAY
     // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
     for (SimTK::Compound::AtomIndex aIx(1); aIx < residue->getNumAtoms(); ++aIx){
@@ -334,7 +334,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             streamObj_c << std::string("c") + std::to_string(int(aIx));
             std::string text_c = streamObj_c.str();
             DecorativeText decorativeText_c(text_c);
-            SimTK::Transform textOffset_c(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
+            SimTK::Transform textOffset_c(SimTK::Rotation(), SimTK::Vec3(0.0, 0.00, 0.0));
             decorativeText_c.setTransform(G_X_child * textOffset_c);
             decorativeText_c.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
             decorativeText_c.setColor(SimTK::Vec3(255, 0, 255));
@@ -357,7 +357,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     }
 // */
 
- /*
+// /*
     // Test Transforms operations
     // Ground
     SimTK::Transform offset(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
@@ -399,17 +399,38 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
   
     // Transform 2
     //SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_bond) ;
-    SimTK::Transform F1_X_F2 = alignFlipAndTranslateFrameAlongXAxis(G_X_F1, G_v1);
-    SimTK::Transform G_X_F2 = G_X_F1 * F1_X_F2;
-    DecorativeFrame decorativeFrame_F2;
-    decorativeFrame_F2.setTransform(G_X_F2);
-    decorativeFrame_F2.setScaleFactors(SimTK::Vec3(1, 1, 1));
-    decorativeFrame_F2.setColor(SimTK::Vec3(255, 0, 255));
-    geometry.push_back( decorativeFrame_F2 );
+    //SimTK::Transform F1_X_F2 = alignFlipAndTranslateFrameAlongXAxis(G_X_F1, G_v1);
+    //SimTK::Transform G_X_F2 = G_X_F1 * F1_X_F2;
+    //DecorativeFrame decorativeFrame_F2;
+    //decorativeFrame_F2.setTransform(G_X_F2);
+    //decorativeFrame_F2.setScaleFactors(SimTK::Vec3(1, 1, 1));
+    //decorativeFrame_F2.setColor(SimTK::Vec3(255, 0, 255));
+    //geometry.push_back( decorativeFrame_F2 );
+
+    // Express everything in F2
+    //SimTK::Transform F2_X_F1 = ~F1_X_F2;
+    //SimTK::Vec3 F2_F2YAxis = SimTK::Vec3(0, 1, 0);
+    //SimTK::Vec3 F2_F2Orig = SimTK::Vec3(0, 0, 0);
+    //SimTK::Vec3 F2_F1F2 = F2_X_F1.p();
+    //SimTK::Vec3 F2_F1XAxis = F2_X_F1.R() * SimTK::Vec3(1, 0, 0);
+    //SimTK::Angle rotAngle = bDihedral(F2_F2YAxis, F2_F2Orig, F2_F1F2, F2_F1XAxis);
+    //SimTK::Transform F2_X_F3 = SimTK::Rotation(rotAngle, SimTK::UnitVec3(1, 0, 0));
+    //SimTK::Transform G_X_F3 = G_X_F2 * F2_X_F3;
+
+    SimTK::Transform F1_X_F3 = alignFlipAndTranslateFrameAlongXAxis(G_X_F1, G_v1);
+    SimTK::Transform G_X_F3 = G_X_F1 * F1_X_F3;
+
+    DecorativeFrame decorativeFrame_F3;
+    decorativeFrame_F3.setTransform(G_X_F3);
+    decorativeFrame_F3.setScaleFactors(SimTK::Vec3(1., 1., 1.));
+    decorativeFrame_F3.setColor(SimTK::Vec3(255, 0, 0));
+    geometry.push_back( decorativeFrame_F3 );
+    
+
 
 // */
 
-// /*
+ /*
     // Draw Compound transforms for periferic atoms NEW WAY
     // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
 
