@@ -92,7 +92,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         }
     }
     */
-/*
+// /*
     // DuMM
     for (DuMM::AtomIndex daIx(0); daIx < dumm->getNumAtoms(); ++daIx) {
         const SimTK::MobilizedBodyIndex mbx = dumm->getAtomBody(daIx);
@@ -214,7 +214,9 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             }
 // */
 
-// /*
+
+
+
     // Draw Compound transforms for root atoms NEW WAY
             SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
             SimTK::Transform P_X_F[matter->getNumBodies()]; // related to X_PFs
@@ -224,6 +226,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             SimTK::Angle inboardBondDihedralAngles[matter->getNumBodies()]; // related to X_FMs
             SimTK::Real inboardBondLengths[matter->getNumBodies()]; // related to X_FMs
             SimTK::Vec3 locs[residue->getNumAtoms()];
+ /*
 
             // Iterate through atoms - get T_X_roots for all the bodies
             for (SimTK::Compound::AtomIndex aIx(0); aIx < residue->getNumAtoms(); ++aIx){
@@ -316,7 +319,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             }
 // */
 
-// /*
+ /*
     // Draw Compound transforms for periferic atoms OLD WAY
     // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
     for (SimTK::Compound::AtomIndex aIx(1); aIx < residue->getNumAtoms(); ++aIx){
@@ -357,7 +360,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     }
 // */
 
-// /*
+ /*
     // Test Transforms operations
     // Ground
     SimTK::Transform offset(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
@@ -397,40 +400,18 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     decorativeLine_v1F1.setColor(SimTK::Vec3(0, 0, 255));
     geometry.push_back(decorativeLine_v1F1);
   
-    // Transform 2
-    //SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_bond) ;
-    //SimTK::Transform F1_X_F2 = alignFlipAndTranslateFrameAlongXAxis(G_X_F1, G_v1);
-    //SimTK::Transform G_X_F2 = G_X_F1 * F1_X_F2;
-    //DecorativeFrame decorativeFrame_F2;
-    //decorativeFrame_F2.setTransform(G_X_F2);
-    //decorativeFrame_F2.setScaleFactors(SimTK::Vec3(1, 1, 1));
-    //decorativeFrame_F2.setColor(SimTK::Vec3(255, 0, 255));
-    //geometry.push_back( decorativeFrame_F2 );
-
-    // Express everything in F2
-    //SimTK::Transform F2_X_F1 = ~F1_X_F2;
-    //SimTK::Vec3 F2_F2YAxis = SimTK::Vec3(0, 1, 0);
-    //SimTK::Vec3 F2_F2Orig = SimTK::Vec3(0, 0, 0);
-    //SimTK::Vec3 F2_F1F2 = F2_X_F1.p();
-    //SimTK::Vec3 F2_F1XAxis = F2_X_F1.R() * SimTK::Vec3(1, 0, 0);
-    //SimTK::Angle rotAngle = bDihedral(F2_F2YAxis, F2_F2Orig, F2_F1F2, F2_F1XAxis);
-    //SimTK::Transform F2_X_F3 = SimTK::Rotation(rotAngle, SimTK::UnitVec3(1, 0, 0));
-    //SimTK::Transform G_X_F3 = G_X_F2 * F2_X_F3;
-
+    // Transform 3
     SimTK::Transform F1_X_F3 = alignFlipAndTranslateFrameAlongXAxis(G_X_F1, G_v1);
     SimTK::Transform G_X_F3 = G_X_F1 * F1_X_F3;
-
     DecorativeFrame decorativeFrame_F3;
     decorativeFrame_F3.setTransform(G_X_F3);
     decorativeFrame_F3.setScaleFactors(SimTK::Vec3(1., 1., 1.));
     decorativeFrame_F3.setColor(SimTK::Vec3(255, 0, 0));
     geometry.push_back( decorativeFrame_F3 );
-    
-
 
 // */
 
- /*
+// /*
     // Draw Compound transforms for periferic atoms NEW WAY
     // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
 
@@ -446,58 +427,54 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             SimTK::UnitVec3 G_XAxis(1,0,0);
             SimTK::UnitVec3 root_XAxis = ~(G_X_root.R()) * G_XAxis;
 
-            //SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(root_v), root_XAxis);
-            //assert(cosAngle < 1.1);
-            //assert(cosAngle > -1.1);
-            //if (cosAngle > 1.0) cosAngle = 1.0;
-            //if (cosAngle < -1.0) cosAngle = -1.0;
-            //SimTK::Angle rotAngle = std::acos( cosAngle );
-            //SimTK::UnitVec3 rotAxis(SimTK::cross(SimTK::UnitVec3(root_v), root_XAxis));
-   
             SimTK::Transform root_X_child = alignFlipAndTranslateFrameAlongXAxis(G_X_root, G_vchild);
-            // SimTK::Transform root_X_child( SimTK::Rotation(rotAngle, rotAxis), root_v ) ;
             SimTK::Transform G_X_child = G_X_root * root_X_child;
 
             // Draw F (Proot_X_Mr in this case) in Ground recovered from P_X_F
+            //std::ostringstream streamObj_c;
+            //streamObj_c << std::string("c") + std::to_string(int(aIx));
+            //std::string text_c = streamObj_c.str();
+            //DecorativeText decorativeText_c(text_c);
+            //SimTK::Transform textOffset_c(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
+            ////decorativeText_c.setTransform(G_X_child * textOffset_c);
+            //decorativeText_c.setTransform(G_X_child);
+            //decorativeText_c.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+            //decorativeText_c.setColor(SimTK::Vec3(255, 0, 255));
+            //geometry.push_back(decorativeText_c);
 
-            std::ostringstream streamObj_c;
-            streamObj_c << std::string("c") + std::to_string(int(aIx));
-            std::string text_c = streamObj_c.str();
-            DecorativeText decorativeText_c(text_c);
-            SimTK::Transform textOffset_c(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
-            //decorativeText_c.setTransform(G_X_child * textOffset_c);
-            decorativeText_c.setTransform(G_X_child);
-            decorativeText_c.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
-            decorativeText_c.setColor(SimTK::Vec3(255, 0, 255));
-            geometry.push_back(decorativeText_c);
+            // Text
+            std::ostringstream streamObj;
+            streamObj << std::fixed;
+            streamObj << std::setprecision(3);
+            streamObj << G_X_child.p()[2];
+            std::string text1 = streamObj.str();
+            DecorativeText decorativeText1(text1);
+            decorativeText1.setTransform(G_X_child);
+            decorativeText1.setScaleFactors(SimTK::Vec3(0.02, 0.02, 0.02));
+            decorativeText1.setColor(SimTK::Vec3(0, 0, 0));
+            geometry.push_back(decorativeText1);
 
-            DecorativeFrame decorativeFrame_c;
-            //decorativeFrame_c.setTransform(G_X_child * textOffset_c);
-            decorativeFrame_c.setTransform(G_X_child);
-            decorativeFrame_c.setScaleFactors(SimTK::Vec3(0.04, 0.04, 0.04));
-            decorativeFrame_c.setLineThickness(4);
-            decorativeFrame_c.setColor(SimTK::Vec3(255, 0, 255));
-            geometry.push_back( decorativeFrame_c );
+            //DecorativeFrame decorativeFrame_c;
+            ////decorativeFrame_c.setTransform(G_X_child * textOffset_c);
+            //decorativeFrame_c.setTransform(G_X_child);
+            //decorativeFrame_c.setScaleFactors(SimTK::Vec3(0.04, 0.04, 0.04));
+            //decorativeFrame_c.setLineThickness(4);
+            //decorativeFrame_c.setColor(SimTK::Vec3(255, 0, 255));
+            //geometry.push_back( decorativeFrame_c );
 
             // Line between root and child in Ground
-            ////DecorativeLine decorativeLine_rc(G_X_root.p() + textOffset_c.p(), G_X_child.p() + textOffset_c.p());
-            //DecorativeLine decorativeLine_rc(G_X_root.p() , G_X_child.p() );
-            //decorativeLine_rc.setLineThickness(2);
-            //decorativeLine_rc.setColor(SimTK::Vec3(255, 0, 255));
-            //geometry.push_back(decorativeLine_rc);
-
             //DecorativeLine decorativeLine_rc2(G_vroot + textOffset_c.p(), G_vchild + textOffset_c.p());
-            DecorativeLine decorativeLine_rc2(G_vroot , G_vchild);
-            decorativeLine_rc2.setLineThickness(2);
-            decorativeLine_rc2.setColor(SimTK::Vec3(0, 255, 255));
-            geometry.push_back(decorativeLine_rc2);
+            //DecorativeLine decorativeLine_rc2(G_vroot , G_vchild);
+            //decorativeLine_rc2.setLineThickness(2);
+            //decorativeLine_rc2.setColor(SimTK::Vec3(0, 255, 255));
+            //geometry.push_back(decorativeLine_rc2);
 
         }
     }
 // */
 
 
-/*
+ /*
     // Draw Default Compound 
     //DecorativeBrick topDecorativeBrick;
     //topDecorativeBrick.setTransform(G_X_T);
