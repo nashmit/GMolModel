@@ -420,23 +420,24 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     geometry.push_back(decorativeLine_v1F1);
   
     // Compute Rotation of F1 around bond
-    SimTK::Vec3 G_bond = (G_v1 - G_X_F1.p());
-    SimTK::Vec3 F1_bond = ~(G_X_F1.R()) * G_bond;
-    SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(F1_bond), SimTK::UnitVec3(1, 0, 0));
-    assert(cosAngle < 1.1); assert(cosAngle > -1.1);
-    if (cosAngle > 1.0) cosAngle = 1.0; if (cosAngle < -1.0) cosAngle = -1.0;
-    SimTK::Angle rotAngle = std::acos( cosAngle );
-    SimTK::UnitVec3 F1_rotAxis(SimTK::cross(SimTK::UnitVec3(F1_bond), SimTK::UnitVec3(1, 0, 0)));
+    //SimTK::Vec3 G_bond = (G_v1 - G_X_F1.p());
+    //SimTK::Vec3 F1_bond = ~(G_X_F1.R()) * G_bond;
+    //SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(F1_bond), SimTK::UnitVec3(1, 0, 0));
+    //assert(cosAngle < 1.1); assert(cosAngle > -1.1);
+    //if (cosAngle > 1.0) cosAngle = 1.0; if (cosAngle < -1.0) cosAngle = -1.0;
+    //SimTK::Angle rotAngle = std::acos( cosAngle );
+    //SimTK::UnitVec3 F1_rotAxis(SimTK::cross(SimTK::UnitVec3(F1_bond), SimTK::UnitVec3(1, 0, 0)));
   
     // Draw rotation axis
-    SimTK::Vec3 G_rotAxis = G_X_F1.R() * F1_rotAxis;
-    DecorativeLine decorativeLine_rotAxis(G_X_G.p() + G_X_F1.p(), G_rotAxis + G_X_F1.p());
-    decorativeLine_rotAxis.setLineThickness(2);
-    decorativeLine_rotAxis.setColor(SimTK::Vec3(255, 0, 0));
-    geometry.push_back(decorativeLine_rotAxis);
+    //SimTK::Vec3 G_rotAxis = G_X_F1.R() * F1_rotAxis;
+    //DecorativeLine decorativeLine_rotAxis(G_X_G.p() + G_X_F1.p(), G_rotAxis + G_X_F1.p());
+    //decorativeLine_rotAxis.setLineThickness(2);
+    //decorativeLine_rotAxis.setColor(SimTK::Vec3(255, 0, 0));
+    //geometry.push_back(decorativeLine_rotAxis);
 
     // Transform 2
-    SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_bond) ;
+    //SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_bond) ;
+    SimTK::Transform F1_X_F2 = alignFlipAndTranslateFrameAlongXAxis(G_X_F1, G_v1);
     SimTK::Transform G_X_F2 = G_X_F1 * F1_X_F2;
     DecorativeFrame decorativeFrame_F2;
     decorativeFrame_F2.setTransform(G_X_F2);

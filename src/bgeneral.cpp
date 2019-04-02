@@ -355,21 +355,38 @@ bool AreSame(double a, double b, double EPSILON)
 }
 
 /*
- * Given Frame B expressed in A, return Transform X_BC having its XAxis aligned with v_A expressed in A
+ * Given a frame F1 expressed in another frame G and a station v1 expressed
+ * in G return another frame F2 with origin in v1, aligne along F1 v1 vector
+ * with the X axis and pointing towards F1
  */
-SimTK::Transform alignFlipiAndTranslateFrameAlongXAxis(SimTK::Transform G_X_F1, SimTK::UnitVec3 G_v1)
+SimTK::Transform alignFlipAndTranslateFrameAlongXAxis(SimTK::Transform G_X_F1, SimTK::Vec3 G_v1)
 {
-    // Compute Rotation of F1 around bond
-    SimTK::Vec3 G_bond = (G_v1 - G_X_F1.p());
-    SimTK::Vec3 F1_bond = ~(G_X_F1.R()) * G_bond;
-    SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(F1_bond), SimTK::UnitVec3(1, 0, 0));
-    assert(cosAngle < 1.1); assert(cosAngle > -1.1);
-    if (cosAngle > 1.0) cosAngle = 1.0; if (cosAngle < -1.0) cosAngle = -1.0;
+    // Compute Rotation of F1 around F1v1 bond
+    SimTK::Vec3 G_F1v1 = (G_v1 - G_X_F1.p());
+    SimTK::Vec3 F1_F1v1 = ~(G_X_F1.R()) * G_F1v1;
+    SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(F1_F1v1), SimTK::UnitVec3(1, 0, 0));
+    assert(cosAngle < 1.1); 
+    assert(cosAngle > -1.1);
+    if (cosAngle > 1.0) cosAngle = 1.0;
+    if (cosAngle < -1.0) cosAngle = -1.0;
     SimTK::Angle rotAngle = std::acos( cosAngle );
-    SimTK::UnitVec3 F1_rotAxis(SimTK::cross(SimTK::UnitVec3(F1_bond), SimTK::UnitVec3(1, 0, 0)));
+    SimTK::UnitVec3 F1_rotAxis(SimTK::cross(SimTK::UnitVec3(F1_F1v1), SimTK::UnitVec3(1, 0, 0)));
 
-    SimTK::Transform F1_X_F2( SimTK::Rotation(-1.0 * rotAngle + SimTK::Pi, F1_rotAxis)) ;
+    SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_F1v1) ;
     return F1_X_F2;
+
+    //SimTK::Vec3 G_F1v1 = (G_v1 - G_X_F1.p());
+    //SimTK::Vec3 F1_F1v1 = ~(G_X_F1.R()) * G_F1v1;
+    //SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(F1_F1v1), SimTK::UnitVec3(1, 0, 0));
+    //assert(cosAngle < 1.1); 
+    //assert(cosAngle > -1.1);
+    //if (cosAngle > 1.0) cosAngle = 1.0;
+    //if (cosAngle < -1.0) cosAngle = -1.0;
+    //SimTK::Angle rotAngle = std::acos( cosAngle );
+    //SimTK::UnitVec3 F1_rotAxis(SimTK::cross(SimTK::UnitVec3(F1_F1v1), SimTK::UnitVec3(1, 0, 0)));
+
+    //SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_F1v1) ;
+
 }
 
 /*

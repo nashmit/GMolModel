@@ -177,9 +177,11 @@ string decimal_prefix(double inp_no, long int limit);
 bool AreSame(double a, double b, double EPSILON);
 
 /*
- * Having Frame B expressed in A, return Transform X_BC having its XAxis aligned with v_B expressed in B
+ * Given a frame F1 expressed in another frame G and a station v1 expressed 
+ * in G return another frame F2 with origin in v1, aligne along F1 v1 vector
+ * with the X axis and pointing towards F1
  */
-SimTK::Transform alignFlipiAndTranslateFrameAlongXAxis(SimTK::Transform A_X_B, SimTK::UnitVec3 v_B);
+SimTK::Transform alignFlipAndTranslateFrameAlongXAxis(SimTK::Transform G_X_F1, SimTK::Vec3 G_v1);
 
 
 /*
