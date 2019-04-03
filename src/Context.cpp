@@ -549,7 +549,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
         for(int round = 0; round < nofRounds; round++){ // Iterate rounds
 
 // TIME START -----------------
-std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
+//std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
 // TIME START
 
             for(unsigned int worldIx = 0; worldIx < getNofWorlds(); worldIx++){ // Iterate worlds
@@ -566,10 +566,10 @@ std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
                 SimTK::State& currentAdvancedState = (updWorld(currentWorldIx))->integ->updAdvancedState();
     
 // TIME STOP
-std::chrono::steady_clock::time_point end0 = std::chrono::steady_clock::now();
-std::cout << "Context::Run end0 - start0 "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end0 - start0).count()
-              << " us.\n";
+//std::chrono::steady_clock::time_point end0 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end0 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end0 - start0).count()
+//              << " us.\n";
 // TIME STOP ===================
 
                 currentAdvancedState = (updWorld(currentWorldIx))->setAtomsLocationsInGround(
@@ -590,10 +590,10 @@ std::cout << "Context::Run end0 - start0 "
                 */
 
 // TIME STOP
-std::chrono::steady_clock::time_point end1_0 = std::chrono::steady_clock::now();
-std::cout << "Context::Run end1_0 - start0 "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end1_0 - start0).count()
-              << " us.\n";
+//std::chrono::steady_clock::time_point end1_0 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end1_0 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end1_0 - start0).count()
+//              << " us.\n";
 // TIME STOP ===================
 
                 // Set old potential energy of the new world
@@ -601,20 +601,20 @@ std::cout << "Context::Run end1_0 - start0 "
                     (updWorld(worldIndexes.back()))
                     ->updSampler(0)->getSetPE() );
 // TIME STOP
-std::chrono::steady_clock::time_point end1_1 = std::chrono::steady_clock::now();
-std::cout << "Context::Run end1_1 - start0 "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end1_1 - start0).count()
-              << " us.\n";
+//std::chrono::steady_clock::time_point end1_1 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end1_1 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end1_1 - start0).count()
+//              << " us.\n";
 // TIME STOP ===================
 
     
                 // Reinitialize current sampler
                 updWorld(currentWorldIx)->updSampler(0)->reinitialize(currentAdvancedState);
 // TIME STOP
-std::chrono::steady_clock::time_point end1_2 = std::chrono::steady_clock::now();
-std::cout << "Context::Run end1_2 - start0 "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end1_2 - start0).count()
-              << " us.\n";
+//std::chrono::steady_clock::time_point end1_2 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end1_2 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end1_2 - start0).count()
+//              << " us.\n";
 // TIME STOP ===================
 
     
@@ -623,10 +623,10 @@ std::cout << "Context::Run end1_2 - start0 "
                     updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, getNofMDStepsPerSample(currentWorldIx));
 
 // TIME STOP
-std::chrono::steady_clock::time_point end1_3 = std::chrono::steady_clock::now();
-std::cout << "Context::Run end1_3 - start0 "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end1_3 - start0).count()
-              << " us.\n";
+//std::chrono::steady_clock::time_point end1_3 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end1_3 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end1_3 - start0).count()
+//              << " us.\n";
 // TIME STOP ===================
 
                 } // END for samples
@@ -642,10 +642,10 @@ std::cout << "Context::Run end1_3 - start0 "
             }
     
 // TIME STOP
-std::chrono::steady_clock::time_point end3 = std::chrono::steady_clock::now();
-std::cout << "Context::Run end3 - start0 "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end3 - start0).count()
-              << " us.\n";
+//std::chrono::steady_clock::time_point end3 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end3 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end3 - start0).count()
+//              << " us.\n";
 // TIME STOP ===================
 
             // Write pdb
@@ -660,10 +660,10 @@ std::cout << "Context::Run end3 - start0 "
             } // if write pdbs
     
 // TIME STOP
-std::chrono::steady_clock::time_point end4 = std::chrono::steady_clock::now();
-std::cout << "Context::Run end4 - start0 "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end4 - start0).count()
-              << " us.\n";
+//std::chrono::steady_clock::time_point end4 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end4 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end4 - start0).count()
+//              << " us.\n";
 // TIME STOP ===================
 
         } // for i in rounds

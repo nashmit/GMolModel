@@ -331,6 +331,11 @@ the configuration and energies. TODO: break in two functions:
 initializeVelocities and propagate/integrate **/
 void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
 {
+
+// TIME START -----------------------------------------------------------------
+//std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
+// TIME START -----------------------------------------------------------------
+
     // Seed the random number generator every move
     //randomEngine.seed(4294653137UL); // for reproductibility
 
@@ -523,8 +528,19 @@ for(int k = 0; k < nosteps; k++){
 }
 // DEBUG END */
 
+// TIME STOP ..........................................................................................................................
+//std::chrono::steady_clock::time_point end0 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end0 - start0 "<< std::chrono::duration_cast<std::chrono::microseconds >(end0 - start0).count() << " us.\n";
+// TIME STOP ==========================================================================================================================
+
     // Integrate (propagate trajectory)
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
+    //((this->timeStepper)->updIntegrator()).stepTo(someState.getTime() + (timestep*nosteps)); // NEW
+
+// TIME STOP ..........................................................................................................................
+//std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end1 - start0 "<< std::chrono::duration_cast<std::chrono::microseconds >(end1 - start0).count() << " us.\n";
+// TIME STOP ==========================================================================================================================
 
 /*    // Configuration
     std::cout << "HMC conf: ";
@@ -728,9 +744,6 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     //std::cout << std::endl ;
 
     //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
-  
-    
-
 
 }
 

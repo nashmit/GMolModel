@@ -411,7 +411,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
 // */
 
-// /*
+ /*
     // Draw Compound transforms for periferic atoms NEW WAY
     // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
 
@@ -510,7 +510,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     }
 // */
 
-/*
+// /*
     // Draw Rigid bodies
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
