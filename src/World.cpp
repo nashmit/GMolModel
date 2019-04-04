@@ -556,6 +556,7 @@ void World::updateAtomLists(const SimTK::State & state)
 some other World's atoms **/ 
 SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations)
 {
+    std::cout << "World::setAtomsLocationsInGround" << std::endl;
     //PrintSimbodyStateCache(someState);
     //someState.invalidateAll(SimTK::Stage::Topology);
     

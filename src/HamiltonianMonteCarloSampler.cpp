@@ -534,6 +534,8 @@ for(int k = 0; k < nosteps; k++){
 // TIME STOP ==========================================================================================================================
 
     // Integrate (propagate trajectory)
+    std::cout << "timeStepper  timestep nosteps " << timestep << " " << nosteps << std::endl << std::flush;
+    std::cout << "start stepping from " << someState.getTime() << " to " << someState.getTime() + (timestep*nosteps) << std::endl << std::flush;
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
     //((this->timeStepper)->updIntegrator()).stepTo(someState.getTime() + (timestep*nosteps)); // NEW
 
