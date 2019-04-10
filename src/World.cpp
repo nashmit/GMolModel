@@ -556,46 +556,29 @@ void World::updateAtomLists(const SimTK::State & state)
 some other World's atoms **/ 
 SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations)
 {
-    std::cout << "World::setAtomsLocationsInGround" << std::endl;
-    //PrintSimbodyStateCache(someState);
-    //someState.invalidateAll(SimTK::Stage::Topology);
     
     SimTK::Transform G_X_T;
     SimTK::Transform T_X_root[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
-    // RE SimTK::Transform T_X_Proot[matter->getNumBodies()];
 
     // Iterate through molecules/topologies
     for(unsigned int i = 0; i < otherWorldsAtomsLocations.size(); i++){
 
         // When in Debug mode
         //paraMolecularDecorator->setAtomTargets(otherWorldsAtomsLocations[i]);
-        // 
 
         SimTK::Transform G_X_T = topologies[i]->getTopLevelTransform();
 
-        // Different regimens have different strategies
+        // Fully flexible regimen. realizeTopology is not needed
         if(topologies[i]->getRegimen() == "IC"){
+            std::cout << "setAtomsLoc World IC" << std::endl << std::flush;
 
-// TIME START -----------------
-//std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
-// TIME START
-
-            //std::cout << std::endl << "World IC" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
-            //std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
             for(unsigned int j = 0; j < otherWorldsAtomsLocations[i].size(); j++){
                 SimTK::Compound::AtomIndex atomIndex = ((otherWorldsAtomsLocations[i][j]).first)->atomIndex;
                 SimTK::Vec3 location = ((otherWorldsAtomsLocations[i][j]).second);
                 atomTargets.insert(std::pair<SimTK::Compound::AtomIndex, SimTK::Vec3>(atomIndex, location));
             }
-
-// TIME STOP
-//std::chrono::steady_clock::time_point end0 = std::chrono::steady_clock::now();
-//std::cout << "setAtomsLocations end0 - start0 "
-//              << std::chrono::duration_cast<std::chrono::microseconds>(end0 - start0).count()
-//              << " us.\n";
-// TIME STOP ===================
 
             // As an alternative we can pool BAT from otherWorlds Qs
             // Match - only matchDefaultConfiguration should be necessary
@@ -606,13 +589,6 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             topologies[i]->matchDefaultTopLevelTransform(atomTargets);
             // Seems to be redundant:
             //topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
-
-// TIME STOP
-//std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
-//std::cout << "setAtomsLocations end1 - start0 "
-//              << std::chrono::duration_cast<std::chrono::microseconds>(end1 - start0).count()
-//              << " us.\n";
-// TIME STOP ===================
 
             // Get transforms and locations: P_X_M, root_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();
@@ -628,12 +604,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
                 P_X_M[int(mbx)] = Transform(Rotation(), atomTargets[aIx]); // NEW
             }
 
-// TIME STOP
-//std::chrono::steady_clock::time_point end2 = std::chrono::steady_clock::now();
-//std::cout << "setAtomsLocations end2 - start0 "
-//              << std::chrono::duration_cast<std::chrono::microseconds>(end2 - start0).count()
-//              << " us.\n";
-// TIME STOP ===================
+std::cout << "IC stage before setQToFitTransform " << matter->getStage(someState) << std::endl;
 
             // Set X_FM and Q 
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
@@ -647,109 +618,17 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
             }
 
-// TIME STOP
-//std::chrono::steady_clock::time_point end3 = std::chrono::steady_clock::now();
-//std::cout << "setAtomsLocations end3 - start0 "
-//              << std::chrono::duration_cast<std::chrono::microseconds>(end3 - start0).count()
-//              << " us.\n";
-// TIME STOP ===================
+std::cout << "IC stage after setQToFitTransform " << matter->getStage(someState) << std::endl;
 
         // END IC regimen
-/*
-        }else if(topologies[i]->getRegimen() == "RB"){ // TD and RB
-            // Create atomTargets
-            std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
-            std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
-            for(unsigned int j = 0; j < currentTopology.size(); j++){
-                SimTK::Compound::AtomIndex atomIndex = ((currentTopology[j]).first)->atomIndex;
-                SimTK::Vec3 location = ((currentTopology[j]).second);
-                atomTargets.insert(std::pair<SimTK::Compound::AtomIndex, SimTK::Vec3>(atomIndex, location));
-            }
-    
-            // Match Default Configuration ( => default state)
-            topologies[i]->matchDefaultAtomChirality(atomTargets, 0.01, false);
-            topologies[i]->matchDefaultBondLengths(atomTargets);
-            topologies[i]->matchDefaultBondAngles(atomTargets);
-            topologies[i]->matchDefaultDihedralAngles(atomTargets, SimTK::Compound::DistortPlanarBonds);
-            topologies[i]->matchDefaultTopLevelTransform(atomTargets);
-            topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
-            // Checked if match is done correctlya
-            / *
-            this->nofSamples += 1;
-            std::string FN(std::string("pdbs/RBmatch") + std::to_string(this->nofSamples) + std::string("before.pdb"));
-            std::cout << "Writing file " << FN << std::endl;
-            topologies[i]->writeDefaultPdb(FN.c_str(), SimTK::Transform());
-            * /
-
-            // Get transforms and locations: P_X_F, root_X_atom.p()
-            G_X_T = topologies[i]->getTopLevelTransform();
-            SimTK::Transform P_X_F[matter->getNumBodies()]; // related to X_PFs
-            SimTK::Angle inboardBondDihedralAngles[matter->getNumBodies()]; // related to X_FMs
-            SimTK::Vec3 locs[topologies[i]->getNumAtoms()];
-            P_X_F[1] = G_X_T * topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
-            T_X_root[1] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
-        
-            // Iterate through atoms - get P_X_F for all the bodies
-            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
-                // Get body, parentBody, parentAtom
-                if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
-                    SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
-                    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-                    const SimTK::MobilizedBody& parentMobod =  mobod.getParentMobilizedBody();
-                    SimTK::MobilizedBodyIndex parentMbx = parentMobod.getMobilizedBodyIndex();
-                    //std::cout << "RB origin atom " << aIx << " mobod (" << mbx  
-                    //    << " parent mobod  ("<< parentMbx << ")" << std::endl;
-                    T_X_root[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
-                    P_X_F[int(mbx)] = G_X_T * T_X_root[int(mbx)];
-                }
-            }
-        
-            // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
-            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
-                SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
-                if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is not at body's origin
-                    SimTK::Transform root_X_T = ~(T_X_root[int(mbx)]);
-                    SimTK::Transform T_X_child =  topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
-                    SimTK::Transform root_X_child = root_X_T * T_X_child;
-
-                    topologies[i]->bsetFrameInMobilizedBodyFrame(aIx, root_X_child);
-
-                    locs[int(aIx)] = root_X_child.p();
-                }
-                else{
-                    locs[int(aIx)] = SimTK::Vec3(0);
-                }
-            }
-        
-            // Set stations and AtomPLacements for atoms in DuMM
-            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
-                SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
-                    SimTK::DuMM::AtomIndex dAIx = topologies[i]->getDuMMAtomIndex(aIx);
-                    forceField->bsetAtomStationOnBody( dAIx, locs[int(aIx)] );
-                    forceField->updIncludedAtomStation(dAIx) = (locs[int(aIx)]);
-                    forceField->bsetAtomPlacementStation(dAIx, mbx, locs[int(aIx)] );
-            }
-        
-            // Set X_PF and Q - Bottleneck!
-            for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-                SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
-                ((SimTK::MobilizedBody::Free&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
-                //((SimTK::MobilizedBody::Free&)mobod).setDefaultQ(SimTK::Vec7(0));
-            }
-
-            this->compoundSystem->realizeTopology();
-            someState = compoundSystem->updDefaultState();
-
-        // END RB regimen
-*/
         }else if((topologies[i]->getRegimen() == "TD") || (topologies[i]->getRegimen() == "RB")){
 
 // TIME START -----------------
 //std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
 // TIME START
 
-            //std::cout << std::endl << "World TD" << std::endl << std::flush;
+            std::cout << "setAtomsLoc World TD" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
             std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
