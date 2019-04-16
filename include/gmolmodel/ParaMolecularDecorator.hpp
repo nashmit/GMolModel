@@ -8,6 +8,7 @@
  */
 
 #include "Robo.hpp"
+#include "Topology.hpp"
 
 using namespace SimTK;
 
@@ -15,7 +16,7 @@ class ParaMolecularDecorator : public DecorationGenerator {
 public:
     ParaMolecularDecorator(SimTK::CompoundSystem *argCompoundSystem,
         SimTK::SimbodyMatterSubsystem *argMatter,
-        SimTK::Compound *argResidue,
+        Topology *argResidue,
         SimTK::DuMMForceFieldSubsystem *argDumm,
         SimTK::GeneralForceSubsystem *argForces);
 
@@ -32,15 +33,22 @@ public:
 
     ~ParaMolecularDecorator(void);
 
+    // Gmolmodel specific
+    void setAtomTargets(std::vector<std::pair<bSpecificAtom *, SimTK::Vec3>> residueAtomLocations);
+
 private:
     SimTK::CompoundSystem *compoundSystem;
     SimTK::SimbodyMatterSubsystem *matter;
-    SimTK::Compound *residue;
+    Topology *residue;
     SimTK::DuMMForceFieldSubsystem *dumm;
     SimTK::GeneralForceSubsystem *forces; 
 
     Array_< Vec3 >  points;
     Array_< std::pair< Vec3, Vec3 > > lines;
+
+    // Gmolmodel specific
+    std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
+
 };
 
 #endif // __PARAMOLECULARDECORATOR_HPP__

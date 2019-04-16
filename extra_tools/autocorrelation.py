@@ -100,7 +100,7 @@ parser.add_argument('--savefig', action='store_true', default=False,
   help='Save the plot into a file')
 args = parser.parse_args()
 
-import genfuncs
+#import genfuncs
 
 # General plot parameters
 if args.makeplots:
@@ -125,6 +125,7 @@ tiny = 0.0000001
 
 for ri in range(len(args.inFNRoots)): # Iterate through roots
   currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
+  print 'currLabel', currLabel
   FNlist = glob.glob(os.path.join(args.dir, args.inFNRoots[ri] + '*'))
   nfiles = len(FNlist)
   hists = np.zeros((nfiles, 2, args.nbins))
@@ -317,7 +318,10 @@ for ri in range(len(args.inFNRoots)): # Iterate through roots
               fig3 = plt.figure(3)
               fig3.suptitle("Raw data")
               ax = plt.subplot(ncols, 1, coli+1)
-              ax.plot(cols[coli], label='Col ' +  str(coli) + ' real', color='black')
+              if currLabel == 'FPNFT':
+                  ax.plot(cols[coli], label='Col ' +  str(coli) + ' real', color='black')
+              else:
+                  ax.plot(cols[coli], label='Col ' +  str(coli) + ' real', color='red')
               ax.legend()
   
               ax.set_xlabel(r'$\mathrm{t}$', fontsize=8)

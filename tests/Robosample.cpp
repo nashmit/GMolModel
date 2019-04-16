@@ -134,6 +134,7 @@ int main(int argc, char **argv)
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         if(setupReader.getValues("FIXMAN_TORQUE")[worldIx] == "TRUE"){
             context->useFixmanTorque(worldIx, std::stof(setupReader.getValues("TEMPERATURE_INI")[worldIx]));
+            //context->useFixmanTorque(worldIx, std::stof(setupReader.getValues("BOOST_TEMPERATURE")[worldIx]));
         }
     }
 
@@ -179,6 +180,8 @@ int main(int argc, char **argv)
 
             // Set thermostats
             context->updWorld(worldIx)->updSampler(samplerIx)->setThermostat(setupReader.getValues("THERMOSTAT")[worldIx]);
+            context->updWorld(worldIx)->updSampler(samplerIx)->setBoostTemperature(
+                std::stof(setupReader.getValues("BOOST_TEMPERATURE")[worldIx]));
 
             // Activate Fixman potential if needed
             if(setupReader.getValues("FIXMAN_POTENTIAL")[worldIx] == "TRUE"){

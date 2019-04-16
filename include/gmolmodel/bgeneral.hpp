@@ -177,6 +177,14 @@ string decimal_prefix(double inp_no, long int limit);
 bool AreSame(double a, double b, double EPSILON);
 
 /*
+ * Given a frame F1 expressed in another frame G and a station v1 expressed 
+ * in G return another frame F2 with origin in v1, aligne along F1 v1 vector
+ * with the X axis and pointing towards F1
+ */
+SimTK::Transform alignFlipAndTranslateFrameAlongXAxis(SimTK::Transform G_X_F1, SimTK::Vec3 G_v1);
+
+
+/*
  * Convert spatial maatrix (Mat< 2, 2, Mat33 >) to 6x6 matrix (Mat<6,6>)
  * Replaces inf and nan with zeros
  */
@@ -221,6 +229,10 @@ void PrintBigMat(SimTK::Vector M, int nrows, int decimal_places, std::string hea
 void PrintSpatialVec(SimTK::SpatialVec V, int decimal_places, std::string header);
 void PrintSpatialMat(SimTK::SpatialMat M, int decimal_places, std::string header);
 
+/*
+ * Print Transform
+ */
+void PrintTransform(SimTK::Transform T, int decimal_places);
 
 /*
  * Dihedral angle

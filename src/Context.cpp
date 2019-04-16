@@ -451,7 +451,8 @@ const float Context::getTimestep(int whichWorld, int whichSampler)
 
 void Context::setTimestep(int whichWorld, int whichSampler, float argTimestep)
 {
-    worlds[whichWorld]->updSampler(whichSampler)->updTimeStepper()->updIntegrator().setFixedStepSize(argTimestep);
+    //worlds[whichWorld]->updSampler(whichSampler)->updTimeStepper()->updIntegrator().setFixedStepSize(argTimestep);
+    worlds[whichWorld]->updSampler(whichSampler)->setTimestep(argTimestep);
 }
 
 // Use Fixman torque as an additional force subsystem
@@ -541,35 +542,26 @@ void Context::Run(SetupReader& setupReader)
 // Main
 void Context::Run(int howManyRounds, float Ti, float Tf)
 {
+
     int currentWorldIx = worldIndexes.front();
     int lastWorldIx = 0;
 
     if( std::abs(Tf - Ti) < SimTK::TinyReal){
         for(int round = 0; round < nofRounds; round++){ // Iterate rounds
-    
-/* Try fast IO
-            // Print energy and geometric features
-            if( (!(round % PRINT_BUFFER_SIZE)) && (round != 0) ){
-                for(unsigned int p = 0; p < PRINT_BUFFER_SIZE; p++){
-                    fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f \n"
-                        , (worlds[worldIndexes.front()])->integ->updAdvancedState().getNU()
-                        , (worlds[worldIndexes.front()]->samplers[0])->acceptedSteps
-                        , (worlds[worldIndexes.front()]->samplers[0])->pe_oBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->pe_setBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->ke_proposedBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->ke_nBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->fix_oBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
-                    );
-                }
-            }
- Try fast IO */
-    
+
+            //std::cout << "round " << round << std::endl;
+
+// TIME START -----------------
+//std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
+// TIME START
+
             for(unsigned int worldIx = 0; worldIx < getNofWorlds(); worldIx++){ // Iterate worlds
     
                 // Rotate worlds indeces (translate from right to left)
                 std::rotate(worldIndexes.begin(), worldIndexes.begin() + 1, worldIndexes.end());
-    
+
+                //std::cout << "world " << worldIndexes.front() << std::endl;
+   
                 // Get indeces
                 currentWorldIx = worldIndexes.front();
                 lastWorldIx = worldIndexes.back();
@@ -578,20 +570,70 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 SimTK::State& lastAdvancedState = (updWorld(worldIndexes.back()))->integ->updAdvancedState();
                 SimTK::State& currentAdvancedState = (updWorld(currentWorldIx))->integ->updAdvancedState();
     
+// TIME STOP
+//std::chrono::steady_clock::time_point end0 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end0 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end0 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
+
                 currentAdvancedState = (updWorld(currentWorldIx))->setAtomsLocationsInGround(
                    currentAdvancedState, (updWorld(worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
-    
+
+                // Check if Compound coordinates are correct
+                /*
+                std::cout << "Writing pdbs for round " << round << std::endl; 
+                (updWorld(worldIndexes.back()))->updateAtomLists(lastAdvancedState);
+                ((updWorld(worldIndexes.back()))->getTopology(0)).writePdb(
+                    getOutputDir(), std::string("/pdbs/sb.") 
+                    + std::to_string(worldIx) + std::string("."), ".0.pdb", 10, round);
+
+                (updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
+                ((updWorld(currentWorldIx))->getTopology(0)).writePdb(
+                    getOutputDir(), std::string("/pdbs/sb.") 
+                    + std::to_string(worldIx) + std::string("."), ".1.pdb", 10, round);
+                */
+
+// TIME STOP
+//std::chrono::steady_clock::time_point end1_0 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end1_0 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end1_0 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
+
                 // Set old potential energy of the new world
                 (updWorld(currentWorldIx))->updSampler(0)->setOldPE(
                     (updWorld(worldIndexes.back()))
                     ->updSampler(0)->getSetPE() );
+// TIME STOP
+//std::chrono::steady_clock::time_point end1_1 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end1_1 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end1_1 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
+
     
                 // Reinitialize current sampler
                 updWorld(currentWorldIx)->updSampler(0)->reinitialize(currentAdvancedState);
+// TIME STOP
+//std::chrono::steady_clock::time_point end1_2 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end1_2 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end1_2 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
+
     
                 // Update
                 for(int k = 0; k < getNofSamplesPerRound(currentWorldIx); k++){ // Iterate through samples
                     updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, getNofMDStepsPerSample(currentWorldIx));
+
+// TIME STOP
+//std::chrono::steady_clock::time_point end1_3 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end1_3 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end1_3 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
+
                 } // END for samples
     
             } // for i in worlds
@@ -604,6 +646,13 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 fprintf(logFile, "\n");
             }
     
+// TIME STOP
+//std::chrono::steady_clock::time_point end3 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end3 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end3 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
+
             // Write pdb
             SimTK::State& pdbState = (updWorld(worldIndexes.front()))->integ->updAdvancedState();
             if( getPdbRestartFreq() != 0){
@@ -615,6 +664,13 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 }
             } // if write pdbs
     
+// TIME STOP
+//std::chrono::steady_clock::time_point end4 = std::chrono::steady_clock::now();
+//std::cout << "Context::Run end4 - start0 "
+//              << std::chrono::duration_cast<std::chrono::microseconds>(end4 - start0).count()
+//              << " us.\n";
+// TIME STOP ===================
+
         } // for i in rounds
 
     }else{// if Ti != Tf heating protocol
@@ -622,24 +678,6 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
         SimTK::Real currT = Ti;
         for(int round = 0; round < nofRounds; round++){ // Iterate rounds
     
-/* Try fast IO
-            // Print energy and geometric features
-            if( (!(round % PRINT_BUFFER_SIZE)) && (round != 0) ){
-                for(unsigned int p = 0; p < PRINT_BUFFER_SIZE; p++){
-                    fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f \n"
-                        , (worlds[worldIndexes.front()])->integ->updAdvancedState().getNU()
-                        , (worlds[worldIndexes.front()]->samplers[0])->acceptedSteps
-                        , (worlds[worldIndexes.front()]->samplers[0])->pe_oBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->pe_setBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->ke_proposedBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->ke_nBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->fix_oBuff[p]
-                        , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
-                    );
-                }
-            } 
- Try fast IO */
-
             // Set current temperature
             currT += Tincr;
             std::cout << "T= " << currT << std::endl;
@@ -657,6 +695,10 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 // Set temperatures
                 updWorld(lastWorldIx)->setTemperature(currT);
                 updWorld(currentWorldIx)->setTemperature(currT);
+
+                if(isUsingFixmanTorque(worldIx)){
+                    setFixmanTorqueTemperature(worldIx, currT);
+                }
     
                 // Transfer coordinates from last world to current
                 SimTK::State& lastAdvancedState = (updWorld(worldIndexes.back()))->integ->updAdvancedState();
@@ -701,21 +743,6 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
 
     } // if heating protocol
 
-/* Try fast IO
-    // Print remaining buffer values
-    for(unsigned int p = 0; p < (nofRounds % PRINT_BUFFER_SIZE); p++){
-        fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f \n"
-            , (worlds[worldIndexes.front()])->integ->updAdvancedState().getNU()
-            , (worlds[worldIndexes.front()]->samplers[0])->acceptedSteps
-            , (worlds[worldIndexes.front()]->samplers[0])->pe_oBuff[p]
-            , (worlds[worldIndexes.front()]->samplers[0])->pe_setBuff[p]
-            , (worlds[worldIndexes.front()]->samplers[0])->ke_proposedBuff[p]
-            , (worlds[worldIndexes.front()]->samplers[0])->ke_nBuff[p]
-            , (worlds[worldIndexes.front()]->samplers[0])->fix_oBuff[p]
-            , (worlds[worldIndexes.front()]->samplers[0])->fix_setBuff[p]
-        );
-    }
-Try fast IO*/
 
 }
 

@@ -1,5 +1,6 @@
 import sys, os, glob
 import numpy as np
+import copy
 import argparse
 import matplotlib
 #matplotlib.use('Agg')
@@ -58,15 +59,25 @@ def Print2DArray(M):
 def PrintMatrix(M):
     for i in range(M.shape[0]):
         for j in range(M.shape[1]):
-            print M[i][j],
+            print M[i, j],
         print
 #
 
 # What interval is the value in
-def which_basin(basins, value):
+def which_basin1d(basins, value):
     for i in range(basins.shape[0] - 1):
         if (value >= basins[i]) and (value < basins[i + 1]):
             return i
+#
+
+# What interval is the value in
+def which_basin2d(basins, phi, psi):
+    for i in range(basins.shape[0]):
+        if (phi >= basins[i][0, 0]) and (phi < basins[i][0, 1]):
+            if (psi >= basins[i][1, 0]) and (psi < basins[i][1, 1]):
+                return i
+    print 'Values', phi, psi, 'out of basins.'
+    
 #
 
 parser = argparse.ArgumentParser()
@@ -106,7 +117,7 @@ if args.makeplots:
     fig_height = 3.0
     fignum = 1
     #plt.figure(num=fignum, figsize=(fig_width, fig_height), linewidth=3.0)
-    #plt.subplots_adjust(left=0.20, right=0.95, bottom=0.2, top=0.95)
+    plt.subplots_adjust(left=0.20, right=0.95, bottom=0.2, top=0.95)
 
 
 # Thermodynamics
@@ -124,15 +135,36 @@ nofdetailedplots = 2
 nofallplots = 3
 figs = []
 
+# Alanine dipeptide basin definitions
+dialBasins = np.zeros((8,2,2))
+tol = 0.001
+mPI = -1.0 * np.pi - tol
+PI = np.pi + tol
+
+dialBasins[0] = np.array([[mPI, 0.175], [ 2.15,    PI]]) # C5
+dialBasins[1] = np.array([[0.175,  PI], [ 2.15,    PI]]) # m1u
+
+dialBasins[2] = np.array([[mPI, 0.175], [ 0.32,  2.15]]) # C7
+dialBasins[3] = np.array([[0.175,  PI], [ 0.32,  2.15]]) # aL
+
+dialBasins[4] = np.array([[mPI, 0.175], [-2.00,  0.32]]) # aR
+dialBasins[5] = np.array([[0.175,  PI], [-2.00,  0.32]]) # C7
+
+dialBasins[6] = np.array([[mPI, 0.175], [  mPI, -2.00]]) # C5d
+dialBasins[7] = np.array([[0.175,  PI], [  mPI, -2.00]]) # m1d
+
 # Iterate through roots
 nroots = len(args.inFNRoots)
+printFreq = 1
 for ri in range(nroots):
     FNlist = glob.glob(os.path.join(args.dir, args.inFNRoots[ri] + '*'))
 
     # Iterate through files
     nfiles = len(FNlist)
-    angles = nfiles * [None]
-    anglesTD = nfiles * [None]
+    anglePhi = nfiles * [None]
+    anglePhiTD = nfiles * [None]
+    anglePsi = nfiles * [None]
+    anglePsiTD = nfiles * [None]
     PEs = nfiles * [None]
     PEsIC = nfiles * [None]
     PEsTD = nfiles * [None]
@@ -167,14 +199,15 @@ for ri in range(nroots):
     rej_FixP_hists = nfiles * [None]
     rejFixP_hists = nfiles * [None]
 
-    _angle_hists = nfiles * [None]
-    angle_hists = nfiles * [None]
+    _anglePhi_hists = nfiles * [None]
+    anglePhi_hists = nfiles * [None]
+    _anglePsi_hists = nfiles * [None]
+    anglePsi_hists = nfiles * [None]
+    _angles_hists = nfiles * [None]
+    angles_hists = nfiles * [None]
 
-    freeEs = nfiles * [None]
     Psyms = nfiles * [None]
 
-    # ndofs accs pe_o pe_set ke_o ke_n fix_o fix_set fix_n geometry
-    printFreq = 50
     for li in range(nfiles):
         with open(FNlist[li], 'r') as in_FN1:
             print 'Reading', FNlist[li]
@@ -186,7 +219,7 @@ for ri in range(nroots):
             # Formats:
             # 0    1        2    3      4       5       6     7       8       9 10  11
             # dofs accsteps pe_o pe_set ke_last ke_prop fix_o fix_set fix_n   d phi psi
-            # dofs accsteps pe_o pe_set ke_prop ke_n    fix_o fix_n   fix_set d phi psi
+            # dofs accsteps pe_o pe_set ke_prop ke_n    fix_o fix_n   fix_set d phi psi 
 
             # Get constrained dynamics # of DOFs
             minndofs = np.minimum(alldata[0][0], alldata[1][0])
@@ -214,15 +247,22 @@ for ri in range(nroots):
             print "Simulation", li, "Fixman Potential mean and std", meanRejFixPs[li], stdRejFixPs[li]
 
             # Get angles
-            angles[li] = np.array([a[9] for a in alldata])
-            anglesTD[li] = np.array([a[9] for a in alldata if a[0] == minndofs])
+            anglePhi[li] = np.array([a[10] for a in alldata])
+            anglePhiTD[li] = np.array([a[10] for a in alldata if a[0] == minndofs])
+            anglePsi[li] = np.array([a[11] for a in alldata])
+            anglePsiTD[li] = np.array([a[11] for a in alldata if a[0] == minndofs])
+
             # Change form -pi pi to 0 2pi
-            for i in range(angles[li].shape[0]):
-                if angles[li][i] < 0:
-                    angles[li][i] += (2.0*np.pi)
-            for i in range(anglesTD[li].shape[0]):
-                if anglesTD[li][i] < 0:
-                    anglesTD[li][i] += (2.0*np.pi)
+            #for i in range(anglePhi[li].shape[0]):
+                #if anglePhi[li][i] < 0:
+                #    anglePhi[li][i] += (2.0*np.pi)
+                #if anglePsi[li][i] < 0:
+                #    anglePsi[li][i] += (2.0*np.pi)
+            for i in range(anglePhiTD[li].shape[0]):
+                if anglePhiTD[li][i] < 0:
+                    anglePhiTD[li][i] += (2.0*np.pi)
+                if anglePsiTD[li][i] < 0:
+                    anglePsiTD[li][i] += (2.0*np.pi)
 
             # Get acceptance rate
             accs[li] = np.array([a[1] for a in alldata])
@@ -234,11 +274,25 @@ for ri in range(nroots):
             print "Acceptance", acc[li]
             print "Acceptance in IC", accIC[li]
             print "Acceptance in TD", accTD[li]
-                    
+        
             # Free energy
-            _angle_hists[li] = np.histogram(angles[li], bins=args.nbins, range=(0.0, 2 * np.pi), density=True)
-            angle_hists[li] = _angle_hists[li][0]
-            anglePrs = _angle_hists[li][0] * (_angle_hists[li][1][1] - _angle_hists[li][1][0])
+            _anglePhi_hists[li] = np.histogram(anglePhi[li], bins=args.nbins, range=(-1.0*np.pi, np.pi), density=True)
+            anglePhi_hists[li] = _anglePhi_hists[li][0]
+            anglePhiPrs = _anglePhi_hists[li][0] * (_anglePhi_hists[li][1][1] - _anglePhi_hists[li][1][0])
+            _anglePsi_hists[li] = np.histogram(anglePsi[li], bins=args.nbins, range=(-1.0*np.pi, np.pi), density=True)
+            anglePsi_hists[li] = _anglePsi_hists[li][0]
+            anglePsiPrs = _anglePsi_hists[li][0] * (_anglePsi_hists[li][1][1] - _anglePsi_hists[li][1][0])
+
+            #_angles_hists[li] = np.histogram2d(anglePhi[li], anglePsi[li], bins=args.nbins, range=np.array([[-1.0*np.pi, np.pi], [-1.0*np.pi, np.pi]]) )
+            _angles_hists[li] = np.histogram2d(anglePhi[li], anglePsi[li], bins = [args.nbins, args.nbins] )
+            angles_hists[li] = _angles_hists[li][0]
+
+            Sum = 0
+            for a in angles_hists[li]:
+                Sum = Sum + a
+
+            angles_hists[li] = angles_hists[li] / Sum
+            anglesPrs = angles_hists[li][0] * (_angles_hists[li][1][1] - _angles_hists[li][1][0])
 
             _PE_hists[li] = np.histogram(PEs[li], bins=args.nbins, density=True)
             PE_hists[li] = _PE_hists[li][0]
@@ -258,75 +312,93 @@ for ri in range(nroots):
             rej_FixP_hists[li] = np.histogram(rejFixPs[li], bins=args.nbins, density=True)
             rejFixP_hists[li] = rej_FixP_hists[li][0]
 
-
-            freeEs[li] = -1.0 * RT * np.log(anglePrs)
-
-            # MFPT (assume equaly spaced intervals for angles
-            # Stationary probabilities
-            nintervals = 24
-            stationaries = np.histogram(angles[li], bins=nintervals, range=(0.0, 2 * np.pi), density=True)
-            basins = stationaries[1]
-
-            # Transition matrix
-            # Count
-            jumps = []
-            P = np.zeros((nintervals, nintervals), dtype=np.float64)
-            previ = 0
-            tauCount = np.zeros((nintervals), dtype=np.float64)
-            tauStops = np.zeros((nintervals), dtype=np.float64)
-            for ai in range(1, alldata.shape[0]):
-                i = which_basin(basins, angles[li][ai - 1])
-                j = which_basin(basins, angles[li][ai])
-                P[i][j] += 1
-
-                # Tau counts
-                if (i == previ) and (j == previ):
-                    tauCount[i] = tauCount[i] + 1
-                else:
-                    tauStops[i] = tauStops[i] + 1
-
-                if i == j:
-                    previ = i
-
-                if i != j:
-                    jumps.append(alldata[ai])
-            jumps = np.array(jumps)
-
-            print 'Basins', basins
-            print 'Counts:'
-            for i in range(P.shape[0]):
-                for j in range(P.shape[1]):
-                    print P[i][j], 
-                print
+            # MFPT
+            # Stationary probability vector
+            _pi_ = np.zeros((dialBasins.shape[0]))
+            P = np.zeros((dialBasins.shape[0], dialBasins.shape[0]), dtype=np.float64)
+            W = np.zeros((dialBasins.shape[0], dialBasins.shape[0]), dtype=np.float64)
+            Z = np.zeros((dialBasins.shape[0], dialBasins.shape[0]), dtype=np.float64)
+            IdimP = np.zeros((dialBasins.shape[0], dialBasins.shape[0]), dtype=np.float64)
+            for i in range(IdimP.shape[0]):
+                IdimP[i, i] = 1.0
+            MFPT = np.zeros((dialBasins.shape[0], dialBasins.shape[0]), dtype=np.float64)
             
-            print 'Diagonal:'
-            for i in range(P.shape[0]):
-               print P[i][i], 
-            print
 
-            print 'tau: '
-            for i in range(tauCount.shape[0]):
-                print tauCount[i] / tauStops[i],
-            print
+            # Count
+            for ai in range(1, anglePhi[li].shape[0]):
+                i = which_basin2d(dialBasins, anglePhi[li][ai - 1], anglePsi[li][ai - 1])
+                j = which_basin2d(dialBasins, anglePhi[li][ai],     anglePsi[li][ai])
+                P[i][j] = P[i][j] + 1
 
+                # Stationary probability vector counts accumulation
+                _pi_[i] = _pi_[i] + 1
+            _pi_[j] = _pi_[j] + 1 # last count
 
-            # Normalize transition matrix
-            # TODO: Numpy sum is incorect ??
-            #for i in range(P.shape[0]):
-            #    for j in range(P.shape[1]):
-            #        print P[i][j],
-            #    print
-            rowsums = np.zeros((nintervals), dtype=np.float64)
-            for i in range(P.shape[0]):
-                rowsums[i] = np.sum(P[:, i], dtype=np.float64)
+            #PrintArray(_pi_)
+            #print 'Tranz counts'
+            #Print2DArray(P)
+
+            # Stationry counts to probabilities
+            Sum = 0.0
+            for i in range(_pi_.shape[0]):
+                Sum = Sum + _pi_[i]
+            _pi_ = _pi_ / Sum
+            #print "Stationary vector"
+            #print _pi_
+
+            # Build W matrix
+            for i in range(W.shape[0]):
+                for j in range(W.shape[1]):
+                    W[i][j] = _pi_[j]
+            #print 'W matrix'
+            #Print2DArray(W)
+
+            # Transition probabilties
+            rowsum = np.zeros((P.shape[0]))
             for i in range(P.shape[0]):
                 for j in range(P.shape[1]):
-                    P[i][j] = P[i][j] / rowsums[i] 
+                    rowsum[i] = rowsum[i] + P[i][j]
 
-            # Symetrize transition matrix
-            Psyms[li] = 0.5 * (P + P.transpose())
-            #print "Symmetrized transition matrix:"
-            #Print2DArray(Psyms[li])
+            for i in range(P.shape[0]):
+                for j in range(P.shape[1]):
+                    P[i][j] = P[i][j] / rowsum[i]
+
+            #print 'Tranz matrix'
+            #Print2DArray(P)
+            #print P
+            #print 'P determinant', np.linalg.det(P)
+
+            # Swith to numpy matrices
+            _pi_Mat = np.matrix(_pi_, copy = True)
+            PMat = np.matrix(P, copy = True)
+            WMat = np.matrix(W, copy = True)
+            IdimPMat = np.matrix(IdimP, copy = True)
+            ZMat = np.matrix(Z, copy = True)
+            MFPTMat = np.matrix(MFPT, copy = True)
+
+            print 'pi mat'
+            PrintMatrix(_pi_Mat)
+            #print 'pi mat', _pi_Mat
+            #print 'piT * P', _pi_Mat.dot(PMat)
+
+            print 'P mat'
+            PrintMatrix(PMat)
+            #print 'W mat'
+            #PrintMatrix(WMat)
+            #print 'I mat'
+            #PrintMatrix(IdimPMat)
+
+            ZMat = (IdimPMat - PMat + WMat).getI()
+            #print 'Fundamental matrix Z mat'
+            #PrintMatrix(ZMat)
+
+
+            for i in range(MFPTMat.shape[0]):
+                for j in range(MFPTMat.shape[1]):
+                    MFPTMat[i, j] = (ZMat[j, j] - ZMat[i, j]) / _pi_Mat[0, j]
+
+            print 'MFPT mat'
+            PrintMatrix(MFPTMat)
 
     # Print acceptance
     print "Acceptance mean and std", np.mean(acc), np.std(acc)
@@ -337,9 +409,14 @@ for ri in range(nroots):
     print "Accepted Fixman potentials mean of means and stds", np.mean(meanAccFixPs), np.mean(stdAccFixPs)
     print "Rejected Fixman potentials in TD mean of means and stds", np.mean(meanRejFixPs), np.mean(stdRejFixPs)
 
+    print "Fixman potentials stds of means and stds", np.std(meanFixPs), np.std(stdFixPs)
+    print "Accepted Fixman potentials stds of means and stds", np.std(meanAccFixPs), np.std(stdAccFixPs)
+    print "Rejected Fixman potentials in TD stds of means and stds", np.std(meanRejFixPs), np.std(stdRejFixPs)
+
     # Plot average angle distribution with error bars
     if args.makeplots:
-        angle_hists = np.array(angle_hists)
+        anglePhi_hists = np.array(anglePhi_hists)
+        anglePsi_hists = np.array(anglePsi_hists)
 
         PE_hists = np.array(PE_hists)
         PETD_hists = np.array(PETD_hists)
@@ -348,17 +425,14 @@ for ri in range(nroots):
         accFixP_hists = np.array(accFixP_hists)
         rejFixP_hists = np.array(rejFixP_hists)
 
-        freeEs = np.array(freeEs)
-
-        avg_angle_hist = np.zeros((angle_hists.shape[1]))
-        std_angle_hist = np.zeros((angle_hists.shape[1]))
+        avg_anglePhi_hist = np.zeros((anglePhi_hists.shape[1]))
+        std_anglePhi_hist = np.zeros((anglePhi_hists.shape[1]))
+        avg_anglePsi_hist = np.zeros((anglePsi_hists.shape[1]))
+        std_anglePsi_hist = np.zeros((anglePsi_hists.shape[1]))
         avg_PE_hist = np.zeros((PE_hists.shape[1]))
         std_PE_hist = np.zeros((PE_hists.shape[1]))
         avg_PETD_hist = np.zeros((PETD_hists.shape[1]))
         std_PETD_hist = np.zeros((PETD_hists.shape[1]))
-
-        avg_freeEs = np.zeros((angle_hists.shape[1]))
-        std_freeEs = np.zeros((angle_hists.shape[1]))
 
         avg_FixP_hist = np.zeros((FixP_hists.shape[1]))
         std_FixP_hist = np.zeros((FixP_hists.shape[1]))
@@ -367,10 +441,6 @@ for ri in range(nroots):
         avg_rejFixP_hist = np.zeros((rejFixP_hists.shape[1]))
         std_rejFixP_hist = np.zeros((rejFixP_hists.shape[1]))
 
-        Psym = np.zeros((angle_hists.shape[0], angle_hists.shape[1]))
-        Psym = np.mean(Psyms, axis = 0)
-        #print 'Average symmetrized transition matrix P:'
-        #Print2DArray(Psym)
 
         for i in range(avg_PE_hist.shape[0]):
             avg_PE_hist[i] = np.mean(PE_hists[:, i])
@@ -378,13 +448,11 @@ for ri in range(nroots):
             avg_PETD_hist[i] = np.mean(PETD_hists[:, i])
             std_PETD_hist[i] = np.std(PETD_hists[:, i])
 
-        for i in range(avg_angle_hist.shape[0]):
-            avg_angle_hist[i] = np.mean(angle_hists[:, i])
-            std_angle_hist[i] = np.std(angle_hists[:, i])
-
-            avg_freeEs[i] = np.mean(freeEs[:, i])
-            std_freeEs[i] = np.std(freeEs[:, i])
-        #print "Angles histogram", avg_angle_hist
+        for i in range(avg_anglePhi_hist.shape[0]):
+            avg_anglePhi_hist[i] = np.mean(anglePhi_hists[:, i])
+            std_anglePhi_hist[i] = np.std(anglePhi_hists[:, i])
+            avg_anglePsi_hist[i] = np.mean(anglePsi_hists[:, i])
+            std_anglePsi_hist[i] = np.std(anglePsi_hists[:, i])
 
         for i in range(avg_FixP_hist.shape[0]):
             avg_FixP_hist[i] = np.mean(FixP_hists[:, i])
@@ -398,16 +466,93 @@ for ri in range(nroots):
             avg_rejFixP_hist[i] = np.mean(rejFixP_hists[:, i])
             std_rejFixP_hist[i] = np.std(rejFixP_hists[:, i])
 
-        dx = (_angle_hists[0][1][1] - _angle_hists[0][1][0])
-        avg_freeE = -1.0 * RT * np.log(avg_angle_hist) * dx
-        #print "Free energy", avg_freeE
-        #for a in avg_freeE:
-        #    print a,
-        #print
+        dx = (_anglePhi_hists[0][1][1] - _anglePhi_hists[0][1][0])
 
-    print args.makeplots, 'makeplots list'   
     # Detailed plots 
     for li in range(nfiles):
+        if 'detailanglesmap' in args.makeplots:
+            figno = figno + 1
+            figs.append(plt.figure(figno))
+            #figs[-1].suptitle("Angles", fontsize=16) 
+            ax = plt.subplot(1,1,1)
+            currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
+    
+            #X = _angles_hists[li][1] + ((_angles_hists[li][1][1] - _angles_hists[li][1][0]) / 2.0)
+            X = np.linspace(_angles_hists[li][1][0], _angles_hists[li][1][-1], args.nbins)
+            Y = copy.deepcopy(X)
+            Z = -1.0 * RT * np.transpose((angles_hists[li]) / (np.max(angles_hists[li])))
+
+            #cset1 = ax.contourf(X , Y, np.transpose(angles_hists[li]), 40, cmap = plt.cm.RdYlBu)
+            cset1 = ax.contourf(X , Y, Z, 40, cmap = plt.cm.bwr)
+            plt.colorbar(cset1)
+            #ax.contour(X , Y, np.transpose(angles_hists[li]), 40)
+            #ax.scatter(anglePhi[li], anglePsi[li], label = currLabel, color='black', s=0.3)
+
+            #ax.legend()
+            ax.set_xlabel(r'$\mathrm{\phi}$', fontsize=20, fontweight  = 'bold')
+            ax.set_ylabel(r'$\mathrm{\psi}$', fontsize=20, fontweight  = 'bold')
+            plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=20, fontweight  = 'bold')
+            plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=20, fontweight  = 'bold')
+            #plt.xlim(0.0, 2*np.pi)
+            #plt.ylim(0.0, 2*np.pi)
+            plt.xlim(-1.0*np.pi, np.pi)
+            plt.ylim(-1.0*np.pi, np.pi)
+
+            if args.savefigs:
+                figFN = "temp." + "angmap" + ".pdf"
+                plt.savefig(figFN, dpi=600, format='pdf')
+
+        if 'detailangles' in args.makeplots:
+            figno = figno + 1
+            figs.append(plt.figure(figno))
+            #figs[-1].suptitle("Angles", fontsize=20) 
+            ax = plt.subplot(1,1,1)
+            currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
+    
+            ax.scatter(anglePhi[li], anglePsi[li], label = currLabel, color='black', s=0.3)
+
+            #ax.legend()
+            ax.set_xlabel(r'$\mathrm{\phi}$', fontsize=20, fontweight  = 'bold')
+            ax.set_ylabel(r'$\mathrm{\psi}$', fontsize=20, fontweight  = 'bold')
+            plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=20, fontweight  = 'bold')
+            plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=20, fontweight  = 'bold')
+            #plt.xlim(0.0, 2*np.pi)
+            #plt.ylim(0.0, 2*np.pi)
+            plt.xlim(-1.0*np.pi, np.pi)
+            plt.ylim(-1.0*np.pi, np.pi)
+
+            if args.savefigs:
+                figFN = "temp." + "angscat" + ".pdf"
+                plt.savefig(figFN, dpi=600, format='pdf')
+
+        if 'detailtranz' in args.makeplots:
+            figno = figno + 1
+            figs.append(plt.figure(figno))
+            figs[-1].suptitle("Angles", fontsize=16) 
+            ax = plt.subplot(1,1,1)
+            currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
+    
+            X = _angles_hists[li][1] + ((_angles_hists[li][1][1] - _angles_hists[li][1][0]) / 2.0)
+            #X = (-1.0) * X[:-1]
+            X = X[:-1]
+            Y = copy.deepcopy(X)
+            ax.scatter(anglePhi[li], anglePsi[li], label = currLabel, color='black', s=0.5)
+            ax.plot(anglePhi[li], anglePsi[li], label = currLabel, color='black', linewidth = 0.5)
+            #ax.contour(X, Y, np.transpose(angles_hists[li]), 40)
+
+            ax.legend()
+            ax.set_xlabel(r'$\mathrm{\phi}$', fontsize=14)
+            ax.set_ylabel(r'$\mathrm{\psi}$', fontsize=14)
+            plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=12)
+            plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=12)
+            #plt.xlim(0.0, 2*np.pi)
+            #plt.ylim(0.0, 2*np.pi)
+            plt.xlim(-1.0*np.pi, np.pi)
+            plt.ylim(-1.0*np.pi, np.pi)
+
+            if args.savefigs:
+                figFN = "temp." + "angtranz" + ".pdf"
+                plt.savefig(figFN, dpi=600, format='pdf')
         if 'detailPE' in args.makeplots:
             figno = figno + 1
             figs.append(plt.figure(figno))
@@ -415,39 +560,19 @@ for ri in range(nroots):
             ax = plt.subplot(1,1,1)
             currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
      
-            #ax.scatter(angles[li], PEs, label = currLabel, color=BasicColors[ri], s=0.5)
-            ax.scatter(anglesTD[li], PEsTD[li], label = currLabel, color='black', s=0.5)
-            #plt.plot(angles[li], PEs[0], linewidth=0.5)
+            #ax.scatter(anglePhi[li], PEs, label = currLabel, color=BasicColors[ri], s=0.5)
+            ax.scatter(anglePhiTD[li], PEsTD[li], label = currLabel, color='red', s=0.5)
+            #plt.plot(anglePhi[li], PEs[0], linewidth=0.5)
 
             ax.legend()
             ax.set_xlabel(r'$\mathrm{angle}$', fontsize=14)
             ax.set_ylabel(r'$\mathrm{U}$', fontsize=14)
-            plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=18)
-            plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=18)
+            plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=12)
+            plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=12)
             plt.xlim(0.0, 2*np.pi)
 
             if args.savefigs:
                 figFN = "temp." + "detPE" + ".pdf"
-                plt.savefig(figFN, dpi=600, format='pdf')
-
-        if 'detailangle' in args.makeplots:
-            figno = figno + 1
-            figs.append(plt.figure(figno))
-            figs[-1].suptitle("Phase Space Transitions", fontsize=16) 
-            ax = plt.subplot(1,1,1)
-            currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
-     
-            plt.plot(angles[li], linewidth=0.5, color='black')
-
-            ax.legend()
-            ax.set_xlabel(r'$\mathrm{step}$', fontsize=14)
-            ax.set_ylabel(r'$\mathrm{\phi}$', fontsize=14)
-            plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=18)
-            plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=18)
-            plt.ylim(0.0, 2*np.pi)
-
-            if args.savefigs:
-                figFN = "temp." + "detang" + ".pdf"
                 plt.savefig(figFN, dpi=600, format='pdf')
 
         if 'detailFixman' in args.makeplots:
@@ -457,18 +582,18 @@ for ri in range(nroots):
             ax = plt.subplot(1,1,1)
             currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
      
-            ax.scatter(anglesTD[li], FixPs, label = currLabel, color=BasicColors[ri], s=0.5)
-            #plt.plot(angles[li], PEs[0], linewidth=0.5)
+            ax.scatter(anglePhiTD[li], FixPs, label = currLabel, color=BasicColors[ri], s=0.5)
+            #plt.plot(anglePhi[li], PEs[0], linewidth=0.5)
 
             ax.legend()
-            ax.set_xlabel(r'$\mathrm{angle}$', fontsize=14)
+            ax.set_xlabel(r'$\mathrm{\phi}$', fontsize=14)
             ax.set_ylabel(r'$\mathrm{U_f}$', fontsize=14)
             plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=12)
             plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=12)
             plt.xlim(0.0, 2*np.pi)
 
             if args.savefigs:
-                figFN = "temp." + "angFix" + ".pdf"
+                figFN = "temp." + "angPhiFix" + ".pdf"
            
         # Other functions
         if 'detailFuncs' in args.makeplots:
@@ -480,12 +605,12 @@ for ri in range(nroots):
    
             normPEsTD = (PEsTD[li] - np.min(PEsTD[li])) / (np.max(PEsTD[li]) - np.min(PEsTD[li])) 
             normFixPs = (FixPs[li] - np.min(FixPs[li])) / (np.max(FixPs[li]) - np.min(FixPs[li])) 
-            #ax.scatter(anglesTD[li][::3], normPEsTD[::3], label = currLabel, color=BasicColors[ri], s=0.3)
-            #ax.scatter(anglesTD[li][::3], normFixPs[::3], label = currLabel, color='red', s=0.3)
-            ax.scatter(anglesTD[li][::3], normFixPs[::3] - normPEsTD[::3], label = currLabel, color='red', s=0.3)
+            #ax.scatter(anglePhiTD[li][::3], normPEsTD[::3], label = currLabel, color=BasicColors[ri], s=0.3)
+            #ax.scatter(anglePhiTD[li][::3], normFixPs[::3], label = currLabel, color='red', s=0.3)
+            ax.scatter(anglePhiTD[li][::3], normFixPs[::3] - normPEsTD[::3], label = currLabel, color='red', s=0.3)
 
             ax.legend()
-            ax.set_xlabel(r'$\mathrm{angle}$', fontsize=14)
+            ax.set_xlabel(r'$\mathrm{anglePhi}$', fontsize=14)
             ax.set_ylabel(r'$\mathrm{f()}$', fontsize=14)
             plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=12)
             plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=12)
@@ -509,48 +634,30 @@ for ri in range(nroots):
     if ('angles' in args.makeplots) or ('all' in args.makeplots):
             figno = figno + 1
             figs.append(plt.figure(figno))
-            figs[-1].suptitle("Middle Angle Distribution", fontsize=16) 
+            figs[-1].suptitle("Angles Distributions", fontsize=16) 
             ax = plt.subplot(1,1,1)
             currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
      
-            (_, caps, _) = plt.errorbar(_angle_hists[0][1][:-1], avg_angle_hist, yerr=std_angle_hist, color = BasicColors[ri], \
+            (_, caps, _) = plt.errorbar(_anglePhi_hists[0][1][:-1], avg_anglePhi_hist, yerr=std_anglePhi_hist, color = BasicColors[ri], \
+                label = currLabel, capsize=2)
+            (_, caps, _) = plt.errorbar(_anglePsi_hists[0][1][:-1], avg_anglePsi_hist, yerr=std_anglePsi_hist, color = BasicColors[ri], \
                 label = currLabel, capsize=2)
 
             ax.legend()
             ax.set_xlabel(r'$\mathrm{\phi}$', fontsize=14)
             ax.set_ylabel(r'$\mathrm{\rho}$', fontsize=14)
-            plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=18)
-            plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=18)
+            plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=12)
+            plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=12)
             plt.xlim(0.0, 2*np.pi)
 
             if args.savefigs:
                 figFN = "temp." + "ang" + ".pdf"
                 plt.savefig(figFN, dpi=600, format='pdf')
 
+    if ('FixmanAll' in args.makeplots) or ('all' in args.makeplots):
             figno = figno + 1
             figs.append(plt.figure(figno))
-            figs[-1].suptitle("Free Energy Surface", fontsize=16) 
-            ax = plt.subplot(1,1,1)
-            currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
-     
-            (_, caps, _) = plt.errorbar(_angle_hists[0][1][:-1], avg_freeE, yerr=std_angle_hist, color = BasicColors[ri], \
-                label = currLabel, capsize=2)
-
-            ax.legend()
-            ax.set_xlabel(r'$\mathrm{\phi}$', fontsize=14)
-            ax.set_ylabel(r'$\mathrm{F}$', fontsize=14)
-            plt.setp(ax.get_xticklabels(), rotation='horizontal', fontsize=32)
-            plt.setp(ax.get_yticklabels(), rotation='horizontal', fontsize=32)
-            plt.xlim(0.0, 2*np.pi)
-
-            if args.savefigs:
-                figFN = "temp." + "FreeE" + ".pdf"
-                plt.savefig(figFN, dpi=600, format='pdf')
-
-    if ('Fixman' in args.makeplots) or ('all' in args.makeplots):
-            figno = figno + 1
-            figs.append(plt.figure(figno))
-            figs[-1].suptitle("Fixman Potential Distribution", fontsize=16) 
+            figs[-1].suptitle("Fixman Potential Distributions", fontsize=16) 
             ax = plt.subplot(1,1,1)         
             currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
      
@@ -624,7 +731,7 @@ for ri in range(nroots):
 
             plt.errorbar(range(args.nbins), PE_Prs, yerr=std_PE_hist, color = BasicColors[0], \
                 label = currLabel, capsize=2)
-            plt.errorbar(range(args.nbins), FixP_Prs, yerr=std_angle_hist, color = BasicColors[1], \
+            plt.errorbar(range(args.nbins), FixP_Prs, yerr=std_FixP_hist, color = BasicColors[1], \
                 label = currLabel, capsize=2)
 
             ax.legend()
@@ -637,7 +744,7 @@ for ri in range(nroots):
                 figFN = "temp." + "PFixP" + ".pdf"
                 plt.savefig(figFN, dpi=600, format='pdf')
 
-    if ('FixmanTimeseries' in args.makeplots) or ('all' in args.makeplots):
+    if ('Fixtimeseries' in args.makeplots) or ('all' in args.makeplots):
             figno = figno + 1
             figs.append(plt.figure(figno))
             figs[-1].suptitle("Fixman Potential Timeseries", fontsize=16) 
@@ -659,17 +766,18 @@ for ri in range(nroots):
                 figFN = "temp." + "Fixtime" + ".pdf"
                 plt.savefig(figFN, dpi=600, format='pdf')
 
-    if ('PETimeseries' in args.makeplots) or ('all' in args.makeplots):
+    if ('PEtimeseries' in args.makeplots) or ('all' in args.makeplots):
             figno = figno + 1
             figs.append(plt.figure(figno))
-            figs[-1].suptitle("Potential Energy Timeseries", fontsize=16) 
+            figs[-1].suptitle("Fixman Potential Timeseries", fontsize=16) 
             currLabel = FPFTLabel2String(FPFTLabel(args.inFNRoots[ri]))
 
             for li in range(nfiles):
                 ax = plt.subplot(nfiles, 1, li + 1)         
-                ax.plot(PEsTD[li], label = currLabel, color = BasicColors[ri])
+                #ax.plot(PEsTD[li], label = currLabel, color = BasicColors[ri])
+                ax.plot(PEs[li], label = currLabel, color = 'black')
 
-            plt.xticks(np.arange(0, PEsTD[li].size, 100))
+            plt.xticks(np.arange(0, FixPs[li].size, 100))
             ax.legend()
             ax.set_xlabel(r'$\mathrm{t}$', fontsize=14)
             ax.set_ylabel(r'$\mathrm{U_f}$', fontsize=14)
@@ -683,6 +791,9 @@ for ri in range(nroots):
 
 # Show
 if args.makeplots:
+  #if args.savefigs:
+  #  figFN = "temp." + str(args.makeplots[figno]) + ".pdf"
+  #  plt.savefig(figFN, dpi=600, format='pdf')
   plt.show()
   
   

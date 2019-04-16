@@ -90,7 +90,7 @@ void MonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real argTem
     }
 
     // Store potential energies
-    setOldPE(getPEFromEvaluator(someState));
+    //setOldPE(getPEFromEvaluator(someState));
     setSetPE(getOldPE());
 
     // Store Fixman potential
@@ -448,7 +448,8 @@ void MonteCarloSampler::update(SimTK::State& someState){
 // Get the potential energy from an external source as far as the sampler
 // is concerned - OPENMM has to be inserted here
 SimTK::Real MonteCarloSampler::getPEFromEvaluator(SimTK::State& someState){
-    return forces->getMultibodySystem().calcPotentialEnergy(someState);
+    //return forces->getMultibodySystem().calcPotentialEnergy(someState);
+    return dumm->CalcFullPotEnergyIncludingRigidBodies(someState);
 }
 
 // Get the desired simulation temperature. Not to be confused with 

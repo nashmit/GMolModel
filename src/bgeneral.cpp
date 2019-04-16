@@ -355,6 +355,48 @@ bool AreSame(double a, double b, double EPSILON)
 }
 
 /*
+ * Given a frame F1 expressed in another frame G and a station v1 expressed
+ * in G return another frame F2 with origin in v1, aligne along F1 v1 vector
+ * with the X axis and pointing towards F1
+ */
+SimTK::Transform alignFlipAndTranslateFrameAlongXAxis(SimTK::Transform G_X_F1, SimTK::Vec3 G_v1)
+{
+
+    // Get F1v1 vector
+    SimTK::Vec3 G_F1v1 = (G_v1 - G_X_F1.p());
+
+    // Re-express F1v1 in F1
+    SimTK::Vec3 F1_F1v1 = ~(G_X_F1.R()) * G_F1v1;
+
+    // Get rotation axis and angle with dot and cross products
+    SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(F1_F1v1), SimTK::UnitVec3(1, 0, 0));
+    assert(cosAngle < 1.1); 
+    assert(cosAngle > -1.1);
+    if (cosAngle > 1.0) cosAngle = 1.0;
+    if (cosAngle < -1.0) cosAngle = -1.0;
+    SimTK::Angle rotAngle = std::acos( cosAngle );
+    SimTK::UnitVec3 F1_rotAxis(SimTK::cross(SimTK::UnitVec3(F1_F1v1), SimTK::UnitVec3(1, 0, 0)));
+
+    // Put results into a new Transform
+    SimTK::Transform F1_X_F2( SimTK::Rotation((-1.0 * rotAngle) + SimTK::Pi, F1_rotAxis), F1_F1v1) ;
+
+    // ALign YAxis with XAxis
+    // Express everything in F2
+    SimTK::Transform F2_X_F1 = ~F1_X_F2;
+    SimTK::Vec3 F2_F2YAxis = SimTK::Vec3(0, 1, 0);
+    SimTK::Vec3 F2_F2Orig = SimTK::Vec3(0, 0, 0);
+    SimTK::Vec3 F2_F1F2 = F2_X_F1.p();
+    SimTK::Vec3 F2_F1XAxis = F2_X_F1.R() * SimTK::Vec3(1, 0, 0);
+    rotAngle = bDihedral(F2_F2YAxis, F2_F2Orig, F2_F1F2, F2_F1XAxis);
+    SimTK::Transform F2_X_F3 = SimTK::Rotation(rotAngle, SimTK::UnitVec3(1, 0, 0));
+    // SimTK::Transform G_X_F3 = G_X_F2 * F2_X_F3;
+    SimTK::Transform F1_X_F3 = F1_X_F2 * F2_X_F3;
+
+    return F1_X_F3;
+
+}
+
+/*
  * Convert spatial maatrix (Mat< 2, 2, Mat33 >) to 6x6 matrix (Mat<6,6>)
  * Replaces inf and nan with zeros
  */
@@ -645,6 +687,22 @@ void PrintBigMat(SimTK::Vector V, int nrows, int decimal_places, std::string hea
             std::cout << V[i] << " ";
     }
     std::cout << std::endl;
+}
+
+/*
+ * Print Transform
+ */
+void PrintTransform(SimTK::Transform T, int decimal_places)
+{
+    const SimTK::Mat44 M = T.toMat44();
+    std::cout << std::setprecision(decimal_places) << std::fixed;
+    for(int i = 0; i < 4; i++){
+        for(int k = 0; k < 4; k++){
+            std::cout << M(i, k) << " ";
+        }
+        std::cout << std::endl;
+    }
+
 }
 
 /*
