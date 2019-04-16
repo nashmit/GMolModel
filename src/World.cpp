@@ -570,7 +570,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
         // Fully flexible regimen. realizeTopology is not needed
         if(topologies[i]->getRegimen() == "IC"){
-            std::cout << "setAtomsLoc World IC" << std::endl << std::flush;
+            //std::cout << "setAtomsLoc World IC" << std::endl << std::flush;
 
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
@@ -604,9 +604,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
                 P_X_M[int(mbx)] = Transform(Rotation(), atomTargets[aIx]); // NEW
             }
 
-std::cout << "IC stage before setQToFitTransform " << matter->getStage(someState) << std::endl;
-
-            // Set X_FM and Q 
+            // Set X_FM and Q : backs up to stage Time
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
                 SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
 
@@ -618,17 +616,11 @@ std::cout << "IC stage before setQToFitTransform " << matter->getStage(someState
 
             }
 
-std::cout << "IC stage after setQToFitTransform " << matter->getStage(someState) << std::endl;
-
         // END IC regimen
 
         }else if((topologies[i]->getRegimen() == "TD") || (topologies[i]->getRegimen() == "RB")){
 
-// TIME START -----------------
-//std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
-// TIME START
-
-            std::cout << "setAtomsLoc World TD" << std::endl << std::flush;
+            //std::cout << "setAtomsLoc World TD" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
             std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > currentTopology = otherWorldsAtomsLocations[i];
@@ -646,13 +638,6 @@ std::cout << "IC stage after setQToFitTransform " << matter->getStage(someState)
             topologies[i]->matchDefaultTopLevelTransform(atomTargets);
             topologies[i]->matchDefaultConfiguration(atomTargets, SimTK::Compound::Match_Exact, true, 150.0);
 
-// TIME STOP
-//std::chrono::steady_clock::time_point end4 = std::chrono::steady_clock::now();
-//std::cout << "setAtomsLocations end4 - start0 "
-//<< std::chrono::duration_cast<std::chrono::microseconds>(end4 - start0).count()
-//<< " us.\n";
-// TIME STOP ===================
-
             // Get transforms and locations: P_X_F and root_X_atom.p()
             // M0 and Mr are actually used for F
             G_X_T = topologies[i]->getTopLevelTransform();
@@ -661,17 +646,11 @@ std::cout << "IC stage after setQToFitTransform " << matter->getStage(someState)
             SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
             SimTK::Transform P_X_F[matter->getNumBodies()]; // related to X_PFs
             // SimTK::Transform T_X_root[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
-            // RE SimTK::Transform T_X_Proot[matter->getNumBodies()];
             SimTK::Transform T_X_Proot; // NEW
             SimTK::Transform root_X_M0[matter->getNumBodies()];
             SimTK::Angle inboardBondDihedralAngles[matter->getNumBodies()]; // related to X_FMs
             SimTK::Real inboardBondLengths[matter->getNumBodies()]; // related to X_FMs
             SimTK::Vec3 locs[topologies[i]->getNumAtoms()];
-
-            // RE T_X_root[1] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
-            // RE P_X_F[1] = G_X_T * topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0));
-            //T_X_root[1] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(0)); // NEW
-            //P_X_F[1] = G_X_T * T_X_root[1]; // NEW
 
             // Iterate through atoms - get T_X_roots for all the bodies
             for (SimTK::Compound::AtomIndex aIx(0); aIx < topologies[i]->getNumAtoms(); ++aIx){
@@ -696,7 +675,6 @@ std::cout << "IC stage after setQToFitTransform " << matter->getStage(someState)
                     if(parentMobod.getMobilizedBodyIndex() != 0){ // parent not Ground
                         SimTK::Compound::AtomIndex parentAIx = (topologies[i]->getMbx2aIx()).at(parentMbx);
 
-                        // RE T_X_Proot[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(parentAIx);
                         T_X_Proot = T_X_root[parentMbx]; // NEW
 
                         // Get inboard dihedral angle and put in root_X_M0 !!!!!!!
@@ -707,71 +685,15 @@ std::cout << "IC stage after setQToFitTransform " << matter->getStage(someState)
                         );
 
                         // Get Proot_X_M0
-                        // RE RE T_X_root[int(mbx)] = topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
                         SimTK::Transform T_X_M0 = T_X_root[int(mbx)] * root_X_M0[int(mbx)];
- 
-                        // RE const SimTK::Transform& T_X_Proot = topologies[i]->calcDefaultAtomFrameInCompoundFrame(parentAIx);
-                        // RE SimTK::Transform Proot_X_T = ~T_X_Proot;
                         SimTK::Transform Proot_X_T = ~T_X_Proot; // NEW
- 
- 
                         SimTK::Transform Proot_X_M0 = Proot_X_T * T_X_M0;
-                        // RE P_X_F[int(mbx)] = Proot_X_M0;
                         P_X_F[int(mbx)] = Proot_X_M0 * M_X_pin; // NEW
-               
-                        //SimTK::Transform proposalF_X_M(SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::ZAxis), Vec3(0, 0, 0));
-                        //SimTK::Transform proposal = proposalF_X_M;
-                        //std::cout << "proposal " << int(mbx)<< std::endl;
-                        //PrintTransform(proposal, 5);
 
                     } //END if parent not Ground
                 }
             }
         
-// TIME STOP
-//std::chrono::steady_clock::time_point end5 = std::chrono::steady_clock::now();
-//std::cout << "setAtomsLocations end5 - start0 "
-//<< std::chrono::duration_cast<std::chrono::microseconds>(end5 - start0).count()
-//<< " us.\n";
-// TIME STOP ===================
-
- /*
-            // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone OLD WAY
-            for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
-                SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
-                if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is not at body's origin
-
-                    SimTK::Transform root_X_T = ~(T_X_root[int(mbx)]);
-                    SimTK::Transform T_X_child =  topologies[i]->calcDefaultAtomFrameInCompoundFrame(aIx);
-                    SimTK::Transform root_X_child = root_X_T * T_X_child;
-                    topologies[i]->bsetFrameInMobilizedBodyFrame(aIx, root_X_child);
-                    locs[int(aIx)] = root_X_child.p();
-                    
-//                    SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)]; // NEW
-//                    SimTK::Vec3 G_vchild = atomTargets[aIx]; //NEW 
-//                    SimTK::Vec3 G_vroot = G_X_root.p(); // NEW
-//                    SimTK::Vec3 G_v = G_vchild - G_vroot; // NEW
-//                    SimTK::Vec3 root_v = (~G_X_root).R() * G_v; //NEW 
-//
-//                    SimTK::Real Cx = root_v[0];
-//                    SimTK::Real Cy = root_v[1];
-//                    SimTK::Real Cz = root_v[2];
-//                    SimTK::Real theta1 = atan2(Cz, Cx);
-//                    SimTK::Real theta2 = atan2(Cy, Cx);
-//                    SimTK::Rotation rot1(-theta1, SimTK::YAxis);
-//                    SimTK::Rotation rot2(-theta2, SimTK::ZAxis);
-//                    SimTK::Rotation rot_total = rot1 * rot2;
-//                    SimTK::Transform root_X_child(rot_total, root_v);
-//
-//                    topologies[i]->bsetFrameInMobilizedBodyFrame(aIx, root_X_child);
-//                    locs[int(aIx)] = root_v; // NEW
-
-                }
-                else{
-                    locs[int(aIx)] = SimTK::Vec3(0);
-                }
-            }
-// */
 ///*            // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone NEW WAY
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
                 SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
@@ -790,13 +712,6 @@ std::cout << "IC stage after setQToFitTransform " << matter->getStage(someState)
             }
 // */
         
-// TIME STOP
-//std::chrono::steady_clock::time_point end6 = std::chrono::steady_clock::now();
-//std::cout << "setAtomsLocations end6 - start0 "
-//<< std::chrono::duration_cast<std::chrono::microseconds>(end6 - start0).count()
-//<< " us.\n";
-// TIME STOP ===================
-
             // Set stations and AtomPLacements for atoms in DuMM
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
                 SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
@@ -815,32 +730,16 @@ std::cout << "IC stage after setQToFitTransform " << matter->getStage(someState)
                     forceField->bsetAtomPlacementStation(dAIx, mbx, locs[int(aIx)] );
             }
         
-// TIME STOP
-//std::chrono::steady_clock::time_point end7 = std::chrono::steady_clock::now();
-//std::cout << "setAtomsLocations end7 - start0 "
-//<< std::chrono::duration_cast<std::chrono::microseconds>(end7 - start0).count()
-//<< " us.\n";
-// TIME STOP ===================
-
-            // Set X_PF and Q - Bottleneck! RESTORE RE
+            // Set X_PF and Q
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
                 SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
                 if(int(mbx) == 1){ // This is dangerous TODO
                     ((SimTK::MobilizedBody::Free&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
                 }else{
-                    // RE ((SimTK::MobilizedBody::Pin&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)] * M_X_pin);
                     ((SimTK::MobilizedBody::Pin&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]); // NEW
                     ((SimTK::MobilizedBody::Pin&)mobod).setDefaultQ(inboardBondDihedralAngles[int(mbx)]);
                 }
             }
-
-// TIME STOP
-//std::chrono::steady_clock::time_point end8 = std::chrono::steady_clock::now();
-//std::cout << "setAtomsLocations end8 - start0 "
-//<< std::chrono::duration_cast<std::chrono::microseconds>(end8 - start0).count()
-//<< " us.\n";
-// TIME STOP ===================
-
 
             // Set mass properties for mobilized bodies
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
@@ -850,13 +749,6 @@ std::cout << "IC stage after setQToFitTransform " << matter->getStage(someState)
                 mobod.setDefaultMassProperties(massProperties);
             }
     
-// TIME STOP
-//std::chrono::steady_clock::time_point end9 = std::chrono::steady_clock::now();
-//std::cout << "setAtomsLocations end9 - start0 "
-//<< std::chrono::duration_cast<std::chrono::microseconds>(end9 - start0).count()
-//<< " us.\n";
-// TIME STOP ===================
-
             this->compoundSystem->realizeTopology();
             someState = compoundSystem->updDefaultState();
 
@@ -872,9 +764,6 @@ std::cout << "IC stage after setQToFitTransform " << matter->getStage(someState)
                     std::cout << "BodyOriginLocation for aIx " << aIx << " " 
                     << p_GB[0] << " " << p_GB[1] << " " << p_GB[2] << " "
                     << std::endl;
-                    
-                    
-
                 }
             }
  END CHECK */ 
@@ -943,8 +832,6 @@ std::cout << "IC stage after setQToFitTransform " << matter->getStage(someState)
         } // END TD regimen and all regimens
 
     } // END iterating through molecules/topologies
-
-    // RESTORE RE this->compoundSystem->realizeTopology();
 
     // RESTORE RE someState = compoundSystem->updDefaultState();
 

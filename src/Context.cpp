@@ -549,7 +549,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
     if( std::abs(Tf - Ti) < SimTK::TinyReal){
         for(int round = 0; round < nofRounds; round++){ // Iterate rounds
 
-            std::cout << "round " << round << std::endl;
+            //std::cout << "round " << round << std::endl;
 
 // TIME START -----------------
 //std::chrono::steady_clock::time_point start0 = std::chrono::steady_clock::now();
@@ -560,7 +560,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 // Rotate worlds indeces (translate from right to left)
                 std::rotate(worldIndexes.begin(), worldIndexes.begin() + 1, worldIndexes.end());
 
-                std::cout << "world " << worldIndexes.front() << std::endl;
+                //std::cout << "world " << worldIndexes.front() << std::endl;
    
                 // Get indeces
                 currentWorldIx = worldIndexes.front();
