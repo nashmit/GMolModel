@@ -374,11 +374,11 @@ void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
         bonds[i].j = amberReader->getBondsAtomsIndex2(i);
     }
 
-    // Assign the number of bonds an atom has and sets the number of freebonds
+    // Assign the number of bonds an atom has and set the number of freebonds
     // equal to the number of bonds for now
-    for(int i=0; i<natoms ; i++){
+    for(int i = 0; i < natoms ; i++){
         bAtomList[i].nbonds = 0;
-        for(int j=0; j<nbonds; j++){ 
+        for(int j = 0; j < nbonds; j++){
             if((bAtomList[i].number == bonds[j].i) || \
                (bAtomList[i].number == bonds[j].j)){
                 ++bAtomList[i].nbonds;
@@ -403,7 +403,8 @@ void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
     // appropriate element and assign it's Compound::AtomName to unique name
     // Every atom is derived from SingleAtom in turn derived from 
     // Compound with one atom (AtomIndex 0)
-    // TODO: Bromine and Clorine
+    // Also set atom forecfield type
+    // TODO: Bromine and Clorine and others
     // ---------------------------------------------
     for(int i = 0; i < (natoms + noDummies); i++){
         // Atoms with one bond
@@ -538,7 +539,8 @@ void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
             }
             bAtomList[i].bAtomType->setDefaultInboardBondLength(0.19);
         }
-  
+
+        // Assign atom's forcefield type
         bZeroCharArray(bAtomList[i].biotype, 20);
         sprintf(bAtomList[i].biotype, "%s_%s", \
           bAtomList[i].name, bAtomList[i].fftype);
@@ -764,7 +766,7 @@ void Topology::walkGraph(bSpecificAtom *root)
 on the graph using using Molmodels matchDefaultConfiguration and sets the 
 general flexibility of the molecule. **/
 void Topology::build(
-    SimTK::DuMMForceFieldSubsystem &dumm
+      SimTK::DuMMForceFieldSubsystem &dumm
     , std::string flexFN
     , std::string regimenSpec
 )

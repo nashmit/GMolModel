@@ -159,10 +159,14 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
     std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
-/** Creates Gmolmodel topologies objects and
-based on amberReader forcefield adds parameters: defines Biotypes;
- - adds BAT parameters to DuMM. Also creates decorations for visualizers **/
-void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string regimenSpec)
+/** Creates Gmolmodel topologies objects and based on amberReader forcefield
+ * adds parameters: defines Biotypes; - adds BAT parameters to DuMM. Also
+ * creates decorations for visualizers **/
+void World::AddMolecule(
+        readAmberInput *amberReader,
+        std::string rbFN,
+        std::string flexFN,
+        std::string regimenSpec)
 {
     // Statistics
     moleculeCount++; // Used for unique names of molecules
@@ -173,16 +177,19 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
     this->regimenSpec = regimenSpec;
  
     // Add a new molecule (Topology object which inherits Compound)
-    // to the vector of molecules and build its graph 
-    Topology * top = new Topology(std::string("lig") 
-        + std::to_string(moleculeCount));
+    // to the vector of molecules.
+    // TODO: Why resName and moleculeName have to be the same?
+    //std::string moleculeName = std::string("lig") + std::to_string(moleculeCount); // RERE
+    std::string moleculeName = regimenSpec + std::to_string(moleculeCount); // RERE
+    Topology *top = new Topology(moleculeName);
     topologies.push_back(top);
 
-    // Take information from amberReader and put it in bAtomList and bonds
+    // Get information from amberReader and put it in bAtomList and bonds
     (topologies.back())->loadAtomAndBondInfoFromReader(amberReader);
 
     // Add parameters from amberReader
-    //(topologies.back())->bAddAllParams(std::string("lig") + std::to_string(moleculeCount) //RERE
+    //(topologies.back())->bAddAllParams(std::string("lig") // RERE
+    // + std::to_string(moleculeCount) //RERE
     //   , amberReader, *forceField); //RERE
     std::string resName = regimenSpec + std::to_string(moleculeCount); // NEW
     (topologies.back())->bAddAllParams(resName, amberReader, *forceField); // NEW
