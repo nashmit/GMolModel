@@ -159,12 +159,11 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
     std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
-/** Creates a Gmolmodel moleculeReaders, topologies objects and 
-based on amberReader forcefield adds parameters - defines Biotypes;
+/** Creates Gmolmodel topologies objects and
+based on amberReader forcefield adds parameters: defines Biotypes;
  - adds BAT parameters to DuMM. Also creates decorations for visualizers **/
 void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string regimenSpec)
 {
-    std::cout << "World::AddMolecule BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
     // Statistics
     moleculeCount++; // Used for unique names of molecules
 
@@ -173,41 +172,23 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
     this->flexFN = flexFN;
     this->regimenSpec = regimenSpec;
  
-    // Add a MoleculeReader object to the vector of moleculeReaders
-    //bMoleculeReader * molRead = new bMoleculeReader(amberReader, rbFN.c_str());
-    //RE bMoleculeReader * molRead = new bMoleculeReader(amberReader);
-    //RE moleculeReaders.push_back(molRead);
-
-    //RE // Add parameters from amberReader
-    //RE bAddAllParams(std::string("lig") + std::to_string(moleculeCount)
-    //RE    , amberReader, *forceField, (moleculeReaders.back())->bAtomList
-    //RE    , (moleculeReaders.back())->bonds);
-  
-    // Add a new molecule (Topology object which inherits Compound) 
+    // Add a new molecule (Topology object which inherits Compound)
     // to the vector of molecules and build its graph 
     Topology * top = new Topology(std::string("lig") 
         + std::to_string(moleculeCount));
     topologies.push_back(top);
 
-    (topologies.back())->loadAtomAndBondInfoFromReader(amberReader); // RE
+    // Take information from amberReader and put it in bAtomList and bonds
+    (topologies.back())->loadAtomAndBondInfoFromReader(amberReader);
 
-    // Add parameters from amberReader //RE
-    //bAddAllParams(std::string("lig") + std::to_string(moleculeCount) //RE
-    //   , amberReader, *forceField, (topologies.back())->bAtomList //RE
-    //   , (topologies.back())->bonds); //RE
-  
-    (topologies.back())->bAddAllParams(std::string("lig") + std::to_string(moleculeCount) //RERE
-       , amberReader, *forceField); //RERE
-  
-    //RE (topologies.back())->build(*forceField, (moleculeReaders.back())->natoms
-    //RE     , (moleculeReaders.back())->bAtomList, (moleculeReaders.back())->nbonds
-    //RE    , (moleculeReaders.back())->bonds, flexFN, regimenSpec);
+    // Add parameters from amberReader
+    //(topologies.back())->bAddAllParams(std::string("lig") + std::to_string(moleculeCount) //RERE
+    //   , amberReader, *forceField); //RERE
+    std::string resName = regimenSpec + std::to_string(moleculeCount); // NEW
+    (topologies.back())->bAddAllParams(resName, amberReader, *forceField); // NEW
 
-    (topologies.back())->build(*forceField
-        //, (topologies.back())->natoms //RE
-        //, (topologies.back())->bAtomList, (topologies.back())->nbonds //RE
-        //, (topologies.back())->bonds
-        , flexFN, regimenSpec); //RE
+    // Build the graph representing molecule's topology
+    (topologies.back())->build(*forceField, flexFN, regimenSpec);
 
     // Allocate the vector of coordinates (DCD)
     Xs.resize(Xs.size() + topologies.back()->getNAtoms());
@@ -231,7 +212,7 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
             << std::endl << std::flush;
     }
   
-    // Generate decorations for first molecule
+    // Generate decorations for molecule
     if(visual){
         paraMolecularDecorator = new ParaMolecularDecorator(
             compoundSystem,
@@ -243,7 +224,6 @@ void World::AddMolecule(readAmberInput *amberReader, std::string rbFN, std::stri
         visualizer->addDecorationGenerator(paraMolecularDecorator);
     }
 
-    std::cout << "World::AddMolecule END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
 int World::getNofMolecules(void)

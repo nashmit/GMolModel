@@ -37,7 +37,7 @@
 /** Topological information (bonds graph) for one molecule.
 It maps to one compound in Molmodel thus it is derived 
 from Molmodel Compound class.
-It does  things:
+It does the following things:
    - loads information from input files such as Amber input prmtop / inpcrd
    - adds parameters to a DuMM force field which belongs to the World class
      because one DuMM class should be used for multiple molecules

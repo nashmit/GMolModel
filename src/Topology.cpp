@@ -26,33 +26,35 @@ Topology::~Topology(){
     }
 }
 
-
 /** Biotype is a Molmodel hook that is usually used to look up molecular
 force field specific parameters for an atom type. Gmolmodel defines a
 new Biotype for each atom. The only thing that is specified is the element
 with info about name, atomic number, valence and mass. **/
 void Topology::bAddBiotypes(
-    std::string resName
+      std::string resName
     , readAmberInput *amberReader
     , SimTK::DuMMForceFieldSubsystem& dumm
 )
 {
-    for(int i=0; i<amberReader->getNumberAtoms(); i++){
+    // Iterate through atoms and define Biotypes based on resname
+    for(int i = 0; i < amberReader->getNumberAtoms(); i++){
         SimTK::BiotypeIndex biotypeIndex = SimTK::Biotype::defineBiotype(
               SimTK::Element(
-                  bAtomList[i].getAtomicNumber()
-                  , (std::to_string(bAtomList[i].getElem())).c_str()
-                  , (std::to_string(bAtomList[i].getElem())).c_str()
-                  , bAtomList[i].getMass())
-            , bAtomList[i].getNBonds()
-            , resName.c_str()
-            , (bAtomList[i].getName()).c_str()
-            , SimTK::Ordinality::Any
+                  bAtomList[i].getAtomicNumber(),
+                  (std::to_string(bAtomList[i].getElem())).c_str(),
+                  (std::to_string(bAtomList[i].getElem())).c_str(),
+                  bAtomList[i].getMass()),
+            bAtomList[i].getNBonds(),
+            resName.c_str(),
+            (bAtomList[i].getName()).c_str(),
+            SimTK::Ordinality::Any
         );
 
         bAtomList[i].setBiotypeIndex(biotypeIndex);
-        std::cout << " bAddParams: Defined Biotype: " 
-            << resName << bAtomList[i].name << " " << SimTK::Ordinality::Any << "|" 
+
+        std::cout << " bAddBiotypes: Defined Biotype: "
+            << resName << "|" << bAtomList[i].name << " "
+            << SimTK::Ordinality::Any << "|"
             << " with BiotypeIndex " << bAtomList[i].getBiotypeIndex() << std::endl;
     }
 }
@@ -61,86 +63,116 @@ void Topology::bAddBiotypes(
 setBiotypeChargedAtomType for every atom. These Molmodel functions contain 
 information regarding the force field parameters. **/
 void Topology::bAddAtomClasses(
-    std::string resName
-    , readAmberInput *amberReader
-    , SimTK::DuMMForceFieldSubsystem& dumm
+                  std::string resName
+                , readAmberInput *amberReader
+                , SimTK::DuMMForceFieldSubsystem& dumm
 )
 {
-    // Add atom classes
+    // Define AtomClasses
     SimTK::DuMM::AtomClassIndex aIx;
-    for(int i=0; i<amberReader->getNumberAtoms(); i++){
+
+    // Iterate through amberReader atoms and define AtomClasses
+    for(int i = 0; i < amberReader->getNumberAtoms(); i++){
+        // Get an AtomClass index
         aIx = dumm.getNextUnusedAtomClassIndex();
         bAtomList[i].setAtomClassIndex(aIx);
+
+        // Define an AtomClass name
+        const char* atomClassName = (
+                std::string("top")
+                + resName
+                + bAtomList[i].getFftype()
+                + std::string("_")
+                + std::to_string(bAtomList[i].getNumber()) ).c_str();
+
+        // Define an AtomClass (has info about van der Waals)
         dumm.defineAtomClass(
-            (SimTK::DuMM::AtomClassIndex)aIx,
-	        ( std::string("top") + resName + bAtomList[i].getFftype() 
-                + std::string("_") + std::to_string(bAtomList[i].getNumber()) ).c_str(),
+            aIx,
+            atomClassName,
             bAtomList[i].getAtomicNumber(), // int atomicNumber
-            bAtomList[i].getNBonds(),
+            bAtomList[i].getNBonds(), // expected valence
             bAtomList[i].getVdwRadius() / 10.0, // nm
-            //bAtomList[i].getVdwRadius(), // A
             bAtomList[i].getLJWellDepth() * 4.184 // kcal to kJ
         );
-        std::cout << "bAddParams: Defined AtomClass: " << bAtomList[i].getAtomClassIndex() << std::endl;
+
+        std::cout << "bAddAtomClasses: Defined AtomClass: " << bAtomList[i].getAtomClassIndex() << std::endl;
     }
 
-    // Define DuMM charged atom types
-    for(int k=0; k<amberReader->getNumberAtoms(); k++){
-        std::string abuff =  resName;
-        abuff += bAtomList[k].biotype;
-  
-        SimTK::DuMM::ChargedAtomTypeIndex tempChargedAtomTypeIndex = dumm.getNextUnusedChargedAtomTypeIndex();
-        bAtomList[k].setChargedAtomTypeIndex(tempChargedAtomTypeIndex);
-        std::cout << "bAddParams: defineChargedAtomType atomTypeIx "<<tempChargedAtomTypeIndex
-            << " atomTypeName " << abuff.c_str() << " atomClassIx " << bAtomList[k].getAtomClassIndex()
-            << " partialChargeInE " << bAtomList[k].charge << " chargedAtomTypeIndex " << bAtomList[k].getChargedAtomTypeIndex() << std::endl;
+    // Define ChargedAtomTypeIndeces
+    SimTK::DuMM::ChargedAtomTypeIndex chargedAtomTypeIndex;
+    std::string chargedAtomTypeName;
+
+    // Iterate through atoms and define DuMM charged atom types
+    for(int k = 0; k < amberReader->getNumberAtoms(); k++){
+        // Get a ChargedAtomType index
+        chargedAtomTypeIndex = dumm.getNextUnusedChargedAtomTypeIndex();
+        bAtomList[k].setChargedAtomTypeIndex(chargedAtomTypeIndex);
+
+        // Define a chargedAtomType name
+        chargedAtomTypeName =  resName;
+        chargedAtomTypeName += bAtomList[k].biotype;
+
+        // Define a ChargedAtomType (AtomClass with a charge)
         dumm.defineChargedAtomType(
-          tempChargedAtomTypeIndex,
-          abuff.c_str(),
+          chargedAtomTypeIndex,
+          chargedAtomTypeName.c_str(),
           bAtomList[k].getAtomClassIndex(),
           bAtomList[k].charge
         );
-  
+
+        std::cout << "bAddAtomClasses: defineChargedAtomType atomTypeIx "<< chargedAtomTypeIndex
+                  << " atomTypeName " << chargedAtomTypeName.c_str() << " atomClassIx " << bAtomList[k].getAtomClassIndex()
+                  << " partialChargeInE " << bAtomList[k].charge << " chargedAtomTypeIndex " << bAtomList[k].getChargedAtomTypeIndex() << std::endl;
   
         // Associate a ChargedAtomTypeIndex with a Biotype index
-        std::cout << "bAddParams: setBiotypeChargedAtomType bAtomList["<< k << "].getChargedAtomTypeIndex() "
-            << bAtomList[k].getChargedAtomTypeIndex()
-            << " bAtomList[" << k << "].biotype " << bAtomList[k].biotype
-            << std::endl << std::flush;
         dumm.setBiotypeChargedAtomType(
           bAtomList[k].getChargedAtomTypeIndex(),
           bAtomList[k].getBiotypeIndex()
         );
+
+        std::cout << "bAddAtomClasses: setBiotypeChargedAtomType bAtomList["<< k << "].getChargedAtomTypeIndex() "
+                    << bAtomList[k].getChargedAtomTypeIndex()
+                    << " bAtomList[" << k << "].biotype " << bAtomList[k].biotype
+                    << std::endl << std::flush;
     }
 
 }
 
-/** Calls DuMM defineBondStretch. **/
+/** Calls DuMM defineBondStretch to define bonds parameters. **/
 void Topology::bAddBondParams(
-    std::string resName
+      std::string resName
     , readAmberInput *amberReader
     , SimTK::DuMMForceFieldSubsystem& dumm
 )
 {
+    // Iterate through bonds and define their parameters
     // Suppose or try to have the same order as the reader
-    for(int t=0; t<amberReader->getNumberBonds(); t++){
+    for(int t = 0; t < amberReader->getNumberBonds(); t++){
         dumm.defineBondStretch_KA(
             (bAtomList[bonds[t].i]).getAtomClassIndex(), 
             (bAtomList[bonds[t].j]).getAtomClassIndex(),
             amberReader->getBondsForceK(t),  //k1
             amberReader->getBondsEqval(t)   //equil1
         );
+
+        //std::cout << "bAddBondParams: defineBondStretch_KA between "
+        //    << (bAtomList[bonds[t].i]).getAtomClassIndex() << " "
+        //    << (bAtomList[bonds[t].j]).getAtomClassIndex() << " "
+        //    << amberReader->getBondsForceK(t) << " "
+        //    << amberReader->getBondsEqval(t) << std::endl;
+
     }
 }
 
-/** Calls DuMM defineBondBend. **/
+/** Calls DuMM defineBondBend to define angle parameters. **/
 void Topology::bAddAngleParams(
-    std::string resName
+      std::string resName
     , readAmberInput *amberReader
     , SimTK::DuMMForceFieldSubsystem& dumm
 )
 {
-    for(int t=0; t<amberReader->getNumberAngles(); t++){
+    // Iterate through angles and define their parameters
+    for(int t = 0; t < amberReader->getNumberAngles(); t++){
         dumm.defineBondBend_KA(
             bAtomList[amberReader->getAnglesAtomsIndex1(t)].getAtomClassIndex(),
             bAtomList[amberReader->getAnglesAtomsIndex2(t)].getAtomClassIndex(),
@@ -153,7 +185,7 @@ void Topology::bAddAngleParams(
 
 /** Calls DuMM defineBondTorsion for 1, 2 and 3 periodicities **/
 void Topology::bAddTorsionParams(
-    std::string resName
+      std::string resName
     , readAmberInput *amberReader
     , SimTK::DuMMForceFieldSubsystem& dumm
 )
@@ -208,7 +240,7 @@ void Topology::bAddTorsionParams(
 
 /** Adds force field parameters read by the inputReader **/
 void Topology::bAddAllParams(
-    std::string resName
+      std::string resName
     , readAmberInput *amberReader
     , SimTK::DuMMForceFieldSubsystem& dumm
 )
@@ -222,7 +254,8 @@ void Topology::bAddAllParams(
 
 
 
-/** Reads informatin from a readAmberInput object. **/
+/** Reads information from a readAmberInput object and put it in
+ * bAtomList and bonds lists **/
 void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
 {
     std::cout << "Topology::loadAtomAndBondInfoFromReader START" << std::endl;
@@ -233,11 +266,13 @@ void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
     natoms = amberReader->getNumberAtoms();
     nbonds = amberReader->getNumberBonds();
 
-    //RE bAtomList = new bSpecificAtom[natoms];
-    bAtomList.resize(natoms); //RE
+    bAtomList.resize(natoms);
+    bonds.resize(nbonds);
 
-    //RE bonds = new bBond[nbonds];
-    bonds.resize(nbonds); //RE
+    // Initialize atom variables
+    for(int i = 0; i < natoms; i++){
+        bAtomList[i].Zero();
+    }
 
     // Declare handy variables
     std::string str_buf;
@@ -248,23 +283,16 @@ void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
     std::string aStr, bStr, cStr, dStr;
     int nameCounter = 0; // same as i but clearer
 
-
-    // -----------------------------------------------------------------
-    // Assign atom properties. Take as much as possible from amberReader
-    // -----------------------------------------------------------------
-    // Make sure that variables in atoms are properly initialized
-    // Shouldi not be needed
-    for(int i = 0; i < natoms; i++){
-        bAtomList[i].Zero();
-    }
-
+    // -----------------------
+    // Assign atom properties.
+    // -----------------------
+    // Iterate through atoms and set as much as possible from amberReader
     for(int i = 0; i < natoms; i++){
 
         // Assign an index like in prmtop
         bAtomList[i].setNumber(i);
-        //bAtomList[i].setNumber(amberReader->getAtomIndex); // not implemented
 
-        // Assign element
+        // Assign element from the first letter of the name
         str_buf = amberReader->getAtomsName(i);
         unsigned int strix;
         for (strix = 0; strix < str_buf.length(); strix++){
@@ -283,29 +311,6 @@ void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
         std::string string_name;
         nameCounter++;
 
-        /*
-        charpos[0] = int(nameCounter / 216000);
-        aRest = nameCounter % int(216000);
-        charpos[1] = int(aRest / 3600);
-        bRest = aRest % int(3600);
-        charpos[2] = int(bRest / 60);
-        cRest = bRest % int(60);
-        charpos[3] = int(cRest / 1);
-        // Spread the numbers so that the ASCII symbol will be readble
-        for (unsigned int charposIx = 0; charposIx < 4; charposIx++){
-            if(charpos[charposIx] > (10 + 25)){
-                charpos[charposIx] += (7 + 6);
-            }else if(charpos[charposIx] > (9)){
-                charpos[charposIx] += (7);
-            }
-            charpos[charposIx] += 48;
-        }
-        aStr = (char)(charpos[0]);
-        bStr = (char)(charpos[1]);
-        cStr = (char)(charpos[2]);
-        dStr = (char)(charpos[3]);
-        */
-
         a = int(nameCounter / std::pow(25, 3));
         aStr = (char)(a + 65);
         aRest = nameCounter % int(std::pow(25, 3));
@@ -323,26 +328,6 @@ void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
 
         string_name = aStr + bStr + cStr + dStr;
         
-
-
-        /*
-        assert(nameCounter < 65536);
-        std::stringstream sstream;
-        std::string string_name;
-        if(nameCounter < 16){
-            sstream << std::hex << nameCounter;
-            string_name = "000" + sstream.str();
-        }else if(nameCounter < 256){
-            sstream << std::hex << nameCounter;
-            string_name = "00" + sstream.str();
-        }else if(nameCounter < 4096){
-            sstream << std::hex << nameCounter;
-            string_name = "0" + sstream.str();
-        }else if(nameCounter < 65536){
-            sstream << std::hex << nameCounter;
-            string_name = sstream.str();
-        }
-        */
         bAtomList[i].setName(string_name);
 
         // Store the initial name from prmtop
@@ -382,7 +367,7 @@ void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
     // -----------------------
     // Assign bond properties
     // -----------------------
-    //  
+    // Iterate through bonds and get atom indeces
     for(int i=0; i<nbonds; i++){
         bonds[i].setIndex(i);
         bonds[i].i = amberReader->getBondsAtomsIndex1(i);
