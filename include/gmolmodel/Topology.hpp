@@ -103,7 +103,8 @@ public:
 
     /** Get bond order. **/
     int getBondOrder(int, int) const;
- 
+
+    // Interface to access the maps
     std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > getMbx2aIx(void){
         return mbx2aIx;
     }
@@ -111,6 +112,12 @@ public:
     std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > getAIx2mbx(void){
         return aIx2mbx;
     }
+
+    // Get the number of MobilizedBodies in this Compound
+    unsigned int getNofMobilizedBodies(void){
+        return mbx2aIx.size();
+    }
+
 
     void writePdb(std::string dirname, std::string prefix, std::string sufix, int maxNofDigits, int index) const;
 
@@ -151,6 +158,8 @@ public:
     // Get coordinates
     void getCoordinates(std::vector<SimTK::Real> Xs, std::vector<SimTK::Real> Ys, std::vector<SimTK::Real> Zs);
 
+
+
 public:
 
     bool hasBuiltSystem;
@@ -176,6 +185,7 @@ private:
 
     // Map mbx2aIx contains only atoms at the origin of mobods
     std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > mbx2aIx;
+    // Map aIx is redundant in MobilizedBodyIndeces
     std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > aIx2mbx;
     //std::map< SimTK::Compound::AtomIndex, int > aIx2number;
     std::map< SimTK::Compound::BondIndex, int > bondIx2bond;
@@ -222,11 +232,10 @@ private:
 
     /** Graph building functions
     // Process a graph node **/
-    //void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode, int nofProcesses, int baseAtomNumber);
-    void process_node(bSpecificAtom *node, int CurrentGeneration, bSpecificAtom *previousNode);
+    void process_node(bSpecificAtom *node, bSpecificAtom *previousNode);
 
     // Construct the molecule topology
-    void walkGraph(bSpecificAtom *root);
+    void buildGraph(bSpecificAtom *root);
 
 };
 

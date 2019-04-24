@@ -648,7 +648,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
                 }
             }
 
-            P_X_F[1] = G_X_T * T_X_root[1]; // NEW
+            P_X_F[1] = G_X_T * T_X_root[1]; // TODO: doesn't work on multiple molecules
             // Iterate through atoms - get P_X_F for all the bodies
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
                 if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
@@ -720,7 +720,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
             // Set X_PF and Q
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
                 SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
-                if(int(mbx) == 1){ // This is dangerous TODO
+                if(int(mbx) == 1){ // TODO: doesn't work for multiple molecules
                     ((SimTK::MobilizedBody::Free&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
                 }else{
                     ((SimTK::MobilizedBody::Pin&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]); // NEW

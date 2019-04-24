@@ -122,7 +122,7 @@ public:
     void setCompoundAtomIndex(SimTK::Compound::AtomIndex);
     void setCharge(SimTK::Real);
     void setIsMobile(int);
-    void setIsVisited(int);
+    void setVisited(int);
 
     void addNeighbor(bSpecificAtom *);
     void addBond(bBond *);

@@ -275,7 +275,13 @@ void bSpecificAtom::setChargedAtomTypeIndex(SimTK::DuMM::ChargedAtomTypeIndex in
 }
 
 void bSpecificAtom::setIsMobile(int){assert(!"Not implemented");}
-void bSpecificAtom::setIsVisited(int){assert(!"Not implemented");}
+
+/** Set the number of times this atom was visited during the construction of
+ * the graph **/
+void bSpecificAtom::setVisited(int argVisited)
+{
+    this->visited = argVisited;
+}
 
 // Get the atom class index
 DuMM::AtomClassIndex bSpecificAtom::getAtomClassIndex(void)
