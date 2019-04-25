@@ -543,9 +543,13 @@ void World::updateAtomLists(const SimTK::State & state)
 some other World's atoms **/ 
 SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations)
 {
-    
+    // Get the total no of bodies in this world (each World has its own
+    // SimbodyMatterSubsystem)
+    int totalNofBodies = matter->getNumBodies();
+
+    // Declare arrays of Transforms that we need
     SimTK::Transform G_X_T;
-    SimTK::Transform T_X_root[matter->getNumBodies()]; // related to CompoundAtom.frameInMobilizedBodyFrame s
+    SimTK::Transform T_X_root[totalNofBodies]; // related to CompoundAtom.frameInMobilizedBodyFrame s
 
     // Iterate through molecules/topologies
     for(unsigned int i = 0; i < otherWorldsAtomsLocations.size(); i++){
@@ -553,6 +557,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
         // When in Debug mode
         //paraMolecularDecorator->setAtomTargets(otherWorldsAtomsLocations[i]);
 
+        // Get the Ground to Top Transform
         SimTK::Transform G_X_T = topologies[i]->getTopLevelTransform();
 
         // Fully flexible regimen. realizeTopology is not needed
@@ -579,7 +584,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
             // Get transforms and locations: P_X_M, root_X_atom.p()
             G_X_T = topologies[i]->getTopLevelTransform();
-            SimTK::Transform P_X_M[matter->getNumBodies()]; // related to X_PFs
+            SimTK::Transform P_X_M[totalNofBodies]; // related to X_PFs
         
             // Iterate through atoms - get P_X_M for all the bodies
             for (SimTK::Compound::AtomIndex aIx(0); aIx < topologies[i]->getNumAtoms(); ++aIx){

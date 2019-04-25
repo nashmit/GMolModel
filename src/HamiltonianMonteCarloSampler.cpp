@@ -359,12 +359,6 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     }
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
 
-    someState.updU() = SqrtMInvV;
-
-    // Store the proposed energies
-    system->realize(someState, SimTK::Stage::Velocity);
-    setProposedKE(matter->calcKineticEnergy(someState));
-    this->etot_proposed = getOldPE() + getProposedKE() + getOldFixman();
 
     // BEGIN Temperature boost
     // TODO: Implement this in a different function
@@ -372,14 +366,17 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     //    SimTK::Real temperatureBoost = 1.826; // sqrt(1000/300) : brings temperature from 300 to 2000
     //    //SimTK::Real temperatureBoost = 2.582; // sqrt(2000/300) : brings temperature from 300 to 2000
     //    //SimTK::Real temperatureBoost = 3.1623; // sqrt(3000/300) : brings temperature from 300 to 3000
-
     // Set velocities according to the boost
-    //SqrtMInvV *= (sqrtRT * temperatureBoost); // Set stddev according to temperature
+    SqrtMInvV *= (sqrtRT); // Set stddev according to temperature
+    // END temperature boost
 
     // Raise the temperature
-    //someState.updU() = SqrtMInvV;
-    //system->realize(someState, SimTK::Stage::Velocity);
-    // END temperature boost
+    someState.updU() = SqrtMInvV;
+    system->realize(someState, SimTK::Stage::Velocity);
+
+    // Store the proposed energies
+    setProposedKE(matter->calcKineticEnergy(someState));
+    this->etot_proposed = getOldPE() + getProposedKE() + getOldFixman();
 
 
     ////////////// Verify equipartition theorem using SOAa////////////
@@ -622,12 +619,12 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     etot_n;
 
 
-//    std::cout<<std::setprecision(5)<<std::fixed; //p
-//    std::cout << "pe_o " << pe_o << " pe_n " << pe_n << " ke_prop " << ke_proposed << " ke_n " << ke_n
-//        << " fix_o " << fix_o << " fix_n " << fix_n << " " 
-//        << " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
-//        << " etot_n " << etot_n  << " etot_proposed " << etot_proposed
-//        << std::endl;
+    std::cout<<std::setprecision(5)<<std::fixed; //p
+    std::cout << "pe_o " << pe_o << " pe_n " << pe_n << " ke_prop " << ke_proposed << " ke_n " << ke_n
+        << " fix_o " << fix_o << " fix_n " << fix_n << " "
+        << " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
+        << " etot_n " << etot_n  << " etot_proposed " << etot_proposed
+        << std::endl;
 
 //     std::cout << std::setprecision(10) << std::fixed << fix_n << ' ';
 
