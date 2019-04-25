@@ -619,12 +619,12 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     etot_n;
 
 
-    std::cout<<std::setprecision(5)<<std::fixed; //p
-    std::cout << "pe_o " << pe_o << " pe_n " << pe_n << " ke_prop " << ke_proposed << " ke_n " << ke_n
-        << " fix_o " << fix_o << " fix_n " << fix_n << " "
-        << " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
-        << " etot_n " << etot_n  << " etot_proposed " << etot_proposed
-        << std::endl;
+//    std::cout<<std::setprecision(5)<<std::fixed; //p
+//    std::cout << "pe_o " << pe_o << " pe_n " << pe_n << " ke_prop " << ke_proposed << " ke_n " << ke_n
+//        << " fix_o " << fix_o << " fix_n " << fix_n << " "
+//        << " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
+//        << " etot_n " << etot_n  << " etot_proposed " << etot_proposed
+//        << std::endl;
 
 //     std::cout << std::setprecision(10) << std::fixed << fix_n << ' ';
 
