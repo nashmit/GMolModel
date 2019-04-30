@@ -1,0 +1,1055 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="gmolmodel"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\src\;CMake Files\cmake_modules\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\..\;CMake Files\..\..\..\..\..\usr\;CMake Files\..\..\..\..\..\usr\local\;CMake Files\..\..\..\..\..\usr\local\lib\;CMake Files\..\..\..\..\..\usr\local\lib\cmake\;CMake Files\..\..\..\..\..\usr\local\lib\cmake\simbody\;CMake Files\..\..\..\..\..\usr\lib\;CMake Files\..\..\..\..\..\usr\lib\cmake\;CMake Files\..\..\..\..\..\usr\lib\cmake\eigen3\;CMake Files\tests\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="GMOLMODEL_test">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/GMOLMODEL_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 GMOLMODEL_test"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="GMOLMODEL_test/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/GMOLMODEL_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 GMOLMODEL_test/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="GMOLMODEL_dynamic">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/lib/libGMOLMODEL_dynamic.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 GMOLMODEL_dynamic"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="GMOLMODEL_dynamic/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/lib/libGMOLMODEL_dynamic.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 GMOLMODEL_dynamic/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="GMOLMODEL_static">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/lib/libGMOLMODEL_static.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 GMOLMODEL_static"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="GMOLMODEL_static/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/lib/libGMOLMODEL_static.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 GMOLMODEL_static/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Robosample">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Robosample" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 Robosample"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Robosample/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Robosample" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 Robosample/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestHMCSOA">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestHMCSOA" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestHMCSOA"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestHMCSOA/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestHMCSOA" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestHMCSOA/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestWriteDCD">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestWriteDCD" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestWriteDCD"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestWriteDCD/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestWriteDCD" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestWriteDCD/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestMolmodelBasic">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestMolmodelBasic" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestMolmodelBasic"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestMolmodelBasic/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestMolmodelBasic" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestMolmodelBasic/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestSimbodyBasic">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestSimbodyBasic" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestSimbodyBasic"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestSimbodyBasic/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestSimbodyBasic" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestSimbodyBasic/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestMolmodelBuildCompound">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestMolmodelBuildCompound" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestMolmodelBuildCompound"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestMolmodelBuildCompound/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestMolmodelBuildCompound" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestMolmodelBuildCompound/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestAmberInput">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestAmberInput" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestAmberInput"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestAmberInput/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestAmberInput" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestAmberInput/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestPDBReaderMolModel">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestPDBReaderMolModel" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestPDBReaderMolModel"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestPDBReaderMolModel/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestPDBReaderMolModel" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestPDBReaderMolModel/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestParallelExecutor">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestParallelExecutor" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestParallelExecutor"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestParallelExecutor/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestParallelExecutor" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestParallelExecutor/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestMassSqrtAndDet">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestMassSqrtAndDet" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestMassSqrtAndDet"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestMassSqrtAndDet/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestMassSqrtAndDet" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestMassSqrtAndDet/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestOpenMMBasic">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestOpenMMBasic" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestOpenMMBasic"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TestOpenMMBasic/fast">
+				<Option output="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/TestOpenMMBasic" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/openmm/include"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/src/../molmodel_legacy/simbody/SimTKmath/Integrators/src"/>
+					<Add directory="/usr/local/include/simbody/.."/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/pcuser/git2/gchmc/gmolmodel/tests/../include/gmolmodel"/>
+					<Add directory="/usr/local/include/simbody"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 TestOpenMMBasic/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/pcuser/git2/gchmc/gmolmodel/cmake-build-debug/tests/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/ConformationalSearch.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/Context.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/FixmanTorque.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/GirolamiSampler.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/HMCSOA.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/HamiltonianMonteCarloSampler.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/IState.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/MonteCarloSampler.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/MyState.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/ParaMolecularDecorator.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/Sampler.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/SetupReader.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/Topology.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/TrivalentAtomTetra.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/World.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/bBond.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/bSpecificAtom.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/bgeneral.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/format/PDBObject.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/format/TrajectoryObject.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/format/dcdplugin.c">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/readAmberInput.cpp">
+			<Option target="GMOLMODEL_test"/>
+			<Option target="GMOLMODEL_dynamic"/>
+			<Option target="GMOLMODEL_static"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/testMain.cpp">
+			<Option target="GMOLMODEL_test"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/Robosample.cpp">
+			<Option target="Robosample"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/TestAmberInput.cpp">
+			<Option target="TestAmberInput"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/TestHMCSOA.cpp">
+			<Option target="TestHMCSOA"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/TestMassSqrtAndDet.cpp">
+			<Option target="TestMassSqrtAndDet"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/TestMolmodelBasic.cpp">
+			<Option target="TestMolmodelBasic"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/TestMolmodelBuildCompound.cpp">
+			<Option target="TestMolmodelBuildCompound"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/TestOpenMMBasic.cpp">
+			<Option target="TestOpenMMBasic"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/TestPDBReaderMolModel.cpp">
+			<Option target="TestPDBReaderMolModel"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/TestParallelExecutor.cpp">
+			<Option target="TestParallelExecutor"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/TestSimbodyBasic.cpp">
+			<Option target="TestSimbodyBasic"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/TestWriteDCD.cpp">
+			<Option target="TestWriteDCD"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/cmake_modules/FindOpenMM.cmake">
+			<Option virtualFolder="CMake Files\cmake_modules\"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/../../../../../usr/local/lib/cmake/simbody/SimbodyConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\lib\cmake\simbody\"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/../../../../../usr/local/lib/cmake/simbody/SimbodyConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\lib\cmake\simbody\"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/../../../../../usr/local/lib/cmake/simbody/SimbodyTargets-debug.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\lib\cmake\simbody\"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/../../../../../usr/local/lib/cmake/simbody/SimbodyTargets.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\lib\cmake\simbody\"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/../../../../../usr/lib/cmake/eigen3/Eigen3Config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\lib\cmake\eigen3\"/>
+		</Unit>
+		<Unit filename="/home/pcuser/git2/gchmc/gmolmodel/tests/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\tests\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
