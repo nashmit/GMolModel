@@ -349,6 +349,10 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     setOldPE(getSetPE());
     setOldFixman(getSetFixman());
 
+
+    std::cout << "reco " << getOldPE() << " " << dumm->CalcFullPotEnergyIncludingRigidBodies(someState) << std::endl;
+
+
     // Initialize velocities according to the Maxwell-Boltzmann distribution
     int nu = someState.getNU();
     double sqrtRT = std::sqrt(RT);
@@ -373,12 +377,6 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     // Raise the temperature
     someState.updU() = SqrtMInvV;
     system->realize(someState, SimTK::Stage::Velocity);
-
-    printf("us ");
-    for(unsigned int i = 0; i < nu; i++) {
-        printf("%.0f ", someState.getU()[i]);
-    }
-    printf("\n");
 
     // Store the proposed energies
     setProposedKE(matter->calcKineticEnergy(someState));

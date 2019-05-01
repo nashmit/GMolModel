@@ -605,6 +605,9 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 (updWorld(currentWorldIx))->updSampler(0)->setOldPE(
                     (updWorld(worldIndexes.back()))
                     ->updSampler(0)->getSetPE() );
+
+                std::cout << "Run pe " << updWorld(worldIndexes.back())->updSampler(0)->getSetPE() << " ";
+
 // TIME STOP
 //std::chrono::steady_clock::time_point end1_1 = std::chrono::steady_clock::now();
 //std::cout << "Context::Run end1_1 - start0 "
