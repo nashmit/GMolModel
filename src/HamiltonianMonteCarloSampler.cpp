@@ -374,6 +374,12 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     someState.updU() = SqrtMInvV;
     system->realize(someState, SimTK::Stage::Velocity);
 
+    printf("us ");
+    for(unsigned int i = 0; i < nu; i++) {
+        printf("%.0f ", someState.getU()[i]);
+    }
+    printf("\n");
+
     // Store the proposed energies
     setProposedKE(matter->calcKineticEnergy(someState));
     this->etot_proposed = getOldPE() + getProposedKE() + getOldFixman();
@@ -522,8 +528,12 @@ for(int k = 0; k < nosteps; k++){
 // DEBUG END */
 
     // Integrate (propagate trajectory)
+    std::cout << "time " << someState.getTime() << " + "
+        << timestep << " * " << nosteps << " ";
+
     this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
 
+    std::cout << someState.getTime() << std::endl;
 /*    // Configuration
     std::cout << "HMC conf: ";
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
@@ -603,7 +613,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
     //std::cout << "Multibody PE " << getPEFromEvaluator(someState) << ' ' ; // OPENMM
     pe_n = dumm->CalcFullPotEnergyIncludingRigidBodies(someState); // ELIZA FULL
 
-    system->realize(someState, SimTK::Stage::Velocity);
+    system->realize(someState, SimTK::Stage::Velocity); // TODO: before computing pe_n
     ke_n = matter->calcKineticEnergy(someState);
 
     SimTK::Real etot_proposed, etot_n;
@@ -620,7 +630,7 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
 
 
     std::cout<<std::setprecision(5)<<std::fixed; //p
-    std::cout << "pe_o " << pe_o << " pe_n " << pe_n << " ke_prop " << ke_proposed << " ke_n " << ke_n
+    std::cout << "pe_o " << pe_o << " pe_n " << pe_n << " pe_nB " << getPEFromEvaluator(someState) << " ke_prop " << ke_proposed << " ke_n " << ke_n
         << " fix_o " << fix_o << " fix_n " << fix_n << " "
         << " rand_no " << rand_no << " RT " << RT << " exp(-(etot_n - etot_proposed) " << exp(-(etot_n - etot_proposed) / RT)
         << " etot_n " << etot_n  << " etot_proposed " << etot_proposed
