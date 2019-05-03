@@ -674,6 +674,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
                         inboardBondLengths[int(mbx)] = topologies[i]->bgetDefaultInboardBondLength(aIx);
                         root_X_M0[int(mbx)] = SimTK::Transform(
                             SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis)
+                            // , SimTK::Vec3(0, 0, 0) // Constructor takes care of this
                         );
 
                         // Get Proot_X_M0
@@ -746,6 +747,8 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
 
 /* BEGIN CHECK
             // Check reconstruction
+
+            //forceField->CalcFullPotEnergyIncludingRigidBodies(someState);
             this->compoundSystem->realize(someState, SimTK::Stage::Position);
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
                 if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is at body's origin
@@ -758,7 +761,7 @@ SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vec
                     << std::endl;
                 }
             }
- END CHECK */ 
+//  */
 
             // TRACE ----------------------------------------------------------
 /*            

@@ -606,7 +606,26 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                     (updWorld(worldIndexes.back()))
                     ->updSampler(0)->getSetPE() );
 
-                std::cout << "Run pe " << updWorld(worldIndexes.back())->updSampler(0)->getSetPE() << " ";
+                double backE = updWorld(worldIndexes.back())->updSampler(0)->getSetPE();
+                double currE = updWorld(currentWorldIx)->forceField->CalcFullPotEnergyIncludingRigidBodies(currentAdvancedState);
+                if((backE - currE) > 0.001) {
+                    std::cout << "RunPe back curr currCalc "
+                              << backE << " "
+                              << (updWorld(currentWorldIx))->updSampler(0)->getOldPE() << " "
+                              << currE
+                              << std::endl;
+                    std::cout << "Writing pdbs for round " << round << std::endl;
+                    (updWorld(worldIndexes.back()))->updateAtomLists(lastAdvancedState);
+                    ((updWorld(worldIndexes.back()))->getTopology(0)).writePdb(
+                            getOutputDir(), std::string("/pdbs/sb.")
+                                            + std::to_string(worldIx) + std::string("."), ".0.pdb", 10, round);
+
+                    (updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
+                    ((updWorld(currentWorldIx))->getTopology(0)).writePdb(
+                            getOutputDir(), std::string("/pdbs/sb.")
+                                            + std::to_string(worldIx) + std::string("."), ".1.pdb", 10, round);
+                    exit(1);
+                }
 
 // TIME STOP
 //std::chrono::steady_clock::time_point end1_1 = std::chrono::steady_clock::now();

@@ -350,7 +350,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     setOldFixman(getSetFixman());
 
 
-    std::cout << "reco " << getOldPE() << " " << dumm->CalcFullPotEnergyIncludingRigidBodies(someState) << std::endl;
+    //std::cout << "reco " << getOldPE() << " " << dumm->CalcFullPotEnergyIncludingRigidBodies(someState) << std::endl;
 
 
     // Initialize velocities according to the Maxwell-Boltzmann distribution
