@@ -608,7 +608,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
 
                 double backE = updWorld(worldIndexes.back())->updSampler(0)->getSetPE();
                 double currE = updWorld(currentWorldIx)->forceField->CalcFullPotEnergyIncludingRigidBodies(currentAdvancedState);
-                if((backE - currE) > 0.001) {
+                if((backE - currE) > 100.0) {
                     std::cout << "RunPe back curr currCalc "
                               << backE << " "
                               << (updWorld(currentWorldIx))->updSampler(0)->getOldPE() << " "
