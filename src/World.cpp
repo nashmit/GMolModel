@@ -541,7 +541,11 @@ void World::updateAtomLists(const SimTK::State & state)
 
 /** Set Compound, MultibodySystem and DuMM configurations according to
 some other World's atoms **/ 
-SimTK::State& World::setAtomsLocationsInGround(SimTK::State& someState, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations)
+SimTK::State& World::setAtomsLocationsInGround(
+        SimTK::State& someState,
+        std::vector<
+                std::vector<
+                        std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations)
 {
     // Get the total no of bodies in this world (each World has its own
     // SimbodyMatterSubsystem)

@@ -608,12 +608,12 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
 
                 double backE = updWorld(worldIndexes.back())->updSampler(0)->getSetPE();
                 double currE = updWorld(currentWorldIx)->forceField->CalcFullPotEnergyIncludingRigidBodies(currentAdvancedState);
-                if((backE - currE) > 100.0) {
-                    std::cout << "RunPe back curr currCalc "
-                              << backE << " "
-                              << (updWorld(currentWorldIx))->updSampler(0)->getOldPE() << " "
-                              << currE
-                              << std::endl;
+                std::cout << "RunPe back curr currCalc "
+                          << backE << " "
+                          << (updWorld(currentWorldIx))->updSampler(0)->getOldPE() << " "
+                          << currE
+                          << std::endl;
+                if((backE - currE) > 10.0) {
                     std::cout << "Writing pdbs for round " << round << std::endl;
                     (updWorld(worldIndexes.back()))->updateAtomLists(lastAdvancedState);
                     ((updWorld(worldIndexes.back()))->getTopology(0)).writePdb(
