@@ -580,21 +580,8 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 currentAdvancedState = (updWorld(currentWorldIx))->setAtomsLocationsInGround(
                    currentAdvancedState, (updWorld(worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
 
-                // Check if Compound coordinates are correct
-                /*
-                std::cout << "Writing pdbs for round " << round << std::endl; 
-                (updWorld(worldIndexes.back()))->updateAtomLists(lastAdvancedState);
-                ((updWorld(worldIndexes.back()))->getTopology(0)).writePdb(
-                    getOutputDir(), std::string("/pdbs/sb.") 
-                    + std::to_string(worldIx) + std::string("."), ".0.pdb", 10, round);
 
-                (updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
-                ((updWorld(currentWorldIx))->getTopology(0)).writePdb(
-                    getOutputDir(), std::string("/pdbs/sb.") 
-                    + std::to_string(worldIx) + std::string("."), ".1.pdb", 10, round);
-                */
-
-// TIME STOP
+  // TIME STOP
 //std::chrono::steady_clock::time_point end1_0 = std::chrono::steady_clock::now();
 //std::cout << "Context::Run end1_0 - start0 "
 //              << std::chrono::duration_cast<std::chrono::microseconds>(end1_0 - start0).count()
@@ -606,15 +593,16 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                     (updWorld(worldIndexes.back()))
                     ->updSampler(0)->getSetPE() );
 
-                double backE = updWorld(worldIndexes.back())->updSampler(0)->getSetPE();
-                double currE = updWorld(currentWorldIx)->forceField->CalcFullPotEnergyIncludingRigidBodies(currentAdvancedState);
-                std::cout << "RunPe back curr currCalc "
-                          << backE << " "
-                          << (updWorld(currentWorldIx))->updSampler(0)->getOldPE() << " "
-                          << currE
+                double backSetE = updWorld(worldIndexes.back())->updSampler(0)->getSetPE();
+                double backCalcE = updWorld(worldIndexes.back())->forceField->CalcFullPotEnergyIncludingRigidBodies(lastAdvancedState);
+                double currOldE = updWorld(currentWorldIx)->updSampler(0)->getOldPE();
+                double currCalcE = updWorld(currentWorldIx)->forceField->CalcFullPotEnergyIncludingRigidBodies(currentAdvancedState);
+                std::cout << "RunPe backSet backCalc currCalc currOld "
+                          << backSetE << " " << backCalcE << " "
+                          << currCalcE << " " << currOldE
                           << std::endl;
-                if((backE - currE) > 10.0) {
-                    std::cout << "Writing pdbs for round " << round << std::endl;
+                if(std::abs(backCalcE - currCalcE) > 10.0) {
+                    std::cout << "Writing Compound pdbs for round " << round << std::endl;
                     (updWorld(worldIndexes.back()))->updateAtomLists(lastAdvancedState);
                     ((updWorld(worldIndexes.back()))->getTopology(0)).writePdb(
                             getOutputDir(), std::string("/pdbs/sb.")
@@ -624,6 +612,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                     ((updWorld(currentWorldIx))->getTopology(0)).writePdb(
                             getOutputDir(), std::string("/pdbs/sb.")
                                             + std::to_string(worldIx) + std::string("."), ".1.pdb", 10, round);
+
                     exit(1);
                 }
 

@@ -523,7 +523,9 @@ std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > World::get
     return returnVector;
 }
 
-/** Put coordinates into bAtomLists of Topologies. **/
+/** Put coordinates into bAtomLists of Topologies.
+ * When provided with a State, calcAtomLocationInGroundFrame
+ * realizes Position and uses matter to calculate locations **/
 void World::updateAtomLists(const SimTK::State & state)
 {
     // Iterate through topologies

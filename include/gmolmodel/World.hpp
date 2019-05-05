@@ -95,7 +95,8 @@ public:
     SimTK::State& setAtomsLocationsInGround(SimTK::State&, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations);
   
     /** Update Gmolmodel bSpecificAtom Cartesian coordinates according to
-    Molmodel Compound **/
+    Molmodel Compound which in turn relizes Position and uses matter
+     to calculate locations. **/
     void updateAtomLists(const SimTK::State&);
 
     /** To be called before use of getXs, getYs or getZs **/
