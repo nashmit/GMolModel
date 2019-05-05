@@ -601,7 +601,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                           << backSetE << " " << backCalcE << " "
                           << currCalcE << " " << currOldE
                           << std::endl;
-                if(std::abs(backCalcE - currCalcE) > 10.0) {
+                if(std::abs(backCalcE - currCalcE) > 100.0) {
                     std::cout << "Writing Compound pdbs for round " << round << std::endl;
                     (updWorld(worldIndexes.back()))->updateAtomLists(lastAdvancedState);
                     ((updWorld(worldIndexes.back()))->getTopology(0)).writePdb(
