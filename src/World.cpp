@@ -693,7 +693,7 @@ SimTK::State& World::setAtomsLocationsInGround(
                 }
             }
         
-///*            // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone NEW WAY
+///*        // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone NEW WAY
             for (SimTK::Compound::AtomIndex aIx(1); aIx < topologies[i]->getNumAtoms(); ++aIx){
                 SimTK::MobilizedBodyIndex mbx = topologies[i]->getAtomMobilizedBodyIndex(aIx);
                 if(topologies[i]->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is not at body's origin
