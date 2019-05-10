@@ -581,6 +581,15 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                    currentAdvancedState, (updWorld(worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
 
 
+                double backSetE = updWorld(worldIndexes.back())->updSampler(0)->getSetPE();
+                double backCalcE = updWorld(worldIndexes.back())->forceField->CalcFullPotEnergyIncludingRigidBodies(lastAdvancedState);
+                double currOldE = updWorld(currentWorldIx)->updSampler(0)->getOldPE();
+                double currCalcE = updWorld(currentWorldIx)->forceField->CalcFullPotEnergyIncludingRigidBodies(currentAdvancedState);
+
+                // Check if reconstructions is done correctly
+                assert(std::abs(backCalcE - currCalcE) < 0.00001);
+                //assert((backCalcE - currCalcE) > SimTK::SignificantReal);
+
   // TIME STOP
 //std::chrono::steady_clock::time_point end1_0 = std::chrono::steady_clock::now();
 //std::cout << "Context::Run end1_0 - start0 "
@@ -593,10 +602,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                     (updWorld(worldIndexes.back()))
                     ->updSampler(0)->getSetPE() );
 
-                double backSetE = updWorld(worldIndexes.back())->updSampler(0)->getSetPE();
-                double backCalcE = updWorld(worldIndexes.back())->forceField->CalcFullPotEnergyIncludingRigidBodies(lastAdvancedState);
-                double currOldE = updWorld(currentWorldIx)->updSampler(0)->getOldPE();
-                double currCalcE = updWorld(currentWorldIx)->forceField->CalcFullPotEnergyIncludingRigidBodies(currentAdvancedState);
+
                 std::cout << "RunPe backSet backCalc currCalc currOld "
                           << backSetE << " " << backCalcE << " "
                           << currCalcE << " " << currOldE

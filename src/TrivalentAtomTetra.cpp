@@ -28,8 +28,8 @@ TrivalentAtomTetra::TrivalentAtomTetra(
     addFirstBondCenter( "bond1", atomName );
   
     // bond centers 2 and 3 dihedrals relative to bond center 1
-    //addSecondBondCenter( "bond2", atomName,  TetrahedralAngle);
-    addLeftHandedBondCenter( "bond2", atomName, TetrahedralAngle, TetrahedralAngle );
+    addSecondBondCenter( "bond2", atomName,  TetrahedralAngle);
+    //addLeftHandedBondCenter( "bond2", atomName, TetrahedralAngle, TetrahedralAngle );
     addRightHandedBondCenter( "bond3", atomName, TetrahedralAngle, TetrahedralAngle );
   
     // Choice of inboard bond may differ from bond priority - user may change this
