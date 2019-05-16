@@ -71,7 +71,7 @@ public:
     ~bSpecificAtom();
     void Print(void);
     void Zero(void);
-  
+
     // Interface
     int getNBonds(void);
     int getFreebonds(void);

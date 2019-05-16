@@ -7,32 +7,10 @@
  * This is part of Robosampling                                               *
  */
 
-//RE #include "bMoleculeReader.hpp"
 #include "TrivalentAtomTetra.hpp"
 #include "bSpecificAtom.hpp"
 #include "bBond.hpp"
 #include "server.hpp"
-
-/*
-#ifndef MAIN_RESIDUE_DEBUG_SPECIFIC
-#define MAIN_RESIDUE_DEBUG_SPECIFIC 1
-#endif
-#ifndef MAIN_RESIDUE_DEBUG_LEVEL01
-#define MAIN_RESIDUE_DEBUG_LEVEL01
-#endif
-
-#ifndef MAIN_RESIDUE_DEBUG_LEVEL02
-#define MAIN_RESIDUE_DEBUG_LEVEL02
-#endif
-
-#ifndef DEBUG_PARAMS_LEVEL01
-#define DEBUG_PARAMS_LEVEL01
-#endif
-
-#ifndef DEBUG_PARAMS_LEVEL02
-#define DEBUG_PARAMS_LEVEL02
-#endif
-*/
 
 /** Topological information (bonds graph) for one molecule.
 It maps to one compound in Molmodel thus it is derived 
@@ -55,33 +33,51 @@ public:
 
     /** Constructor that sets the name of the molecule. The name has no 
     particular function and is not guaranteed to be unique. **/
-    Topology(std::string nameOfThisMolecule);
+    explicit Topology(std::string nameOfThisMolecule);
 
     /** Default Destructor. **/
     virtual ~Topology();
 
+    /** Set atoms properties from a reader: number, name, element, initial
+     * name, force field type, charge, coordinates, mass, LJ parameters **/
+    void SetAtomPropertiesFromReader(readAmberInput *amberReader);
+
+    /** Set bonds properties from reader: bond indeces, atom neighbours **/
+    void SetBondingPropertiesFromReader(readAmberInput *amberReader);
+
+    /** Set atoms Molmodel types (Compound::SingleAtom derived) based on
+     * their valence **/
+     void SetAtomsMolmodelTypes();
+
     /** Reads data from a specific reader (readAmberInput for now) object **/
     void loadAtomAndBondInfoFromReader(readAmberInput *amberReader);
 
+    /** Print atom list **/
+    void PrintAtomList();
+
+    /** Print Molmodel specific types as introduced in Gmolmodel **/
+    void PrintMolmodelAndDuMMTypes();
+
     /** Adds force field parameters read by the inputReader to DuMM **/
     void bAddAllParams(
-        std::string resName
-        , readAmberInput *amberReader
+        readAmberInput *amberReader
         , SimTK::DuMMForceFieldSubsystem& dumm
     );
 
     // Interface:
     /** Get the name of this molecule **/
-    std::string getname(void){return this->name;}
+    std::string getName(){return this->name;}
 
     /** Set the name of this molecule **/
-    void setName(std::string nameOfThisMolecule){this->name = nameOfThisMolecule;}
+    void setName(std::string nameOfThisMolecule){
+        this->name = nameOfThisMolecule;
+    }
 
     /** Get the number of atoms. **/
-    int getNAtoms(void) const;
+    int getNAtoms() const;
 
     /** Get the number of bonds. **/
-    int getNBonds(void) const;
+    int getNBonds() const;
 
     /** Get a pointer to an atom object in the atom list inquiring
     by number **/
@@ -105,21 +101,29 @@ public:
     int getBondOrder(int, int) const;
 
     // Interface to access the maps
-    std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > getMbx2aIx(void){
+    /** Get MobilizedBody to AtomIndex map **/
+    std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex >
+    getMbx2aIx(){
         return mbx2aIx;
     }
 
-    std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > getAIx2mbx(void){
+    /** Get AtomIndex to MobilizedBodyIndex map **/
+    std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex >
+    getAIx2mbx(){
         return aIx2mbx;
     }
 
-    // Get the number of MobilizedBodies in this Compound
-    unsigned int getNofMobilizedBodies(void){
+    /** Get the number of MobilizedBodies in this Compound **/
+    unsigned int getNofMobilizedBodies(){
         return mbx2aIx.size();
     }
 
 
-    void writePdb(std::string dirname, std::string prefix, std::string sufix, int maxNofDigits, int index) const;
+    void writePdb(std::string dirname,
+            std::string prefix,
+            std::string sufix,
+            int maxNofDigits,
+            int index) const;
 
     /** Builds the Compound's tree, closes the rings, matches the configuration
     on the graph using using Molmodels matchDefaultConfiguration and sets the
@@ -131,49 +135,47 @@ public:
     );
 
     void setRegimen(std::string argRegimen, std::string flexFN);
-    std::string getRegimen(void);
+    std::string getRegimen();
 
-    void PrintStaticVars(void){
+    /** To be removed **/
+    void PrintStaticVars(){
         std::cout << "Topology static vars:" 
             << " regimen " << regimen << " name " << name
-            << " nofProcesses " << nofProcesses << " baseSetFlag " << baseSetFlag << " baseAtomNumber " << baseAtomNumber
+            << " nofProcesses " << nofProcesses << " baseSetFlag "
+            << baseSetFlag << " baseAtomNumber " << baseAtomNumber
             << std::endl;
     };
 
-    void loadMaps(void);
-    void printMaps(void);
+    void loadMaps();
+    void printMaps();
 
     // Not sure they belong here
-    //// Scale all DuMM force field terms by scale_factor
+    /** Scale all DuMM force field terms by scale_factor **/
     void setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor);
     
-    // Scale specific DuMM force field terms by scale_factor
+    /** Scale specific DuMM force field terms by scale_factor **/
     void setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm);
    
     // Not sure we need them 
-    // Set graph
+    /** Set graph **/
     void insertAtom(bSpecificAtom *atom);
     void insertBond(int atom_no1, int atom_no2, int bondOrder);
 
-    // Get coordinates
-    void getCoordinates(std::vector<SimTK::Real> Xs, std::vector<SimTK::Real> Ys, std::vector<SimTK::Real> Zs);
-
-
+    /** Get coordinates **/
+    void getCoordinates(
+            std::vector<SimTK::Real> Xs,
+            std::vector<SimTK::Real> Ys,
+            std::vector<SimTK::Real> Zs);
 
 public:
 
-    bool hasBuiltSystem;
-
     int natoms;
-    //RE bSpecificAtom *bAtomList;
-    std::vector<bSpecificAtom > bAtomList; // RE
+    std::vector<bSpecificAtom > bAtomList;
 
     int nbonds;
-    //bBond *bonds; 
-    std::vector<bBond > bonds; // RE
+    std::vector<bBond > bonds;
 
     std::string regimenSpec;
-    unsigned int MAX_LINE_LENGTH;
 
 private:
 
@@ -185,9 +187,11 @@ private:
 
     // Map mbx2aIx contains only atoms at the origin of mobods
     std::map< SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > mbx2aIx;
+
     // Map aIx is redundant in MobilizedBodyIndeces
     std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > aIx2mbx;
-    //std::map< SimTK::Compound::AtomIndex, int > aIx2number;
+
+    //
     std::map< SimTK::Compound::BondIndex, int > bondIx2bond;
 
     /** Biotype is a Molmodel hook that is usually used to look up molecular

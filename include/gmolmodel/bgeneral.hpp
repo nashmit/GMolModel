@@ -239,6 +239,10 @@ void PrintTransform(SimTK::Transform T, int decimal_places);
  */
 SimTK::Real bDihedral(SimTK::Vec3& pos0, SimTK::Vec3& pos1, SimTK::Vec3& pos2, SimTK::Vec3& pos3);
 
+/**  Get a unique name based on number **/
+std::string GetUniqueName(int key);
+
+
 /*
  * Thermodynamics
  */

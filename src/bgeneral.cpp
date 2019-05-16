@@ -739,4 +739,38 @@ SimTK::Real bDihedral(SimTK::Vec3& pos0, SimTK::Vec3& pos1, SimTK::Vec3& pos2, S
   return atan2(psin, pcos);
 }
 
+/**  Get a unique name based on number **/
+// Assign a unique name specific to Gmolmodel. There are 60 available
+// ASCII readble characters: 0-9, A-Z and a-z. This gives a 12.960.000
+// of possible 4 character combinations in a number of the form
+// a*60^3 + b*60^2 + c*60^1 + d. However the readble characters do not
+// form a continuous interval in the ASCII table so they have to be
+// spread.
+std::string GetUniqueName(int nameCounter) {
+
+    std::string string_name;
+    std::string aStr, bStr, cStr, dStr;
+    int a=65, b=65, c=65, d=65;
+    int aRest=0, bRest=0, cRest=0;
+
+    a = int(nameCounter / std::pow(25, 3));
+    aStr = (char)(a + 65);
+    aRest = nameCounter % int(std::pow(25, 3));
+
+    b = int(aRest / std::pow(25, 2));
+    bStr = (char)(b + 65);
+    bRest = aRest % int(std::pow(25, 2));
+
+    c = int(bRest / std::pow(25, 1));
+    cStr = (char)(c + 65);
+    cRest = bRest % int(std::pow(25, 1));
+
+    d = int(cRest / std::pow(25, 0));
+    dStr = (char)(d + 65);
+
+    string_name = aStr + bStr + cStr + dStr;
+
+    return string_name;
+}
+
 

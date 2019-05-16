@@ -192,7 +192,8 @@ void World::AddMolecule(
     // + std::to_string(moleculeCount) //RERE
     //   , amberReader, *forceField); //RERE
     std::string resName = regimenSpec + std::to_string(moleculeCount); // NEW
-    (topologies.back())->bAddAllParams(resName, amberReader, *forceField); // NEW
+    //(topologies.back())->bAddAllParams(resName, amberReader, *forceField); // NEW
+    (topologies.back())->bAddAllParams(amberReader, *forceField); // NEW
 
     // Build the graph representing molecule's topology
     (topologies.back())->build(*forceField, flexFN, regimenSpec);
