@@ -236,10 +236,7 @@ private:
 
     /** Graph building functions
     // Process a graph node **/
-    void process_node(bSpecificAtom *node, bSpecificAtom *previousNode);
-
-    // Construct the molecule topology
-    void buildGraph(bSpecificAtom *root);
+    void buildAcyclicGraph(bSpecificAtom *node, bSpecificAtom *previousNode);
 
 };
 
