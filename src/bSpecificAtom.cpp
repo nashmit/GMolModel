@@ -12,7 +12,7 @@ bSpecificAtom::bSpecificAtom(){
     bZeroCharArray(name, 5);
     bZeroCharArray(inName, 5);
     bZeroCharArray(fftype, 20);
-    bZeroCharArray(biotype, 20);
+    //bZeroCharArray(biotype, 20);
     x = -999;
     y = -999;
     z = -999;
@@ -34,7 +34,7 @@ void bSpecificAtom::Zero(void){
     bZeroCharArray(name, 5);
     bZeroCharArray(inName, 5);
     bZeroCharArray(fftype, 20);
-    bZeroCharArray(biotype, 20);
+    //bZeroCharArray(biotype, 20);
     x = -999;
     y = -999;
     z = -999;
@@ -136,7 +136,7 @@ std::string bSpecificAtom::getFftype(void)
 }
 
 // Returns atom Molmodel biotype name
-const char * bSpecificAtom::getBiotype(void)
+std::string bSpecificAtom::getBiotype(void)
 {
     return this->biotype;
 }
@@ -234,19 +234,13 @@ void bSpecificAtom::setFftype(std::string inpFftype){
 // Set atom Biotype name - dangerous
 void bSpecificAtom::setBiotype(std::string inpBiotype)
 {
-    for(int i=0; i<20; i++){
-        this->biotype[i] = '\0';
-    }
-    std::strncpy(this->biotype, inpBiotype.c_str(), 20);
+    biotype = inpBiotype;
 }
 
 // Set atom Biotype name - dangerous
 void bSpecificAtom::setBiotype(const char * inpBiotype)
 {
-    for(int i=0; i<20; i++){
-        this->biotype[i] = '\0';
-    }
-    std::strncpy(this->biotype, inpBiotype, 20);
+    biotype = inpBiotype;
 }
 
 // Set 
@@ -262,17 +256,6 @@ void bSpecificAtom::setCharge(SimTK::Real inpCharge){
     this->charge = inpCharge;
 }
 
-// Get the DuMM ChargedAtomTypeIndex
-SimTK::DuMM::ChargedAtomTypeIndex bSpecificAtom::getChargedAtomTypeIndex(void)
-{
-    return this->chargedAtomTypeIndex;
-}
-
-// Set the DuMM ChargedAtomTypeIndex
-void bSpecificAtom::setChargedAtomTypeIndex(SimTK::DuMM::ChargedAtomTypeIndex inpChargedAtomTypeIndex)
-{
-    this->chargedAtomTypeIndex = inpChargedAtomTypeIndex;
-}
 
 void bSpecificAtom::setIsMobile(int){assert(!"Not implemented");}
 
@@ -353,6 +336,14 @@ void bSpecificAtom::addNeighbor(bSpecificAtom *someNeighbor)
 void bSpecificAtom::addBond(bBond *someBond)
 {
     bondsInvolved.push_back(someBond);
+}
+
+const DuMM::ChargedAtomTypeIndex bSpecificAtom::getChargedAtomTypeIndex() const {
+    return chargedAtomTypeIndex;
+}
+
+void bSpecificAtom::setChargedAtomTypeIndex(const SimTK::DuMM::ChargedAtomTypeIndex cAIx) {
+    bSpecificAtom::chargedAtomTypeIndex = cAIx;
 }
 
 /********************

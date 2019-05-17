@@ -16,8 +16,8 @@
 
 #include "Simbody.h"
 #include "Molmodel.h"
-#include "bMoleculeReader.hpp"
-#include "bAddParams.hpp"
+//#include "bMoleculeReader.hpp"
+//#include "bAddParams.hpp"
 #include "World.hpp"
 #include "Sampler.hpp"
 #include "Context.hpp"
@@ -28,7 +28,6 @@
 //#include "MMTK/trajectory.h"
 
 //#include <numpy/arrayobject.h>
-
 
 #endif // SIMMAIN_HPP
 

@@ -186,6 +186,7 @@ void World::AddMolecule(
 
     // Get information from amberReader and put it in bAtomList and bonds
     (topologies.back())->loadAtomAndBondInfoFromReader(amberReader);
+    //(topologies.back())->PrintMolmodelAndDuMMTypes();
 
     // Add parameters from amberReader
     //(topologies.back())->bAddAllParams(std::string("lig") // RERE
@@ -194,9 +195,11 @@ void World::AddMolecule(
     std::string resName = regimenSpec + std::to_string(moleculeCount); // NEW
     //(topologies.back())->bAddAllParams(resName, amberReader, *forceField); // NEW
     (topologies.back())->bAddAllParams(amberReader, *forceField); // NEW
+    //(topologies.back())->PrintMolmodelAndDuMMTypes();
 
     // Build the graph representing molecule's topology
     (topologies.back())->build(*forceField, flexFN, regimenSpec);
+    (topologies.back())->PrintMolmodelAndDuMMTypes();
 
     // Allocate the vector of coordinates (DCD)
     Xs.resize(Xs.size() + topologies.back()->getNAtoms());

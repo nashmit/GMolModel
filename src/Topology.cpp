@@ -300,13 +300,16 @@ void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
     SetAtomsMolmodelTypes();
 }
 
-/** Print atom list **/
+/** Print atom and bonds list with details**/
 void Topology::PrintAtomList()
 {
+    // Atoms
     std::cout<<"Topology::PrintAtomList\n";
     for(unsigned int i = 0; i < bAtomList.size(); i++){
         bAtomList[i].Print();
     }
+
+    // Bonds
     for(unsigned int i = 0; i < bAtomList.size(); i++){
         bonds[i].Print();
     }
@@ -338,17 +341,10 @@ void Topology::bAddBiotypes(
 
         bAtomList[i].setBiotypeIndex(biotypeIndex);
 
-        // Assign atom's forcefield type
-        bZeroCharArray(bAtomList[i].biotype, 20);
-
-        //TODO: Assign Biotype function
-        sprintf(bAtomList[i].biotype, "%s_%s", \
-          bAtomList[i].name, bAtomList[i].fftype);
-
-        std::cout << " bAddBiotypes: Defined Biotype: "
-            << resName << "|" << bAtomList[i].name << " "
-            << SimTK::Ordinality::Any << "|"
-            << " with BiotypeIndex " << bAtomList[i].getBiotypeIndex() << std::endl;
+        // Assign atom's biotype as a composed name: name + force field type
+        std:string temp(bAtomList[i].name);
+        temp += bAtomList[i].fftype;
+        bAtomList[i].setBiotype(temp);
     }
 }
 
@@ -414,20 +410,12 @@ void Topology::bAddAtomClasses(
           bAtomList[k].charge
         );
 
-        std::cout << "bAddAtomClasses: defineChargedAtomType atomTypeIx "<< chargedAtomTypeIndex
-                  << " atomTypeName " << chargedAtomTypeName.c_str() << " atomClassIx " << bAtomList[k].getAtomClassIndex()
-                  << " partialChargeInE " << bAtomList[k].charge << " chargedAtomTypeIndex " << bAtomList[k].getChargedAtomTypeIndex() << std::endl;
-  
         // Associate a ChargedAtomTypeIndex with a Biotype index
         dumm.setBiotypeChargedAtomType(
           bAtomList[k].getChargedAtomTypeIndex(),
           bAtomList[k].getBiotypeIndex()
         );
 
-        std::cout << "bAddAtomClasses: setBiotypeChargedAtomType bAtomList["<< k << "].getChargedAtomTypeIndex() "
-                    << bAtomList[k].getChargedAtomTypeIndex()
-                    << " bAtomList[" << k << "].biotype " << bAtomList[k].biotype
-                    << std::endl << std::flush;
     }
 
 }
@@ -435,12 +423,18 @@ void Topology::bAddAtomClasses(
 /** Print Molmodel specific types as introduced in Gmolmodel **/
 void Topology::PrintMolmodelAndDuMMTypes()
 {
-
+    std::cout << "Print Molmodel And DuMM Types:" << std::endl;
     for(int i = 0; i < bAtomList.size(); i++){
-        std::cout << " name " << bAtomList[i].name << " BiotypeIndex "
-                  << bAtomList[i].getBiotypeIndex() << std::endl;
+        std::cout << " list ix " << i
+            << " biotypename " << bAtomList[i].biotype
+            << " name " << bAtomList[i].name
+            << " BiotypeIndex " << bAtomList[i].getBiotypeIndex()
+            << " ChargedAtomTypeIndex "<< bAtomList[i].getChargedAtomTypeIndex()
+            << " AtomClassIx " << bAtomList[i].getAtomClassIndex()
+            << " partialChargeInE " << bAtomList[i].charge
+            << " chargedAtomTypeIndex " << bAtomList[i].getChargedAtomTypeIndex()
+            << std::endl;
     }
-
 }
 
 /** Calls DuMM defineBondStretch to define bonds parameters. **/
@@ -803,15 +797,14 @@ void Topology::build(
                 109*Deg2Rad,
                 BondMobility::Rigid // CHANGE
             );
-    
-            //this->setAtomBiotype(leftNode->name, (this->name), leftNode->biotype);
-            //this->setAtomBiotype(rightNode->name, (this->name), rightNode->biotype);
+
+
+            // Compound::setAtomBiotype(Compound::AtomPathName,
+            // biotypeResidueName, biotypeAtomName
+            // SimTK::Ordinality::Residue = SimTK::Ordinality::Any)
             this->setAtomBiotype(leftNode->name, (this->name), leftNode->getName());
             this->setAtomBiotype(rightNode->name, (this->name), rightNode->getName());
     
-            //leftNode->atomIndex = getBondAtomIndex(Compound::BondIndex(getNumBonds() - 1), 0) ; // Not necessary
-            //rightNode->atomIndex = getBondAtomIndex(Compound::BondIndex(getNumBonds() - 1), 1) ; // Not necessary
-
             --leftNode->freebonds;
             --rightNode->freebonds;
 

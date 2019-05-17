@@ -40,12 +40,14 @@ public:
     double charge;
     char fftype[20];
     SimTK::DuMM::AtomClassIndex atomClassIndex;
-    SimTK::DuMM::ChargedAtomTypeIndex chargedAtomTypeIndex;
+
+
 
     float x;
     float y;
     float z;
-    char biotype[20];
+    //char biotype[20];
+    std::string biotype; // NEW
     SimTK::BiotypeIndex biotypeIndex;
 
     // We need this to be a pointer because we don't know it's size at
@@ -87,7 +89,7 @@ public:
     std::string getFftype(void);
     SimTK::DuMM::AtomClassIndex getAtomClassIndex(void);
     void setAtomClassIndex(SimTK::DuMM::AtomClassIndex);
-    const char * getBiotype(void);
+    std::string getBiotype(void);
     SimTK::Compound::SingleAtom * getBAtomType(void);
     SimTK::Compound::AtomIndex getCompoundAtomIndex(void);
     SimTK::Real getCharge(void);
@@ -100,8 +102,9 @@ public:
     void setVdwRadius(SimTK::Real);
     SimTK::Real getLJWellDepth(void);
     void setLJWellDepth(SimTK::Real);
-    SimTK::DuMM::ChargedAtomTypeIndex getChargedAtomTypeIndex(void);
-    void setChargedAtomTypeIndex(SimTK::DuMM::ChargedAtomTypeIndex);
+
+    const SimTK::DuMM::ChargedAtomTypeIndex getChargedAtomTypeIndex() const;
+    void setChargedAtomTypeIndex(const SimTK::DuMM::ChargedAtomTypeIndex);
 
     SimTK::BiotypeIndex getBiotypeIndex(void);
     void setBiotypeIndex(SimTK::BiotypeIndex);
@@ -112,6 +115,8 @@ public:
     void setInName(std::string);
     void setNumber(int);
     void setElem(char);
+
+
     void setX(SimTK::Real);
     void setY(SimTK::Real);
     void setZ(SimTK::Real);
@@ -126,6 +131,9 @@ public:
 
     void addNeighbor(bSpecificAtom *);
     void addBond(bBond *);
+
+private:
+    SimTK::DuMM::ChargedAtomTypeIndex chargedAtomTypeIndex;
 
 };
 
