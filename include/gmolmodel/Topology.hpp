@@ -40,14 +40,14 @@ public:
 
     /** Set atoms properties from a reader: number, name, element, initial
      * name, force field type, charge, coordinates, mass, LJ parameters **/
-    void SetAtomPropertiesFromReader(readAmberInput *amberReader);
+    void SetGmolAtomPropertiesFromReader(readAmberInput *amberReader);
 
     /** Set bonds properties from reader: bond indeces, atom neighbours **/
-    void SetBondingPropertiesFromReader(readAmberInput *amberReader);
+    void SetGmolBondingPropertiesFromReader(readAmberInput *amberReader);
 
     /** Set atoms Molmodel types (Compound::SingleAtom derived) based on
      * their valence **/
-     void SetAtomsMolmodelTypes();
+     void SetGmolAtomsMolmodelTypes();
 
     /** Reads data from a specific reader (readAmberInput for now) object **/
     void loadAtomAndBondInfoFromReader(readAmberInput *amberReader);
@@ -57,6 +57,45 @@ public:
 
     /** Print Molmodel specific types as introduced in Gmolmodel **/
     void PrintMolmodelAndDuMMTypes();
+    /** Biotype is a Molmodel hook that is usually used to look up molecular
+     force field specific parameters for an atom type. Gmolmodel defines a
+     new Biotype for each atom. The only thing that is specified is the element
+     with info about name, atomic number, valence and mass. **/
+    void bAddBiotypes(
+            std::string resName
+            , readAmberInput *amberReader
+            , SimTK::DuMMForceFieldSubsystem& dumm
+    );
+
+    /** It calls DuMMs defineAtomClass, defineChargedAtomTye and
+    setBiotypeChargedAtomType for every atom. These Molmodel functions contain
+    information regarding the force field parameters. **/
+    void bAddAtomClasses(
+            std::string resName
+            , readAmberInput *amberReader
+            , SimTK::DuMMForceFieldSubsystem& dumm
+    );
+
+    /** Calls DuMM defineBondStretch. **/
+    void bAddBondParams(
+            std::string resName
+            , readAmberInput *amberReader
+            , SimTK::DuMMForceFieldSubsystem& dumm
+    );
+
+    /** Calls DuMM defineBondBend. **/
+    void bAddAngleParams(
+            std::string resName
+            , readAmberInput *amberReader
+            , SimTK::DuMMForceFieldSubsystem& dumm
+    );
+
+    /** Calls DuMM defineBondTorsion for 1, 2 and 3 periodicities **/
+    void bAddTorsionParams(
+            std::string resName
+            , readAmberInput *amberReader
+            , SimTK::DuMMForceFieldSubsystem& dumm
+    );
 
     /** Adds force field parameters read by the inputReader to DuMM **/
     void bAddAllParams(
@@ -64,9 +103,32 @@ public:
         , SimTK::DuMMForceFieldSubsystem& dumm
     );
 
+    /** Build the molecular tree without the cycle closing bonds **/
+    void buildAcyclicGraph(bSpecificAtom *node, bSpecificAtom *previousNode);
+
+    /** After building the acyclic molecular tree close the remaining bonds **/
+    void addRingClosingBonds();
+
+    /** Match Default configuration with the coordinates loaded from
+     * the input reader **/
+    void matchDefaultConfigurationWithAtomList(
+            SimTK::Compound::MatchStratagem matchStratagem);
+
+    /** Builds the Compound's tree, closes the rings, matches the configuration
+    on the graph using using Molmodels matchDefaultConfiguration and sets the
+    general flexibility of the molecule. **/
+    void build(
+            SimTK::DuMMForceFieldSubsystem &dumm
+            , std::string flexFN="ligand.flex"
+            , std::string regimenSpec="IC"
+    );
+
+    void setRegimen(std::string argRegimen, std::string flexFN);
+    std::string getRegimen();
+
     // Interface:
     /** Get the name of this molecule **/
-    std::string getName(){return this->name;}
+    const std::string getName() const {return this->name;}
 
     /** Set the name of this molecule **/
     void setName(std::string nameOfThisMolecule){
@@ -118,24 +180,11 @@ public:
         return mbx2aIx.size();
     }
 
-
     void writePdb(std::string dirname,
             std::string prefix,
             std::string sufix,
             int maxNofDigits,
             int index) const;
-
-    /** Builds the Compound's tree, closes the rings, matches the configuration
-    on the graph using using Molmodels matchDefaultConfiguration and sets the
-    general flexibility of the molecule. **/
-    void build(
-        SimTK::DuMMForceFieldSubsystem &dumm
-        , std::string flexFN="ligand.flex"
-        , std::string regimenSpec="IC"
-    );
-
-    void setRegimen(std::string argRegimen, std::string flexFN);
-    std::string getRegimen();
 
     /** To be removed **/
     void PrintStaticVars(){
@@ -147,11 +196,13 @@ public:
     };
 
     void loadMaps();
+
     void printMaps();
 
     // Not sure they belong here
     /** Scale all DuMM force field terms by scale_factor **/
-    void setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor);
+    void setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm,
+            SimTK::Real scale_factor);
     
     /** Scale specific DuMM force field terms by scale_factor **/
     void setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm);
@@ -175,7 +226,7 @@ public:
     int nbonds;
     std::vector<bBond > bonds;
 
-    std::string regimenSpec;
+    //std::string regimenSpec;
 
 private:
 
@@ -192,51 +243,8 @@ private:
     std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > aIx2mbx;
 
     //
-    std::map< SimTK::Compound::BondIndex, int > bondIx2bond;
-
-    /** Biotype is a Molmodel hook that is usually used to look up molecular
-    force field specific parameters for an atom type. Gmolmodel defines a 
-    new Biotype for each atom. The only thing that is specified is the element
-    with info about name, atomic number, valence and mass. **/
-    void bAddBiotypes(
-        std::string resName
-        , readAmberInput *amberReader
-        , SimTK::DuMMForceFieldSubsystem& dumm
-    );
-
-    /** It calls DuMMs defineAtomClass, defineChargedAtomTye and
-    setBiotypeChargedAtomType for every atom. These Molmodel functions contain
-    information regarding the force field parameters. **/
-    void bAddAtomClasses(
-        std::string resName
-        , readAmberInput *amberReader
-        , SimTK::DuMMForceFieldSubsystem& dumm
-    );
-
-    /** Calls DuMM defineBondStretch. **/
-    void bAddBondParams(
-        std::string resName
-        , readAmberInput *amberReader
-        , SimTK::DuMMForceFieldSubsystem& dumm
-    );
-
-    /** Calls DuMM defineBondBend. **/
-    void bAddAngleParams(
-        std::string resName
-        , readAmberInput *amberReader
-        , SimTK::DuMMForceFieldSubsystem& dumm
-    );
-
-    /** Calls DuMM defineBondTorsion for 1, 2 and 3 periodicities **/
-    void bAddTorsionParams(
-        std::string resName
-        , readAmberInput *amberReader
-        , SimTK::DuMMForceFieldSubsystem& dumm
-    );
-
-    /** Graph building functions
-    // Process a graph node **/
-    void buildAcyclicGraph(bSpecificAtom *node, bSpecificAtom *previousNode);
+    std::map< SimTK::Compound::BondIndex, int > bondIx2GmolBond;
+    std::map< int,  SimTK::Compound::BondIndex> GmolBond2bondIx;
 
 };
 

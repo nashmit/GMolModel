@@ -546,6 +546,21 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
     int currentWorldIx = worldIndexes.front();
     int lastWorldIx = 0;
 
+    // TODO move or delete
+    // Write the initial Default Configuration of the first Compound
+    // of the first World
+    PdbStructure  pdb(worlds[0]->getTopology(0));
+    std::ostringstream sstream;
+    sstream << "pdbs/sb_" << ((updWorld(worldIndexes.back()))->getTopology(0)).getName() <<"_ini"<<".pdb";
+    std::string ofilename = sstream.str();
+    std::filebuf fb;
+    std::cout<<"Writing pdb file: "<<ofilename<<std::endl;
+    fb.open(ofilename.c_str(), std::ios::out);
+    std::ostream os(&fb);
+    pdb.write(os); // automatically multiplies by ten (nm to A)
+    fb.close();
+    //
+
     if( std::abs(Tf - Ti) < SimTK::TinyReal){
         for(int round = 0; round < nofRounds; round++){ // Iterate rounds
 

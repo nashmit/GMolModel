@@ -9,12 +9,14 @@ using namespace SimTK;
 The name has no particular function and is not guaranteed to be unique **/
 Topology::Topology(){
     this->name = std::string("no_name");
+    this->setCompoundName((this->name)); // NEW
 }
 
 /** Constructor that sets the name of the molecule. The name has no particular 
 function and is not guaranteed to be unique **/
 Topology::Topology(std::string nameOfThisMolecule){
     this->name = nameOfThisMolecule;
+    this->setCompoundName((this->name)); // NEW
 }
 
 /** Default destructor. It deallocates bAtomType of every atom in the bAtomList
@@ -28,7 +30,7 @@ Topology::~Topology(){
 
 /** Set atoms properties from a reader: number, name, element, initial
  * name, force field type, charge, coordinates, mass, LJ parameters **/
-void Topology::SetAtomPropertiesFromReader(readAmberInput *amberReader)
+void Topology::SetGmolAtomPropertiesFromReader(readAmberInput *amberReader)
 {
     // Initialize atom variables
     for(int i = 0; i < natoms; i++){
@@ -91,7 +93,7 @@ void Topology::SetAtomPropertiesFromReader(readAmberInput *amberReader)
 }
 
 /** Set bonds properties from reader: bond indeces, atom neighbours **/
-void Topology::SetBondingPropertiesFromReader(readAmberInput *amberReader)
+void Topology::SetGmolBondingPropertiesFromReader(readAmberInput *amberReader)
 {
 
     // Iterate through bonds and get atom indeces
@@ -128,7 +130,7 @@ void Topology::SetBondingPropertiesFromReader(readAmberInput *amberReader)
 
 /** Set atoms Molmodel types (Compound::SingleAtom derived) based on
  * their valence **/
-void Topology::SetAtomsMolmodelTypes()
+void Topology::SetGmolAtomsMolmodelTypes()
 {
     // ---------------------------------------------
     // Set every atom's (SimTK::Compound::SingleAtom *) to it's
@@ -290,14 +292,14 @@ void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
 
     // Set atoms properties from a reader: number, name, element, initial
     // name, force field type, charge, coordinates, mass, LJ parameters
-    SetAtomPropertiesFromReader(amberReader);
+    SetGmolAtomPropertiesFromReader(amberReader);
 
     // Set bonds properties from reader: bond indeces, atom neighbours
-    SetBondingPropertiesFromReader(amberReader);
+    SetGmolBondingPropertiesFromReader(amberReader);
 
     // Set atoms Molmodel types (Compound::SingleAtom derived) based on
     // their valence
-    SetAtomsMolmodelTypes();
+    SetGmolAtomsMolmodelTypes();
 }
 
 /** Print atom and bonds list with details**/
@@ -384,8 +386,6 @@ void Topology::bAddAtomClasses(
             bAtomList[i].getLJWellDepth() * 4.184 // kcal to kJ
         );
 
-        std::cout << "bAddAtomClasses: Defined AtomClass: "
-            << bAtomList[i].getAtomClassIndex() << std::endl;
     }
 
     // Define ChargedAtomTypeIndeces
@@ -663,11 +663,19 @@ void Topology::buildAcyclicGraph(bSpecificAtom *node, bSpecificAtom *previousNod
 
                 // Set bBond Molmodel Compound::BondIndex
                 (*bondsInvolvedIter)->setBondIndex(Compound::BondIndex(getNumBonds() - 1));
-                std::pair<SimTK::Compound::BondIndex, int>
-                        pairToBeInserted(
-                                Compound::BondIndex(getNumBonds() - 1),
-                                (*bondsInvolvedIter)->getIndex() );
-                bondIx2bond.insert(pairToBeInserted);
+                std::pair<SimTK::Compound::BondIndex, int> pairToBeInserted(
+                        Compound::BondIndex(getNumBonds() - 1),
+                        (*bondsInvolvedIter)->getIndex()
+                );
+
+                bondIx2GmolBond.insert(pairToBeInserted);
+
+
+
+                GmolBond2bondIx.insert( std::pair<int, SimTK::Compound::BondIndex>(
+                        (*bondsInvolvedIter)->getIndex(),
+                        Compound::BondIndex(getNumBonds() - 1)
+                ) );
 
                 // Drop the number of available bonds
                 --previousNode->freebonds;
@@ -694,6 +702,67 @@ void Topology::buildAcyclicGraph(bSpecificAtom *node, bSpecificAtom *previousNod
 
 }
 
+/** After building the acyclic molecular tree close the remaining bonds **/
+void Topology::addRingClosingBonds() {
+    // Consider all remaining bonds ring closing bonds and close them
+    for(int i=0; i<nbonds; i++){
+        if(bonds[i].isVisited() == 0){
+
+            bSpecificAtom *leftNode  =  &(bAtomList[bonds[i].i]);
+            bSpecificAtom *rightNode =  &(bAtomList[bonds[i].j]);
+
+            std::stringstream sbuff;
+            if(leftNode->number == baseAtomNumber){
+                sbuff << leftNode->name << "/bond" << leftNode->freebonds;
+            }else{
+                sbuff << leftNode->name << "/bond"
+                    << (leftNode->nbonds - leftNode->freebonds + 1);
+            }
+
+            std::stringstream otsbuff;
+            if(rightNode->number == baseAtomNumber){
+                otsbuff << rightNode->name << "/bond" << rightNode->freebonds;
+            }else{
+                otsbuff << rightNode->name << "/bond"
+                    << (rightNode->nbonds - rightNode->freebonds + 1);
+            }
+
+            this->addRingClosingBond(
+                    (sbuff.str()).c_str(),
+                    (otsbuff.str()).c_str(),
+                    0.14,
+                    109*Deg2Rad,
+                    BondMobility::Rigid // CHANGE
+            );
+
+            // Compound::setAtomBiotype(Compound::AtomPathName,
+            // biotypeResidueName, biotypeAtomName
+            // SimTK::Ordinality::Residue = SimTK::Ordinality::Any)
+            this->setAtomBiotype(leftNode->name, (this->name), leftNode->getName());
+            this->setAtomBiotype(rightNode->name, (this->name), rightNode->getName());
+
+            --leftNode->freebonds;
+            --rightNode->freebonds;
+
+        }
+    }
+}
+
+/** Match Default configuration with the coordinates loaded from
+ * the input reader **/
+void Topology::matchDefaultConfigurationWithAtomList(SimTK::Compound::MatchStratagem matchStratagem)
+{
+    // Assign Compound coordinates by matching bAtomList coordinates
+    std::map<AtomIndex, Vec3> atomTargets;
+    for(int ix = 0; ix < getNumAtoms(); ++ix){
+        Vec3 vec(bAtomList[ix].getX(), bAtomList[ix].getY(), bAtomList[ix].getZ());
+        atomTargets.insert(pair<AtomIndex, Vec3> (bAtomList[ix].atomIndex, vec));
+    }
+
+    matchDefaultConfiguration(atomTargets, matchStratagem, true, 150.0); //Compound::Match_Idealized
+
+}
+
 /** Builds the molecular tree, closes the rings, matches the configuration
 on the graph using using Molmodels matchDefaultConfiguration and sets the 
 general flexibility of the molecule. **/
@@ -704,17 +773,14 @@ void Topology::build(
 )
 {
     // Set regimen
-    this->regimenSpec = regimenSpec;
+    //this->regimenSpec = regimenSpec;
 
-    // Set the name of the Compound
-    this->setCompoundName((this->name));
-
-    // Initialize atoms to unvisited
+    // Initialize all atoms to unvisited
     for(int i = 0; i < natoms; i++){
         bAtomList[i].setVisited(0);
     }
 
-    // Initialize bonds to unvisited
+    // Initialize all bonds to unvisited
     for(int i = 0; i < nbonds; i++){
         bonds[i].setVisited(0);
     }
@@ -733,103 +799,16 @@ void Topology::build(
     baseAtomNumber = root->number;
 
     // Build the graph
-    nofProcesses = 0; // NEW
-    buildAcyclicGraph(root, root); // NEW
+    nofProcesses = 0;
+    buildAcyclicGraph(root, root);
 
-    // Add ring closing bonds
-    for(int i=0; i<nbonds; i++){
-        if(bonds[i].isVisited() == 0){
-            
-            bSpecificAtom *leftNode  =  &(bAtomList[bonds[i].i]);
-            bSpecificAtom *rightNode =  &(bAtomList[bonds[i].j]);
+    // Close the remaining bonds
+    addRingClosingBonds();
 
-            std::stringstream sbuff;
-            if(leftNode->number == baseAtomNumber){
-                sbuff << leftNode->name << "/bond" << leftNode->freebonds;
-            }else{
-                sbuff << leftNode->name << "/bond" << (leftNode->nbonds - leftNode->freebonds + 1);
-            }
-    
-            std::stringstream otsbuff;
-            if(rightNode->number == baseAtomNumber){
-                otsbuff << rightNode->name << "/bond" << rightNode->freebonds;
-            }else{
-                otsbuff << rightNode->name << "/bond" << (rightNode->nbonds - rightNode->freebonds + 1);
-            }
-                  
-            this->addRingClosingBond(
-                (sbuff.str()).c_str(),
-                (otsbuff.str()).c_str(),
-                0.14,
-                109*Deg2Rad,
-                BondMobility::Rigid // CHANGE
-            );
+    // Build the conformation
+    matchDefaultConfigurationWithAtomList(SimTK::Compound::Match_Exact);
 
-
-            // Compound::setAtomBiotype(Compound::AtomPathName,
-            // biotypeResidueName, biotypeAtomName
-            // SimTK::Ordinality::Residue = SimTK::Ordinality::Any)
-            this->setAtomBiotype(leftNode->name, (this->name), leftNode->getName());
-            this->setAtomBiotype(rightNode->name, (this->name), rightNode->getName());
-    
-            --leftNode->freebonds;
-            --rightNode->freebonds;
-
-            std::cout << "Closed ring " 
-                << leftNode->name << "(" << leftNode->getInName() 
-                << ") " << leftNode->number << " " << (sbuff.str()).c_str() << " to " 
-                << rightNode->name << "(" << rightNode->getInName() 
-                << ") " << rightNode->number << " " << (otsbuff.str()).c_str() 
-                << " ... " << std::flush;
-
-            std::cout << "done." << std::endl << std::flush;
-        }
-    }
-
-    std::cout << "Topology: name inName atomIndexi:" << std::endl;
-    for(int ix = 0; ix < getNumAtoms(); ++ix){
-        std::cout << bAtomList[ix].name << " " << bAtomList[ix].inName << " " << bAtomList[ix].atomIndex << std::endl;
-    }
-    std::cout << std::endl << std::flush;
-
-    // Assign Compound coordinates by matching bAtomList coordinates
-    std::cout << "atomTargets from passed coords array: " << std::endl;
-    std::map<AtomIndex, Vec3> atomTargets;
-    for(int ix = 0; ix < getNumAtoms(); ++ix){
-        std::cout << bAtomList[ix].atomIndex << " " 
-            << this->getAtomName(bAtomList[ix].atomIndex) << " " 
-            << bAtomList[ix].getX() << " " << bAtomList[ix].getY() << " " << bAtomList[ix].getZ()
-            << std::endl;
-        Vec3 vec(bAtomList[ix].getX(), bAtomList[ix].getY(), bAtomList[ix].getZ());
-        atomTargets.insert(pair<AtomIndex, Vec3> (bAtomList[ix].atomIndex, vec));
-    }
-
-    std::cout << "Trying matchDefaultConfiguration Match_Exact ... " << std::flush;
-    matchDefaultConfiguration(atomTargets, Match_Exact, true, 150.0); //Compound::Match_Idealized
-    std::cout << "done. " << std::endl << std::flush;
-
-    PdbStructure  pdb(*this);
-    std::ostringstream sstream;
-    sstream << "pdbs/sb_" << this->name <<"_ini"<<".pdb";
-    std::string ofilename = sstream.str();
-    std::filebuf fb;
-    std::cout<<"Writing pdb file: "<<ofilename<<std::endl;
-    fb.open(ofilename.c_str(), std::ios::out);
-    std::ostream os(&fb);
-    pdb.write(os); // automatically multiplies by ten (nm to A)
-    fb.close();
-
-    /* Just checking *////////
-    std::cout << "Checking after Topology" << std::endl;
-    for(int i=0; i<getNumAtoms();i++){
-        bAtomList[i].Print();
-    }
-    for(int i=0; i<getNumBonds(); i++){ // EU
-        std::cout<<"bond: "<<bonds[i].i<<" "<<bonds[i].j<<std::endl;
-        fflush(stdout);
-    }
-    ///////////////////////////
-
+    // Implement flexibility/rigidity specifications
     setRegimen(regimenSpec, flexFN);
 
 }
@@ -840,19 +819,19 @@ std::string Topology::getRegimen(void){
 }
 
 /** Set regimen **/
+// TODO refactor
 void Topology::setRegimen(std::string argRegimen, std::string flexFN){
     
     if(argRegimen == "IC"){
         for (unsigned int r=0 ; r<getNumBonds(); r++){
             setBondMobility(BondMobility::Free, Compound::BondIndex(r));
-            bonds[bondIx2bond[Compound::BondIndex(r)]].setBondMobility(BondMobility::Free);
+            bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(BondMobility::Free);
         }
-        std::cout << "Changed regimen to: " << "IC" << std::endl;
     }else if(argRegimen == "TD"){
         for (unsigned int r=0 ; r<getNumBonds(); r++){
             setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
+            bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(BondMobility::Torsion);
         }
-        std::cout << "Changed regimen to: " << "TD" << std::endl;
     }else if(argRegimen == "RB"){
 
         // Get flexible bonds from file and put it in PrmFlexBonds
@@ -880,15 +859,28 @@ void Topology::setRegimen(std::string argRegimen, std::string flexFN){
             }
             if(word_i > 0){
                 assert((word_i >= 1) && "2 indeces needed on each line of ligand.flex.");
-                PrmFlexBonds.push_back(std::pair<int, int>( std::stod(LineWords[0]), std::stod(LineWords[1]) ));
+                PrmFlexBonds.emplace_back(std::pair<int, int>( std::stoi(LineWords[0]), std::stoi(LineWords[1]) ));
             }
         }
+
 
         // Set all bonds to rigid first
         for (unsigned int r=0 ; r<getNumBonds(); r++){
             setBondMobility(BondMobility::Rigid, SimTK::Compound::BondIndex(r));
         }
 
+        // New algorithm
+        for ( PrmFlexBondsIt = PrmFlexBonds.begin(); PrmFlexBondsIt != PrmFlexBonds.end(); ++PrmFlexBondsIt){
+            for(int i=0; i<nbonds; i++){
+                if(bonds[i].isThisMe((*PrmFlexBondsIt).first, (*PrmFlexBondsIt).second)){
+                    Compound::BondIndex compoundFlexBondIx = GmolBond2bondIx.at(i);
+                    setBondMobility(BondMobility::Torsion, compoundFlexBondIx);
+                    break;
+                }
+            }
+        }
+
+        /*
         // Iterate through prmtop flexible bonds, get Molmodel Compound::AtomIndeces and put it in MolmodelFlexBonds
         for ( PrmFlexBondsIt = PrmFlexBonds.begin(); PrmFlexBondsIt != PrmFlexBonds.end(); ++PrmFlexBondsIt){
             MolmodelFlexBonds.push_back(std::pair<SimTK::Compound::AtomIndex, SimTK::Compound::AtomIndex>(
@@ -920,7 +912,10 @@ void Topology::setRegimen(std::string argRegimen, std::string flexFN){
             }
         }
         std::cout << "Changed regimen to: " << "RB" << std::endl;
+
+        */
     }
+
     this->regimen = argRegimen;
 }
 
@@ -958,11 +953,18 @@ void Topology::printMaps(void)
         std::cout << "atomIndex " << it->first << " mbx " << it->second << std::endl;
     }
 
-    for(map<SimTK::Compound::BondIndex, int>::const_iterator it = bondIx2bond.begin();
-       it != bondIx2bond.end(); ++it)
+    for(map<SimTK::Compound::BondIndex, int>::const_iterator it = bondIx2GmolBond.begin();
+       it != bondIx2GmolBond.end(); ++it)
     {
         std::cout << "Compound bondIndex " << it->first << " bBond index " << it->second << std::endl;
     }
+
+    for(map<int, SimTK::Compound::BondIndex>::const_iterator it = GmolBond2bondIx.begin();
+        it != GmolBond2bondIx.end(); ++it)
+    {
+        std::cout << "bBond index " << it->first << " Compound index " << it->second << std::endl;
+    }
+
 }
 
 /** Write a pdb with bAtomList coordinates and inNames **/
@@ -1078,5 +1080,7 @@ void Topology::setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm){
 
     dumm.setGbsaGlobalScaleFactor(0.0);
 }
+
+
 
 
