@@ -825,112 +825,79 @@ void Topology::setRegimen(std::string argRegimen, std::string flexFN){
     if(argRegimen == "IC"){
         for (unsigned int r=0 ; r<getNumBonds(); r++){
             setBondMobility(BondMobility::Free, Compound::BondIndex(r));
-            bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(BondMobility::Free);
+            bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+                    BondMobility::Free);
         }
     }else if(argRegimen == "TD"){
         for (unsigned int r=0 ; r<getNumBonds(); r++){
             setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
-            bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(BondMobility::Torsion);
+            bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+                    BondMobility::Torsion);
         }
     }else if(argRegimen == "RB"){
 
-        // Get flexible bonds from file and put it in PrmFlexBonds
-        std::string line;
-        std::ifstream F(flexFN);
-        std::vector<std::pair<int, int>> PrmFlexBonds;
-        std::vector<std::pair<int, int>>::iterator PrmFlexBondsIt;
-        std::vector<std::pair<SimTK::Compound::AtomIndex, SimTK::Compound::AtomIndex>> MolmodelFlexBonds;
-        std::vector<std::pair<SimTK::Compound::AtomIndex, SimTK::Compound::AtomIndex>>::iterator MolmodelFlexBondsIt;
-        int line_i = -1;
-        while(F.good()){
-            line_i++;
-            std::getline(F, line);
-            std::istringstream iss(line);
-            std::string word;
-            std::vector<std::string> LineWords;
-          
-            int word_i = -1;
-            while(iss >> word){
-                if(word[0] == '#'){
-                    break;
-                }
-                word_i++;
-                LineWords.push_back(std::move(word));
-            }
-            if(word_i > 0){
-                assert((word_i >= 1) && "2 indeces needed on each line of ligand.flex.");
-                PrmFlexBonds.emplace_back(std::pair<int, int>( std::stoi(LineWords[0]), std::stoi(LineWords[1]) ));
-            }
-        }
-
-
-        // Set all bonds to rigid first
+        // Set all Compound and Topology bonds to rigid
         for (unsigned int r=0 ; r<getNumBonds(); r++){
             setBondMobility(BondMobility::Rigid, SimTK::Compound::BondIndex(r));
         }
+        for (unsigned int r=0 ; r<getNumBonds(); r++){
+            bonds[r].setBondMobility(BondMobility::Torsion);
+        }
 
-        // New algorithm
-        for ( PrmFlexBondsIt = PrmFlexBonds.begin(); PrmFlexBondsIt != PrmFlexBonds.end(); ++PrmFlexBondsIt){
-            for(int i=0; i<nbonds; i++){
-                if(bonds[i].isThisMe((*PrmFlexBondsIt).first, (*PrmFlexBondsIt).second)){
-                    Compound::BondIndex compoundFlexBondIx = GmolBond2bondIx.at(i);
-                    setBondMobility(BondMobility::Torsion, compoundFlexBondIx);
-                    break;
+        // Get flexible bonds from file. Numbering starts at 0 in prmtop
+        std::string line;
+        std::ifstream F(flexFN);
+
+        while(F.good()){
+            std::getline(F, line);
+            if(!line.empty()){
+                if(line.at(0) == '#'){
+                    continue;
+                }
+
+                std::istringstream iss(line);
+                std::string word;
+                std::vector<std::string> lineWords;
+
+                while(iss >> word){
+                    lineWords.push_back(std::move(word));
+                }
+                 if(lineWords.size() >= 2 ){
+                    for(unsigned int i = 0; i < nbonds; i++){
+                        if(bonds[i].isThisMe(
+                          std::stoi(lineWords[0]), std::stoi(lineWords[1])) ){
+                            bonds[i].setBondMobility(BondMobility::Torsion);
+                            setBondMobility(BondMobility::Torsion,
+                                    GmolBond2bondIx.at(i));
+                            break;
+                        }
+                    }
                 }
             }
         }
 
-        /*
-        // Iterate through prmtop flexible bonds, get Molmodel Compound::AtomIndeces and put it in MolmodelFlexBonds
-        for ( PrmFlexBondsIt = PrmFlexBonds.begin(); PrmFlexBondsIt != PrmFlexBonds.end(); ++PrmFlexBondsIt){
-            MolmodelFlexBonds.push_back(std::pair<SimTK::Compound::AtomIndex, SimTK::Compound::AtomIndex>(
-                SimTK::Compound::AtomIndex(bAtomList[(*PrmFlexBondsIt).first].atomIndex), 
-                SimTK::Compound::AtomIndex(bAtomList[(*PrmFlexBondsIt).second].atomIndex)) );
-        }
-
-        // Print
-        for ( PrmFlexBondsIt = PrmFlexBonds.begin(); PrmFlexBondsIt != PrmFlexBonds.end(); ++PrmFlexBondsIt){
-            std::cout << "Topology::setRegimen: FlexBond Prm Indeces " << (*PrmFlexBondsIt).first << " " << (*PrmFlexBondsIt).second << std::endl;
-        }
-        for ( MolmodelFlexBondsIt = MolmodelFlexBonds.begin(); MolmodelFlexBondsIt != MolmodelFlexBonds.end(); ++MolmodelFlexBondsIt){
-            std::cout << "Topology::setRegimen: FlexBond AtomIndeces " << (*MolmodelFlexBondsIt).first << " " << (*MolmodelFlexBondsIt).second << std::endl;
-        }
-        for (unsigned int j = 0 ; j < getNumBonds(); j++){
-            std::cout << "Topology::setRegimen: Compound Bonds AtomIndeces " << getBondAtomIndex(Compound::BondIndex(j), 0) << " " << getBondAtomIndex(Compound::BondIndex(j), 1) << std::endl;
-        }
-
-        // Iterate through  Molmodel Compound bonds and match with MolmodelFlexBonds
-        for (unsigned int i = 0 ; i < MolmodelFlexBonds.size(); i++){
-            for (unsigned int j = 0 ; j < getNumBonds(); j++){
-                if( ((getBondAtomIndex(Compound::BondIndex(j), 0) == MolmodelFlexBonds[i].first) && (getBondAtomIndex(Compound::BondIndex(j), 1) == MolmodelFlexBonds[i].second)) || 
-                    ((getBondAtomIndex(Compound::BondIndex(j), 1) == MolmodelFlexBonds[i].first) && (getBondAtomIndex(Compound::BondIndex(j), 0) == MolmodelFlexBonds[i].second)) ){
-                    //setBondMobility(BondMobility::Free, Compound::BondIndex(j));
-                    setBondMobility(BondMobility::Torsion, Compound::BondIndex(j));
-                    std::cout << "Topology::setRegimen: Bond " << j << " set to torsion" << std::endl;
-                    break;
-                }
-            }
-        }
-        std::cout << "Changed regimen to: " << "RB" << std::endl;
-
-        */
-    }
+    } // RB
 
     this->regimen = argRegimen;
 }
 
 /** Create MobilizedBodyIndex vs Compound::AtomIndex maps **/
-void Topology::loadMaps(void){
+void Topology::loadMobodsRelatedMaps(void){
 
     // Iterate through atoms and get their MobilizedBodyIndeces
     for (SimTK::Compound::AtomIndex aIx(0); aIx < getNumAtoms(); ++aIx){
         // Map mbx2aIx contains only atoms at the origin of mobods
         SimTK::MobilizedBodyIndex mbx = getAtomMobilizedBodyIndex(aIx);
-        std::pair<SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex > pairToBeInserted(mbx, aIx);
-        mbx2aIx.insert(pairToBeInserted);
+        //std::pair<SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex >
+        //        pairToBeInserted(mbx, aIx);
+        mbx2aIx.insert(
+                std::pair<SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex>
+                (mbx, aIx));
 
         // Map aIx is redundant in MobilizedBodyIndeces
-        aIx2mbx.insert(std::pair< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex >(aIx, mbx));
+        aIx2mbx.insert(
+                std::pair<SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex>
+                (aIx, mbx));
     }
 
 }

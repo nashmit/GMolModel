@@ -195,11 +195,14 @@ public:
             << std::endl;
     };
 
-    void loadMaps();
+    /** Create MobilizedBodyIndex vs Compound::AtomIndex maps  **/
+    void loadMobodsRelatedMaps();
 
+    /** Print atom to MobilizedBodyIndex and bond to Compound::Bond index
+     * maps **/
     void printMaps();
 
-    // Not sure they belong here
+    // TODO Move in World
     /** Scale all DuMM force field terms by scale_factor **/
     void setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm,
             SimTK::Real scale_factor);

@@ -250,7 +250,7 @@ void World::ModelTopologies(bool useFixmanTorqueOpt)
 
     // Load MobilizedBodyIndex vs Compound::AtomIndex maps 
     for ( unsigned int i = 0; i < this->topologies.size(); i++){
-        ((this->topologies)[i])->loadMaps();
+        ((this->topologies)[i])->loadMobodsRelatedMaps();
         std::cout << "Print maps topology " << i << std::endl;
         ((this->topologies)[i])->printMaps();
     }
