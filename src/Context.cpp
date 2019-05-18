@@ -625,12 +625,12 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 if(std::abs(backCalcE - currCalcE) > 100.0) {
                     std::cout << "Writing Compound pdbs for round " << round << std::endl;
                     (updWorld(worldIndexes.back()))->updateAtomLists(lastAdvancedState);
-                    ((updWorld(worldIndexes.back()))->getTopology(0)).writePdb(
+                    ((updWorld(worldIndexes.back()))->getTopology(0)).writeAtomListPdb(
                             getOutputDir(), std::string("/pdbs/sb.")
                                             + std::to_string(worldIx) + std::string("."), ".0.pdb", 10, round);
 
                     (updWorld(currentWorldIx))->updateAtomLists(currentAdvancedState);
-                    ((updWorld(currentWorldIx))->getTopology(0)).writePdb(
+                    ((updWorld(currentWorldIx))->getTopology(0)).writeAtomListPdb(
                             getOutputDir(), std::string("/pdbs/sb.")
                                             + std::to_string(worldIx) + std::string("."), ".1.pdb", 10, round);
 
@@ -691,7 +691,10 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 if(((round) % getPdbRestartFreq()) == 0){
                     (updWorld(worldIndexes.front()))->updateAtomLists(pdbState);
                     for(int mol_i = 0; mol_i < getNofMolecules(); mol_i++){
-                        ((updWorld(worldIndexes.front()))->getTopology(mol_i)).writePdb(getOutputDir(), "/pdbs/sb." + getPdbPrefix() + ".", ".pdb", 10, round);
+                        ((updWorld(worldIndexes.front()))->getTopology(mol_i)).writeAtomListPdb(getOutputDir(),
+                                                                                                "/pdbs/sb." +
+                                                                                                getPdbPrefix() + ".",
+                                                                                                ".pdb", 10, round);
                     }
                 }
             } // if write pdbs
@@ -766,7 +769,10 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                 if(((round) % getPdbRestartFreq()) == 0){
                     (updWorld(worldIndexes.front()))->updateAtomLists(pdbState);
                     for(int mol_i = 0; mol_i < getNofMolecules(); mol_i++){
-                        ((updWorld(worldIndexes.front()))->getTopology(mol_i)).writePdb(getOutputDir(), "/pdbs/sb." + getPdbPrefix() + ".", ".pdb", 10, round);
+                        ((updWorld(worldIndexes.front()))->getTopology(mol_i)).writeAtomListPdb(getOutputDir(),
+                                                                                                "/pdbs/sb." +
+                                                                                                getPdbPrefix() + ".",
+                                                                                                ".pdb", 10, round);
                     }
                 }
             } // if write pdbs

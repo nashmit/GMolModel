@@ -323,7 +323,10 @@ int main(int argc, char **argv)
         (context->updWorld(currentWorldIx))->updateAtomLists(advancedState);
         std::cout << "Writing pdb  sb" << mc_step << ".pdb" << std::endl;
         for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-            ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writePdb(context->getOutputDir(), "/pdbs/sb." + context->getPdbPrefix() + ".", ".pdb", 10, mc_step);
+            ((context->updWorld(currentWorldIx))->getTopology(mol_i)).writeAtomListPdb(context->getOutputDir(),
+                                                                                       "/pdbs/sb." +
+                                                                                       context->getPdbPrefix() + ".",
+                                                                                       ".pdb", 10, mc_step);
         }
     }
 
@@ -345,7 +348,9 @@ int main(int argc, char **argv)
 
     // Write final pdbs
     for(unsigned int mol_i = 0; mol_i < setupReader.getValues("MOLECULES").size(); mol_i++){
-        ((context->updWorld( context->worldIndexes.front() ))->getTopology(mol_i)).writePdb(context->getOutputDir(), "/pdbs/final." + context->getPdbPrefix() + ".", ".pdb", 10, context->getNofRounds());
+        ((context->updWorld(context->worldIndexes.front()))->getTopology(mol_i)).writeAtomListPdb(
+                context->getOutputDir(), "/pdbs/final." + context->getPdbPrefix() + ".", ".pdb", 10,
+                context->getNofRounds());
     }
     //
 

@@ -180,20 +180,11 @@ public:
         return mbx2aIx.size();
     }
 
-    void writePdb(std::string dirname,
-            std::string prefix,
-            std::string sufix,
-            int maxNofDigits,
-            int index) const;
-
-    /** To be removed **/
-    void PrintStaticVars(){
-        std::cout << "Topology static vars:" 
-            << " regimen " << regimen << " name " << name
-            << " nofProcesses " << nofProcesses << " baseSetFlag "
-            << baseSetFlag << " baseAtomNumber " << baseAtomNumber
-            << std::endl;
-    };
+    void writeAtomListPdb(std::string dirname,
+                          std::string prefix,
+                          std::string sufix,
+                          int maxNofDigits,
+                          int index) const;
 
     /** Create MobilizedBodyIndex vs Compound::AtomIndex maps  **/
     void loadMobodsRelatedMaps();
@@ -201,19 +192,6 @@ public:
     /** Print atom to MobilizedBodyIndex and bond to Compound::Bond index
      * maps **/
     void printMaps();
-
-    // TODO Move in World
-    /** Scale all DuMM force field terms by scale_factor **/
-    void setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm,
-            SimTK::Real scale_factor);
-    
-    /** Scale specific DuMM force field terms by scale_factor **/
-    void setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm);
-   
-    // Not sure we need them 
-    /** Set graph **/
-    void insertAtom(bSpecificAtom *atom);
-    void insertBond(int atom_no1, int atom_no2, int bondOrder);
 
     /** Get coordinates **/
     void getCoordinates(
@@ -245,7 +223,7 @@ private:
     // Map aIx is redundant in MobilizedBodyIndeces
     std::map< SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex > aIx2mbx;
 
-    //
+    // Gmolmodel to Molmodel (and inverse) bond mappings
     std::map< SimTK::Compound::BondIndex, int > bondIx2GmolBond;
     std::map< int,  SimTK::Compound::BondIndex> GmolBond2bondIx;
 

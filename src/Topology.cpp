@@ -9,14 +9,14 @@ using namespace SimTK;
 The name has no particular function and is not guaranteed to be unique **/
 Topology::Topology(){
     this->name = std::string("no_name");
-    this->setCompoundName((this->name)); // NEW
+    this->setCompoundName((this->name));
 }
 
 /** Constructor that sets the name of the molecule. The name has no particular 
 function and is not guaranteed to be unique **/
 Topology::Topology(std::string nameOfThisMolecule){
     this->name = nameOfThisMolecule;
-    this->setCompoundName((this->name)); // NEW
+    this->setCompoundName((this->name));
 }
 
 /** Default destructor. It deallocates bAtomType of every atom in the bAtomList
@@ -750,7 +750,8 @@ void Topology::addRingClosingBonds() {
 
 /** Match Default configuration with the coordinates loaded from
  * the input reader **/
-void Topology::matchDefaultConfigurationWithAtomList(SimTK::Compound::MatchStratagem matchStratagem)
+void Topology::matchDefaultConfigurationWithAtomList(
+        SimTK::Compound::MatchStratagem matchStratagem)
 {
     // Assign Compound coordinates by matching bAtomList coordinates
     std::map<AtomIndex, Vec3> atomTargets;
@@ -759,7 +760,7 @@ void Topology::matchDefaultConfigurationWithAtomList(SimTK::Compound::MatchStrat
         atomTargets.insert(pair<AtomIndex, Vec3> (bAtomList[ix].atomIndex, vec));
     }
 
-    matchDefaultConfiguration(atomTargets, matchStratagem, true, 150.0); //Compound::Match_Idealized
+    matchDefaultConfiguration(atomTargets, matchStratagem, true, 150.0);
 
 }
 
@@ -819,7 +820,6 @@ std::string Topology::getRegimen(void){
 }
 
 /** Set regimen **/
-// TODO refactor
 void Topology::setRegimen(std::string argRegimen, std::string flexFN){
     
     if(argRegimen == "IC"){
@@ -906,36 +906,45 @@ void Topology::loadMobodsRelatedMaps(void){
 /** Print maps **/
 void Topology::printMaps(void)
 {
-    std::cout << "Topology printMaps" << std::endl;
+    std::cout << "Topology " << name << " maps " << std::endl;
     std::cout << "mbx2aIx:" << std::endl;
-    for(map<SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex>::const_iterator it = mbx2aIx.begin();
-       it != mbx2aIx.end(); ++it)
+    map<SimTK::MobilizedBodyIndex, SimTK::Compound::AtomIndex>::const_iterator mbx2aIxIt;
+    for(mbx2aIxIt = mbx2aIx.begin();
+       mbx2aIxIt != mbx2aIx.end(); ++mbx2aIxIt)
     {
-        std::cout << "mbx " << it->first << " atomIndex " << it->second << std::endl;
+        std::cout << "mbx " << mbx2aIxIt->first
+            << " atomIndex " << mbx2aIxIt->second << std::endl;
     }
     std::cout << "aIx2mbx:" << std::endl;
-    for(map<SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex>::const_iterator it = aIx2mbx.begin();
-       it != aIx2mbx.end(); ++it)
+    map<SimTK::Compound::AtomIndex, SimTK::MobilizedBodyIndex>::const_iterator aIx2mbxIt;
+    for(aIx2mbxIt = aIx2mbx.begin();
+       aIx2mbxIt != aIx2mbx.end(); ++aIx2mbxIt)
     {
-        std::cout << "atomIndex " << it->first << " mbx " << it->second << std::endl;
+        std::cout << "atomIndex " << aIx2mbxIt->first
+            << " mbx " << aIx2mbxIt->second << std::endl;
     }
 
-    for(map<SimTK::Compound::BondIndex, int>::const_iterator it = bondIx2GmolBond.begin();
-       it != bondIx2GmolBond.end(); ++it)
+    map<SimTK::Compound::BondIndex, int>::const_iterator bondIx2GmolBondIt;
+    for(bondIx2GmolBondIt = bondIx2GmolBond.begin();
+       bondIx2GmolBondIt != bondIx2GmolBond.end(); ++bondIx2GmolBondIt)
     {
-        std::cout << "Compound bondIndex " << it->first << " bBond index " << it->second << std::endl;
+        std::cout << "Compound bondIndex " << bondIx2GmolBondIt->first
+            << " bBond index " << bondIx2GmolBondIt->second << std::endl;
     }
 
-    for(map<int, SimTK::Compound::BondIndex>::const_iterator it = GmolBond2bondIx.begin();
-        it != GmolBond2bondIx.end(); ++it)
+    map<int, SimTK::Compound::BondIndex>::const_iterator GmolBond2bondIxIt;
+    for(GmolBond2bondIxIt = GmolBond2bondIx.begin();
+        GmolBond2bondIxIt != GmolBond2bondIx.end(); ++GmolBond2bondIxIt)
     {
-        std::cout << "bBond index " << it->first << " Compound index " << it->second << std::endl;
+        std::cout << "bBond index " << GmolBond2bondIxIt->first
+            << " Compound index " << GmolBond2bondIxIt->second << std::endl;
     }
 
 }
 
 /** Write a pdb with bAtomList coordinates and inNames **/
-void Topology::writePdb(std::string dirname, std::string prefix, std::string sufix, int maxNofDigits, int index) const
+void Topology::writeAtomListPdb(std::string dirname, std::string prefix,
+                                std::string sufix, int maxNofDigits, int index) const
 {
     int nofDigits = (int) floor(log10(index));
     std::string zeros("");
@@ -970,18 +979,6 @@ void Topology::writePdb(std::string dirname, std::string prefix, std::string suf
     fclose(oF);
 }
 
-/** Not sure we need this **/
-void Topology::insertAtom(bSpecificAtom *)
-{
-    assert(!"Not implemented.");
-}
-
-/**  **/
-void Topology::insertBond(int at1, int at2, int bondOrder)
-{
-    assert(!"Not implemented.");
-}
-
 /** Get bAtomList coordinates coordinates **/
 void Topology::getCoordinates(
         std::vector<SimTK::Real> Xs,
@@ -997,57 +994,5 @@ void Topology::getCoordinates(
         Zs[ix] = bAtomList[ix].getZ();
     }
 }
-
-// Not sure they belong here
-/* ==================================================
- *    Scale all DuMM force field terms by scale_factor
- * ================================================== */
-void Topology::setDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm, SimTK::Real scale_factor){    
-    dumm.setBondStretchGlobalScaleFactor(scale_factor);
-    dumm.setBondBendGlobalScaleFactor(scale_factor);
-    dumm.setBondTorsionGlobalScaleFactor(scale_factor);
-    dumm.setAmberImproperTorsionGlobalScaleFactor(scale_factor);
-    dumm.setVdw12ScaleFactor(scale_factor);
-    dumm.setVdw13ScaleFactor(scale_factor);
-    dumm.setVdw14ScaleFactor(scale_factor);
-    dumm.setVdw15ScaleFactor(scale_factor);
-    dumm.setVdwGlobalScaleFactor(scale_factor);
-    dumm.setCoulomb12ScaleFactor(scale_factor);
-    dumm.setCoulomb13ScaleFactor(scale_factor);
-    dumm.setCoulomb14ScaleFactor(scale_factor);
-    dumm.setCoulomb15ScaleFactor(scale_factor);
-    dumm.setCoulombGlobalScaleFactor(scale_factor);
-    dumm.setGbsaGlobalScaleFactor(scale_factor);
-}
-
-/* ==================================================
- *    Scale DuMM force field terms by scale_factor
- * ================================================== */
-void Topology::setSpecificDuMMScaleFactor(SimTK::DuMMForceFieldSubsystem &dumm){
-
-    dumm.setBondStretchGlobalScaleFactor(0.0);
-
-    dumm.setBondBendGlobalScaleFactor(0.0);
-
-    dumm.setBondTorsionGlobalScaleFactor(0.0);
-
-    dumm.setAmberImproperTorsionGlobalScaleFactor(0.0);
-
-    dumm.setVdw12ScaleFactor(0.0);
-    dumm.setVdw13ScaleFactor(0.0);
-    dumm.setVdw14ScaleFactor(0.5);
-    dumm.setVdw15ScaleFactor(1.0);
-    //dumm.setVdwGlobalScaleFactor(1.0);
-
-    dumm.setCoulomb12ScaleFactor(0.0);
-    dumm.setCoulomb13ScaleFactor(0.0);
-    dumm.setCoulomb14ScaleFactor(0.0);
-    dumm.setCoulomb15ScaleFactor(0.0);
-    dumm.setCoulombGlobalScaleFactor(0.0);
-
-    dumm.setGbsaGlobalScaleFactor(0.0);
-}
-
-
 
 
