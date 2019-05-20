@@ -34,22 +34,19 @@
 
 #include <boost/timer.hpp>
 
-//#include "/home/lspirido/Installers/armadillo-6.400.3/include/armadillo.hpp"
-
 //#ifndef TRY_TO_USE_OPENMM
 //#define TRY_TO_USE_OPENMM
 //#endif
 
-//RE #include "bMoleculeReader.hpp"
-//#include "bAddParams.hpp"
 #include "server.hpp"
 #include "Topology.hpp"
 #include "bArgParser.hpp"
 #include "HamiltonianMonteCarloSampler.hpp"
 #include "ConformationalSearch.hpp"
 
-//typedef double Vector3[3];
-
+// TODO write a pdb writer for all the Compounds
+// TODO move this in Topology since they work only for one Compound
+// The following use PdbStructure for a Compound's Default Configuration
 void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
          const char *dirname, const char *prefix, int midlength, const char *sufix);
 
@@ -75,11 +72,16 @@ public:
     // --- Structural functions ---
     /** Constructor **/
     World(int worldIndex, bool isVisual=true, SimTK::Real visualizerFrequency = 0.0015);
- 
+
+    // Destructor
+    ~World(); // destructor
+
     /** Creates a topology object and based on amberReader forcefield 
      parameters - defines Biotypes; - adds BAT parameters to DuMM **/
     void AddMolecule(readAmberInput *amberReader, std::string rbFN, std::string flexFN, std::string regimenSpec);
-    int getNofMolecules(void);
+
+    /** Get the number of molecules **/
+    int getNofMolecules();
  
     /** Calls CompoundSystem.modelCompounds and realizes Topology 
     To be called after loading all Compounds. **/
@@ -93,7 +95,14 @@ public:
     /** Set Compound, MultibodySystem and DuMM configurations according to
     some other World's atoms **/
     SimTK::State& setAtomsLocationsInGround(SimTK::State&, std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations);
-  
+
+    /** Return own CompoundSystem **/
+    CompoundSystem *getCompoundSystem() const;
+
+    /** Set own Compound system **/
+    // TODO find a solution for the old one
+    void setCompoundSystem(CompoundSystem *compoundSystem);
+
     /** Update Gmolmodel bSpecificAtom Cartesian coordinates according to
     Molmodel Compound which in turn relizes Position and uses matter
      to calculate locations. **/
@@ -130,6 +139,10 @@ public:
     void setSeed(int whichSampler, unsigned long long int);
     unsigned long long int getSeed(int whichSampler);
 
+    /** Use the Fixman torque as an additional force subsystem.
+    Careful not have different temperatures for World and Fixman Torque. **/
+    void addFixmanTorque();
+
     /** Amber like scale factors. **/
     void setAmberForceFieldScaleFactors(void);
 
@@ -142,11 +155,7 @@ public:
     /** Get a writeble pointer to the DuMM force field **/
     SimTK::DuMMForceFieldSubsystem * updForceField(void);
 
-    /** Use the Fixman torque as an additional force subsystem.
-    Careful not have different temperatures for World and Fixman Torque. **/
-    void useFixmanTorque(SimTK::Real argTemperature);
-
-    /** Check if the Fixman torque flag is set **/
+    /** Return true if the Fixman torque flag is set **/
     bool isUsingFixmanTorque(void);
     //...............
 
@@ -181,16 +190,25 @@ public:
     /** Print information about Simbody systems **/
     void PrintSimbodyStateCache(SimTK::State&);
   
-    /** Print Compound Cartesian coordinates **/
+    /** Print a Compound Cartesian coordinates as given by
+     * Compound::calcAtomLocationInGroundFrame **/
     void printPoss(const SimTK::Compound& c, SimTK::State& someState);
+
+    /** Print a Compound Cartesian velocities as given by
+ * Compound::calcAtomVelocityInGroundFrame **/
+    void printVels(const SimTK::Compound& c, SimTK::State& someState);
+
+    /** Print a Compound Cartesian coordinates and velocities
+     * as given by Compound::calcAtomLocationInGroundFrame and
+     * Compound::calcAtomVelocityInGroundFrame**/
+    void printPossVels(const SimTK::Compound& c, SimTK::State& someState);
     //...............
  
-    // Destructor
-    ~World(); // destructor
+
 
 public:
 
-    // --- Structural data ---
+    // --- The three S: Study, System and State related ---
     /** System->MultibodySystem->MolecularMechanicsSystems->CompoundSystem **/
     SimTK::CompoundSystem *compoundSystem;
 
@@ -211,10 +229,10 @@ public:
     int moleculeCount;
 
     /** Filenames for files needed to build molecules (topologies) **/
-    std::string rbFN; // rigid bodies specifications
-    std::string frcmodF; // to be removed
-    std::string flexFN; // flexible bonds specifications
-    std::string regimenSpec; // regimen specification
+    //std::string rbFN; // rigid bodies specifications
+    //std::string frcmodF; // to be removed
+    //std::string flexFN; // flexible bonds specifications
+    //std::string regimenSpec; // regimen specification
   
     /** Molecules (topologies<-Compounds) objects **/
     //std::vector<bMoleculeReader *> moleculeReaders;
@@ -251,6 +269,7 @@ public:
   
     // --- Graphics ---
     bool visual;
+
     // Our decorations
     ParaMolecularDecorator *paraMolecularDecorator;
 

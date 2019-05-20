@@ -16,9 +16,11 @@ class ParaMolecularDecorator : public DecorationGenerator {
 public:
     ParaMolecularDecorator(SimTK::CompoundSystem *argCompoundSystem,
         SimTK::SimbodyMatterSubsystem *argMatter,
-        Topology *argResidue,
+        //Topology *argResidue, // RE
         SimTK::DuMMForceFieldSubsystem *argDumm,
         SimTK::GeneralForceSubsystem *argForces);
+
+    void AddMolecule(Topology *argMolecule);
 
     void loadPoint(const Vec3 point);
 
@@ -39,9 +41,11 @@ public:
 private:
     SimTK::CompoundSystem *compoundSystem;
     SimTK::SimbodyMatterSubsystem *matter;
-    Topology *residue;
     SimTK::DuMMForceFieldSubsystem *dumm;
-    SimTK::GeneralForceSubsystem *forces; 
+    SimTK::GeneralForceSubsystem *forces;
+
+    // Topology *molecule; // RE
+    std::vector<Topology *> molecules; // NEW
 
     Array_< Vec3 >  points;
     Array_< std::pair< Vec3, Vec3 > > lines;

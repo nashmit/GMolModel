@@ -55,8 +55,7 @@ public:
     /** Print atom list **/
     void PrintAtomList();
 
-    /** Print Molmodel specific types as introduced in Gmolmodel **/
-    void PrintMolmodelAndDuMMTypes();
+
     /** Biotype is a Molmodel hook that is usually used to look up molecular
      force field specific parameters for an atom type. Gmolmodel defines a
      new Biotype for each atom. The only thing that is specified is the element
@@ -103,6 +102,9 @@ public:
         , SimTK::DuMMForceFieldSubsystem& dumm
     );
 
+    /** Print Molmodel specific types as introduced in Gmolmodel **/
+    void PrintMolmodelAndDuMMTypes(SimTK::DuMMForceFieldSubsystem& dumm);
+
     /** Build the molecular tree without the cycle closing bonds **/
     void buildAcyclicGraph(bSpecificAtom *node, bSpecificAtom *previousNode);
 
@@ -117,13 +119,14 @@ public:
     /** Builds the Compound's tree, closes the rings, matches the configuration
     on the graph using using Molmodels matchDefaultConfiguration and sets the
     general flexibility of the molecule. **/
-    void build(
+    void buildGraphAndMatchCoords(
             SimTK::DuMMForceFieldSubsystem &dumm
-            , std::string flexFN="ligand.flex"
-            , std::string regimenSpec="IC"
     );
 
-    void setRegimen(std::string argRegimen, std::string flexFN);
+    // Set flexibility according to an input file
+    void setFlexibility(std::string argRegimen, std::string flexFN);
+
+    // Get regimen keyword
     std::string getRegimen();
 
     // Interface:
@@ -134,6 +137,13 @@ public:
     void setName(std::string nameOfThisMolecule){
         this->name = nameOfThisMolecule;
     }
+
+    /** Get own CompoundIndex in CompoundSystem **/
+    const SimTK::CompoundSystem::CompoundIndex &getCompoundIndex() const;
+
+    /** Set the compoundIndex which is the position in the vector of Compounds
+ * of the CompoundSystem **/
+    void setCompoundIndex(const SimTK::CompoundSystem::CompoundIndex &compoundIndex);
 
     /** Get the number of atoms. **/
     int getNAtoms() const;
@@ -186,7 +196,8 @@ public:
                           int maxNofDigits,
                           int index) const;
 
-    /** Create MobilizedBodyIndex vs Compound::AtomIndex maps  **/
+    /** To be removed. *Create MobilizedBodyIndex vs Compound::AtomIndex
+     * maps. **/
     void loadMobodsRelatedMaps();
 
     /** Print atom to MobilizedBodyIndex and bond to Compound::Bond index
@@ -201,18 +212,23 @@ public:
 
 public:
 
+    // TODO move to Context
     int natoms;
     std::vector<bSpecificAtom > bAtomList;
 
     int nbonds;
     std::vector<bBond > bonds;
 
-    //std::string regimenSpec;
-
 private:
 
     std::string regimen;
     std::string name;
+
+    /** Every Compound has an index which is the position in the vector
+     * of Compounds in CompoundSystem
+     */
+    SimTK::CompoundSystem::CompoundIndex compoundIndex;
+
     int nofProcesses;
     int baseSetFlag;
     int baseAtomNumber;

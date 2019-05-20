@@ -79,13 +79,13 @@ bool SetupReader::find( std::string argKey )
 }
 
 // Access values by key
-std::vector<std::string> SetupReader::getValues(const char *cArgKey)
+std::vector<std::string> SetupReader::get(const char *cArgKey)
 {
     return Args[std::string(cArgKey)];
 }
 
 // Access values by key
-std::vector<std::string> SetupReader::getValues(std::string argKey)
+std::vector<std::string> SetupReader::get(std::string argKey)
 {
     return Args[argKey];
 }

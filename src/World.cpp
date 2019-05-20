@@ -1,5 +1,7 @@
 #include "World.hpp"
 
+// TODO write a pdb writer for all the Compounds
+// TODO move this in Topology since they work only for one Compound
 void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
          const char *dirname, const char *prefix, int midlength, const char *sufix)
 {
@@ -69,6 +71,8 @@ void writePdb(SimTK::PdbStructure pdb, const char *FN)
   fb.close();
 }
 
+/** Print a Compound Cartesian coordinates as given by
+     * Compound::calcAtomLocationInGroundFrame **/
 void World::printPoss(const SimTK::Compound& c, SimTK::State& advanced)
 {
     SimTK::Vec3 vertex;
@@ -80,7 +84,7 @@ void World::printPoss(const SimTK::Compound& c, SimTK::State& advanced)
     }
 }
 
-void printVels(const SimTK::Compound& c, SimTK::State& advanced)
+void World::printVels(const SimTK::Compound& c, SimTK::State& advanced)
 {
     SimTK::Vec3 vel;
     std::cout<<"Velocities:"<<std::endl;
@@ -92,7 +96,7 @@ void printVels(const SimTK::Compound& c, SimTK::State& advanced)
     std::cout<<std::endl;
 }
 
-void printPossVels(const SimTK::Compound& c, SimTK::State& advanced)
+void World::printPossVels(const SimTK::Compound& c, SimTK::State& advanced)
 {
     SimTK::Vec3 vertex, vel;
     std::cout<<"Positions:"<<std::endl;
@@ -111,43 +115,57 @@ void printPossVels(const SimTK::Compound& c, SimTK::State& advanced)
     std::cout<<std::endl;
 }
 
-void shmDump(TARGET_TYPE *shm, unsigned int natms)
-{
-  assert(!"Not implemented");
-}
-
-/** Constructor. Allocates memory for new CompoundSystem, 
-SimbodyMatterSubsystem, GeneralForceSubsystem, 
-DecorationSubsystem, Visualizer, Visualizer::Reporter,
-DuMMForceFieldSubsystem, Integrator, TimeStepper **/
+/** Constructor. Initializes the following pretty much empty objects:
+ *  - CompoundSystem,
+ *      - SimbodyMatterSubsystem, GeneralForceSubsystem, DecorationSubsystem,
+ *        Visualizer, Visualizer::Reporter, DuMMForceFieldSubsystem,
+ *  - Integrator with a TimeStepper on top **/
 World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
 {
+    // Get an index from a higher caller
     ownWorldIndex = worldIndex;
-    std::cout << "World::World BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 
-    // Flags
+    // Initialize Fixman torque flag
     _useFixmanTorque = false;
   
-    // SimTK Systems and Subsystems
-    compoundSystem = new SimTK::CompoundSystem; // Molmodel
-    matter = new SimTK::SimbodyMatterSubsystem(*compoundSystem); // Simbody
-    forces = new SimTK::GeneralForceSubsystem(*compoundSystem); // Simbody
+    // Molmodel System derived from Simbody System
+    compoundSystem = new SimTK::CompoundSystem;
 
-    // Visual Systems
+    // Simbody subsystems (Minimum requirements)
+    matter = new SimTK::SimbodyMatterSubsystem(*compoundSystem);
+    forces = new SimTK::GeneralForceSubsystem(*compoundSystem);
+
+
+  
+    // Initialize Molmodel default ForceSubsystem (DuMM)
+    forceField = new SimTK::DuMMForceFieldSubsystem(*compoundSystem);
+
+    // Intialize an integrator and a TimeStepper to manage it
+    integ = new SimTK::VerletIntegrator(*compoundSystem);
+    ts = new SimTK::TimeStepper(*compoundSystem, *integ);
+
+    // Set the visual flag and if true initialize a Decorations Subsystem,
+    // a Visualizer and a Simbody EventReporter which interacts with the
+    // Visualizer
     this->visual = isVisual;
     if(visual){
         decorations = new SimTK::DecorationSubsystem(*compoundSystem);
         visualizer = new SimTK::Visualizer(*compoundSystem);
         visualizerReporter = new SimTK::Visualizer::Reporter(*visualizer
-           , visualizerFrequency);
+                , visualizerFrequency);
         compoundSystem->addEventReporter( visualizerReporter );
+
+        // Initialize a DecorationGenerator
+        paraMolecularDecorator = new ParaMolecularDecorator(
+                compoundSystem,
+                matter,
+                forceField,
+                forces
+        );
+
+        visualizer->addDecorationGenerator(paraMolecularDecorator);
+
     }
-  
-    // Other SimTK Systems and Subsystems
-    forceField = new SimTK::DuMMForceFieldSubsystem(*compoundSystem); // Molmodel
-    //forceField->loadAmber99Parameters();
-    integ = new SimTK::VerletIntegrator(*compoundSystem); // Simbody
-    ts = new SimTK::TimeStepper(*compoundSystem, *integ); // Simbody
 
     // Statistics
     moleculeCount = -1;
@@ -156,7 +174,6 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
     // Thermodynamics
     this->temperature = -1; // this leads to unusal behaviour hopefully
 
-    std::cout << "World::World END: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
 }
 
 /** Creates Gmolmodel topologies objects and based on amberReader forcefield
@@ -170,32 +187,36 @@ void World::AddMolecule(
 {
     // Statistics
     moleculeCount++; // Used for unique names of molecules
-
-    // Get filenames for flexibility specifications
-    this->rbFN = rbFN;
-    this->flexFN = flexFN;
-    this->regimenSpec = regimenSpec;
  
     // Add a new molecule (Topology object which inherits Compound)
     // to the vector of molecules.
     // TODO: Why resName and moleculeName have to be the same?
-    //std::string moleculeName = std::string("lig") + std::to_string(moleculeCount); // RERE
-    std::string moleculeName = regimenSpec + std::to_string(moleculeCount); // RERE
+    std::string moleculeName = regimenSpec + std::to_string(moleculeCount);
     Topology *top = new Topology(moleculeName);
-    topologies.push_back(top);
+    topologies.emplace_back(top);
 
-    // Get information from amberReader and put it in bAtomList and bonds
-    (topologies.back())->loadAtomAndBondInfoFromReader(amberReader);
+    // Set atoms properties from a reader: number, name, element, initial
+    // name, force field type, charge, coordinates, mass, LJ parameters
+    (topologies.back())->SetGmolAtomPropertiesFromReader(amberReader);
+
+    // Set bonds properties from reader: bond indeces, atom neighbours
+    (topologies.back())->SetGmolBondingPropertiesFromReader(amberReader);
+
+    // Set atoms Molmodel types (Compound::SingleAtom derived) based on
+    // their valence
+    (topologies.back())->SetGmolAtomsMolmodelTypes();
 
     // Add parameters from amberReader
-    std::string resName = regimenSpec + std::to_string(moleculeCount); // NEW
-    (topologies.back())->bAddAllParams(amberReader, *forceField); // NEW
-    //(topologies.back())->PrintMolmodelAndDuMMTypes();
+    (topologies.back())->bAddAllParams(amberReader, *forceField);
 
     // Build the graph representing molecule's topology
-    (topologies.back())->build(*forceField, flexFN, regimenSpec);
+    (topologies.back())->buildGraphAndMatchCoords(*forceField);
 
-    (topologies.back())->PrintMolmodelAndDuMMTypes();
+    // Set flexibility according to the flexibility file
+    (topologies.back())->setFlexibility(regimenSpec, flexFN);
+
+    // Print Molmodel types
+    (topologies.back())->PrintMolmodelAndDuMMTypes(*forceField);
 
     // Allocate the vector of coordinates (DCD)
     Xs.resize(Xs.size() + topologies.back()->getNAtoms());
@@ -204,85 +225,58 @@ void World::AddMolecule(
   
     // Add Topology to CompoundSystem and realize topology
     compoundSystem->adoptCompound( *(topologies.back()) );
-    compoundSystem->realizeTopology();
+    (topologies.back())->setCompoundIndex(
+            SimTK::CompoundSystem::CompoundIndex(
+             compoundSystem->getNumCompounds() - 1));
 
-    // Debug info
-    std::cout << "Number of included atoms in nonbonded interactions: "
-        << forceField->getNumNonbondAtoms() << std::endl << std::flush;
-    std::cout << "getVdwGlobalScaleFactor() " 
-        << forceField->getVdwGlobalScaleFactor() << std::endl << std::flush;
-    for(int i = 0; i < (topologies.back())->natoms; i++){
-        std::cout << " DuMM VdW Radius " 
-            << forceField->getVdwRadius(((topologies.back())->bAtomList[i]).getAtomClassIndex())
-            << " DuMM VdW Well Depth "
-            << forceField->getVdwWellDepth(((topologies.back())->bAtomList[i]).getAtomClassIndex())
-            << std::endl << std::flush;
-    }
-  
-    // Generate decorations for molecule
+    // Add the new molecule to Decorators's vector of molecules
     if(visual){
-        paraMolecularDecorator = new ParaMolecularDecorator(
-            compoundSystem,
-            matter,
-            topologies.back(),
-            forceField,
-            forces
-        );
-        visualizer->addDecorationGenerator(paraMolecularDecorator);
+        // We need copy here.
+        paraMolecularDecorator->AddMolecule(topologies.back());
     }
 
 }
 
+// Get the number of molecules
 int World::getNofMolecules(void)
 {
     return (this->moleculeCount + 1);
 }
 
-
-/** Calls CompoundSystem.modelCompounds and realizes Topology.
-To be called after loading all Compounds. **/
+/** Calls CompoundSystem.modelOneCompound which links the Compounds to the
+ * Simbody subsystems and realizes Topology. To be called after setting all
+ * Compounds properties. **/
 void World::ModelTopologies(bool useFixmanTorqueOpt)
 {
-    std::cout << "World::Init BEGIN: ownWorldIndex: " << this->ownWorldIndex << std::endl << std::flush;
-
-    // Model Compounds
-    compoundSystem->modelCompounds();
-
-    // Load MobilizedBodyIndex vs Compound::AtomIndex maps 
+    // Model the Compounds one by one in case we want to attach different types
+    // of Mobilizers to the Ground in the feature.
     for ( unsigned int i = 0; i < this->topologies.size(); i++){
+        SimTK::String GroundToCompoundMobilizerType = "Free";
+        compoundSystem->modelOneCompound(
+                SimTK::CompoundSystem::CompoundIndex(i),
+                GroundToCompoundMobilizerType);
+
+        // Realize Topology
+        compoundSystem->realizeTopology();
+
         ((this->topologies)[i])->loadMobodsRelatedMaps();
-        std::cout << "Print maps topology " << i << std::endl;
-        ((this->topologies)[i])->printMaps();
+
     }
 
-//    // OpenMM coupling
-//    #ifdef TRY_TO_USE_OPENMM
-//        forceField->setUseOpenMMAcceleration(true);
-//    #endif
-    //forceField->setTracing(true); // log OpenMM info to console
-    //forceField->setNumThreadsRequested(1); // don't use this unless
-  
     // Realize Topology
-    compoundSystem->realizeTopology();
-
-    std::cout << "World::Init END: ownWorldIndex: " << this->ownWorldIndex << std::endl;
+    //compoundSystem->realizeTopology();
 }
 
 /** Set up Fixman torque **/
-void World::useFixmanTorque(SimTK::Real argTemperature)
+void World::addFixmanTorque()
 {
     // Set flag
     _useFixmanTorque = true;
 
-    // Alloc memory for FixmanTorquw implementation and add to forces
+    // Alloc memory for FixmanTorque implementation and add to forces
     FixmanTorqueImpl = new FixmanTorque(compoundSystem, *matter);
-    Force::Custom ExtForce(*forces, FixmanTorqueImpl);
-
-    // Set the temperature for the Fixman torque
-    FixmanTorqueImpl->setTemperature(argTemperature);
-
-    // Not sure if this is necessary
-    compoundSystem->realizeTopology();
+    ExtForce = new Force::Custom(*forces, FixmanTorqueImpl); // NEW
+    //Force::Custom ExtForce(*forces, FixmanTorqueImpl); // RE
 }
 
 /** Check if the Fixman torque flag is set **/
@@ -904,9 +898,7 @@ World::~World(){
     delete matter;
     delete forces;
     delete compoundSystem;
-    //RE for(unsigned int i = 0; i < moleculeReaders.size(); i++){
-    //RE     delete moleculeReaders[i];
-    //RE }
+
     for(unsigned int i = 0; i < topologies.size(); i++){
         delete topologies[i];
     }
@@ -917,6 +909,17 @@ World::~World(){
     Xs.clear();
     Ys.clear();
     Zs.clear();
+}
+
+/** Return own CompoundSystem **/
+CompoundSystem *World::getCompoundSystem() const {
+    return compoundSystem;
+}
+
+/** Set own Compound system **/
+// TODO find a solution for the old one
+void World::setCompoundSystem(CompoundSystem *compoundSystem) {
+    World::compoundSystem = compoundSystem;
 }
 
 

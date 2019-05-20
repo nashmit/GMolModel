@@ -36,8 +36,12 @@ public:
     bool loadRigidBodiesSpecs(int whichWorld, int whichMolecule, std::string RBSpecsFN);
     bool loadFlexibleBondsSpecs(int whichWorld, int whichMolecule, std::string FlexSpecsFN);
     void setRegimen (int whichWorld, int whichMolecule, std::string regimen);
-    void loadMolecules();
+
+    /** Load molecules based on loaded filenames **/
+    void AddMolecules();
     void modelTopologies(void);
+
+    void realizeTopology(void);
 
     void LoadWorldsFromSetup(SetupReader&);
 
@@ -79,8 +83,10 @@ public:
     // Use Fixman torque as an additional force subsystem
     void useFixmanPotential(int whichWorld, int whichSampler);
     bool isUsingFixmanPotential(int whichWorld, int whichSampler);
-    void useFixmanTorque(int whichWorld, SimTK::Real argTemperature);
+
+    void addFixmanTorque(int whichWorld);
     bool isUsingFixmanTorque(int whichWorld);
+
     void setFixmanTorqueScaleFactor(int whichWorld, double scaleFactor);
     void setFixmanTorqueTemperature(int whichWorld, double temperature);
     //------------

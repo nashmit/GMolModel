@@ -32,6 +32,10 @@ Topology::~Topology(){
  * name, force field type, charge, coordinates, mass, LJ parameters **/
 void Topology::SetGmolAtomPropertiesFromReader(readAmberInput *amberReader)
 {
+    // Alloc memory for atoms and bonds list
+    natoms = amberReader->getNumberAtoms();
+    bAtomList.resize(natoms);
+
     // Initialize atom variables
     for(int i = 0; i < natoms; i++){
         bAtomList[i].Zero();
@@ -56,6 +60,7 @@ void Topology::SetGmolAtomPropertiesFromReader(readAmberInput *amberReader)
         }
         bAtomList[i].setElem(str_buf.at(strix));
 
+        // Assign a "unique" name. The generator is however limited.
         bAtomList[i].setName(GetUniqueName(i));
 
         // Store the initial name from prmtop
@@ -83,18 +88,21 @@ void Topology::SetGmolAtomPropertiesFromReader(readAmberInput *amberReader)
         bAtomList[i].setLJWellDepth(amberReader->getAtomsEpsilon(i));
 
         // Set residue name and index
-        //bAtomList[i].setResidueName(amberReader->getResidueName(i));
-        //bAtomList[i].setResidueIndex(amberReader->getResidueIndex(i));
         bAtomList[i].residueName = std::string("UNK");
         bAtomList[i].residueIndex = 1;
 
-        //bAtomList[i].Print();
     } // END atom properties
 }
 
 /** Set bonds properties from reader: bond indeces, atom neighbours **/
 void Topology::SetGmolBondingPropertiesFromReader(readAmberInput *amberReader)
 {
+    assert( (!bAtomList.empty()) &&
+    "Topology::loadAtomAndBondInfoFromReader: atom list empty.");
+
+    // Alloc memory for bonds list
+    nbonds = amberReader->getNumberBonds();
+    bonds.resize(nbonds);
 
     // Iterate through bonds and get atom indeces
     for(int i=0; i<nbonds; i++){
@@ -282,14 +290,6 @@ void Topology::SetGmolAtomsMolmodelTypes()
  * bAtomList and bonds lists **/
 void Topology::loadAtomAndBondInfoFromReader(readAmberInput *amberReader)
 {
-    // Alloc memory for atoms and bonds list
-    natoms = amberReader->getNumberAtoms();
-    nbonds = amberReader->getNumberBonds();
-    bAtomList.resize(natoms);
-    bonds.resize(nbonds);
-
-    assert( (!bAtomList.empty()) && "Topology::loadAtomAndBondInfoFromReader: atom list empty.");
-
     // Set atoms properties from a reader: number, name, element, initial
     // name, force field type, charge, coordinates, mass, LJ parameters
     SetGmolAtomPropertiesFromReader(amberReader);
@@ -421,7 +421,7 @@ void Topology::bAddAtomClasses(
 }
 
 /** Print Molmodel specific types as introduced in Gmolmodel **/
-void Topology::PrintMolmodelAndDuMMTypes()
+void Topology::PrintMolmodelAndDuMMTypes(SimTK::DuMMForceFieldSubsystem& dumm)
 {
     std::cout << "Print Molmodel And DuMM Types:" << std::endl;
     for(int i = 0; i < bAtomList.size(); i++){
@@ -432,7 +432,12 @@ void Topology::PrintMolmodelAndDuMMTypes()
             << " ChargedAtomTypeIndex "<< bAtomList[i].getChargedAtomTypeIndex()
             << " AtomClassIx " << bAtomList[i].getAtomClassIndex()
             << " partialChargeInE " << bAtomList[i].charge
-            << " chargedAtomTypeIndex " << bAtomList[i].getChargedAtomTypeIndex()
+            << " chargedAtomTypeIndex "
+            << bAtomList[i].getChargedAtomTypeIndex()
+            << " DuMM VdW Radius "
+            << dumm.getVdwRadius(bAtomList[i].getAtomClassIndex())
+            << " DuMM VdW Well Depth "
+            << dumm.getVdwWellDepth(bAtomList[i].getAtomClassIndex())
             << std::endl;
     }
 }
@@ -767,27 +772,20 @@ void Topology::matchDefaultConfigurationWithAtomList(
 /** Builds the molecular tree, closes the rings, matches the configuration
 on the graph using using Molmodels matchDefaultConfiguration and sets the 
 general flexibility of the molecule. **/
-void Topology::build(
-      SimTK::DuMMForceFieldSubsystem &dumm
-    , std::string flexFN
-    , std::string regimenSpec
+void Topology::buildGraphAndMatchCoords(
+        SimTK::DuMMForceFieldSubsystem &dumm
 )
 {
-    // Set regimen
-    //this->regimenSpec = regimenSpec;
 
-    // Initialize all atoms to unvisited
+    // Initialize all atoms and bonds to unvisited
     for(int i = 0; i < natoms; i++){
         bAtomList[i].setVisited(0);
     }
-
-    // Initialize all bonds to unvisited
     for(int i = 0; i < nbonds; i++){
         bonds[i].setVisited(0);
     }
 
     // Find an atom to be the root. It has to have more than one bond
-    std::cout << "Start building the graph" << std::endl;
     int baseAtomListIndex = 0;
     for(int i = 0; i < natoms; i++){
         if(bAtomList[i].getNBonds() > 1){
@@ -795,7 +793,6 @@ void Topology::build(
             break;
         }
     }
-
     bSpecificAtom *root = &(bAtomList[baseAtomListIndex]);
     baseAtomNumber = root->number;
 
@@ -810,17 +807,17 @@ void Topology::build(
     matchDefaultConfigurationWithAtomList(SimTK::Compound::Match_Exact);
 
     // Implement flexibility/rigidity specifications
-    setRegimen(regimenSpec, flexFN);
+    //setRegimen(regimenSpec, flexFN);
 
 }
 
 /** Get regimen **/
-std::string Topology::getRegimen(void){
+std::string Topology::getRegimen(){
     return this->regimen;
 }
 
-/** Set regimen **/
-void Topology::setRegimen(std::string argRegimen, std::string flexFN){
+/** Set regimen according to input file **/
+void Topology::setFlexibility(std::string argRegimen, std::string flexFN){
     
     if(argRegimen == "IC"){
         for (unsigned int r=0 ; r<getNumBonds(); r++){
@@ -993,6 +990,17 @@ void Topology::getCoordinates(
         Ys[ix] = bAtomList[ix].getY();
         Zs[ix] = bAtomList[ix].getZ();
     }
+}
+
+/** Get own CompoundIndex in CompoundSystem **/
+const CompoundSystem::CompoundIndex &Topology::getCompoundIndex() const {
+    return compoundIndex;
+}
+
+/** Set the compoundIndex which is the position in the vector of Compounds
+ * of the CompoundSystem **/
+void Topology::setCompoundIndex(const CompoundSystem::CompoundIndex &compoundIndex) {
+    Topology::compoundIndex = compoundIndex;
 }
 
 

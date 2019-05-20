@@ -44,7 +44,7 @@ Context::Context(World *inp_p_world, std::string logFilename){
 
 }
 
-// Add another world and a sampler to the context
+// Add an empty world to the context
 World * Context::AddWorld(bool visual){
 
     worldIndexes.push_back(worldIndexes.size());
@@ -179,15 +179,24 @@ void Context::setRegimen (int whichWorld, int whichMolecule, std::string regimen
     regimens[whichWorld].push_back(regimen);
 }
 
-void Context::loadMolecules(void)
+/** Load molecules based on loaded filenames **/
+void Context::AddMolecules(void)
 {
-
+    // TODO assert that the filenames vectors are not empty
+    // Iterate through Worlds
     for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){
+        // Iterate through topology filenames vector
         for(unsigned int molIx = 0; molIx < topFNs[worldIx].size(); molIx++){
+            // Initialize an input reader
             readAmberInput *amberReader = new readAmberInput();
             amberReader->readAmberFiles(crdFNs[worldIx][molIx], topFNs[worldIx][molIx]);
+
+            // Add the molecule to the World
             (updWorld(worldIx))->AddMolecule(amberReader,
-                rbSpecsFNs[worldIx][molIx], flexSpecsFNs[worldIx][molIx], regimens[worldIx][molIx]);
+                    rbSpecsFNs[worldIx][molIx], flexSpecsFNs[worldIx][molIx],
+                    regimens[worldIx][molIx]);
+
+            // Delete the reader
             delete amberReader; 
         }
     }
@@ -456,9 +465,9 @@ void Context::setTimestep(int whichWorld, int whichSampler, float argTimestep)
 }
 
 // Use Fixman torque as an additional force subsystem
-void Context::useFixmanTorque(int whichWorld, SimTK::Real argTemperature)
+void Context::addFixmanTorque(int whichWorld)
 {
-    worlds[whichWorld]->useFixmanTorque(argTemperature);
+    worlds[whichWorld]->addFixmanTorque();
 }
 
 bool Context::isUsingFixmanTorque(int whichWorld)
@@ -921,14 +930,14 @@ void Context::PrintSamplerData(unsigned int whichWorld)
 // Print geometric parameters during simulation
 void Context::PrintGeometry(SetupReader& setupReader, int whichWorld)
 {
-    if(setupReader.getValues("GEOMETRY")[0] == "TRUE"){
+    if(setupReader.get("GEOMETRY")[0] == "TRUE"){
         // Get distances indeces
-        int distanceIx[setupReader.getValues("DISTANCE").size()];
-        for(unsigned int i = 0; i < setupReader.getValues("DISTANCE").size(); i++){
-            distanceIx[i] = atoi(setupReader.getValues("DISTANCE")[i].c_str());
+        int distanceIx[setupReader.get("DISTANCE").size()];
+        for(unsigned int i = 0; i < setupReader.get("DISTANCE").size(); i++){
+            distanceIx[i] = atoi(setupReader.get("DISTANCE")[i].c_str());
         }
         // Get distances
-        for(int ai = 0; ai < (setupReader.getValues("DISTANCE").size() / 2); ai++){
+        for(int ai = 0; ai < (setupReader.get("DISTANCE").size() / 2); ai++){
             /*
             std::cout << std::setprecision(4) 
             << this->Distance(whichWorld, 0, 0, 
@@ -941,12 +950,12 @@ void Context::PrintGeometry(SetupReader& setupReader, int whichWorld)
         }
 
         // Get dihedrals indeces
-        int dihedralIx[setupReader.getValues("DIHEDRAL").size()];
-        for(unsigned int i = 0; i < setupReader.getValues("DIHEDRAL").size(); i++){
-            dihedralIx[i] = atoi(setupReader.getValues("DIHEDRAL")[i].c_str());
+        int dihedralIx[setupReader.get("DIHEDRAL").size()];
+        for(unsigned int i = 0; i < setupReader.get("DIHEDRAL").size(); i++){
+            dihedralIx[i] = atoi(setupReader.get("DIHEDRAL")[i].c_str());
         }
         // Get dihedrals
-        for(int ai = 0; ai < (setupReader.getValues("DIHEDRAL").size() / 4); ai++){
+        for(int ai = 0; ai < (setupReader.get("DIHEDRAL").size() / 4); ai++){
             /*
             std::cout << std::setprecision(4) 
             << this->Dihedral(whichWorld, 0, 0, 
@@ -1169,6 +1178,13 @@ SimTK::Real Context::Distance(int whichWorld, int whichCompound, int whichSample
 SimTK::State& Context::updAdvancedState(int whichWorld, int whichSampler)
 {
     return (worlds[whichWorld]->updSampler(whichSampler)->updTimeStepper()->updIntegrator()).updAdvancedState();
+}
+
+// Realize Topology Stage for all the Worlds
+void Context::realizeTopology() {
+    for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++) {
+        (worlds[worldIx]->getCompoundSystem())->realizeTopology();
+    }
 }
 
 

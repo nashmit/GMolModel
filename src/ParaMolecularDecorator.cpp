@@ -8,15 +8,20 @@ using namespace SimTK;
 
 ParaMolecularDecorator::ParaMolecularDecorator(SimTK::CompoundSystem *argCompoundSystem,
                  SimTK::SimbodyMatterSubsystem *argMatter,
-                 Topology *argResidue,
+                 //Topology *argResidue, RE
                  SimTK::DuMMForceFieldSubsystem *argDumm,
                  SimTK::GeneralForceSubsystem *argForces)
 {
     this->compoundSystem = argCompoundSystem;
     this->matter = argMatter;
-    this->residue = argResidue;
+    // this->molecule = argResidue; //RE
     this->dumm = argDumm;
     this->forces = argForces;
+}
+
+void ParaMolecularDecorator::AddMolecule(Topology *argMolecule)
+{
+    molecules.push_back(argMolecule);
 }
 
 void ParaMolecularDecorator::loadPoint(const Vec3 point)
@@ -135,7 +140,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 // */
 
 
-    SimTK::Transform G_X_T = residue->getTopLevelTransform();
+    SimTK::Transform G_X_T = molecules[0]->getTopLevelTransform();
 /*
     // Draw Compound transforms for root atoms OLD WAY
     // Get transforms and locations: P_X_M, root_X_atom.p()
@@ -225,7 +230,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             SimTK::Transform root_X_M0[matter->getNumBodies()];
             SimTK::Angle inboardBondDihedralAngles[matter->getNumBodies()]; // related to X_FMs
             SimTK::Real inboardBondLengths[matter->getNumBodies()]; // related to X_FMs
-            SimTK::Vec3 locs[residue->getNumAtoms()];
+            SimTK::Vec3 locs[molecules[0]->getNumAtoms()];
  /*
 
             // Iterate through atoms - get T_X_roots for all the bodies
@@ -481,8 +486,8 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     //topDecorativeBrick.setScaleFactors(SimTK::Vec3(0.03, 0.03, 0.03));
     //topDecorativeBrick.setColor(SimTK::Vec3(0, 0, 0));
     //geometry.push_back( topDecorativeBrick );
-    for (SimTK::Compound::AtomIndex aIx(0); aIx < residue->getNumAtoms(); ++aIx){
-        SimTK::Transform T_X_atom =  residue->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(aIx));
+    for (SimTK::Compound::AtomIndex aIx(0); aIx < molecules[0]->getNumAtoms(); ++aIx){
+        SimTK::Transform T_X_atom =  molecules[0]->calcDefaultAtomFrameInCompoundFrame(SimTK::Compound::AtomIndex(aIx));
         SimTK::Transform G_X_atom = G_X_T * T_X_atom;
         // Bricks
         //DecorativeBrick decorativeBrick(SimTK::Vec3(0.03, 0.03, 0.03));

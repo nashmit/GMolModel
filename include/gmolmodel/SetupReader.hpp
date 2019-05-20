@@ -25,8 +25,8 @@ public:
     // Access values by key
     bool find( std::string argKey );
 
-    std::vector<std::string> getValues(const char *argKey);
-    std::vector<std::string> getValues(std::string argKey);
+    std::vector<std::string> get(const char *argKey);
+    std::vector<std::string> get(std::string argKey);
 
 private:
     std::map<std::string, std::vector<std::string>> Args; // arguments
