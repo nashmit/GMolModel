@@ -119,6 +119,9 @@ public:
     bool getReproducible(void);
     void setReproducible(void);
 
+    /** Print the number of threads each World got **/
+    void PrintNumThreads(void);
+
     /** Get/Set seed for reproducibility. **/
     void setSeed(int whichWorld, int whichSampler, unsigned long long int);
     unsigned long long int getSeed(int whichWorld, int whichSampler);

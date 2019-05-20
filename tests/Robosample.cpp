@@ -28,6 +28,7 @@ int main(int argc, char **argv)
     setupReader.dump();
 
     // Assert minimal requirements
+    // TODO Move asserts in Context
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         for(unsigned int molIx = 0; molIx < setupReader.get("MOLECULES").size(); molIx++){
             assert(SimTK::Pathname::fileExists(
@@ -92,40 +93,42 @@ int main(int argc, char **argv)
 
     // Add filenames to Context filenames vectors
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
-        for(unsigned int molIx = 0; molIx < setupReader.get("MOLECULES").size(); molIx++){
+        for(unsigned int molIx = 0;
+            molIx < setupReader.get("MOLECULES").size();
+            molIx++){
 
             context->loadTopologyFile( worldIx, molIx,
-                                       setupReader.get("MOLECULES")[molIx] + std::string("/")
-                + setupReader.get("PRMTOP")[molIx]
+                    setupReader.get("MOLECULES")[molIx] + std::string("/")
+                    + setupReader.get("PRMTOP")[molIx]
             );
 
             context->loadCoordinatesFile( worldIx, molIx,
-                                          setupReader.get("MOLECULES")[molIx] + std::string("/")
-                + setupReader.get("INPCRD")[molIx]
+                    setupReader.get("MOLECULES")[molIx] + std::string("/")
+                    + setupReader.get("INPCRD")[molIx]
             );
 
             context->loadRigidBodiesSpecs( worldIx, molIx,
-                                           setupReader.get("MOLECULES")[molIx] + std::string("/")
-                + setupReader.get("RBFILE")[molIx]
+                    setupReader.get("MOLECULES")[molIx] + std::string("/")
+                    + setupReader.get("RBFILE")[molIx]
             );
 
             context->loadFlexibleBondsSpecs( worldIx, molIx,
-                                             setupReader.get("MOLECULES")[molIx] + std::string("/")
-                + setupReader.get("FLEXFILE")[molIx]
+                    setupReader.get("MOLECULES")[molIx] + std::string("/")
+                    + setupReader.get("FLEXFILE")[molIx]
             );
 
             context->setRegimen( worldIx, molIx,
-                                 setupReader.get("WORLDS")[worldIx] );
+                    setupReader.get("WORLDS")[worldIx] );
         }
     }
 
     // Add molecules to Worlds based on just read filenames
     context->AddMolecules();
 
-    // Link the Compounds to Simbody System
+    // Link the Compounds to Simbody System for all Worlds
     context->modelTopologies();
 
-    // Do we use Fixman torque (Additional ForceSubsystem)
+    // Add Fixman torque (Additional ForceSubsystem) if required
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         if(setupReader.get("FIXMAN_TORQUE")[worldIx] == "TRUE"){
             context->addFixmanTorque(worldIx);
@@ -142,37 +145,27 @@ int main(int argc, char **argv)
                     std::stod(setupReader.get("FFSCALE")[worldIx]));
         }
         // Set world GBSA scale factor
-        context->setGbsaGlobalScaleFactor(worldIx, std::stod(setupReader.get("GBSA")[worldIx]));
+        context->setGbsaGlobalScaleFactor(worldIx,
+                std::stod(setupReader.get("GBSA")[worldIx]));
     }
 
 
-    // Set the number of threads
-    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
-        context->setNumThreadsRequested(worldIx, std::stod(setupReader.get("THREADS")[worldIx]));
+    // Request threads
+    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++) {
+        context->setNumThreadsRequested(worldIx,
+                std::stod(setupReader.get("THREADS")[worldIx]));
     }
 
-    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
-        std::cout << "main context->updWorld(" << worldIx<< ")->getNumThreadsRequested() " 
-            << context->updWorld(worldIx)->updForceField()->getNumThreadsRequested() << std::endl;
-        std::cout << "main context->updWorld(" << worldIx<< ")->getNumThreadsInUse() " 
-            << context->updWorld(worldIx)->updForceField()->getNumThreadsInUse() << std::endl;
-    }
+    // Print the number of threads we got back
+    context->PrintNumThreads();
 
-    // Use OpenMM
+    // Use OpenMM if possible
     if(setupReader.get("OPENMM")[0] == "TRUE"){
         context->setUseOpenMMAcceleration(true);
     }
 
     // Realize topology for all the Worlds
     context->realizeTopology();
-
-    // Set Fixman torques scale factors
-    for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
-        if(setupReader.get("FIXMAN_TORQUE")[worldIx] == "TRUE"){
-            std::cout << "main call context->setFixmanTorqueScaleFactor(" << worldIx << " -1 " << std::endl;
-            context->setFixmanTorqueScaleFactor(worldIx, -1.0);
-        }
-    }
 
     // Add samplers to the worlds
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){

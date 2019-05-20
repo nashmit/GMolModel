@@ -275,8 +275,7 @@ void World::addFixmanTorque()
 
     // Alloc memory for FixmanTorque implementation and add to forces
     FixmanTorqueImpl = new FixmanTorque(compoundSystem, *matter);
-    ExtForce = new Force::Custom(*forces, FixmanTorqueImpl); // NEW
-    //Force::Custom ExtForce(*forces, FixmanTorqueImpl); // RE
+    ExtForce = new Force::Custom(*forces, FixmanTorqueImpl);
 }
 
 /** Check if the Fixman torque flag is set **/
@@ -313,7 +312,6 @@ void World::setTemperature(SimTK::Real argTemperature)
 {
     // Set the temperature for the samplers
     for(unsigned int samplerIx = 0; samplerIx < samplers.size(); samplerIx++){
-        //std::cout << " World::setTemperature for sampler "<< samplerIx << " " << argTemperature << std::endl;
         samplers[samplerIx]->setTemperature(argTemperature);
     }
 
@@ -321,8 +319,7 @@ void World::setTemperature(SimTK::Real argTemperature)
     this->temperature = argTemperature;
 
     // Set the temperature for the Fixman torque also
-    //std::cout << " World::setTemperature for FixmanTorque " << argTemperature << std::endl;
-    if(_useFixmanTorque){ 
+    if(_useFixmanTorque){
         FixmanTorqueImpl->setTemperature(this->temperature);
     }
 }
@@ -345,9 +342,8 @@ unsigned long long int World::getSeed(int whichSampler)
 
 
 /** Amber like scale factors. **/
-void World::setAmberForceFieldScaleFactors(void)
+void World::setAmberForceFieldScaleFactors()
 {
-
     forceField->setVdw12ScaleFactor(0.0);
     forceField->setVdw13ScaleFactor(0.0);
     forceField->setVdw14ScaleFactor(0.5);
@@ -356,8 +352,8 @@ void World::setAmberForceFieldScaleFactors(void)
     forceField->setCoulomb13ScaleFactor(0.0);
     forceField->setCoulomb14ScaleFactor(0.8333333333);
     forceField->setCoulomb15ScaleFactor(1.0);
-    forceField->setVdwMixingRule(SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
-  
+    forceField->setVdwMixingRule(
+            SimTK::DuMMForceFieldSubsystem::LorentzBerthelot);
 }
 
 /** Set a global scaling factor for all the terms in the forcefield **/
@@ -387,12 +383,10 @@ void World::setGlobalForceFieldScaleFactor(SimTK::Real scaleFactor)
 void World::setGbsaGlobalScaleFactor(SimTK::Real scaleFactor)
 {
     forceField->setGbsaGlobalScaleFactor(scaleFactor);
-    std::cout << "GBSA solvent dielectric " << forceField->getSolventDielectric() << std::endl;
-    std::cout << "GBSA solute dielectric " << forceField->getSoluteDielectric() << std::endl;
 }
 
 /** Get a writeble pointer to the DuMM force field **/
-SimTK::DuMMForceFieldSubsystem * World::updForceField(void)
+SimTK::DuMMForceFieldSubsystem * World::updForceField()
 {
     return forceField;
 }
@@ -456,17 +450,18 @@ int World::addSampler(SamplerName samplerName)
         HamiltonianMonteCarloSampler * pHMC = new HamiltonianMonteCarloSampler(
             compoundSystem, matter, topologies[0],
             forceField, forces, ts );
-        //samplers.push_back((Sampler *) pHMC);
         samplers.push_back(pHMC);
+        //samplers.push_back(pHMC);
     }
-    /*
+/*
     else if(samplerName == MC){
         MonteCarloSampler * pMC = new MonteCarloSampler(
             compoundSystem, matter, topologies[0],
             forceField, forces, ts );
         samplers.push_back((Sampler *) pMC);
+        //samplers.push_back(pMC);
     }
-    */
+*/
     return samplers.size();
 }
 

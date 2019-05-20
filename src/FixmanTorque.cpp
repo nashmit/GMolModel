@@ -52,8 +52,8 @@ void FixmanTorque::calcForce(const SimTK::State& state, SimTK::Vector_<SimTK::Sp
             //x}
             //    << " to body " << std::setprecision(0) << int(mbx) << " slot " << uslot << " ";
 
-            //std::cout << "scaleFactor " << scaleFactor << "; " ;
-            //std::cout << " -RT " << (-1.0) * RT << "; " ;
+            //std::cout << "Fixman torque scaleFactor " << scaleFactor << " " ;
+            //std::cout << " temperature " << temperature << " -RT " << (-1.0) * RT << std::endl ;
         }
     }
     //xstd::cout << std::endl ;

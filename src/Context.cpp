@@ -1187,6 +1187,17 @@ void Context::realizeTopology() {
     }
 }
 
+/** Print the number of threads each World got **/
+void Context::PrintNumThreads(void) {
+    for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++) {
+        std::cout << "World " << worldIx  << " requested "
+            << worlds[worldIx]->updForceField()->getNumThreadsRequested()
+            << " and got "
+            << worlds[worldIx]->updForceField()->getNumThreadsInUse()
+            << std::endl;
+    }
+}
+
 
 
 
