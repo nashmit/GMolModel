@@ -204,7 +204,7 @@ int main(int argc, char **argv)
     for(int worldIx = 0; worldIx < setupReader.get("WORLDS").size(); worldIx++){
         context->setTemperature(worldIx, std::stof(setupReader.get("TEMPERATURE_INI")[worldIx]));
         context->setNofSamplesPerRound(worldIx, std::stoi(setupReader.get("SAMPLES_PER_ROUND")[worldIx]));
-        context->setNofMDStepsPerSample(worldIx, std::stoi(setupReader.get("MDSTEPS")[worldIx]));
+        context->setNofMDStepsPerSample(worldIx, 0, std::stoi(setupReader.get("MDSTEPS")[worldIx]));
     }
 
     // Set the seeds for reproducibility

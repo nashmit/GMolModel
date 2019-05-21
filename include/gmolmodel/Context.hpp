@@ -73,8 +73,8 @@ public:
     void setGbsaGlobalScaleFactor(int whichWorld, SimTK::Real);
 
     // If HMC, get/set the number of MD steps
-    int getNofMDStepsPerSample(int whichWorld);
-    void setNofMDStepsPerSample(int whichWorld, int MDStepsPerSample);
+    int getNofMDStepsPerSample(int whichWorld, int whichSampler);
+    void setNofMDStepsPerSample(int whichWorld, int whichSampler, int MDStepsPerSample);
 
     // If HMC, get/set timestep forMD
     const float getTimestep(int whichWorld, int whichSampler);

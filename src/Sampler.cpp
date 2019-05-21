@@ -89,6 +89,7 @@ int Sampler::getNofSamples(void){
 
 //void Sampler::update(SimTK::State& somState){}
 
+// TODO move
 void Sampler::PrintSimbodyStateCache(SimTK::State& someState){
     std::cout << " System Stage: " << someState.getSystemStage() << std::endl;
     for(int i = 0; i < someState.getNumSubsystems(); i++){
@@ -104,11 +105,13 @@ void Sampler::PrintSimbodyStateCache(SimTK::State& someState){
 }
 
 void Sampler::initialize() {
-
+    // Sampling
+    int nofSamples = 0;
 }
 
 void Sampler::reinitialize() {
-
+    // Sampling
+    int nofSamples = 0;
 }
 
 // Getter for macroscopic temperature

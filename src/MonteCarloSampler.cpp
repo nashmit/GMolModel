@@ -374,20 +374,11 @@ void MonteCarloSampler::assignConfFromTVector(SimTK::State& someState)
 // [qw, qx, qy, qz, x1, x2, x3]
 void MonteCarloSampler::propose(SimTK::State& someState)
 {
-    //randomEngine.seed(4294653137UL); // for reproductibility
-
-    /*
-    std::cout << "State info BEFORE updQ. Time = " << someState.getTime() << std::endl;
-    for(int i = 0; i < someState.getNumSubsystems(); i++){
-        std::cout << someState.getSubsystemName(SimTK::SubsystemIndex(i)) << " ";
-        std::cout << someState.getSubsystemStage(SimTK::SubsystemIndex(i)) << " ";
-        std::cout << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
-    }
-    */
     int i = 1;
     for (SimTK::MobilizedBodyIndex mbx(i); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
         SimTK::Real rand_no = uniformRealDistribution_0_2pi(randomEngine);
+
         for(int j=0; j<mobod.getNumQ(someState); j++){
             mobod.setOneQ(someState, j, rand_no);
             //someState.updQ()[i] = rand_no;
@@ -395,17 +386,7 @@ void MonteCarloSampler::propose(SimTK::State& someState)
         i++;
     }
 
-    //system->realize(someState, SimTK::Stage::Acceleration); // NECESSARY
     system->realize(someState, SimTK::Stage::Position); // NECESSARY
-
-    /*
-    std::cout << "State info AFTER  updQ. Time = " << someState.getTime() << std::endl;
-    for(int i = 0; i < someState.getNumSubsystems(); i++){
-        std::cout << someState.getSubsystemName(SimTK::SubsystemIndex(i)) << " ";
-        std::cout << someState.getSubsystemStage(SimTK::SubsystemIndex(i)) << " ";
-        std::cout << someState.getSubsystemVersion(SimTK::SubsystemIndex(i)) << std::endl;
-    }
-    */
 
 }
 

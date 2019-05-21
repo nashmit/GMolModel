@@ -82,12 +82,12 @@ public:
     algorithm. It essentially propagates the trajectory after it stores
     the configuration and energies. TODO: break in two functions:
     initializeVelocities and propagate/integrate **/
-    void propose(SimTK::State& someState, int nosteps);
+    void propose(SimTK::State& someState);
 
     /** Main function that contains all the 3 steps of HMC.
     Implements the acception-rejection step and sets the state of the 
     compound to the appropriate conformation wether it accepted or not. **/
-    void update(SimTK::State& someState, int nosteps);
+    void update(SimTK::State& someState);
 
     /** Modifies Q randomly
      **/
@@ -109,6 +109,13 @@ public:
     move is accepted. It's a component of the total energy stored. **/
     void setLastAcceptedKE(SimTK::Real);
 
+    int getMDStepsPerSample() const;
+
+    void setMDStepsPerSample(int mdStepsPerSample);
+
+    /** Print detailed energy information **/
+    void PrintDetailedEnergyInfo(SimTK::State& someState);
+
 protected:
 
     float timestep;
@@ -117,10 +124,12 @@ protected:
     SimTK::Real ke_n; // new kinetic energy
     SimTK::Real etot_set; // stored total energy
     SimTK::Real etot_proposed; // last accepted total energ (same with stored)
+    SimTK::Real etot_n;
 
     SimTK::Real boostT;
     SimTK::Real boostFactor;
 
+    int MDStepsPerSample;
 
 };
 

@@ -86,7 +86,7 @@ try {
                   << integAdvancedState.getU() << std::endl;
         std::cout << "Time before update: " << ts.getTime() << std::endl;
 
-        p_HMCsampler->update(integAdvancedState, atof(argv[4]));
+        p_HMCsampler->update(integAdvancedState);
 
         std::cout << "Q after update integAdvancedState "
                   << integAdvancedState.getQ() << std::endl;

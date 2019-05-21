@@ -64,6 +64,10 @@ public:
     // Assign a random conformation
     void propose(SimTK::State& advanced);
 
+    // Performs the acception-rejection step and sets the state of the compound
+    // to the appropriate conformation
+    void update(SimTK::State&);
+
     // Get/set set potential energy
     SimTK::Real getSetPE(void);
     void setSetPE(SimTK::Real argPE);
@@ -113,10 +117,6 @@ public:
 
     // Is the sampler always accepting the proposed moves
     void setAlwaysAccept(bool);
-
-    // Performs the acception-rejection step and sets the state of the compound
-    // to the appropriate conformation
-    void update(SimTK::State&);
 
     // Get the number of accpted conformations
     int getAcceptedSteps(void);

@@ -442,13 +442,15 @@ void Context::setGbsaGlobalScaleFactor(int whichWorld, SimTK::Real gbsaGlobalSca
 }
 
 // If HMC, get/set the number of MD steps
-int Context::getNofMDStepsPerSample(int whichWorld){
-   return nofMDStepsPerSample[whichWorld]; 
+int Context::getNofMDStepsPerSample(int whichWorld, int whichSampler){
+   //return nofMDStepsPerSample[whichWorld]; // RE
+   return worlds[whichWorld]->updSampler(whichSampler)->getMDStepsPerSample();
 }
 
-void Context::setNofMDStepsPerSample(int whichWorld, int MDStepsPerSample)
+void Context::setNofMDStepsPerSample(int whichWorld, int whichSampler, int MDStepsPerSample)
 {
-   nofMDStepsPerSample[whichWorld] = MDStepsPerSample;
+   nofMDStepsPerSample[whichWorld] = MDStepsPerSample; // RE
+   worlds[whichWorld]->updSampler(whichSampler)->setMDStepsPerSample(MDStepsPerSample); // NEW
 }
 
 // If HMC, get/set timestep forMD
@@ -666,7 +668,9 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
     
                 // Update
                 for(int k = 0; k < getNofSamplesPerRound(currentWorldIx); k++){ // Iterate through samples
-                    updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, getNofMDStepsPerSample(currentWorldIx));
+                    updWorld(currentWorldIx)->updSampler(0)->propose(currentAdvancedState);
+                    updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState);
+                            // , getNofMDStepsPerSample(currentWorldIx, 0)); RE
 
 // TIME STOP
 //std::chrono::steady_clock::time_point end1_3 = std::chrono::steady_clock::now();
@@ -759,7 +763,8 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
     
                 // Update
                 for(int k = 0; k < getNofSamplesPerRound(currentWorldIx); k++){ // Iterate through samples
-                    updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState, getNofMDStepsPerSample(currentWorldIx));
+                    updWorld(currentWorldIx)->updSampler(0)->propose(currentAdvancedState);
+                    updWorld(currentWorldIx)->updSampler(0)->update(currentAdvancedState);
                 } // END for samples
     
             } // for i in worlds

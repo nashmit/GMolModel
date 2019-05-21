@@ -25,7 +25,7 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
     this->timestep = 0.002; // ps
     this->temperature = 300.0;
     this->boostT = this->temperature;
-    //this->reproducible = false;
+    MDStepsPerSample = 0;
 }
 
 /** Destructor **/
@@ -287,18 +287,6 @@ void HamiltonianMonteCarloSampler::setTimestep(float argTimestep)
     this->timestep = argTimestep;
 }
 
-/*
-bool HamiltonianMonteCarloSampler::getReproducible(void)
-{
-    return reproducible;
-}
-
-void HamiltonianMonteCarloSampler::setReproducible(void)
-{
-    this->reproducible = true;
-}
-*/
-
 /** Get/Set boost temperature **/
 SimTK::Real HamiltonianMonteCarloSampler::getBoostTemperature(void)
 {
@@ -314,12 +302,8 @@ void HamiltonianMonteCarloSampler::setBoostTemperature(SimTK::Real argT)
 algorithm. It essentially propagates the trajectory after it stores
 the configuration and energies. TODO: break in two functions:
 initializeVelocities and propagate/integrate **/
-void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
+void HamiltonianMonteCarloSampler::propose(SimTK::State& someState)
 {
-
-    // Seed the random number generator every move
-    //randomEngine.seed(4294653137UL); // for reproductibility
-
     // Initialize configuration - not necessary unless we modify the
     // configuration in addition to velocities
     system->realize(someState, SimTK::Stage::Position);
@@ -331,12 +315,10 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     }
 
     // TODO: change the names from Old to Proposed and Set to lastAccepted
-    setOldPE(getSetPE());
-    setOldFixman(getSetFixman());
-
-
-    //std::cout << "reco " << getOldPE() << " " << dumm->CalcFullPotEnergyIncludingRigidBodies(someState) << std::endl;
-
+    // setOldPE(getSetPE()); // RE
+    // setOldFixman(getSetFixman()); // RE
+    pe_o = pe_set; // NEW
+    fix_o = fix_set; // NEW
 
     // Initialize velocities according to the Maxwell-Boltzmann distribution
     int nu = someState.getNU();
@@ -348,258 +330,45 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState, int nosteps)
     }
     matter->multiplyBySqrtMInv(someState, V, SqrtMInvV);
 
-
-    // BEGIN Temperature boost
-    // TODO: Implement this in a different function
-    //SimTK::Real temperatureBoost = 1.000; // no temperature boost
-    //    SimTK::Real temperatureBoost = 1.826; // sqrt(1000/300) : brings temperature from 300 to 2000
-    //    //SimTK::Real temperatureBoost = 2.582; // sqrt(2000/300) : brings temperature from 300 to 2000
-    //    //SimTK::Real temperatureBoost = 3.1623; // sqrt(3000/300) : brings temperature from 300 to 3000
-    // Set velocities according to the boost
     SqrtMInvV *= (sqrtRT); // Set stddev according to temperature
-    // END temperature boost
 
     // Raise the temperature
     someState.updU() = SqrtMInvV;
     system->realize(someState, SimTK::Stage::Velocity);
 
     // Store the proposed energies
-    setProposedKE(matter->calcKineticEnergy(someState));
+    // setProposedKE(matter->calcKineticEnergy(someState));
+    this->ke_proposed = matter->calcKineticEnergy(someState);
     this->etot_proposed = getOldPE() + getProposedKE() + getOldFixman();
 
 
-    ////////////// Verify equipartition theorem using SOAa////////////
-    /*
-    SimTK::Vector ThetaDot(nu);
-    SimTK::Vector MThetaDot(nu);
-    ThetaDot = SqrtMInvV;
-    matter->multiplyByM(someState, ThetaDot, MThetaDot);
-
-    // Print velocities and momenta
-    //std::cout << "ThetaDot " << ThetaDot << std::endl;
-    //std::cout << "MThetaDot " << MThetaDot << std::endl;
-    // Print generated random numbers
-    //for (int i=0; i < nu; ++i){
-    //    std::cout << V[i] << ' ';
-    //}
-    //std::cout << std::endl;
-
-    // Print pv matrix
-    for(int i = 0; i < nu; i++){
-        for(int j = 0; j < nu; j++){
-            std::cout << ThetaDot[i] * MThetaDot[j] << ' ';
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    // Print kinetic energy
-    //SimTK::Real KE2 = ThetaDot.transpose() * MThetaDot;
-    //std::cout << "ThetaDot * MThetaDot / 2 " << 0.5 * KE2 << std::endl;
-    //SimTK::Real ThetaDotMThetaDot = SimTK::dot(ThetaDot, MThetaDot);
-    //SimTK::Real ThetaDotMThetaDot = ThetaDot * MThetaDot;
-    //std::cout << "ThetaDotMThetaDot " << ThetaDotMThetaDot << " RT " << RT << std::endl;
-    */
-    ///////////////
-
-
-    // TODEL
-    // TODO: Implement this in a different function
-////
-////    // Unlock all mobilizers
-////    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-////        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-////        mobod.unlock(someState);
-////    }
-////
-////    // Randomly choose what mobods to lock and store the chosen ones into
-////    // a binary array
-////    int BinaryArray[matter->getNumBodies()];
-////    for(int i = 0; i < matter->getNumBodies(); i++){
-////        BinaryArray[i] = 1;
-////    }
-////    for(int i = 0; i < 3; i++){
-////        SimTK::Real rand_no = uniformRealDistribution(randomEngine);
-////        BinaryArray[int(std::floor(matter->getNumBodies() * rand_no))] = 0;
-////    }
-////    
-////    // Lock the chosen mobilizers
-////    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-////        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-////        if(BinaryArray[int(mbx) - 1] == 0){
-////            SimTK::Motion::Level motionLevel = SimTK::Motion::Level::Position;
-////            mobod.lock(someState, motionLevel);
-////        }
-////    }
-    // END TODEL
-
-    // TODEL
-////    std::cout << "Qs and Us before stepTo:" << std::endl;
-////    PrintBigMat(someState.getQ(), someState.getNQ(), 3, "Q");
-////    PrintBigMat(someState.getU(), someState.getNU(), 3, "U");
-    // END TODEL
-
-    // Write a check file
-    /*
-    std::string prefix;
-    prefix = std::string("pdbs/HMC");
-    std::string FN;
-    FN = prefix + std::to_string(this->nofSamples) + std::string("before.pdb");
-    std::cout << "Writing file " << FN << std::endl;
-    std::filebuf fb;
-    fb.open (FN, std::ios::out);
-    std::ostream os(&fb);
-    ((SimTK::Compound *)residue)->writePdb(someState, os);
-    fb.close();
-    //
-    */
-
-    // START Guidance Hamiltonian with a boost temperature
-
-/* DEBUG BEGIN
-std::cout << "before "
-    << dumm->CalcFullPotEnergyIncludingRigidBodies(someState) << ' '
-    << matter->calcKineticEnergy(someState) << ' '
-    << calcFixman(someState)
-    << std::endl;
-// DEBUG END */
-
-/* BOOST BEGIN
-    boostFactor = std::sqrt(boostT / this->getTemperature());
-    //std::cout << "Boosting by " << boostFactor << " (" << boostT << " / " << this->getTemperature() << ")" << std::endl;
-    someState.updU() *= boostFactor;
-    system->realize(someState, SimTK::Stage::Velocity);
-// BOOST END */
-
-
-/* DEBUG BEGIN
-for(int k = 0; k < nosteps; k++){
-    this->timeStepper->stepTo(someState.getTime() + (timestep));
-
-    std::cout << "guide1 "
-        << dumm->CalcFullPotEnergyIncludingRigidBodies(someState) << ' '
-        << matter->calcKineticEnergy(someState) << ' '
-        << calcFixman(someState)
-        << " ";
-        //<< std::endl;
-
-// Alanine dipeptide DIHEDRAL 4 5 7 13 5 7 13 14
-    int a1, a2, a3, a4;
-    a1 = 4;
-    a2 = 5;
-    a3 = 7;
-    a4 = 13;
-    SimTK::Vec3 a1pos, a2pos, a3pos, a4pos;
-    a1pos = residue->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a1)));
-    a2pos = residue->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a2)));
-    a3pos = residue->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a3)));
-    a4pos = residue->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a4)));
-    std::cout << bDihedral(a1pos, a2pos, a3pos, a4pos)
-        << " ";
-    a1 = 5;
-    a2 = 7;
-    a3 = 13;
-    a4 = 14;
-    a1pos = residue->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a1)));
-    a2pos = residue->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a2)));
-    a3pos = residue->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a3)));
-    a4pos = residue->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(SimTK::Compound::AtomIndex(a4)));
-    std::cout << bDihedral(a1pos, a2pos, a3pos, a4pos)
-        << std::endl;
-
-}
-// DEBUG END */
-
     // Integrate (propagate trajectory)
-    std::cout << "time " << someState.getTime() << " + "
-        << timestep << " * " << nosteps << " ";
-
-    this->timeStepper->stepTo(someState.getTime() + (timestep*nosteps));
-
-    std::cout << someState.getTime() << std::endl;
-/*    // Configuration
-    std::cout << "HMC conf: ";
-    for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-        const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-        std::cout << " mobod " << int(mbx) << " = ";
-        std::cout << "Q " << mobod.getQAsVector(someState) << std::endl ;
-        std::cout << " P_X_F " << mobod.getInboardFrame(someState) << " ";
-        std::cout << " F_X_M " << mobod.getMobilizerTransform(someState) << " ";
-        std::cout << " B_X_M " << mobod.getOutboardFrame(someState) << " ";
-        //std::cout << " P_X_F * F_X_M " << mobod.getInboardFrame(someState) * mobod.getMobilizerTransform(someState) << " ";
-        std::cout << "; ";
-    }
-    std::cout << std::endl;
-*/
-
-/* DEBOOST BEGIN
-    // RESET Guidance Hamiltonian with a boost temperature
-    someState.updU() *= (1.0 / boostFactor);
-    system->realize(someState, SimTK::Stage::Velocity);
-// DEBOOST END */
-
-/* DEBUG BEGIN
-for(int k = 0; k < (nosteps * 5); k++){
-    this->timeStepper->stepTo(someState.getTime() + (timestep));
-
-    std::cout << "guide2 "
-        << dumm->CalcFullPotEnergyIncludingRigidBodies(someState) << ' '
-        << matter->calcKineticEnergy(someState) << ' '
-        << forces->getMultibodySystem().calcEnergy(someState) << ' '
-        << calcFixman(someState)
-        << std::endl;
-}
-// DEBUG END */
-
-/* DEBUG BEGIN
-std::cout << "after "
-    << dumm->CalcFullPotEnergyIncludingRigidBodies(someState) << ' '
-    << matter->calcKineticEnergy(someState) << ' '
-    << calcFixman(someState)
-    << std::endl;
-
-    // END Guidance */
-
-    // TODEL
-////    std::cout << "Qs and Us after stepTo:" << std::endl;
-////    PrintBigMat(someState.getQ(), someState.getNQ(), 3, "Q");
-////    PrintBigMat(someState.getU(), someState.getNU(), 3, "U");
-    // END TODEL
-
+    this->timeStepper->stepTo(someState.getTime() + (timestep*MDStepsPerSample)); // NEW
 
 }
 
 /** Main function that contains all the 3 steps of HMC.
 Implements the acception-rejection step and sets the state of the
 compound to the appropriate conformation wether it accepted or not. **/
-void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
+void HamiltonianMonteCarloSampler::update(SimTK::State& someState)
 {
     SimTK::Real rand_no = uniformRealDistribution(randomEngine);
 
-    // Do a trial move
-    propose(someState, nosteps);
-
-    // Get needed energies
-    SimTK::Real pe_o  = getOldPE();
-    if(useFixman){
-        SimTK::Real fix_o = getOldFixman();
-    }
-    SimTK::Real ke_proposed  = getProposedKE();
-
+    // Get new Fixman potential
     if(useFixman){
         fix_n = calcFixman(someState);
     }else{
         fix_n = 0.0;
     }
 
-    //SimTK::Real pe_n = getPEFromEvaluator(someState); // OPENMM
-    //std::cout << "Multibody PE " << getPEFromEvaluator(someState) << ' ' ; // OPENMM
-    pe_n = dumm->CalcFullPotEnergyIncludingRigidBodies(someState); // ELIZA FULL
-
-    system->realize(someState, SimTK::Stage::Velocity); // TODO: before computing pe_n
+    // Get new kinetic energy
+    system->realize(someState, SimTK::Stage::Velocity);
     ke_n = matter->calcKineticEnergy(someState);
 
-    SimTK::Real etot_proposed, etot_n;
+    // Get new potential energy
+    pe_n = dumm->CalcFullPotEnergyIncludingRigidBodies(someState); // ELIZA FULL
+
+    // Calculate total energy
     if(useFixman){
         etot_n = pe_n + ke_n + fix_n;
         etot_proposed = pe_o + ke_proposed + fix_o;
@@ -608,119 +377,55 @@ void HamiltonianMonteCarloSampler::update(SimTK::State& someState, int nosteps)
         etot_proposed = pe_o + ke_proposed;
     }
 
-    //etot_proposed;
-    //etot_n;
+    PrintDetailedEnergyInfo(someState);
 
-
-    std::cout<<std::setprecision(5)<<std::fixed; //p
-    std::cout << "pe_o " << pe_o << " pe_n " << pe_n << " pe_nB " << getPEFromEvaluator(someState) << " ke_prop " << ke_proposed << " ke_n " << ke_n
-        << " fix_o " << fix_o << " fix_n " << fix_n << " "
-        << " rand_no " << rand_no << " RT " << RT << " exp(bdE) " << exp(-(etot_n - etot_proposed) / RT)
-        << " etot_n " << etot_n  << " etot_proposed " << etot_proposed
-        << std::endl;
-
-//     std::cout << std::setprecision(10) << std::fixed << fix_n << ' ';
-
-    // Apply Metropolis criterion
-    int accepted = 0;
+    // Decide and get a new sample
     if ( getThermostat() == ANDERSEN ){ // MD with Andersen thermostat
-        accepted = 1;
         setSetTVector(someState);
-        //sendConfToEvaluator(); // OPENMM
-        setSetPE(pe_n);
-        setSetFixman(fix_n);
-        setLastAcceptedKE(ke_n);
-        this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
+        pe_set = pe_n;
+        fix_set = fix_n;
+        ke_lastAccepted = ke_n;
+        etot_set = pe_set + fix_set + ke_proposed;
         ++acceptedSteps;
-    }
-    else if( (!std::isnan(pe_n)) && 
-    ((etot_n < etot_proposed) || (rand_no < exp(-(etot_n - etot_proposed)/RT))) ){ // Correct Acceptance-Rejection 
-//    ((etot_n > etot_proposed) || (rand_no < exp((etot_n - etot_proposed)/RT))) ){ // Unfold trial
-    //((fix_n < fix_o) || (rand_no < exp(-(fix_n - fix_o)/RT))) ){ // Fixman Monte Carlo
-        accepted = 1;
-        setSetTVector(someState);
-        //sendConfToEvaluator(); // OPENMM
-        setSetPE(pe_n);
-        setSetFixman(fix_n);
-        setLastAcceptedKE(ke_n);
-        this->etot_set = getSetPE() + getSetFixman() + getProposedKE(); // TODO
-        ++acceptedSteps;
-    }else{ // Reject
-        accepted = 0;
-        assignConfFromSetTVector(someState);
+    }else { // Apply Metropolis correction
+        if ((!std::isnan(pe_n)) && ((etot_n < etot_proposed) ||
+             (rand_no < exp(-(etot_n - etot_proposed) / RT)))) { // Accept
+            setSetTVector(someState);
+            pe_set = pe_n;
+            fix_set = fix_n;
+            ke_lastAccepted = ke_n;
+            etot_set = pe_set + fix_set + ke_proposed;
+            ++acceptedSteps;
+        } else { // Reject
+            assignConfFromSetTVector(someState);
+        }
     }
 
-    //std::cout << " pe_os " << getSetPE() << " ke_os " << getLastAcceptedKE() << " fix_os " << getSetFixman() //p
-    //xstd::cout << " 0 ";
-    //xfor (SimTK::MobilizedBodyIndex mbx(2); mbx < matter->getNumBodies(); ++mbx){
-    //x    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-    //x    const SimTK::MobilizedBody *p_mobod = &mobod;
-    //x    std::cout<< std::setprecision(10) << std::fixed;
-    //x    std::cout << ((SimTK::MobilizedBody::Pin *)(p_mobod))->getAngle(someState)  << " " ;
-    //x}
-    //xstd::cout << getSetFixman()  << " " << calcNumFixman(someState) << " " ;
-//p    std::cout << accepted << ' ' << getPEFromEvaluator(someState) << ' ' << getLastAcceptedKE() << ' ' << getSetFixman()  << ' ' ;
-
-//                    std::cout << bDihedral( (argResidue)->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(10)),
-//                                            (argResidue)->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(0)),
-//                                            (argResidue)->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(3)),
-//                                            (argResidue)->calcAtomLocationInGroundFrame(someState, SimTK::Compound::AtomIndex(6)) )  << " ";
-
-
-        //<< " pe_n " << pe_n << " ke_n " << ke_n << " fix_n " << fix_n << " rand " << rand_no
-        //<< std:: endl; //p
-/* RESTORE p
-    std::cout << someState.getNU() << ' ' << accepted << ' ' 
-        //<< getSetPE() + getREP() << ' ' << getLastAcceptedKE() 
-        << pe_o << ' '<< getSetPE() << ' ' << getLastAcceptedKE() 
-        << ' ' << getSetFixman() << ' ' << fix_o << ' ' << fix_n << ' ';
-*/
-    // Keep track of how many MC trials have been done 
     ++nofSamples;
 
-    // Write a check file
-    /*
-    //std::string prefix;
-    //prefix = std::string("pdbs/HMC");
-    //std::string FN;
-    FN = prefix + std::to_string(this->nofSamples) + std::string("after.pdb");
-    std::cout << "Writing file " << FN << std::endl;
-    //std::filebuf fb;
-    fb.open (FN, std::ios::out);
-    std::ostream os2(&fb);
-    ((SimTK::Compound *)residue)->writePdb(someState, os2);
-    fb.close();
-    //
-    */
-
-    // Configuration
-    //std::cout << "HMC conf: ";
-    //for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
-    //    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-    //    std::cout << " mobod " << int(mbx) << " = ";
-    //    std::cout << mobod.getQAsVector(someState) << std::endl ;
-    //    std::cout << " P_X_F " << mobod.getInboardFrame(someState) << " ";
-    //    std::cout << " F_X_M " << mobod.getMobilizerTransform(someState) << " ";
-    //    //std::cout << " P_X_F * F_X_M " << mobod.getInboardFrame(someState) * mobod.getMobilizerTransform(someState) << " ";
-    //    std::cout << "; ";
-    //}
-    //std::cout << std::endl;
-
-    // Calculate geometric features fast
-    //std::cout << someState.getQ() << std::endl ;
-    //for (SimTK::MobilizedBodyIndex mbx(2); mbx < matter->getNumBodies(); ++mbx){
-    //    const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
-    //    const SimTK::MobilizedBody *p_mobod = &mobod;
-        //std::cout << SimTK::DuMM::Rad2Deg * ((SimTK::MobilizedBody::Pin *)(p_mobod))->getAngle(someState)  << " " ;
-    //    std::cout << ((SimTK::MobilizedBody::Pin *)(p_mobod))->getAngle(someState)  << " " ;
-        //std::cout << mobod.getAngle(someState) << " " ;
-        //std::cout << "mobod " << int(mbx) << mobod.getQAsVector(someState) << "; ";
-    //}
-    //std::cout << std::endl ;
-
-    //std::cout << "Number of times the force field was evaluated: " << dumm->getForceEvaluationCount() << std::endl;
-
 }
+
+int HamiltonianMonteCarloSampler::getMDStepsPerSample() const {
+    return MDStepsPerSample;
+}
+
+void HamiltonianMonteCarloSampler::setMDStepsPerSample(int mdStepsPerSample) {
+    MDStepsPerSample = mdStepsPerSample;
+}
+
+/** Print detailed energy information **/
+void HamiltonianMonteCarloSampler::PrintDetailedEnergyInfo(SimTK::State& someState)
+{
+    std::cout << std::setprecision(5) << std::fixed;
+    std::cout << "pe_o " << pe_o << " pe_n " << pe_n
+        << " pe_nB " << getPEFromEvaluator(someState)
+        << " ke_prop " << ke_proposed << " ke_n " << ke_n
+        << " fix_o " << fix_o << " fix_n " << fix_n << " "
+        << " RT " << RT << " exp(bdE) " << exp(-(etot_n - etot_proposed) / RT)
+        << " etot_n " << etot_n  << " etot_proposed " << etot_proposed
+        << std::endl;
+}
+
 
 /** Modifies Q randomly
  **/
@@ -762,17 +467,14 @@ void HamiltonianMonteCarloSampler::perturbQ(SimTK::State& someState)
     ++acceptedSteps;
     assignConfFromSetTVector(someState);
 
-    std::cout << someState.getNU() << ' ' << 1 << ' ' 
-      //<< getSetPE() + getREP() << ' ' << getLastAcceptedKE() 
-      << getSetPE() << ' ' << 0 
-      << ' ' << getSetFixman() << ' ' << fix_o << ' ' << fix_n << ' ';
+    std::cout << someState.getNU() << ' ' << 1 << ' '
+              //<< getSetPE() + getREP() << ' ' << getLastAcceptedKE()
+              << getSetPE() << ' ' << 0
+              << ' ' << getSetFixman() << ' ' << fix_o << ' ' << fix_n << ' ';
 
-    // Keep track of how many MC trials have been done 
+    // Keep track of how many MC trials have been done
     ++nofSamples;
 }
-
-
-
 
 
 

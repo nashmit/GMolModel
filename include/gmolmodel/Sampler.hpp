@@ -6,10 +6,6 @@
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-//#ifndef HARMONICOSCILLATOR
-//#define HARMONICOSCILLATOR // for testing purposes
-//#endif
-
 #ifndef PRINT_BUFFER_SIZE
 #define PRINT_BUFFER_SIZE 4096
 #endif 
@@ -44,9 +40,6 @@ public:
     SimTK::Real getTemperature() const;
     void setTemperature(SimTK::Real temperature);
 
-    // Extract one or more samples
-    virtual void update(SimTK::State&) = 0;
-
     /** Returns the number of samples extracted so far. **/
     int getNofSamples(void);
 
@@ -54,6 +47,10 @@ public:
     unsigned long long int getSeed(void);
     void setSeed(unsigned long long int);
 
+    /** Propose a move **/
+    virtual void propose(SimTK::State& someState) = 0;
+    //virtual eval() = 0;
+    virtual void update(SimTK::State& someState) = 0;
 
     // For debugging purposes
     void PrintSimbodyStateCache(SimTK::State& someState);
@@ -69,15 +66,12 @@ public:
 
     // Thermodynamics
     ThermostatName thermostat;
-
-    // Thermodynammics
     SimTK::Real temperature;
     SimTK::Real RT;
 
     // Sampling
     int nofSamples;
     unsigned long long int seed;
-    //bool reproducible;
 
     // Random number generators - not sure if I need two
     boost::random::mt19937 randomEngine = boost::random::mt19937();
