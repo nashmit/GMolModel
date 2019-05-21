@@ -21,12 +21,11 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
     this->fix_n = this->fix_o = 0.0;
     this->residualEmbeddedPotential = 0.0;
     nofSamples = 0;
-    //printBuffIx = 0;
     this->alwaysAccept = false;
     this->timestep = 0.002; // ps
     this->temperature = 300.0;
     this->boostT = this->temperature;
-    this->reproducible = false;
+    //this->reproducible = false;
 }
 
 /** Destructor **/
@@ -139,21 +138,9 @@ velocities to desired temperature, variables that store the configuration
 and variables that store the energies, both needed for the
 acception-rejection step. Also realize velocities and initialize
 the timestepper. **/
-//r void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature, bool argUseFixman) 
-void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool randomizeConformation ) //SimTK::Real argTemperature, bool argUseFixman) 
+void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool randomizeConformation )
 {
-    // Seed the random number generator
-    if(reproducible){
-        //setSeed(1);
-        randomEngine.seed( getSeed() );
-        std::cout << "SEED: " << getSeed() << std::endl;
-    }else{
-        setSeed( std::time(0) );
-        randomEngine.seed( getSeed() );
-        std::cout << "SEED: " << getSeed() << std::endl;
-    }
-
-    // After an event handler has made a discontinuous change to the 
+    // After an event handler has made a discontinuous change to the
     // Integrator's "advanced state", this method must be called to 
     // reinitialize the Integrator.
     timeStepper->initialize(compoundSystem->getDefaultState());
@@ -202,6 +189,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool rand
     }
 
     // Initialize velocities to temperature
+    // TODO Shouldn't be here
     double sqrtRT = std::sqrt(RT);
     SimTK::Vector V(nu);
     SimTK::Vector SqrtMInvV(nu);
@@ -228,12 +216,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool rand
 //r void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature) 
 void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState/*, SimTK::Real argTemperature*/) 
 {
-    if(reproducible){
-        //randomEngine.seed( nofSamples ); // TODO change to seed + nofSamples
-        randomEngine.seed( getSeed() + nofSamples ); // TODO change to seed + nofSamples
-    }
-
-    // After an event handler has made a discontinuous change to the 
+     // After an event handler has made a discontinuous change to the
     // Integrator's "advanced state", this method must be called to 
     // reinitialize the Integrator.
     //(this->timeStepper->updIntegrator()).reinitialize(SimTK::Stage::Topology, false);
@@ -268,6 +251,7 @@ void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState/*, SimTK
     }
 
     // Initialize velocities to temperature
+    // TODO Shouldn't be here
     int nu = someState.getNU();
     double sqrtRT = std::sqrt(RT);
     SimTK::Vector V(nu);
@@ -303,7 +287,7 @@ void HamiltonianMonteCarloSampler::setTimestep(float argTimestep)
     this->timestep = argTimestep;
 }
 
-/** Initialize the same velocities **/
+/*
 bool HamiltonianMonteCarloSampler::getReproducible(void)
 {
     return reproducible;
@@ -313,6 +297,7 @@ void HamiltonianMonteCarloSampler::setReproducible(void)
 {
     this->reproducible = true;
 }
+*/
 
 /** Get/Set boost temperature **/
 SimTK::Real HamiltonianMonteCarloSampler::getBoostTemperature(void)

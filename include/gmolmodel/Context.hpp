@@ -115,10 +115,6 @@ public:
     void setNumThreadsRequested(int which, int howMany);
     void setUseOpenMMAcceleration(bool arg);
 
-    /** Initialize the same velocities **/
-    bool getReproducible(void);
-    void setReproducible(void);
-
     /** Print the number of threads each World got **/
     void PrintNumThreads(void);
 

@@ -60,7 +60,7 @@ public:
     and variables that store the energies, both needed for the 
     acception-rejection step. Also realize velocities and initialize 
     the timestepper. **/
-    virtual void initialize(SimTK::State& advanced, bool randomizeConformation = false); //SimTK::Real argTemperature, bool argUseFixman = true); 
+    virtual void initialize(SimTK::State& advanced, bool randomizeConformation = false);
 
     /** Same as initialize **/
     virtual void reinitialize(SimTK::State& advanced/*, SimTK::Real argTemperature*/) ; 
@@ -109,13 +109,6 @@ public:
     move is accepted. It's a component of the total energy stored. **/
     void setLastAcceptedKE(SimTK::Real);
 
-    /** Returns the number of MC trials done by this integrator. **/
-    //int getNofSamples(void);
-
-    /** Initialize the same velocities **/
-    bool getReproducible(void);
-    void setReproducible(void);
-
 protected:
 
     float timestep;
@@ -128,17 +121,6 @@ protected:
     SimTK::Real boostT;
     SimTK::Real boostFactor;
 
-    // Print buffers
-    //SimTK::Real ke_lastBuff[PRINT_BUFFER_SIZE];
-    //SimTK::Real ke_proposedBuff[PRINT_BUFFER_SIZE];
-    //SimTK::Real ke_nBuff[PRINT_BUFFER_SIZE];
-
-
-    int nofSamples; // counter for the number of MC trials 
-    bool reproducible;
-
-    //SimTK::VerletIntegrator * integ ; //ninteg
-    //SimTK::TimeStepper * ts ; //ninteg
 
 };
 

@@ -806,23 +806,6 @@ void Context::setUseOpenMMAcceleration(bool arg)
     }
 }
 
-/** Initialize the same velocities **/
-bool Context::getReproducible(void)
-{
-   return reproducible;
-}
-
-void Context::setReproducible(void)
-{
-    reproducible = true;
-    for(unsigned int worldIx = 0; worldIx < worlds.size(); worldIx++){
-        for (unsigned int samplerIx = 0; samplerIx < worlds[worldIx]->getNofSamplers(); samplerIx ++){
-            worlds[worldIx]->updSampler(samplerIx)->setReproducible();
-        }
-    }
-}
-
-
 /** Get/Set seed for reproducibility. **/
 void Context::setSeed(int whichWorld, int whichSampler, unsigned long long int argSeed)
 {

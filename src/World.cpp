@@ -448,10 +448,10 @@ int World::addSampler(SamplerName samplerName)
 {
     if(samplerName == HMC){
         HamiltonianMonteCarloSampler * pHMC = new HamiltonianMonteCarloSampler(
+        // Sampler * pHMC = new HamiltonianMonteCarloSampler(
             compoundSystem, matter, topologies[0],
             forceField, forces, ts );
         samplers.push_back(pHMC);
-        //samplers.push_back(pHMC);
     }
 /*
     else if(samplerName == MC){
@@ -466,12 +466,14 @@ int World::addSampler(SamplerName samplerName)
 }
 
 // Get a sampler based on its position in the samplers vector
+// TODO Use Sampler polymorphism
 const HamiltonianMonteCarloSampler * World::getSampler(int which)
 {
     return samplers[which];
 }
 
 // Get a writable sampler based on its position in the samplers vector
+// TODO Use Sampler polymorphism
 HamiltonianMonteCarloSampler * World::updSampler(int which)
 {
     return samplers[which];

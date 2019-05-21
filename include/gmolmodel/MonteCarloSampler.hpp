@@ -28,8 +28,8 @@ public:
     virtual ~MonteCarloSampler();
 
     // Simulation temperature related
-    SimTK::Real getTemperature(void);
-    void setTemperature(SimTK::Real);
+    //SimTK::Real getTemperature(void);
+    //void setTemperature(SimTK::Real);
 
     // Set a thermostat (even for MCMC)
     void setThermostat(ThermostatName);
@@ -126,18 +126,6 @@ protected:
     SimTK::Transform *TVector; // Transform matrices
     SimTK::Real pe_set, pe_o, pe_n;
 
-    // Print buffers
-    //SimTK::Real pe_setBuff[PRINT_BUFFER_SIZE];
-    //SimTK::Real pe_oBuff[PRINT_BUFFER_SIZE];
-    //SimTK::Real pe_nBuff[PRINT_BUFFER_SIZE];
-    //SimTK::Real fix_setBuff[PRINT_BUFFER_SIZE];
-    //SimTK::Real fix_oBuff[PRINT_BUFFER_SIZE];
-    //SimTK::Real fix_nBuff[PRINT_BUFFER_SIZE];
-
-    // Thermodynammics
-    SimTK::Real temperature;
-    SimTK::Real RT;
-
     bool useFixman;
     bool alwaysAccept;
     SimTK::Real fix_set, fix_o, fix_n;
@@ -145,26 +133,6 @@ protected:
 
     int acceptedSteps;
  
-    // Random number generators - not sure if I need two
-    // Needs testing
-
-    boost::random::mt19937 randomEngine = boost::random::mt19937();
-
-    boost::random::uniform_real_distribution<double> uniformRealDistribution_0_2pi =
-        boost::random::uniform_real_distribution<double>(SimTK::Zero, 2*SimTK::Pi);
-
-    boost::random::uniform_real_distribution<double> uniformRealDistribution_mpi_pi =
-        boost::random::uniform_real_distribution<double>((-1)*SimTK::Pi, SimTK::Pi);
-
-    boost::random::uniform_real_distribution<double> uniformRealDistribution =
-        boost::random::uniform_real_distribution<double>(SimTK::Zero, SimTK::One);
-
-    boost::random::uniform_real_distribution<double> uniformRealDistribution_m1_1 =
-        boost::random::uniform_real_distribution<double>((-1)*SimTK::One, SimTK::One);
-
-    boost::normal_distribution<> gaurand = boost::normal_distribution<>(0.0, 1.0);
-    //boost::math::normal gaurand;
-
 };
 
 #endif // __MONTECARLOSAMPLER_HPP__

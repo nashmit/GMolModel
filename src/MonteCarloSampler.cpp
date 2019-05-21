@@ -39,9 +39,6 @@ MonteCarloSampler::~MonteCarloSampler()
 // the timestepper.
 void MonteCarloSampler::initialize(SimTK::State& someState, SimTK::Real argTemperature, bool argUseFixman) 
 {
-    // Seed the random number generator
-    randomEngine.seed( std::time(0) );
-
     // Set the simulation temperature
     setTemperature(argTemperature); // Needed for Fixman
 
@@ -452,6 +449,7 @@ SimTK::Real MonteCarloSampler::getPEFromEvaluator(SimTK::State& someState){
     return dumm->CalcFullPotEnergyIncludingRigidBodies(someState);
 }
 
+/*
 // Get the desired simulation temperature. Not to be confused with 
 // the instant temperature
 SimTK::Real MonteCarloSampler::getTemperature(void){
@@ -469,6 +467,7 @@ void MonteCarloSampler::setTemperature(SimTK::Real argTemperature)
     }
     RT = this->temperature * SimTK_BOLTZMANN_CONSTANT_MD;
 }
+*/
 
 // Set a thermostat
 void MonteCarloSampler::setThermostat(ThermostatName argThermostat){

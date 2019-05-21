@@ -200,14 +200,6 @@ int main(int argc, char **argv)
     }
 
 
-    // Make the simulation reproducible 
-    if(setupReader.get("REPRODUCIBLE")[0] == "TRUE"){
-        context->setReproducible();
-        srand (0);
-    }else{
-        srand (time(NULL));
-    }
-
     // Set thermodynamics
     for(int worldIx = 0; worldIx < setupReader.get("WORLDS").size(); worldIx++){
         context->setTemperature(worldIx, std::stof(setupReader.get("TEMPERATURE_INI")[worldIx]));

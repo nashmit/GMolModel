@@ -172,6 +172,7 @@ public:
     int addSampler(std::string);
     int addSampler(SamplerName);
 
+    // TODO Use Sampler polymorphism
     /** Get a sampler based on its position in the samplers vector **/
     const HamiltonianMonteCarloSampler * getSampler(int which);
 
@@ -228,12 +229,7 @@ public:
     /** Nof molecules **/
     int moleculeCount;
 
-    /** Filenames for files needed to build molecules (topologies) **/
-    //std::string rbFN; // rigid bodies specifications
-    //std::string frcmodF; // to be removed
-    //std::string flexFN; // flexible bonds specifications
-    //std::string regimenSpec; // regimen specification
-  
+
     /** Molecules (topologies<-Compounds) objects **/
     //std::vector<bMoleculeReader *> moleculeReaders;
     std::vector<Topology *> topologies;
@@ -258,8 +254,8 @@ public:
     // --- Simulation ---
     SimTK::VerletIntegrator *integ;
     SimTK::TimeStepper *ts;
+    // TODO Use Sampler polymorphism
     std::vector<HamiltonianMonteCarloSampler *> samplers;
-    //std::vector<Sampler *> samplers;
     bool _useFixmanTorque;
     //...............
 
