@@ -408,19 +408,14 @@ void Context::setGuidanceTemperature(int whichWorld, int whichSampler, float som
 
 // --- Simulation parameters ---
 
-int Context::addSampler(int whichWorld, std::string whichSampler)
-{
-    worlds[whichWorld]->addSampler(whichSampler);
-}
-
 int Context::addSampler(int whichWorld, SamplerName whichSampler)
 {
     worlds[whichWorld]->addSampler(whichSampler);
 }
 
-void Context::initializeSampler(int whichWorld, int whichSampler, bool randomizeConformation )
+void Context::initializeSampler(int whichWorld, int whichSampler)
 {
-    worlds[whichWorld]->updSampler(whichSampler)->initialize( worlds[whichWorld]->integ->updAdvancedState(), randomizeConformation );
+    worlds[whichWorld]->updSampler(whichSampler)->initialize( worlds[whichWorld]->integ->updAdvancedState());
 }
 
 // Amber like scale factors.
@@ -443,27 +438,26 @@ void Context::setGbsaGlobalScaleFactor(int whichWorld, SimTK::Real gbsaGlobalSca
 
 // If HMC, get/set the number of MD steps
 int Context::getNofMDStepsPerSample(int whichWorld, int whichSampler){
-   //return nofMDStepsPerSample[whichWorld]; // RE
-   return worlds[whichWorld]->updSampler(whichSampler)->getMDStepsPerSample();
+   return pHMC(worlds[whichWorld]->updSampler(whichSampler))->getMDStepsPerSample();
 }
 
 void Context::setNofMDStepsPerSample(int whichWorld, int whichSampler, int MDStepsPerSample)
 {
    nofMDStepsPerSample[whichWorld] = MDStepsPerSample; // RE
-   worlds[whichWorld]->updSampler(whichSampler)->setMDStepsPerSample(MDStepsPerSample); // NEW
+   pHMC(worlds[whichWorld]->updSampler(whichSampler))->setMDStepsPerSample(MDStepsPerSample); // NEW
 }
 
 // If HMC, get/set timestep forMD
 const float Context::getTimestep(int whichWorld, int whichSampler)
 {
-    return worlds[whichWorld]->updSampler(whichSampler)->getTimeStepper()->getIntegrator().getPredictedNextStepSize();
+    return pHMC(worlds[whichWorld]->updSampler(whichSampler))->getTimeStepper()->getIntegrator().getPredictedNextStepSize();
 
 }
 
 void Context::setTimestep(int whichWorld, int whichSampler, float argTimestep)
 {
     //worlds[whichWorld]->updSampler(whichSampler)->updTimeStepper()->updIntegrator().setFixedStepSize(argTimestep);
-    worlds[whichWorld]->updSampler(whichSampler)->setTimestep(argTimestep);
+    pHMC(worlds[whichWorld]->updSampler(whichSampler))->setTimestep(argTimestep);
 }
 
 // Use Fixman torque as an additional force subsystem
@@ -494,12 +488,12 @@ void Context::setFixmanTorqueTemperature(int whichWorld, double argTemperature)
 // Use Fixman potential
 void Context::useFixmanPotential(int whichWorld, int whichSampler)
 {
-    worlds[whichWorld]->updSampler(whichSampler)->useFixmanPotential();
+    pMC(worlds[whichWorld]->updSampler(whichSampler))->useFixmanPotential();
 }
 
 bool Context::isUsingFixmanPotential(int whichWorld, int whichSampler)
 {
-    return worlds[whichWorld]->updSampler(whichSampler)->isUsingFixmanPotential();
+    return pMC(worlds[whichWorld]->updSampler(whichSampler))->isUsingFixmanPotential();
 }
 
 
@@ -607,9 +601,9 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                    currentAdvancedState, (updWorld(worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
 
 
-                double backSetE = updWorld(worldIndexes.back())->updSampler(0)->getSetPE();
+                double backSetE = pMC(updWorld(worldIndexes.back())->updSampler(0))->getSetPE();
                 double backCalcE = updWorld(worldIndexes.back())->forceField->CalcFullPotEnergyIncludingRigidBodies(lastAdvancedState);
-                double currOldE = updWorld(currentWorldIx)->updSampler(0)->getOldPE();
+                double currOldE = pMC(updWorld(currentWorldIx)->updSampler(0))->getOldPE();
                 double currCalcE = updWorld(currentWorldIx)->forceField->CalcFullPotEnergyIncludingRigidBodies(currentAdvancedState);
 
                 // Check if reconstructions is done correctly
@@ -624,9 +618,9 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
 // TIME STOP ===================
 
                 // Set old potential energy of the new world
-                (updWorld(currentWorldIx))->updSampler(0)->setOldPE(
-                    (updWorld(worldIndexes.back()))
-                    ->updSampler(0)->getSetPE() );
+                pMC((updWorld(currentWorldIx))->updSampler(0))->setOldPE(
+                    pMC((updWorld(worldIndexes.back()))
+                    ->updSampler(0))->getSetPE() );
 
 
                 std::cout << "RunPe backSet backCalc currCalc currOld "
@@ -756,7 +750,9 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
                    currentAdvancedState, (updWorld(worldIndexes.back()))->getAtomsLocationsInGround( lastAdvancedState ));
     
                 // Set old potential energy of the new world
-                (updWorld(currentWorldIx))->updSampler(0)->setOldPE((updWorld(worldIndexes.back()))->updSampler(0)->getSetPE() );
+                pMC((updWorld(currentWorldIx))->updSampler(0))->setOldPE(
+                        pMC((updWorld(worldIndexes.back()))
+                        ->updSampler(0))->getSetPE() );
     
                 // Reinitialize current sampler
                 updWorld(currentWorldIx)->updSampler(0)->reinitialize(currentAdvancedState);
@@ -903,14 +899,14 @@ void Context::PrintSamplerData(unsigned int whichWorld)
     // Write to a file instead of stdout
     fprintf(logFile, "%d %d %.2f %.2f %.2f %.2f %.2f %.2f %.2f "
         , currentAdvancedState.getNU()
-        , (worlds[whichWorld]->samplers[0])->acceptedSteps
-        , (worlds[whichWorld]->samplers[0])->pe_o
-        , (worlds[whichWorld]->samplers[0])->pe_set
-        , (worlds[whichWorld]->samplers[0])->ke_proposed
-        , (worlds[whichWorld]->samplers[0])->ke_n
-        , (worlds[whichWorld]->samplers[0])->fix_o
-        , (worlds[whichWorld]->samplers[0])->fix_n
-        , (worlds[whichWorld]->samplers[0])->fix_set
+        , pHMC(worlds[whichWorld]->samplers[0])->acceptedSteps
+        , pMC((worlds[whichWorld]->samplers[0]))->pe_o
+        , pMC((worlds[whichWorld]->samplers[0]))->pe_set
+        , pHMC((worlds[whichWorld]->samplers[0]))->ke_proposed
+        , pHMC((worlds[whichWorld]->samplers[0]))->ke_n
+        , pMC((worlds[whichWorld]->samplers[0]))->fix_o
+        , pMC((worlds[whichWorld]->samplers[0]))->fix_n
+        , pMC((worlds[whichWorld]->samplers[0]))->fix_set
     );
 
 }
@@ -1165,7 +1161,7 @@ SimTK::Real Context::Distance(int whichWorld, int whichCompound, int whichSample
 // Writeble reference to a samplers advanced state
 SimTK::State& Context::updAdvancedState(int whichWorld, int whichSampler)
 {
-    return (worlds[whichWorld]->updSampler(whichSampler)->updTimeStepper()->updIntegrator()).updAdvancedState();
+    return (pHMC(worlds[whichWorld]->updSampler(whichSampler))->updTimeStepper()->updIntegrator()).updAdvancedState();
 }
 
 // Realize Topology Stage for all the Worlds

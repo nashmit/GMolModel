@@ -34,9 +34,9 @@
 
 #include <boost/timer.hpp>
 
-//#ifndef TRY_TO_USE_OPENMM
-//#define TRY_TO_USE_OPENMM
-//#endif
+#ifndef BaseSampler
+#define BaseSampler HamiltonianMonteCarloSampler
+#endif
 
 #include "server.hpp"
 #include "Topology.hpp"
@@ -174,10 +174,10 @@ public:
 
     // TODO Use Sampler polymorphism
     /** Get a sampler based on its position in the samplers vector **/
-    const HamiltonianMonteCarloSampler * getSampler(int which);
+    const BaseSampler * getSampler(int which);
 
     /** Get a writable sampler based on its position in the samplers vector **/
-    HamiltonianMonteCarloSampler * updSampler(int which);
+    BaseSampler * updSampler(int which);
 
     /** Get writble pointer to FixmanTorque implementation **/
     FixmanTorque * updFixmanTorque(void);
@@ -254,8 +254,8 @@ public:
     // --- Simulation ---
     SimTK::VerletIntegrator *integ;
     SimTK::TimeStepper *ts;
-    // TODO Use Sampler polymorphism
-    std::vector<HamiltonianMonteCarloSampler *> samplers;
+    std::vector<BaseSampler *> samplers;
+
     bool _useFixmanTorque;
     //...............
 

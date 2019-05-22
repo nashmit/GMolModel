@@ -32,8 +32,8 @@ public:
     SimTK::Real calcMassDeterminant(SimTK::State& );
 
     // Set / reset variables needed at the beginning of a simulation
-    void initialize();
-    void reinitialize();
+    void initialize(SimTK::State& someState);
+    void reinitialize(SimTK::State& someState);
 
     // Getter / setter for macroscopic temperature and RT
     // virtual void setTemperature(SimTK::Real) = 0; // RE

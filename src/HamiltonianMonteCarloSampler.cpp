@@ -16,6 +16,7 @@ HamiltonianMonteCarloSampler::HamiltonianMonteCarloSampler(SimTK::CompoundSystem
                                      ,SimTK::TimeStepper *argTimeStepper
                                      )
     : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
+    , Sampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
 {
     this->useFixman = false;  
     this->fix_n = this->fix_o = 0.0;
@@ -138,7 +139,7 @@ velocities to desired temperature, variables that store the configuration
 and variables that store the energies, both needed for the
 acception-rejection step. Also realize velocities and initialize
 the timestepper. **/
-void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool randomizeConformation )
+void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState )
 {
     // After an event handler has made a discontinuous change to the
     // Integrator's "advanced state", this method must be called to 
@@ -214,7 +215,7 @@ void HamiltonianMonteCarloSampler::initialize(SimTK::State& someState, bool rand
 
 /** Same as initialize **/
 //r void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState, SimTK::Real timestep, int nosteps, SimTK::Real argTemperature) 
-void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState/*, SimTK::Real argTemperature*/) 
+void HamiltonianMonteCarloSampler::reinitialize(SimTK::State& someState)
 {
      // After an event handler has made a discontinuous change to the
     // Integrator's "advanced state", this method must be called to 

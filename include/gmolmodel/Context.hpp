@@ -59,9 +59,8 @@ public:
     //------------
 
     // --- Simulation parameters ---
-    int addSampler(int whichWorld, std::string whichSampler);
     int addSampler(int whichWorld, SamplerName whichSampler);
-    void initializeSampler(int whichWorld, int whichSampler, bool randomizeConformation = false);
+    void initializeSampler(int whichWorld, int whichSampler);
 
     // Amber like scale factors.
     void setAmberForceFieldScaleFactors(int whichWorld);

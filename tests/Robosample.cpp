@@ -179,8 +179,8 @@ int main(int argc, char **argv)
             context->setTimestep(worldIx, samplerIx, std::stod(setupReader.get("TIMESTEPS")[worldIx]) );
 
             // Set thermostats
-            context->updWorld(worldIx)->updSampler(samplerIx)->setThermostat(setupReader.get("THERMOSTAT")[worldIx]);
-            context->updWorld(worldIx)->updSampler(samplerIx)->setBoostTemperature(
+            pMC(context->updWorld(worldIx)->updSampler(samplerIx))->setThermostat(setupReader.get("THERMOSTAT")[worldIx]);
+            pHMC(context->updWorld(worldIx)->updSampler(samplerIx))->setBoostTemperature(
                 std::stof(setupReader.get("BOOST_TEMPERATURE")[worldIx]));
 
             // Activate Fixman potential if needed
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
     for(unsigned int worldIx = 0; worldIx < nofWorlds; worldIx++){
         for (unsigned int samplerIx = 0; samplerIx < context->getWorld(worldIx)->getNofSamplers(); samplerIx++){
             std::cout << "After setThermo world " << worldIx << " sampler " << samplerIx << "getThermostat: " ;
-            std::cout << context->updWorld(worldIx)->updSampler(samplerIx)->getThermostat() ;
+            std::cout << pMC(context->updWorld(worldIx)->updSampler(samplerIx))->getThermostat() ;
             std::cout << std::endl;
         }
     }
@@ -234,8 +234,8 @@ int main(int argc, char **argv)
                 << " temperature = " << context->updWorld(worldIx)->updSampler(samplerIx)->getTemperature()
                 << " initial const state PE: " << std::setprecision(20)
                 //<< (context->updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy((updWorld(worldIx))->integ->updAdvancedState())
-                << (context->updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy(context->updAdvancedState(worldIx, samplerIx))
-                << " useFixmanPotential = " << context->updWorld(worldIx)->updSampler(samplerIx)->isUsingFixmanPotential()
+                //<< (context->updWorld(worldIx))->forces->getMultibodySystem().calcPotentialEnergy(context->updAdvancedState(worldIx, samplerIx))
+                << " useFixmanPotential = " << pMC(context->updWorld(worldIx)->updSampler(samplerIx))->isUsingFixmanPotential()
                 << std::endl;
         }
 
@@ -299,12 +299,6 @@ int main(int argc, char **argv)
     currentWorldIx = context->worldIndexes.front();
     SimTK::State& advancedState = (context->updWorld(currentWorldIx))->integ->updAdvancedState();
 
-    // Update
-//    for(int k = 0; k < context->getNofSamplesPerRound(currentWorldIx); k++){
-//        ++mc_step; // Increment mc_step
-//        context->updWorld(currentWorldIx)->updSampler(0)->update(advancedState, context->getNofMDStepsPerSample(currentWorldIx));
-//    }
-
     // Write pdb
     context->setOutputDir(setupReader.get("OUTPUT_DIR")[0] );
     context->setPdbPrefix(setupReader.get("MOLECULES")[0]
@@ -322,7 +316,7 @@ int main(int argc, char **argv)
         }
     }
 
-    if(SimTK::Pathname::getEnvironmentVariable("CUDA_ROOT") == ""){
+    if(SimTK::Pathname::getEnvironmentVariable("CUDA_ROOT").empty()){
         std::cout << "CUDA_ROOT not set." << std::endl;
     }else{
         std::cout << "CUDA_ROOT set to " 
@@ -331,6 +325,9 @@ int main(int argc, char **argv)
 
     // Get output printing frequency
     context->setPrintFreq( std::stoi(setupReader.get("PRINT_FREQ")[0]) );
+
+    // Realize topology for all the Worlds
+    context->realizeTopology();
 
     // -- Run --
     context->Run(context->getNofRounds(), 

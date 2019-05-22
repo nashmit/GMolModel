@@ -10,6 +10,7 @@ TestHMCSOA::TestHMCSOA(SimTK::CompoundSystem *argCompoundSystem,
                                      SimTK::GeneralForceSubsystem *argForces,
                                      SimTK::TimeStepper *argTimeStepper)
     : MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
+    , Sampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
 {
     this->useFixman = true;  
     this->fix_n = this->fix_o = 0.0;

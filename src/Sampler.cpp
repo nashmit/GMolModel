@@ -104,12 +104,12 @@ void Sampler::PrintSimbodyStateCache(SimTK::State& someState){
     }
 }
 
-void Sampler::initialize() {
+void Sampler::initialize(SimTK::State& someState) {
     // Sampling
     int nofSamples = 0;
 }
 
-void Sampler::reinitialize() {
+void Sampler::reinitialize(SimTK::State& someState) {
     // Sampling
     int nofSamples = 0;
 }

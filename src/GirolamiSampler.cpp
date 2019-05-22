@@ -15,6 +15,8 @@ GirolamiSampler::GirolamiSampler(SimTK::CompoundSystem *argCompoundSystem,
                                      SimTK::GeneralForceSubsystem *argForces,
                                      SimTK::TimeStepper *argTimeStepper)
     : HamiltonianMonteCarloSampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
+    , MonteCarloSampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
+    , Sampler(argCompoundSystem, argMatter, argResidue, argDumm, argForces, argTimeStepper)
 {
     this->useFixmanTorque = true;  
 }

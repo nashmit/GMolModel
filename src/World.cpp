@@ -1,5 +1,7 @@
 #include "World.hpp"
 
+
+
 // TODO write a pdb writer for all the Compounds
 // TODO move this in Topology since they work only for one Compound
 void writePdb(const SimTK::Compound& c, SimTK::State& advanced,
@@ -415,66 +417,33 @@ int World::getNofSamplers(void)
     return samplers.size();
 }
 
-/** Add a sampler to this World using a string identifier. **/
-int World::addSampler(std::string samplerName)
-{
-    if((samplerName == "HamiltonianMonteCarlo") || (samplerName == "HMC")){
-        HamiltonianMonteCarloSampler * pHMC = new HamiltonianMonteCarloSampler(
-            compoundSystem, matter, topologies[0],
-            forceField, forces, ts );
-        //samplers.push_back((Sampler *) pHMC);
-        samplers.push_back(pHMC);
-    }
-    /*
-    else if((samplerName == "MonteCarlo") || (samplerName == "MC")){
-        MonteCarloSampler * pMC = new MonteCarloSampler(
-            compoundSystem, matter, topologies[0],
-            forceField, forces, ts );
-        samplers.push_back((Sampler *) pMC);
-    }
-    else if((samplerName == "ConformationalSearch")){
-         ConformationalSearch * pCF = new ConformationalSearch(
-            compoundSystem, matter, topologies[0],
-            forceField, forces, ts );
-        samplers.push_back((Sampler *) pCF);
-    }
-    */
-    return samplers.size();
-}
-
 /** Add a sampler to this World using the specialized struct
 for samplers names. **/
 int World::addSampler(SamplerName samplerName)
 {
     if(samplerName == HMC){
-        HamiltonianMonteCarloSampler * pHMC = new HamiltonianMonteCarloSampler(
-        // Sampler * pHMC = new HamiltonianMonteCarloSampler(
-            compoundSystem, matter, topologies[0],
-            forceField, forces, ts );
-        samplers.push_back(pHMC);
+
+        BaseSampler *p = new HamiltonianMonteCarloSampler(
+                compoundSystem, matter, topologies[0],
+                forceField, forces, ts
+                );
+        samplers.emplace_back(p);
+
     }
-/*
-    else if(samplerName == MC){
-        MonteCarloSampler * pMC = new MonteCarloSampler(
-            compoundSystem, matter, topologies[0],
-            forceField, forces, ts );
-        samplers.push_back((Sampler *) pMC);
-        //samplers.push_back(pMC);
-    }
-*/
+
     return samplers.size();
 }
 
 // Get a sampler based on its position in the samplers vector
-// TODO Use Sampler polymorphism
-const HamiltonianMonteCarloSampler * World::getSampler(int which)
+// TODO Use ampler polymorphism
+const BaseSampler * World::getSampler(int which)
 {
     return samplers[which];
 }
 
 // Get a writable sampler based on its position in the samplers vector
 // TODO Use Sampler polymorphism
-HamiltonianMonteCarloSampler * World::updSampler(int which)
+BaseSampler * World::updSampler(int which)
 {
     return samplers[which];
 }

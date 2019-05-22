@@ -8,10 +8,18 @@
 //#include <boost/random/uniform_real_distribution.hpp>
 //#include <boost/random/normal_distribution.hpp>
 
+
+// Just to remove the long syntax requirement
+#ifndef pMC
+//#define pMC(pSampler) dynamic_cast<MonteCarloSampler *>(pSampler)
+#define pMC(pSampler) pSampler
+#endif
+
+// Other classes that we need
 class Topology;
 class IState;
 
-class MonteCarloSampler : public Sampler
+class MonteCarloSampler : virtual public Sampler
 {
     friend class Context;
 public:

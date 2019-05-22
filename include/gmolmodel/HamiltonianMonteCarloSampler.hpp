@@ -9,8 +9,12 @@
 
 #include "MonteCarloSampler.hpp"
 
-class Topology;
-class IState;
+// Just to remove the long syntax requirement
+#ifndef pHMC
+//#define pHMC(pSampler) dynamic_cast<HamiltonianMonteCarloSampler *>(pSampler)
+#define pHMC(pSampler) pSampler
+#endif
+
 void writePdb(      SimTK::Compound& c, SimTK::State& advanced,
          const char *dirname, const char *prefix, int midlength, const char *sufix, double aTime);
 
@@ -26,7 +30,7 @@ of the following steps:
 Step 1 and 2 are implemented in the fuction propose. Step 3 is implemented
 in the function update.
 **/
-class HamiltonianMonteCarloSampler : public MonteCarloSampler
+class HamiltonianMonteCarloSampler : virtual public MonteCarloSampler
 {
 friend class Context;
 public:
@@ -60,10 +64,10 @@ public:
     and variables that store the energies, both needed for the 
     acception-rejection step. Also realize velocities and initialize 
     the timestepper. **/
-    virtual void initialize(SimTK::State& advanced, bool randomizeConformation = false);
+    virtual void initialize(SimTK::State& advanced);
 
     /** Same as initialize **/
-    virtual void reinitialize(SimTK::State& advanced/*, SimTK::Real argTemperature*/) ; 
+    virtual void reinitialize(SimTK::State& advanced) ;
 
     /** Get the TimeStepper that manages the integrator **/
     const SimTK::TimeStepper * getTimeStepper(void);
