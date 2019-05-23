@@ -273,6 +273,12 @@ enum IntegratorName { // Samplers
 /*
  * Statistics
  */
+/** The type of distribution to draw a random number from **/
+enum GmolRandDistributionType {
+    UNIFORM,
+    NORMAL
+};
+
 
 enum SamplerName { // Samplers
     MC,

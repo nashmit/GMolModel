@@ -125,4 +125,16 @@ void Sampler::setTemperature(SimTK::Real temperature) {
     RT = this->temperature * SimTK_BOLTZMANN_CONSTANT_MD;
 }
 
+SimTK::Real Sampler::getRT() const {
+    return RT;
+}
+
+SimTK::Real Sampler::generateRandomNumber(GmolRandDistributionType distributionType) {
+    if(distributionType == UNIFORM){
+        return uniformRealDistribution(randomEngine);
+    }else if(distributionType == NORMAL){
+        return gaurand(randomEngine);
+    }
+}
+
 

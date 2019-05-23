@@ -28,8 +28,9 @@ public:
     virtual ~Sampler();
 
     // Compute mass matrix determinant (O(n))
-    SimTK::Real calcMassDeterminant(const SimTK::State& );
-    SimTK::Real calcMassDeterminant(SimTK::State& );
+    // TODO Move
+    SimTK::Real calcMassDeterminant(const SimTK::State&);
+    SimTK::Real calcMassDeterminant(SimTK::State&);
 
     // Set / reset variables needed at the beginning of a simulation
     void initialize(SimTK::State& someState);
@@ -40,12 +41,17 @@ public:
     SimTK::Real getTemperature() const;
     void setTemperature(SimTK::Real temperature);
 
+    SimTK::Real getRT() const;
+
     /** Returns the number of samples extracted so far. **/
     int getNofSamples(void);
 
     // Get set the seed
     unsigned long long int getSeed(void);
     void setSeed(unsigned long long int);
+
+    /** Generate a random number. **/
+    SimTK::Real generateRandomNumber(GmolRandDistributionType);
 
     /** Propose a move **/
     virtual void propose(SimTK::State& someState) = 0;

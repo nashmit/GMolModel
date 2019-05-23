@@ -114,10 +114,9 @@ set(TESTS_SRCS
         TestSimbodyBasic.cpp
         TestMassSqrtAndDet.cpp
         TestMolmodelBasic.cpp
-        TestMolmodelBuildCompound.cpp
         TestOpenMMBasic.cpp
-        TestPDBReaderMolModel.cpp
         TestParallelExecutor.cpp
+        TestSampler.cpp
         TestAmberInput.cpp
         TestWriteDCD.cpp
         Robosample.cpp
@@ -127,7 +126,7 @@ set(TESTS_SRCS
 foreach(TEST_SRC ${TESTS_SRCS})
     STRING(REGEX REPLACE ".cpp" "" TEST_EXE ${TEST_SRC})
     MESSAGE(${TEST_EXE} ${TEST_SRC})
-    add_executable(${TEST_EXE} ${TEST_SRC} )
+    add_executable(${TEST_EXE} ${TEST_SRC})
     TARGET_LINK_LIBRARIES( ${TEST_EXE}
                 ${Simbody_LIBRARIES}
                 SimTKmolmodel_d #adding molmodel lib as a dependence.. this needs to be refactor since the name should be changeable

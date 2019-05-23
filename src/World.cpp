@@ -137,8 +137,6 @@ World::World(int worldIndex, bool isVisual, SimTK::Real visualizerFrequency)
     matter = new SimTK::SimbodyMatterSubsystem(*compoundSystem);
     forces = new SimTK::GeneralForceSubsystem(*compoundSystem);
 
-
-  
     // Initialize Molmodel default ForceSubsystem (DuMM)
     forceField = new SimTK::DuMMForceFieldSubsystem(*compoundSystem);
 
