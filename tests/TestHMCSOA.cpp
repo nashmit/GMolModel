@@ -112,7 +112,7 @@ int main(int argc, char **argv)
     }
 
     // Get simulation parameters
-    int total_mcsteps = std::stoi(setupReader.get("STEPS")[0]);
+    int total_mcsteps = std::stoi(setupReader.get("ROUNDS")[0]);
     int mix_mcsteps[nofRegimens];
     int mdsteps[nofRegimens];
     float timesteps[nofRegimens];
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
     int round_mcsteps = 0;
 
     for(int worldIx = 0; worldIx < nofRegimens; worldIx++){
-        mix_mcsteps[worldIx] = std::stoi(setupReader.get("MIXMCSTEPS")[worldIx]);
+        mix_mcsteps[worldIx] = std::stoi(setupReader.get("SAMPLES_PER_ROUND"")[worldIx]);
         assert( (!(total_mcsteps % mix_mcsteps[worldIx])) &&
             "Total number of steps must be divisible with each regimen MC steps." );
         round_mcsteps += mix_mcsteps[worldIx];

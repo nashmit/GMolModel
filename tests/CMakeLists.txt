@@ -111,18 +111,15 @@ LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/../build-debug/lib)
 MESSAGE("Gmolmodel libs dir: ${CMAKE_CURRENT_LIST_DIR}/../build-debug/lib")
 
 set(TESTS_SRCS
-	      TestSimbodyBasic.cpp
-	      TestMolmodelBasic.cpp
-              TestMolmodelBuildCompound.cpp
+        TestSimbodyBasic.cpp
         TestMassSqrtAndDet.cpp
+        TestMolmodelBasic.cpp
+        TestMolmodelBuildCompound.cpp
         TestOpenMMBasic.cpp
-        #TestPrmCrdPeptide.cpp
-	      TestPDBReaderMolModel.cpp
+        TestPDBReaderMolModel.cpp
         TestParallelExecutor.cpp
-	      TestAmberInput.cpp
-        #TestMixing.cpp
+        TestAmberInput.cpp
         TestWriteDCD.cpp
-        TestHMCSOA.cpp
         Robosample.cpp
         TestTopology.cpp
 	)
