@@ -2,20 +2,21 @@
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
     <generated>
-      <config projectName="gmolmodel" targetName="TestMolmodelBuildCompound" />
-      <config projectName="gmolmodel" targetName="TestMassSqrtAndDet" />
-      <config projectName="gmolmodel" targetName="TestAmberInput" />
+      <config projectName="gmolmodel" targetName="TestOpenMMBasic" />
+      <config projectName="gmolmodel" targetName="GMOLMODEL_test" />
+      <config projectName="gmolmodel" targetName="Robosample" />
       <config projectName="gmolmodel" targetName="TestSimbodyBasic" />
       <config projectName="gmolmodel" targetName="TestPDBReaderMolModel" />
-      <config projectName="gmolmodel" targetName="TestMolmodelBasic" />
-      <config projectName="gmolmodel" targetName="TestOpenMMBasic" />
-      <config projectName="gmolmodel" targetName="Robosample" />
-      <config projectName="gmolmodel" targetName="GMOLMODEL_test" />
       <config projectName="gmolmodel" targetName="GMOLMODEL_dynamic" />
-      <config projectName="gmolmodel" targetName="GMOLMODEL_static" />
-      <config projectName="gmolmodel" targetName="TestHMCSOA" />
+      <config projectName="gmolmodel" targetName="TestAmberInput" />
       <config projectName="gmolmodel" targetName="TestWriteDCD" />
       <config projectName="gmolmodel" targetName="TestParallelExecutor" />
+      <config projectName="gmolmodel" targetName="TestMolmodelBasic" />
+      <config projectName="gmolmodel" targetName="TestHMCSOA" />
+      <config projectName="gmolmodel" targetName="TestMolmodelBuildCompound" />
+      <config projectName="gmolmodel" targetName="TestMassSqrtAndDet" />
+      <config projectName="gmolmodel" targetName="GMOLMODEL_static" />
+      <config projectName="gmolmodel" targetName="TestTopology" />
     </generated>
   </component>
   <component name="CMakeSettings">
@@ -25,36 +26,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6c34303e-b674-4009-9f08-0535436c4278" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/src/CMakeFiles/GMOLMODEL_dynamic.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/src/CMakeFiles/GMOLMODEL_dynamic.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/src/CMakeFiles/GMOLMODEL_dynamic.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/src/CMakeFiles/GMOLMODEL_dynamic.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/src/CMakeFiles/GMOLMODEL_static.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/src/CMakeFiles/GMOLMODEL_static.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/src/CMakeFiles/GMOLMODEL_test.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/src/CMakeFiles/GMOLMODEL_test.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/src/CMakeFiles/GMOLMODEL_test.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/src/CMakeFiles/GMOLMODEL_test.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/Robosample.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/Robosample.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/Robosample.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/Robosample.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestAmberInput.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestAmberInput.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestAmberInput.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestAmberInput.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestHMCSOA.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestHMCSOA.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestHMCSOA.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestHMCSOA.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMassSqrtAndDet.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMassSqrtAndDet.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMassSqrtAndDet.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMassSqrtAndDet.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMolmodelBasic.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMolmodelBasic.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMolmodelBasic.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMolmodelBasic.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMolmodelBuildCompound.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMolmodelBuildCompound.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMolmodelBuildCompound.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestMolmodelBuildCompound.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestOpenMMBasic.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestOpenMMBasic.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestOpenMMBasic.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestOpenMMBasic.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestPDBReaderMolModel.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestPDBReaderMolModel.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestPDBReaderMolModel.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestPDBReaderMolModel.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestParallelExecutor.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestParallelExecutor.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestParallelExecutor.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestParallelExecutor.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestSimbodyBasic.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestSimbodyBasic.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestSimbodyBasic.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestSimbodyBasic.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestWriteDCD.dir/depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestWriteDCD.dir/depend.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestWriteDCD.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/tests/CMakeFiles/TestWriteDCD.dir/link.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/pcuser.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/pcuser.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/molmodel_legacy" beforeDir="false" afterPath="$PROJECT_DIR$/molmodel_legacy" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/molmodel_legacy/simbody" beforeDir="false" afterPath="$PROJECT_DIR$/molmodel_legacy/simbody" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/molmodel_legacy/simbody/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/molmodel_legacy/simbody/.idea/workspace.xml" afterDir="false" />
@@ -72,30 +45,167 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="225">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/include/gmolmodel/SetupReader.hpp">
+        <entry file="file://$PROJECT_DIR$/tests/Robosample.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" selection-start-line="9" selection-end-line="9" />
+            <state relative-caret-position="5010">
+              <caret line="334" selection-start-line="334" selection-end-line="334" />
+              <folding>
+                <element signature="e#52#69#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/gmolmodel/MonteCarloSampler.hpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="195">
+              <caret line="14" column="30" selection-start-line="14" selection-start-column="30" selection-end-line="14" selection-end-column="30" />
+              <folding>
+                <element signature="e#69#88#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/gmolmodel/HamiltonianMonteCarloSampler.hpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="605">
+              <caret line="48" lean-forward="true" selection-start-line="48" selection-end-line="48" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tests/TestMixing.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="662">
+              <caret line="320" column="24" lean-forward="true" selection-start-line="320" selection-start-column="24" selection-end-line="320" selection-end-column="24" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Context.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-2">
+              <caret line="790" lean-forward="true" selection-start-line="790" selection-end-line="790" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/gmolmodel/Context.hpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="4" column="17" selection-start-line="4" selection-start-column="10" selection-end-line="4" selection-end-column="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/gmolmodel/World.hpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="530">
+              <caret line="259" column="20" selection-start-line="259" selection-start-column="20" selection-end-line="259" selection-end-column="20" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/SetupReader.cpp">
+        <entry file="file://$PROJECT_DIR$/src/World.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="261">
-              <caret line="69" column="44" lean-forward="true" selection-start-line="69" selection-start-column="44" selection-end-line="69" selection-end-column="44" />
+            <state relative-caret-position="165">
+              <caret line="122" column="68" lean-forward="true" selection-start-line="122" selection-start-column="68" selection-end-line="122" selection-end-column="68" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>residue</find>
+      <find>generate</find>
+      <find>compoundId</find>
+      <find>dumm</find>
+      <find>OPEN</find>
+      <find>scaleFactor</find>
+      <find>addFixmanT</find>
+      <find>useFixman</find>
+      <find>p_samplers</find>
+      <find>sampler</find>
+      <find>RE sampler</find>
+      <find>setTemperature</find>
+      <find>HO</find>
+      <find>reprod</find>
+      <find>g</find>
+      <find>setReproduci</find>
+      <find>reproducible</find>
+      <find>propose</find>
+      <find>setSeed</find>
+      <find>seed</find>
+      <find>update</find>
+      <find>~World</find>
+      <find>HamiltonianMonteCarloSampler</find>
+      <find>initialize</find>
+      <find>setTher</find>
+      <find>getTimeStep</find>
+      <find>MD</find>
+      <find>addSampler</find>
+      <find>Sampler</find>
+      <find>Run</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>Sampler</replace>
+      <replace>BaseSampler</replace>
+    </replaceStrings>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/tests/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/tests/TestTopology.cpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/bgeneral.hpp" />
+        <option value="$PROJECT_DIR$/src/bgeneral.cpp" />
+        <option value="$PROJECT_DIR$/src/bMoleculeReader.cpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/bMoleculeReader.hpp" />
+        <option value="$PROJECT_DIR$/src/bAddParams.cpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/bAddParams.hpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/simmain.hpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/bSpecificAtom.hpp" />
+        <option value="$PROJECT_DIR$/src/bSpecificAtom.cpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/ParaMolecularDecorator.hpp" />
+        <option value="$PROJECT_DIR$/src/Topology.cpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/Topology.hpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/SetupReader.hpp" />
+        <option value="$PROJECT_DIR$/src/SetupReader.cpp" />
+        <option value="$PROJECT_DIR$/src/FixmanTorque.cpp" />
+        <option value="$PROJECT_DIR$/src/MonteCarloSampler.cpp" />
+        <option value="$PROJECT_DIR$/tests/TestPDBReaderMolModel.cpp" />
+        <option value="$PROJECT_DIR$/src/ParaMolecularDecorator.cpp" />
+        <option value="$PROJECT_DIR$/src/GirolamiSampler.cpp" />
+        <option value="$PROJECT_DIR$/src/HMCSOA.cpp" />
+        <option value="$PROJECT_DIR$/src/HamiltonianMonteCarloSampler.cpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/Sampler.hpp" />
+        <option value="$PROJECT_DIR$/src/Sampler.cpp" />
+        <option value="$PROJECT_DIR$/src/Context.cpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/Context.hpp" />
+        <option value="$PROJECT_DIR$/tests/Robosample.cpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/MonteCarloSampler.hpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/HamiltonianMonteCarloSampler.hpp" />
+        <option value="$PROJECT_DIR$/src/World.cpp" />
+        <option value="$PROJECT_DIR$/include/gmolmodel/World.hpp" />
+      </list>
+    </option>
+  </component>
+  <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
     <option name="x" value="3840" />
     <option name="y" value="23" />
@@ -107,7 +217,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -118,18 +227,30 @@
             <path>
               <item name="gmolmodel" type="b2602c69:ProjectViewProjectNode" />
               <item name="gmolmodel" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="include" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="gmolmodel" type="b2602c69:ProjectViewProjectNode" />
+              <item name="gmolmodel" type="462c0819:PsiDirectoryNode" />
+              <item name="include" type="462c0819:PsiDirectoryNode" />
+              <item name="gmolmodel" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="gmolmodel" type="b2602c69:ProjectViewProjectNode" />
+              <item name="gmolmodel" type="462c0819:PsiDirectoryNode" />
+              <item name="tests" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.tools" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -209,6 +330,11 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="TestTopology" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="gmolmodel" TARGET_NAME="TestTopology" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="gmolmodel" RUN_TARGET_NAME="TestTopology">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="TestWriteDCD" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="gmolmodel" TARGET_NAME="TestWriteDCD" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="gmolmodel" RUN_TARGET_NAME="TestWriteDCD">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -225,9 +351,10 @@
       <item itemvalue="CMake Application.TestMolmodelBasic" />
       <item itemvalue="CMake Application.TestMolmodelBuildCompound" />
       <item itemvalue="CMake Application.TestOpenMMBasic" />
-      <item itemvalue="CMake Application.TestParallelExecutor" />
       <item itemvalue="CMake Application.TestPDBReaderMolModel" />
+      <item itemvalue="CMake Application.TestParallelExecutor" />
       <item itemvalue="CMake Application.TestSimbodyBasic" />
+      <item itemvalue="CMake Application.TestTopology" />
       <item itemvalue="CMake Application.TestWriteDCD" />
     </list>
   </component>
@@ -242,12 +369,50 @@
       <option name="presentableId" value="Default" />
       <updated>1557923224213</updated>
       <workItem from="1557923227503" duration="206000" />
-      <workItem from="1557923441999" duration="753000" />
+      <workItem from="1557923441999" duration="1263000" />
+      <workItem from="1557926655819" duration="2443000" />
+      <workItem from="1557930105455" duration="276000" />
+      <workItem from="1557930425002" duration="904000" />
+      <workItem from="1557991349591" duration="545000" />
+      <workItem from="1557997724892" duration="7792000" />
+      <workItem from="1558015008606" duration="10460000" />
+      <workItem from="1558034095613" duration="160000" />
+      <workItem from="1558076969301" duration="9000" />
+      <workItem from="1558077110206" duration="1493000" />
+      <workItem from="1558078878278" duration="339000" />
+      <workItem from="1558079370708" duration="84000" />
+      <workItem from="1558079484401" duration="1724000" />
+      <workItem from="1558081268440" duration="1288000" />
+      <workItem from="1558082839084" duration="24757000" />
+      <workItem from="1558160644715" duration="2971000" />
+      <workItem from="1558164833737" duration="1589000" />
+      <workItem from="1558166526498" duration="4611000" />
+      <workItem from="1558175680700" duration="4949000" />
+      <workItem from="1558187326690" duration="572000" />
+      <workItem from="1558189222638" duration="43000" />
+      <workItem from="1558190385191" duration="1114000" />
+      <workItem from="1558193247319" duration="1653000" />
+      <workItem from="1558206580762" duration="13000" />
+      <workItem from="1558208781960" duration="1843000" />
+      <workItem from="1558247881612" duration="905000" />
+      <workItem from="1558248959165" duration="2693000" />
+      <workItem from="1558259148208" duration="3547000" />
+      <workItem from="1558267871134" duration="2602000" />
+      <workItem from="1558341841956" duration="16154000" />
+      <workItem from="1558360514458" duration="8540000" />
+      <workItem from="1558386003245" duration="161000" />
+      <workItem from="1558424557540" duration="25225000" />
+      <workItem from="1558452790694" duration="619000" />
+      <workItem from="1558465516714" duration="306000" />
+      <workItem from="1558508302319" duration="1795000" />
+      <workItem from="1558510153919" duration="122000" />
+      <workItem from="1558512940180" duration="10074000" />
+      <workItem from="1558593696419" duration="2364000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="959000" />
+    <option name="totallyTimeSpent" value="148208000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -260,24 +425,23 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="3840" y="23" width="1858" height="1177" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24972558" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13501647" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Messages" visible="true" weight="0.3299909" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39927074" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3296501" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3290793" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.2898815" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3299909" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.3299909" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="10" />
-      <window_info anchor="bottom" id="CMake" order="11" />
+      <window_info anchor="bottom" id="Version Control" order="10" weight="0.3299909" />
+      <window_info anchor="bottom" id="CMake" order="11" weight="0.3299909" />
+      <window_info anchor="bottom" id="Messages" order="12" weight="0.34275296" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -287,25 +451,382 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="watch">
+      <expression>
+        <expression-string>context-&gt;worlds[1]-&gt;integ-&gt;rep-&gt;advancedState.impl</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/molmodel_legacy/simbody/SimTKcommon/src/Pathname.cpp">
+    <entry file="file:///usr/local/include/molmodel/internal/Pdb.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="394" selection-start-line="394" selection-end-line="394" />
+        <state relative-caret-position="609">
+          <caret line="468" column="21" selection-start-line="468" selection-start-column="21" selection-end-line="468" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/gmolmodel/bSpecificAtom.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="60" column="4" lean-forward="true" selection-start-line="60" selection-start-column="4" selection-end-line="60" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/bits/stl_pair.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="353">
+          <caret line="123" column="14" selection-start-line="123" selection-start-column="14" selection-end-line="123" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/gmolmodel/bBond.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="438">
+          <caret line="51" column="14" selection-start-line="51" selection-start-column="14" selection-end-line="51" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/bBond.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="438">
+          <caret line="176" column="16" selection-start-line="176" selection-start-column="16" selection-end-line="176" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/simbody/SimTKmath/Integrators/src/AbstractIntegratorRep.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="28" column="14" selection-start-line="28" selection-start-column="14" selection-end-line="28" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/simbody/SimTKmath/Integrators/src/IntegratorRep.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="183" column="78" lean-forward="true" selection-start-line="183" selection-start-column="78" selection-end-line="183" selection-end-column="78" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/simbody/SimTKmath/Integrators/src/AbstractIntegratorRep.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="246">
+          <caret line="43" column="42" lean-forward="true" selection-start-line="43" selection-start-column="42" selection-end-line="43" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/include/simbody/SimTKcommon/internal/System.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="244" column="58" lean-forward="true" selection-start-line="244" selection-start-column="58" selection-end-line="244" selection-end-column="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/include/simbody/SimTKcommon/internal/SystemGuts.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="217">
+          <caret line="94" column="41" lean-forward="true" selection-start-line="94" selection-start-column="41" selection-end-line="94" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/include/simbody/SimTKcommon/internal/State.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="189" column="30" selection-start-line="189" selection-start-column="30" selection-end-line="189" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/include/molmodel/internal/Compound.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="353">
+          <caret line="665" column="9" selection-start-line="665" selection-start-column="9" selection-end-line="665" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/gmolmodel/ParaMolecularDecorator.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="495">
+          <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/src/CompoundSystem.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="136" column="62" selection-start-line="136" selection-start-column="52" selection-end-line="136" selection-end-column="62" />
+          <folding>
+            <element signature="e#0#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/include/molmodel/internal/CompoundSystem.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="283">
+          <caret line="112" column="42" lean-forward="true" selection-start-line="112" selection-start-column="42" selection-end-line="112" selection-end-column="42" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/include/gmolmodel/SetupReader.hpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        <state relative-caret-position="450">
+          <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/include/molmodel/internal/DuMMForceFieldSubsystem.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="358">
+          <caret line="1283" column="20" lean-forward="true" selection-start-line="1283" selection-start-column="20" selection-end-line="1283" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/gmolmodel/FixmanTorque.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="30" column="37" selection-start-line="30" selection-start-column="37" selection-end-line="30" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/FixmanTorque.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="22" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/TestHMCSOA.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="39" column="40" selection-start-line="39" selection-start-column="30" selection-end-line="39" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Topology.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="26" lean-forward="true" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/gmolmodel/Topology.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1025">
+          <caret line="148" column="26" selection-start-line="148" selection-start-column="26" selection-end-line="148" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/TestPDBReaderMolModel.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1010">
+          <caret line="115" lean-forward="true" selection-start-line="115" selection-end-line="115" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ParaMolecularDecorator.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="84" column="50" selection-start-line="84" selection-start-column="50" selection-end-line="84" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/HMCSOA.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="19" lean-forward="true" selection-start-line="19" selection-start-column="19" selection-end-line="19" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/gmolmodel/HMCSOA.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="32" selection-start-line="10" selection-start-column="32" selection-end-line="10" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/GirolamiSampler.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="308">
+          <caret line="21" column="1" selection-start-line="21" selection-start-column="1" selection-end-line="21" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MonteCarloSampler.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="6" selection-start-line="16" selection-start-column="6" selection-end-line="16" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/HamiltonianMonteCarloSampler.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="218" column="1" selection-start-line="218" selection-start-column="1" selection-end-line="218" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/gmolmodel/Sampler.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="35" column="45" selection-start-line="35" selection-start-column="45" selection-end-line="35" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Sampler.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="334">
+          <caret line="111" column="50" selection-start-line="111" selection-start-column="50" selection-end-line="111" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/simbody/Simbody/src/MultibodySystemRep.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="393" selection-start-line="393" selection-end-line="393" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/simbody/Simbody/src/GeneralForceSubsystem.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="877" selection-start-line="877" selection-end-line="877" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/simbody/SimTKcommon/Simulation/include/SimTKcommon/internal/SubsystemGuts.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="240" selection-start-line="240" selection-end-line="240" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/simbody/SimTKcommon/Simulation/include/SimTKcommon/internal/StateImpl.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="134">
+          <caret line="962" selection-start-line="962" selection-end-line="962" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/simbody/Simbody/src/MultibodySystem.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="134">
+          <caret line="139" selection-start-line="139" selection-end-line="139" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/SetupReader.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="261">
-          <caret line="69" column="44" lean-forward="true" selection-start-line="69" selection-start-column="44" selection-end-line="69" selection-end-column="44" />
+        <state relative-caret-position="424">
+          <caret line="82" selection-start-line="82" selection-end-line="82" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/bits/stl_vector.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="215">
+          <caret line="779" selection-start-line="779" selection-end-line="779" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/src/CompoundRep.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="1011" selection-start-line="1011" selection-end-line="1011" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/src/Pdb.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="533" selection-start-line="533" selection-end-line="533" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/bits/basic_string.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="215">
+          <caret line="5284" selection-start-line="5284" selection-end-line="5284" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/simbody/SimTKcommon/Simulation/src/System.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="783" selection-start-line="783" selection-end-line="783" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/molmodel_legacy/src/Compound.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="1896" selection-start-line="1896" selection-end-line="1896" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/Robosample.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5010">
+          <caret line="334" selection-start-line="334" selection-end-line="334" />
+          <folding>
+            <element signature="e#52#69#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/TestMixing.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="662">
+          <caret line="320" column="24" lean-forward="true" selection-start-line="320" selection-start-column="24" selection-end-line="320" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Context.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2">
+          <caret line="790" lean-forward="true" selection-start-line="790" selection-end-line="790" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/gmolmodel/Context.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="17" selection-start-line="4" selection-start-column="10" selection-end-line="4" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/gmolmodel/HamiltonianMonteCarloSampler.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="605">
+          <caret line="48" lean-forward="true" selection-start-line="48" selection-end-line="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/gmolmodel/MonteCarloSampler.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="14" column="30" selection-start-line="14" selection-start-column="30" selection-end-line="14" selection-end-column="30" />
+          <folding>
+            <element signature="e#69#88#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/gmolmodel/World.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="530">
+          <caret line="259" column="20" selection-start-line="259" selection-start-column="20" selection-end-line="259" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/World.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="122" column="68" lean-forward="true" selection-start-line="122" selection-start-column="68" selection-end-line="122" selection-end-column="68" />
         </state>
       </provider>
     </entry>
