@@ -458,24 +458,33 @@ Topology& World::updTopology(int moleculeNumber){
     return *(topologies[moleculeNumber]);
 }
 
-// Returns: the inner vector represents the locations as a pair of bSpecificAtom
-// toget various indeces from and a location. The outer vector represents the compounds.
-// The two worlds have to be identical
-// This iterates through all the molecules
-std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > World::getAtomsLocationsInGround(const SimTK::State & state)
+/** Return a 2D vector representing all the coordinates of this World.
+ * The first dimension represents the molecules (topologies) and the second
+ * dimension (inner) represents the coordinates. The second inner dimension
+ * type is pair of bSpecificAtom* and a Vec3. Thus, besides coordinates, it
+ * contains all the information in bSpecificAtom as well.
+ **/
+std::vector < std::vector < std::pair <bSpecificAtom *, SimTK::Vec3> > >
+        World::getAtomsLocationsInGround(const SimTK::State & state)
 {
-    std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > > returnVector;
+    std::vector< std::vector< std::pair<bSpecificAtom *, SimTK::Vec3> > >
+            returnVector;
 
     // Iterate through topologies
     for ( unsigned int i = 0; i < this->topologies.size(); i++){
         std::vector<std::pair<bSpecificAtom *, SimTK::Vec3>> currentTopologyInfo;
         // Iterate through atoms
         for(int j = 0; j < (topologies[i])->getNumAtoms(); j++){
-            SimTK::Compound::AtomIndex compoundAtomIndex = topologies[i]->bAtomList[j].getCompoundAtomIndex();
-            SimTK::Vec3 location = (topologies[i])->calcAtomLocationInGroundFrame(state, compoundAtomIndex);
-            currentTopologyInfo.push_back(std::pair<bSpecificAtom *, SimTK::Vec3>(&((topologies[i])->bAtomList[j]), location));
+            SimTK::Compound::AtomIndex compoundAtomIndex
+                = topologies[i]->bAtomList[j].getCompoundAtomIndex();
+
+            SimTK::Vec3 location = (topologies[i])
+                    ->calcAtomLocationInGroundFrame(state, compoundAtomIndex);
+
+            currentTopologyInfo.emplace_back(
+                    &((topologies[i])->bAtomList[j]), location);
         }
-        returnVector.push_back(currentTopologyInfo);
+        returnVector.emplace_back(currentTopologyInfo);
     }
 
     return returnVector;

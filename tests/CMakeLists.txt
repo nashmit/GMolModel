@@ -121,6 +121,7 @@ set(TESTS_SRCS
         TestWriteDCD.cpp
         Robosample.cpp
         TestTopology.cpp
+        TestSetupReader.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})
