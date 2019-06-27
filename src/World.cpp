@@ -462,7 +462,8 @@ Topology& World::updTopology(int moleculeNumber){
  * The first dimension represents the molecules (topologies) and the second
  * dimension (inner) represents the coordinates. The second inner dimension
  * type is pair of bSpecificAtom* and a Vec3. Thus, besides coordinates, it
- * contains all the information in bSpecificAtom as well.
+ * contains all the information in bSpecificAtom as well. The bottleneck here
+ * is the calcAtomLocationInGroundFrame from Compound.
  **/
 std::vector < std::vector < std::pair <bSpecificAtom *, SimTK::Vec3> > >
         World::getAtomsLocationsInGround(const SimTK::State & state)
@@ -528,7 +529,7 @@ SimTK::State& World::setAtomsLocationsInGround(
     for(unsigned int i = 0; i < otherWorldsAtomsLocations.size(); i++){
 
         // When in Debug mode
-        //paraMolecularDecorator->setAtomTargets(otherWorldsAtomsLocations[i]);
+        paraMolecularDecorator->setAtomTargets(otherWorldsAtomsLocations[i]);
 
         // Get the Ground to Top Transform
         SimTK::Transform G_X_T = topologies[i]->getTopLevelTransform();
@@ -702,8 +703,20 @@ SimTK::State& World::setAtomsLocationsInGround(
                 if(int(mbx) == 1){ // TODO: doesn't work for multiple molecules
                     ((SimTK::MobilizedBody::Free&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
                 }else{
-                    ((SimTK::MobilizedBody::Pin&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]); // NEW
+
+                    // Pin
+                    ((SimTK::MobilizedBody::Pin&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
                     ((SimTK::MobilizedBody::Pin&)mobod).setDefaultQ(inboardBondDihedralAngles[int(mbx)]);
+
+                    // Ball
+                    //((SimTK::MobilizedBody::Ball&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
+                    //SimTK::Rotation R_FM;
+                    //R_FM.setRotationFromAngleAboutX(0.0);
+                    //R_FM.setRotationFromAngleAboutY(0.0);
+                    //R_FM.setRotationFromAngleAboutZ(inboardBondDihedralAngles[int(mbx)]);
+                    //((SimTK::MobilizedBody::Ball&)mobod).setDefaultRotation(R_FM);
+                    ////((SimTK::MobilizedBody::Ball&)mobod).setDefaultQ( Quaternion inboardBondDihedralAngles[int(mbx)] );
+
                 }
             }
 

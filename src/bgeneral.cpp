@@ -370,6 +370,7 @@ SimTK::Transform alignFlipAndTranslateFrameAlongXAxis(SimTK::Transform G_X_F1, S
 
     // Get rotation axis and angle with dot and cross products
     SimTK::Real cosAngle = SimTK::dot(SimTK::UnitVec3(F1_F1v1), SimTK::UnitVec3(1, 0, 0));
+    //std::cout << "F1_F1v1 " << F1_F1v1 << " F1_F1v1 normed " << SimTK::UnitVec3(F1_F1v1) << " cos with (1,0,0) " << cosAngle << std::endl;
     assert(cosAngle < 1.1); 
     assert(cosAngle > -1.1);
     if (cosAngle > 1.0) cosAngle = 1.0;

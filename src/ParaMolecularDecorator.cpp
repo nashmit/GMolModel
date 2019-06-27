@@ -141,7 +141,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 // */
 
 
-    //SimTK::Transform G_X_T = molecules[0]->getTopLevelTransform();
+    SimTK::Transform G_X_T = molecules[0]->getTopLevelTransform();
 /*
     // Draw Compound transforms for root atoms OLD WAY
     // Get transforms and locations: P_X_M, root_X_atom.p()
@@ -222,7 +222,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
 
 
-/*
+
     // Draw Compound transforms for root atoms NEW WAY
             SimTK::Transform M_X_pin = SimTK::Rotation(-90*SimTK::Deg2Rad, SimTK::YAxis); // Moves rotation from X to Z
             SimTK::Transform P_X_F[matter->getNumBodies()]; // related to X_PFs
@@ -232,37 +232,37 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             SimTK::Angle inboardBondDihedralAngles[matter->getNumBodies()]; // related to X_FMs
             SimTK::Real inboardBondLengths[matter->getNumBodies()]; // related to X_FMs
             SimTK::Vec3 locs[molecules[0]->getNumAtoms()];
- */
- /*
+
+ ///*
 
             // Iterate through atoms - get T_X_roots for all the bodies
-            for (SimTK::Compound::AtomIndex aIx(0); aIx < residue->getNumAtoms(); ++aIx){
-                if(residue->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
+            for (SimTK::Compound::AtomIndex aIx(0); aIx < molecules[0]->getNumAtoms(); ++aIx){
+                if(molecules[0]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
                     // Get body
-                    SimTK::MobilizedBodyIndex mbx = residue->getAtomMobilizedBodyIndex(aIx);
-                    T_X_root[int(mbx)] = residue->calcDefaultAtomFrameInCompoundFrame(aIx);
+                    SimTK::MobilizedBodyIndex mbx = molecules[0]->getAtomMobilizedBodyIndex(aIx);
+                    T_X_root[int(mbx)] = molecules[0]->calcDefaultAtomFrameInCompoundFrame(aIx);
                 }
             }
 
             P_X_F[1] = G_X_T * T_X_root[1]; // NEW
             // Iterate through atoms - get P_X_F for all the bodies
-            for (SimTK::Compound::AtomIndex aIx(1); aIx < residue->getNumAtoms(); ++aIx){
-                if(residue->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
+            for (SimTK::Compound::AtomIndex aIx(1); aIx < molecules[0]->getNumAtoms(); ++aIx){
+                if(molecules[0]->getAtomLocationInMobilizedBodyFrame(aIx) == 0){ // atom is at body's origin
 
                     // Get body, parentBody, parentAtom
-                    SimTK::MobilizedBodyIndex mbx = residue->getAtomMobilizedBodyIndex(aIx);
+                    SimTK::MobilizedBodyIndex mbx = molecules[0]->getAtomMobilizedBodyIndex(aIx);
                     const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
                     const SimTK::MobilizedBody& parentMobod =  mobod.getParentMobilizedBody();
                     SimTK::MobilizedBodyIndex parentMbx = parentMobod.getMobilizedBodyIndex();
 
                     if(parentMobod.getMobilizedBodyIndex() != 0){ // parent not Ground
-                        SimTK::Compound::AtomIndex parentAIx = (residue->getMbx2aIx()).at(parentMbx);
+                        SimTK::Compound::AtomIndex parentAIx = (molecules[0]->getMbx2aIx()).at(parentMbx);
 
                         T_X_Proot = T_X_root[parentMbx]; // NEW
 
                         // Get inboard dihedral angle and put in root_X_M0 !!!!!!!
-                        inboardBondDihedralAngles[int(mbx)] = residue->bgetDefaultInboardDihedralAngle(aIx);
-                        inboardBondLengths[int(mbx)] = residue->bgetDefaultInboardBondLength(aIx);
+                        inboardBondDihedralAngles[int(mbx)] = molecules[0]->bgetDefaultInboardDihedralAngle(aIx);
+                        inboardBondLengths[int(mbx)] = molecules[0]->bgetDefaultInboardBondLength(aIx);
                         root_X_M0[int(mbx)] = SimTK::Transform(
                             SimTK::Rotation(inboardBondDihedralAngles[int(mbx)], SimTK::XAxis)
                         );
@@ -275,15 +275,15 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
                         // Draw root 
                         SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)];
-                        std::ostringstream streamObj_r;
-                        streamObj_r << std::string("r") + std::to_string(int(mbx));
-                        std::string text_r = streamObj_r.str();
-                        DecorativeText decorativeText_r(text_r);
-                        SimTK::Transform textOffset_r(SimTK::Rotation(), SimTK::Vec3(0.01, 0.0, 0.0));
-                        decorativeText_r.setTransform(G_X_root * textOffset_r);
-                        decorativeText_r.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
-                        decorativeText_r.setColor(SimTK::Vec3(0, 1, 0));
-                        geometry.push_back(decorativeText_r);
+                        //std::ostringstream streamObj_r;
+                        //streamObj_r << std::string("r") + std::to_string(int(mbx));
+                        //std::string text_r = streamObj_r.str();
+                        //DecorativeText decorativeText_r(text_r);
+                        //SimTK::Transform textOffset_r(SimTK::Rotation(), SimTK::Vec3(0.01, 0.0, 0.0));
+                        //decorativeText_r.setTransform(G_X_root * textOffset_r);
+                        //decorativeText_r.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+                        //decorativeText_r.setColor(SimTK::Vec3(0, 1, 0));
+                        //geometry.push_back(decorativeText_r);
             
                         DecorativeFrame decorativeFrame_r;
                         //decorativeFrame_r.setTransform(G_X_root * textOffset_r);
@@ -422,10 +422,11 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     // Draw Compound transforms for periferic atoms NEW WAY
     // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
 
-    for (SimTK::Compound::AtomIndex aIx(1); aIx < residue->getNumAtoms(); ++aIx){
-        SimTK::MobilizedBodyIndex mbx = residue->getAtomMobilizedBodyIndex(aIx);
-        if(residue->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is not at body's origin
+    for (SimTK::Compound::AtomIndex aIx(1); aIx < molecules[0]->getNumAtoms(); ++aIx){
+        SimTK::MobilizedBodyIndex mbx = molecules[0]->getAtomMobilizedBodyIndex(aIx);
+        if(molecules[0]->getAtomLocationInMobilizedBodyFrame(aIx) != 0){ // atom is not at body's origin
             SimTK::Transform G_X_root = G_X_T * T_X_root[int(mbx)]; // NEW
+            assert(atomTargets[aIx][0]); // We have to set it in World
             SimTK::Vec3 G_vchild = atomTargets[aIx]; //NEW
             SimTK::Vec3 G_vroot = G_X_root.p(); // NEW
             SimTK::Vec3 G_v = G_vchild - G_vroot; // NEW
@@ -450,24 +451,24 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             //geometry.push_back(decorativeText_c);
 
             // Text
-            std::ostringstream streamObj;
-            streamObj << std::fixed;
-            streamObj << std::setprecision(3);
-            streamObj << G_X_child.p()[2];
-            std::string text1 = streamObj.str();
-            DecorativeText decorativeText1(text1);
-            decorativeText1.setTransform(G_X_child);
-            decorativeText1.setScaleFactors(SimTK::Vec3(0.02, 0.02, 0.02));
-            decorativeText1.setColor(SimTK::Vec3(0, 0, 0));
-            geometry.push_back(decorativeText1);
+            //std::ostringstream streamObj;
+            //streamObj << std::fixed;
+            //streamObj << std::setprecision(3);
+            //streamObj << G_X_child.p()[2];
+            //std::string text1 = streamObj.str();
+            //DecorativeText decorativeText1(text1);
+            //decorativeText1.setTransform(G_X_child);
+            //decorativeText1.setScaleFactors(SimTK::Vec3(0.02, 0.02, 0.02));
+            //decorativeText1.setColor(SimTK::Vec3(0, 0, 0));
+            //geometry.push_back(decorativeText1);
 
-            //DecorativeFrame decorativeFrame_c;
-            ////decorativeFrame_c.setTransform(G_X_child * textOffset_c);
-            //decorativeFrame_c.setTransform(G_X_child);
-            //decorativeFrame_c.setScaleFactors(SimTK::Vec3(0.04, 0.04, 0.04));
-            //decorativeFrame_c.setLineThickness(4);
-            //decorativeFrame_c.setColor(SimTK::Vec3(1, 0, 1));
-            //geometry.push_back( decorativeFrame_c );
+            DecorativeFrame decorativeFrame_c;
+            //decorativeFrame_c.setTransform(G_X_child * textOffset_c);
+            decorativeFrame_c.setTransform(G_X_child);
+            decorativeFrame_c.setScaleFactors(SimTK::Vec3(0.04, 0.04, 0.04));
+            decorativeFrame_c.setLineThickness(4);
+            decorativeFrame_c.setColor(SimTK::Vec3(1, 0, 1));
+            geometry.push_back( decorativeFrame_c );
 
             // Line between root and child in Ground
             //DecorativeLine decorativeLine_rc2(G_vroot + textOffset_c.p(), G_vchild + textOffset_c.p());
@@ -517,7 +518,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
     }
 // */
 
- /*
+ ///*
     // Draw Rigid bodies
     for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
         const SimTK::MobilizedBody& mobod = matter->getMobilizedBody(mbx);
