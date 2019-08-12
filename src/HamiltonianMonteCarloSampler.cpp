@@ -343,8 +343,16 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState)
     this->etot_proposed = getOldPE() + getProposedKE() + getOldFixman();
 
 
+    //for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx) {
+    //    const SimTK::MobilizedBody &mobod = matter->getMobilizedBody(mbx);
+    //    SimTK::MassProperties mp = mobod.getBodyMassProperties(someState);
+    //    std::cout << "BALLBUG 1 MassProperties propose mbx " << int(mbx) << " isNaN " << mp.isNaN() << std::endl;
+    //}
+
     // Integrate (propagate trajectory)
     this->timeStepper->stepTo(someState.getTime() + (timestep*MDStepsPerSample)); // NEW
+
+
 
 }
 

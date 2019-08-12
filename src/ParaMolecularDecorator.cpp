@@ -418,7 +418,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
 // */
 
- /*
+ ///*
     // Draw Compound transforms for periferic atoms NEW WAY
     // Set transforms inside the bodies = root_X_atom.p; Set locations for everyone
 
@@ -439,16 +439,16 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             SimTK::Transform G_X_child = G_X_root * root_X_child;
 
             // Draw F (Proot_X_Mr in this case) in Ground recovered from P_X_F
-            //std::ostringstream streamObj_c;
-            //streamObj_c << std::string("c") + std::to_string(int(aIx));
-            //std::string text_c = streamObj_c.str();
-            //DecorativeText decorativeText_c(text_c);
-            //SimTK::Transform textOffset_c(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
-            ////decorativeText_c.setTransform(G_X_child * textOffset_c);
-            //decorativeText_c.setTransform(G_X_child);
-            //decorativeText_c.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
-            //decorativeText_c.setColor(SimTK::Vec3(1, 0, 1));
-            //geometry.push_back(decorativeText_c);
+            std::ostringstream streamObj_c;
+            streamObj_c << std::string("c") + std::to_string(int(aIx));
+            std::string text_c = streamObj_c.str();
+            DecorativeText decorativeText_c(text_c);
+            SimTK::Transform textOffset_c(SimTK::Rotation(), SimTK::Vec3(0.0, 0.01, 0.0));
+            //decorativeText_c.setTransform(G_X_child * textOffset_c);
+            decorativeText_c.setTransform(G_X_child);
+            decorativeText_c.setScaleFactors(SimTK::Vec3(0.008, 0.008, 0.008));
+            decorativeText_c.setColor(SimTK::Vec3(1, 0, 1));
+            geometry.push_back(decorativeText_c);
 
             // Text
             //std::ostringstream streamObj;

@@ -267,7 +267,7 @@ public:
     bool visual;
 
     // Our decorations
-    ParaMolecularDecorator *paraMolecularDecorator;
+    ParaMolecularDecorator *paraMolecularDecorator = nullptr;
 
     // Decoration subsystem
     SimTK::DecorationSubsystem *decorations;

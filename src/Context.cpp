@@ -576,7 +576,7 @@ void Context::Run(int howManyRounds, float Ti, float Tf)
 // TIME START
 
             for(unsigned int worldIx = 0; worldIx < getNofWorlds(); worldIx++){ // Iterate worlds
-    
+
                 // Rotate worlds indeces (translate from right to left)
                 std::rotate(worldIndexes.begin(), worldIndexes.begin() + 1, worldIndexes.end());
 

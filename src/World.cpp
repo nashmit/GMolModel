@@ -509,6 +509,7 @@ void World::updateAtomLists(const SimTK::State & state)
     }
 }
 
+
 /** Set Compound, MultibodySystem and DuMM configurations according to
 some other World's atoms **/ 
 SimTK::State& World::setAtomsLocationsInGround(
@@ -517,6 +518,7 @@ SimTK::State& World::setAtomsLocationsInGround(
                 std::vector<
                         std::pair<bSpecificAtom *, SimTK::Vec3> > > otherWorldsAtomsLocations)
 {
+
     // Get the total no of bodies in this world (each World has its own
     // SimbodyMatterSubsystem)
     int totalNofBodies = matter->getNumBodies();
@@ -526,10 +528,12 @@ SimTK::State& World::setAtomsLocationsInGround(
     SimTK::Transform T_X_root[totalNofBodies]; // related to CompoundAtom.frameInMobilizedBodyFrame s
 
     // Iterate through molecules/topologies
-    for(unsigned int i = 0; i < otherWorldsAtomsLocations.size(); i++){
+    for(unsigned int i = 0; i < otherWorldsAtomsLocations.size(); i++) {
 
         // When in Debug mode
-        paraMolecularDecorator->setAtomTargets(otherWorldsAtomsLocations[i]);
+        if (visual == true) {
+            paraMolecularDecorator->setAtomTargets(otherWorldsAtomsLocations[i]);
+        }
 
         // Get the Ground to Top Transform
         SimTK::Transform G_X_T = topologies[i]->getTopLevelTransform();
@@ -705,16 +709,16 @@ SimTK::State& World::setAtomsLocationsInGround(
                 }else{
 
                     // Pin
-                    ((SimTK::MobilizedBody::Pin&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
-                    ((SimTK::MobilizedBody::Pin&)mobod).setDefaultQ(inboardBondDihedralAngles[int(mbx)]);
+                    //((SimTK::MobilizedBody::Pin&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
+                    //((SimTK::MobilizedBody::Pin&)mobod).setDefaultQ(inboardBondDihedralAngles[int(mbx)]);
 
                     // Ball
-                    //((SimTK::MobilizedBody::Ball&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
-                    //SimTK::Rotation R_FM;
-                    //R_FM.setRotationFromAngleAboutX(0.0);
-                    //R_FM.setRotationFromAngleAboutY(0.0);
-                    //R_FM.setRotationFromAngleAboutZ(inboardBondDihedralAngles[int(mbx)]);
-                    //((SimTK::MobilizedBody::Ball&)mobod).setDefaultRotation(R_FM);
+                    ((SimTK::MobilizedBody::Ball&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
+                    SimTK::Rotation R_FM;
+                    R_FM.setRotationFromAngleAboutX(0.0);
+                    R_FM.setRotationFromAngleAboutY(0.0);
+                    R_FM.setRotationFromAngleAboutZ(inboardBondDihedralAngles[int(mbx)]);
+                    ((SimTK::MobilizedBody::Ball&)mobod).setDefaultRotation(R_FM);
                     ////((SimTK::MobilizedBody::Ball&)mobod).setDefaultQ( Quaternion inboardBondDihedralAngles[int(mbx)] );
 
                 }
@@ -821,6 +825,7 @@ SimTK::State& World::setAtomsLocationsInGround(
     updateAtomLists(someState);
 
     return someState;
+
 }
 
 

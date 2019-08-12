@@ -651,6 +651,7 @@ void Topology::buildAcyclicGraph(bSpecificAtom *node, bSpecificAtom *previousNod
 
                 // Perform the actual bonding
                 // (Compound::SingleAtom&, BondCenterPathName, Length, Angle
+                std::string debugString = parentBondCenterPathName.str();
                 this->bondAtom(*node->bAtomType,
                         (parentBondCenterPathName.str()).c_str(), 0.149, 0);
 
@@ -827,9 +828,9 @@ void Topology::setFlexibility(std::string argRegimen, std::string flexFN){
         }
     }else if(argRegimen == "TD"){
         for (unsigned int r=0 ; r<getNumBonds(); r++){
-            setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
+            setBondMobility(BondMobility::Ball, Compound::BondIndex(r));
             bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
-                    BondMobility::Torsion);
+                    BondMobility::Ball);
         }
     }else if(argRegimen == "RB"){
 
@@ -838,12 +839,19 @@ void Topology::setFlexibility(std::string argRegimen, std::string flexFN){
             setBondMobility(BondMobility::Rigid, SimTK::Compound::BondIndex(r));
         }
         for (unsigned int r=0 ; r<getNumBonds(); r++){
-            bonds[r].setBondMobility(BondMobility::Torsion);
+            bonds[r].setBondMobility(BondMobility::Rigid); // TODO: Change to rigid
         }
 
         // Get flexible bonds from file. Numbering starts at 0 in prmtop
         std::string line;
         std::ifstream F(flexFN);
+
+        //printMaps();
+        std::cout << "GmolBond2bondIx " << GmolBond2bondIx.size() << std::endl;
+        //std::cout << "GmolBond2bondIx:" << std::endl;
+        //for(unsigned int i = 0; i < nbonds; i++){
+        //    std::cout << i << ' ' << GmolBond2bondIx.at(i) << std::endl;
+        //}
 
         while(F.good()){
             std::getline(F, line);
@@ -863,8 +871,8 @@ void Topology::setFlexibility(std::string argRegimen, std::string flexFN){
                     for(unsigned int i = 0; i < nbonds; i++){
                         if(bonds[i].isThisMe(
                           std::stoi(lineWords[0]), std::stoi(lineWords[1])) ){
-                            bonds[i].setBondMobility(BondMobility::Torsion);
-                            setBondMobility(BondMobility::Torsion,
+                            bonds[i].setBondMobility(BondMobility::Ball);
+                            setBondMobility(BondMobility::Ball,
                                     GmolBond2bondIx.at(i));
                             break;
                         }
