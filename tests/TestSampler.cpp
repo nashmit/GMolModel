@@ -7,6 +7,8 @@
 #include <iostream>
 #include "Sampler.hpp"
 
+#include <numeric>
+
 #define ASSERT(cond) {SimTK_ASSERT_ALWAYS(cond, "Assertion failed");}
 
 #define ASSERT_EQUAL(val1, val2) {ASSERT(std::abs(val1-val2) < 1e-10);}

@@ -2,9 +2,10 @@
 #define __SAMPLER_HPP__
 
 #include "Robo.hpp"
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
-#include <boost/random/normal_distribution.hpp>
+#include <random>
+// #include <boost/random/mersenne_twister.hpp>
+// #include <boost/random/uniform_real_distribution.hpp>
+// #include <boost/random/normal_distribution.hpp>
 
 #ifndef PRINT_BUFFER_SIZE
 #define PRINT_BUFFER_SIZE 4096
@@ -80,21 +81,21 @@ public:
     unsigned long long int seed;
 
     // Random number generators - not sure if I need two
-    boost::random::mt19937 randomEngine = boost::random::mt19937();
+    std::mt19937 randomEngine = std::mt19937();
 
-    boost::random::uniform_real_distribution<double> uniformRealDistribution_0_2pi =
-            boost::random::uniform_real_distribution<double>(SimTK::Zero, 2*SimTK::Pi);
+    std::uniform_real_distribution<double> uniformRealDistribution_0_2pi =
+            std::uniform_real_distribution<double>(SimTK::Zero, 2*SimTK::Pi);
 
-    boost::random::uniform_real_distribution<double> uniformRealDistribution_mpi_pi =
-            boost::random::uniform_real_distribution<double>((-1)*SimTK::Pi, SimTK::Pi);
+    std::uniform_real_distribution<double> uniformRealDistribution_mpi_pi =
+            std::uniform_real_distribution<double>((-1)*SimTK::Pi, SimTK::Pi);
 
-    boost::random::uniform_real_distribution<double> uniformRealDistribution =
-            boost::random::uniform_real_distribution<double>(SimTK::Zero, SimTK::One);
+    std::uniform_real_distribution<double> uniformRealDistribution =
+            std::uniform_real_distribution<double>(SimTK::Zero, SimTK::One);
 
-    boost::random::uniform_real_distribution<double> uniformRealDistribution_m1_1 =
-            boost::random::uniform_real_distribution<double>((-1)*SimTK::One, SimTK::One);
+    std::uniform_real_distribution<double> uniformRealDistribution_m1_1 =
+            std::uniform_real_distribution<double>((-1)*SimTK::One, SimTK::One);
 
-    boost::normal_distribution<> gaurand = boost::normal_distribution<>(0.0, 1.0);
+    std::normal_distribution<> gaurand = std::normal_distribution<>(0.0, 1.0);
 
  };
 
