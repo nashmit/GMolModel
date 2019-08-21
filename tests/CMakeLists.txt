@@ -122,6 +122,8 @@ set(TESTS_SRCS
         Robosample.cpp
         TestTopology.cpp
         TestSetupReader.cpp
+        TestBallLongPendulum.cpp
+        TestMatrix.cpp
 	)
 
 foreach(TEST_SRC ${TESTS_SRCS})
