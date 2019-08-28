@@ -89,9 +89,9 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
         SimTK::Vec3 p_GS2 = X_GB2 * p_BS2;
 
         geometry.push_back(DecorativeLine( p_GS1, p_GS2 ));
-        (geometry.back()).setLineThickness(4);
+        (geometry.back()).setLineThickness(3);
         if( mbx1 == mbx2 ){
-            (geometry.back()).setColor( Vec3(0.5, 0.5, 0.5) );
+            (geometry.back()).setColor( Vec3(0.5, 0.0, 1) );
         }else{
             (geometry.back()).setColor( Vec3(1, 0, 1) );
         }
@@ -586,9 +586,10 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             geometry.push_back(decorativeTextF);
 
             // Line between P and F
-            DecorativeLine decorativeLinePF(G_X_P.p(), G_X_F.p());
-            decorativeLinePF.setLineThickness(3);
-            geometry.push_back(decorativeLinePF);
+            //DecorativeLine decorativeLinePF(G_X_P.p(), G_X_F.p());
+            //decorativeLinePF.setLineThickness(3);
+            //decorativeLinePF.setColor(SimTK::Vec3(1, 0, 0));
+            //geometry.push_back(decorativeLinePF);
 
             // M
             //DecorativeSphere decorativeSphereM(0.02);
@@ -616,7 +617,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
 
             // Line between P and F
             DecorativeLine decorativeLineFM(G_X_F.p(), G_X_M.p());
-            decorativeLineFM.setLineThickness(3);
+            decorativeLineFM.setLineThickness(4);
             decorativeLineFM.setColor(SimTK::Vec3(1, 0, 0));
             geometry.push_back(decorativeLineFM);
 

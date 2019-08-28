@@ -588,8 +588,8 @@ SimTK::State& World::setAtomsLocationsInGround(
 
         // END IC regimen
 
-        }else if((topologies[i]->getRegimen() == "TD") || (topologies[i]->getRegimen() == "RB")){
-
+        //}else if((topologies[i]->getRegimen() == "TD") || (topologies[i]->getRegimen() == "RB")){
+        }else{
             //std::cout << "setAtomsLoc World TD" << std::endl << std::flush;
             // Create atomTargets
             std::map<SimTK::Compound::AtomIndex, SimTK::Vec3> atomTargets;
@@ -704,15 +704,13 @@ SimTK::State& World::setAtomsLocationsInGround(
             // Set X_PF and Q
             for (SimTK::MobilizedBodyIndex mbx(1); mbx < matter->getNumBodies(); ++mbx){
                 SimTK::MobilizedBody& mobod = matter->updMobilizedBody(mbx);
-                if(int(mbx) == 1){ // TODO: doesn't work for multiple molecules
+
+                if(mobod.getNumU(someState) == 6){ // Free mobilizer
                     ((SimTK::MobilizedBody::Free&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
-                }else{
-
-                    // Pin
-                    //((SimTK::MobilizedBody::Pin&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
-                    //((SimTK::MobilizedBody::Pin&)mobod).setDefaultQ(inboardBondDihedralAngles[int(mbx)]);
-
-                    // Ball
+                } else if(mobod.getNumU(someState) == 1){ // Pin mobilizer
+                    ((SimTK::MobilizedBody::Pin &) mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
+                    ((SimTK::MobilizedBody::Pin &) mobod).setDefaultQ(inboardBondDihedralAngles[int(mbx)]);
+                } else if(mobod.getNumU(someState) == 3){ // Ball mobilizer
                     ((SimTK::MobilizedBody::Ball&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
                     SimTK::Rotation R_FM;
                     R_FM.setRotationFromAngleAboutX(0.0);
@@ -720,8 +718,27 @@ SimTK::State& World::setAtomsLocationsInGround(
                     R_FM.setRotationFromAngleAboutZ(inboardBondDihedralAngles[int(mbx)]);
                     ((SimTK::MobilizedBody::Ball&)mobod).setDefaultRotation(R_FM);
                     ////((SimTK::MobilizedBody::Ball&)mobod).setDefaultQ( Quaternion inboardBondDihedralAngles[int(mbx)] );
-
                 }
+
+/*                if(int(mbx) == 1){ // TODO: doesn't work for multiple molecules
+                    ((SimTK::MobilizedBody::Free&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
+                }else{
+                    if(topologies[i]->getRegimen() == "TD") {
+                        // Pin
+                        ((SimTK::MobilizedBody::Pin &) mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
+                        ((SimTK::MobilizedBody::Pin &) mobod).setDefaultQ(inboardBondDihedralAngles[int(mbx)]);
+                    }else if(topologies[i]->getRegimen() == "BA") {
+                        // Ball
+                        ((SimTK::MobilizedBody::Ball&)mobod).setDefaultInboardFrame(P_X_F[int(mbx)]);
+                        SimTK::Rotation R_FM;
+                        R_FM.setRotationFromAngleAboutX(0.0);
+                        R_FM.setRotationFromAngleAboutY(0.0);
+                        R_FM.setRotationFromAngleAboutZ(inboardBondDihedralAngles[int(mbx)]);
+                        ((SimTK::MobilizedBody::Ball&)mobod).setDefaultRotation(R_FM);
+                        ////((SimTK::MobilizedBody::Ball&)mobod).setDefaultQ( Quaternion inboardBondDihedralAngles[int(mbx)] );
+                    }
+
+                }*/
             }
 
             // Set mass properties for mobilized bodies

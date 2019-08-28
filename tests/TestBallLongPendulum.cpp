@@ -37,54 +37,84 @@ int main() {
     SimbodyMatterSubsystem matter(system);
     GeneralForceSubsystem forces(system);
     Force::UniformGravity noGravity(forces, matter, Vec3(0, 0, 0));
+    Random::Gaussian random;
+    random.setSeed(time(NULL));
 
     // First body
+    Real mass = 0;
     Inertia inertia(0);
     Vec3 com(0);
-    Real mass = 17.007975980000001;
+/*    Real mass = 17.007975980000001;
     com = Vec3(0, 0.059264899079425913, 0);
     inertia += Inertia(Vec3(0,0,0), 16);
-    inertia += Inertia(Vec3(0,1,0), 1);
-
-    std::cout << "Inertia tensor " << inertia << std::endl;
+    inertia += Inertia(Vec3(0,1,0), 1);*/
+/*     Real mass = 32;
+     com = Vec3(0, 0.5, 0);
+     inertia += Inertia(Vec3(0,0,0), 16);
+     inertia += Inertia(Vec3(0,1,0), 16);
+    //std::cout << "Inertia tensor " << inertia << std::endl;
 
     //inertia = Inertia(1);
 
     Body::Rigid freeBody(MassProperties(mass, com, inertia));
     MobilizedBody::Free first(matter.Ground(),
-                                Transform(Vec3(0, 1, 0)),      // X_PF
+                                Transform(Vec3(0, 0, 0)),      // X_PF
                                 freeBody,            // Mass properties
-                                Transform(Vec3(0, 1, 0)) // X_BM
+                                Transform(Vec3(0, 0, 0)) // X_BM
     );
-    freeBody.addDecoration(Transform(), DecorativeSphere(0.1));
+    //freeBody.addDecoration(Transform(), DecorativeSphere(0.1));
+    freeBody.addDecoration(Transform(), DecorativeFrame());*/
 
     // Second body
-    inertia = Inertia(0);
-    mass = 17.007975980000001;
-    com = Vec3(0, 0.059264899079425913, 0);
-    inertia += Inertia(Vec3(0,0,0), 16);
-    inertia += Inertia(Vec3(0,1,0), 1);
+    //inertia = Inertia(0);
+    //mass = 17.007975980000001;
+    //com = Vec3(0, 0.059264899079425913, 0);
+    //inertia += Inertia(Vec3(0,0,0), 16);
+    //inertia += Inertia(Vec3(0,1,0), 1);
 
-    //inertia = Inertia(1);
+    mass = 16 ; //+ 16; //+ 16; //+ 16;
 
+    com += 16 * Vec3(0,0,0);
+    //com += 16 * Vec3(1,0,0);
+    //com += 16 * Vec3(0,1,0);
+    //com += 16 * Vec3(0,0,1);
+    com /= mass;
+
+    inertia += Inertia(Vec3(0, 0, 0), 16);
+    //inertia += Inertia(Vec3(1, 0, 0), 16);
+    //inertia += Inertia(Vec3(0, 1, 0), 16);
+    //inertia += Inertia(Vec3(0, 0, 1), 16);
+
+    std::cout << "Ball body initial mass " << mass << std::endl;
+    std::cout << "Ball body initial com " << com << std::endl;
+    std::cout << "Ball body initial inertia " << inertia << std::endl;
+
+    Transform X_PF_P(Vec3(random.getValue(), random.getValue(), random.getValue()));
+    //Transform P_X_M(Rotation(35*SimTK_DEGREE_TO_RADIAN, XAxis), Vec3(1, 0, 0));
+    //Transform M_X_pin(Rotation(-90*SimTK_DEGREE_TO_RADIAN, YAxis));
+    //std::cout << "Ball body initial X_PF " << P_X_M << std::endl;
     Body::Rigid ballBody(MassProperties(mass, com, inertia));
-    MobilizedBody::Ball second(first,
+    MobilizedBody::Ball second(matter.Ground(),
+            //P_X_M * M_X_pin,
             Transform(Vec3(0, 1, 0)),      // X_PF
             ballBody,            // Mass properties
-            Transform(Vec3(0, 1, 0)) // X_BM
+            Transform(Vec3(0, 0, 0)) // X_BM
     );
-    ballBody.addDecoration(Transform(), DecorativeSphere(0.1));
+    ballBody.addDecoration(Transform(), DecorativeFrame());
+    ballBody.addDecoration(Transform(Vec3(0, 0, 0)), DecorativeBrick());
+    //ballBody.addDecoration(Transform(Vec3(1, 0, 0)), DecorativeBrick());
+    //ballBody.addDecoration(Transform(Vec3(0, 1, 0)), DecorativeBrick());
+    //ballBody.addDecoration(Transform(Vec3(0, 0, 1)), DecorativeBrick());
 
-    // Visualizer
+      // Visualizer
     Visualizer viz(system);
     system.addEventReporter(new Visualizer::Reporter(viz, 1./30));
     
     // Initialize the system and state.
     system.realizeTopology();
     State state = system.getDefaultState();
-    Random::Gaussian random;
-    for (int i = 0; i < state.getNQ(); ++i)
-        state.updQ()[i] = random.getValue();
+/*    for (int i = 0; i < state.getNQ(); ++i)
+        state.updQ()[i] = random.getValue();*/
 
       //for (int i = 0; i < state.getNU(); ++i)
        //   state.updU()[i] = random.getValue();
@@ -101,11 +131,13 @@ int main() {
     for(int i = 0; i < nofRounds; i++){
         ts.initialize(advState);
         for (int ui = 0; ui < advState.getNU(); ++ui){
-            advState.updU()[ui] = random.getValue() / 10;
+            advState.updU()[ui] = random.getValue() / 0.5;
         }
-        //system.realize(advState, Stage::Velocity);
+        system.realize(advState, Stage::Velocity);
         ts.stepTo(i * 3.0);
+        //ts.stepTo(0.000000000001);
     }
+    std::cout << "Finished" << std::endl;
 
   } catch(const std::exception& e) {
     std::cout << "EXCEPTION: " << e.what() << std::endl;

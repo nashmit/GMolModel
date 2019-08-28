@@ -58,9 +58,9 @@ void roundRealMatUseStr(Mat<3, 3, Real, 3, 1> &m, unsigned int precision)
 // Matrix square root
 struct _fcomplex { float re, im; };
 typedef struct _fcomplex fcomplex;
-Mat<3, 3, fComplex, 3, 1> sqrt(Mat<3, 3, fComplex, 3, 1>& m) {
+Mat<3, 3, Complex, 3, 1> generalMatrixSqrt(Mat<3, 3, fComplex, 3, 1> &m) {
 
-    Mat<3, 3, fComplex, 3, 1> sqrt_m; // dense, columnwise storage
+    Mat<3, 3, Complex, 3, 1> sqrt_m;
     int M = 3;
 
     // Perform Eigenvalue / Eigenvector decomposition
@@ -89,7 +89,6 @@ Mat<3, 3, fComplex, 3, 1> sqrt(Mat<3, 3, fComplex, 3, 1>& m) {
     int ldvr = N;
     fComplex *vr = new fComplex[ldvr*N];
 
-
     float *rwork = new float[2*N];
     int info;
 
@@ -109,11 +108,6 @@ Mat<3, 3, fComplex, 3, 1> sqrt(Mat<3, 3, fComplex, 3, 1>& m) {
         }
         std::cout << std::endl;
     }
-
-    //int lrwork = -1;
-    //int *iwork;
-    //int liwork = -1;
-    //cheevd_(jobz, uplo, N, A_rawData, lda, w_eigenValues, work_rawData, lwork, rwork, lrwork, iwork, liwork, info, 1, 1);
 
     std::cout << "info " << info << std::endl;
     std::cout << "w_eigenValues " << std::endl;
@@ -139,7 +133,7 @@ Mat<3, 3, fComplex, 3, 1> sqrt(Mat<3, 3, fComplex, 3, 1>& m) {
     }
 
     // Compute the square root
-    Mat<3, 3, fComplex, 3, 1> VL(0), VR(0), D(0);
+    Mat<3, 3, Complex, 3, 1> VL(0), VR(0), sqrtD(0);
     for(int i = 0; i < M; i++) {
         for(int j = 0; j < M; j++) {
             VL[i][j] = vl[(i*3) + j];
@@ -147,11 +141,15 @@ Mat<3, 3, fComplex, 3, 1> sqrt(Mat<3, 3, fComplex, 3, 1>& m) {
         }
     }
     for(int i = 0; i < M; i++) {
-        D[i][i] = w_eigenValues[i];
+        sqrtD[i][i] = std::sqrt(w_eigenValues[i]);
     }
 
     std::cout << "m should be " << std::endl;
-    std::cout << VL.transpose() * D * VR << std::endl;
+    sqrt_m = VL.transpose() * sqrtD * VR;
+    std::cout << sqrt_m << std::endl;
+
+    Vec3 oneVector(1);
+    std::cout << "sqrt_M * oneVector " << sqrt_m * oneVector << std::endl;
 
 
     return sqrt_m;
@@ -170,10 +168,10 @@ int main() {
     /***********************
      * Inverse of a real matrix
      ************************/
-     /*
+     /**/
     Mat<3, 3, Real, 3, 1> Mreal(1);
 
-    std::cout << "Version 0" << std::endl;
+/*    std::cout << "Version 0" << std::endl;
     Mreal[0][0] = 5.109256853263803854758862144081; Mreal[0][1] =  6.631074837371017771658898709575; Mreal[0][2] = 3.410527705547373056305104910280;
     Mreal[1][0] = 6.631074837371017771658898709575; Mreal[1][1] = 11.951585331463572714483234449290; Mreal[1][2] = -2.078098713674341624368935299572;
     Mreal[2][0] = 3.410527705547373500394314760342; Mreal[2][1] = -2.078098713674342512547354999697; Mreal[2][2] = 14.923205855272648534537438536063;
@@ -189,8 +187,9 @@ int main() {
     printMat(Mreal, 5);
     invM = lapackInverse(Mreal);
     std::cout << "M * invM" << std::endl; printMat(Mreal * invM, 2);
-    std::cout << "=============================================" << std::endl;
+    std::cout << "=============================================" << std::endl;*/
 
+/*
     std::cout << "Version 2" << std::endl;
     Mreal[0][0] = 5.109256; Mreal[0][1] =  6.631074; Mreal[0][2] = 3.410527;
     Mreal[1][0] = 6.631074; Mreal[1][1] = 11.951585; Mreal[1][2] = -2.078098;
@@ -225,8 +224,16 @@ int main() {
     std::cout << "Mcomplex" << std::endl; printMat(Mcomplex, 5);
 
     Mat<3, 3, Complex, 3, 1> sqrtM;
-    sqrtM = sqrt(Mcomplex);
+    sqrtM = generalMatrixSqrt(Mcomplex);
     //std::cout << "sqrtM" << std::endl; printMat(sqrtM, 5);
+
+    SpatialMat SpatialM(1);
+    std::cout << "Spatial matrix " << std::endl;
+    std::cout << SpatialM << std::endl;
+    std::cout << SpatialM[0] << std::endl;
+    std::cout << SpatialM[0][0] << std::endl;
+    std::cout << det(SpatialM[0][0]) << std::endl;
+
     // END
     return 0;
 }

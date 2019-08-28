@@ -826,12 +826,29 @@ void Topology::setFlexibility(std::string argRegimen, std::string flexFN){
             bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
                     BondMobility::Free);
         }
-    }else if(argRegimen == "TD"){
-        for (unsigned int r=0 ; r<getNumBonds(); r++){
-            setBondMobility(BondMobility::Ball, Compound::BondIndex(r));
+    }else if(argRegimen == "TD") {
+        for (unsigned int r = 0; r < getNumBonds(); r++) {
+            setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
             bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
-                    BondMobility::Ball);
+                    BondMobility::Torsion);
         }
+    }else if(argRegimen == "BA"){
+        for (unsigned int r=0 ; r<getNumBonds(); r++){
+            int  firstSpecificAtomIndex = bonds[bondIx2GmolBond[Compound::BondIndex(r)]].i;
+            int secondSpecificAtomIndex = bonds[bondIx2GmolBond[Compound::BondIndex(r)]].j;
+
+            if( (bAtomList[ firstSpecificAtomIndex].getNBonds() < 3) ||
+                (bAtomList[secondSpecificAtomIndex].getNBonds() < 3)){
+                setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
+                bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+                        BondMobility::Torsion);
+            }else{
+                setBondMobility(BondMobility::Ball, Compound::BondIndex(r));
+                bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+                        BondMobility::Ball);
+            }
+        }
+
     }else if(argRegimen == "RB"){
 
         // Set all Compound and Topology bonds to rigid
