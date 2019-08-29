@@ -284,7 +284,7 @@ float HamiltonianMonteCarloSampler::getTimestep(void)
 
 void HamiltonianMonteCarloSampler::setTimestep(float argTimestep)
 {
-    timeStepper->updIntegrator().setFixedStepSize(timestep);
+    timeStepper->updIntegrator().setFixedStepSize(argTimestep);
     this->timestep = argTimestep;
 }
 
@@ -350,10 +350,8 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState)
     //}
 
     // Integrate (propagate trajectory)
-    std::cout << "HMC propose timestep " << timestep << std::endl;
     this->timeStepper->stepTo(someState.getTime() + (timestep*MDStepsPerSample)); // NEW
-
-
+    std::cout << "HMC propose timestep " << timeStepper->getIntegrator().getPreviousStepSizeTaken() << std::endl;
 
 }
 
