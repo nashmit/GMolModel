@@ -741,6 +741,22 @@ void Topology::addRingClosingBonds() {
                     BondMobility::Rigid // CHANGE
             );
 
+            // Set bBond Molmodel Compound::BondIndex // TODO is this necessary ?
+            bonds[i].setBondIndex(Compound::BondIndex(getNumBonds() - 1));
+            bonds[i].setAsRingClosing();
+            std::pair<SimTK::Compound::BondIndex, int> pairToBeInserted(
+                    Compound::BondIndex(getNumBonds() - 1),
+                    bonds[i].getIndex()
+            );
+
+            bondIx2GmolBond.insert(pairToBeInserted);
+
+            GmolBond2bondIx.insert( std::pair<int, SimTK::Compound::BondIndex>(
+                    bonds[i].getIndex(),
+                    Compound::BondIndex(getNumBonds() - 1)
+            ) );
+            ////////////////////////////////////////////
+
             // Compound::setAtomBiotype(Compound::AtomPathName,
             // biotypeResidueName, biotypeAtomName
             // SimTK::Ordinality::Residue = SimTK::Ordinality::Any)
@@ -829,8 +845,19 @@ void Topology::setFlexibility(std::string argRegimen, std::string flexFN){
     }else if(argRegimen == "TD") {
         for (unsigned int r = 0; r < getNumBonds(); r++) {
             setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
+
+
+            std::cout << "bond maps " << Compound::BondIndex(r)
+                << " " << bondIx2GmolBond[Compound::BondIndex(r)]
+                << " " << bondIx2GmolBond.at(Compound::BondIndex(r)) << std::endl;
+
             bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
                     BondMobility::Torsion);
+
+            //bonds[bondIx2GmolBond.at(Compound::BondIndex(r))].setBondMobility(
+            //        BondMobility::Torsion);
+
+
         }
     }else if(argRegimen == "BA"){
         for (unsigned int r=0 ; r<getNumBonds(); r++){
