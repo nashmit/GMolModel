@@ -94,9 +94,9 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             (geometry.back()).setLineThickness(3);
             (geometry.back()).setColor( Vec3(0.5, 0.0, 1) );
         }else{
-            //geometry.push_back(DecorativeLine( p_GS1, p_GS2 ));
-            //(geometry.back()).setLineThickness(3);
-            //(geometry.back()).setColor( Vec3(1, 0, 1) );
+/*            geometry.push_back(DecorativeLine( p_GS1, p_GS2 ));
+            (geometry.back()).setLineThickness(3);
+            (geometry.back()).setColor( Vec3(1, 0, 1) );*/
         }
     }
 //    */
@@ -624,6 +624,7 @@ void ParaMolecularDecorator::generateDecorations(const State& someState,
             DecorativeLine decorativeLineFM(G_X_P.p(), G_X_F.p());
             decorativeLineFM.setLineThickness(4);
             if(mobod.getNumU(someState) == 3){
+                std::cout << "Ball bond decorated" << std::endl;
                 decorativeLineFM.setColor(SimTK::Vec3(1, 0, 0));
             }else{
                 decorativeLineFM.setColor(SimTK::Vec3(0, 1, 0));

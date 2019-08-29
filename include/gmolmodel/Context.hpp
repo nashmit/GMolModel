@@ -14,7 +14,7 @@ public:
     Context(std::string logFilenameArg);
     ~Context();
 
-    World * AddWorld(bool visual);
+    World * AddWorld(bool visual, SimTK::Real visualizerFrequency = 0.0015);
     //World * AddWorld(World *, bool visual);
 
     World * getWorld(void) const;

@@ -350,6 +350,7 @@ void HamiltonianMonteCarloSampler::propose(SimTK::State& someState)
     //}
 
     // Integrate (propagate trajectory)
+    std::cout << "HMC propose timestep " << timestep << std::endl;
     this->timeStepper->stepTo(someState.getTime() + (timestep*MDStepsPerSample)); // NEW
 
 

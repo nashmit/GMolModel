@@ -45,11 +45,11 @@ Context::Context(World *inp_p_world, std::string logFilename){
 }
 
 // Add an empty world to the context
-World * Context::AddWorld(bool visual){
+World * Context::AddWorld(bool visual, SimTK::Real visualizerFrequency){
 
     worldIndexes.push_back(worldIndexes.size());
 
-    World * inp_p_world = new World(worldIndexes.back(), visual);
+    World * inp_p_world = new World(worldIndexes.back(), visual, visualizerFrequency);
     worlds.push_back(inp_p_world);
 
     topFNs.push_back(std::vector<std::string>());
