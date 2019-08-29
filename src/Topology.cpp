@@ -839,7 +839,9 @@ void Topology::setFlexibility(std::string argRegimen, std::string flexFN){
     if(argRegimen == "IC"){
         for (unsigned int r=0 ; r<getNumBonds(); r++){
             setBondMobility(BondMobility::Free, Compound::BondIndex(r));
-            bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+            //bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+            //        BondMobility::Free);
+            bonds[bondIx2GmolBond.at(Compound::BondIndex(r))].setBondMobility(
                     BondMobility::Free);
         }
     }else if(argRegimen == "TD") {
@@ -847,15 +849,15 @@ void Topology::setFlexibility(std::string argRegimen, std::string flexFN){
             setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
 
 
-            std::cout << "bond maps " << Compound::BondIndex(r)
-                << " " << bondIx2GmolBond[Compound::BondIndex(r)]
-                << " " << bondIx2GmolBond.at(Compound::BondIndex(r)) << std::endl;
+            //std::cout << "bond maps " << Compound::BondIndex(r)
+            //    << " " << bondIx2GmolBond[Compound::BondIndex(r)]
+            //   << " " << bondIx2GmolBond.at(Compound::BondIndex(r)) << std::endl;
 
-            bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+            //bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+            //       BondMobility::Torsion);
+
+            bonds[bondIx2GmolBond.at(Compound::BondIndex(r))].setBondMobility(
                     BondMobility::Torsion);
-
-            //bonds[bondIx2GmolBond.at(Compound::BondIndex(r))].setBondMobility(
-            //        BondMobility::Torsion);
 
 
         }
@@ -872,16 +874,22 @@ void Topology::setFlexibility(std::string argRegimen, std::string flexFN){
             if((std::string(bAtomList[ firstSpecificAtomIndex].getFftype()) == "CA") ||
                (std::string(bAtomList[secondSpecificAtomIndex].getFftype() )== "CA")){
                 setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
-                bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+                //bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+                //        BondMobility::Torsion);
+                bonds[bondIx2GmolBond.at(Compound::BondIndex(r))].setBondMobility(
                         BondMobility::Torsion);
             } else if( (bAtomList[ firstSpecificAtomIndex].getNBonds() < 3) ||
                 (bAtomList[secondSpecificAtomIndex].getNBonds() < 3)){
                 setBondMobility(BondMobility::Torsion, Compound::BondIndex(r));
-                bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+                //bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+                //        BondMobility::Torsion);
+                bonds[bondIx2GmolBond.at(Compound::BondIndex(r))].setBondMobility(
                         BondMobility::Torsion);
             }else{
                 setBondMobility(BondMobility::Ball, Compound::BondIndex(r));
-                bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+                //bonds[bondIx2GmolBond[Compound::BondIndex(r)]].setBondMobility(
+                //        BondMobility::Ball);
+                bonds[bondIx2GmolBond.at(Compound::BondIndex(r))].setBondMobility(
                         BondMobility::Ball);
             }
         }
